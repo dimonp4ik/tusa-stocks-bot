@@ -1622,9 +1622,10 @@ def webhook():
             _reply(chat_id, f"Ошибка: {e}")
         return "ok", 200
 
-    # /start → постоянное меню (у админов расширенное, только в ЛС)
+    # /start → постоянное меню (у админов расширенное — ЛС и группа, группа
+    # для этого бота admin-only, так что гейт по is_dm тут не нужен)
     if text == "/start":
-        _send_persistent_menu(chat_id, is_admin=(is_dm and _is_admin(user_id)))
+        _send_persistent_menu(chat_id, is_admin=_is_admin(user_id))
 
     # 🛠 Кнопка "Админ панель" → инлайн-панель
     elif text == "🛠 админ панель":
