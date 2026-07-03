@@ -5,7 +5,7 @@ Sources (all free, no API key needed):
   - Reuters Business RSS
   - CNBC Markets RSS
   - BBC Business RSS
-  - CoinDesk RSS
+  - MarketWatch Top Stories RSS
 
 AI: Groq free tier (llama-3.1-8b-instant) — 14 400 req/day, ~200ms latency.
 Register free at https://groq.com → API Keys → Create Key → set GROQ_API_KEY in Render.
@@ -27,16 +27,14 @@ from email.utils import parsedate_to_datetime
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import GROQ_API_KEY, NEWS_LOOKBACK_HOURS
 
-# RSS sources — all public, no registration
+# RSS sources — all public, no registration. Crypto feeds (CoinDesk/Decrypt/
+# Cointelegraph/etc, inherited from the crypto bot fork) removed — this bot
+# trades stocks/ETF/commodities, crypto sentiment is noise for that macro read.
 RSS_FEEDS = [
-    ("Reuters",   "https://feeds.reuters.com/reuters/businessNews"),
-    ("CNBC",      "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839135"),
-    ("BBC Biz",   "https://feeds.bbci.co.uk/news/business/rss.xml"),
-    ("CoinDesk",  "https://www.coindesk.com/arc/outboundfeeds/rss/"),
-    ("Decrypt",   "https://decrypt.co/feed"),
-    ("Cointelegraph", "https://cointelegraph.com/rss"),
-    ("CryptoSlate",   "https://cryptoslate.com/feed/"),
-    ("BTC Magazine",  "https://bitcoinmagazine.com/feed"),
+    ("Reuters",     "https://feeds.reuters.com/reuters/businessNews"),
+    ("CNBC",        "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839135"),
+    ("BBC Biz",     "https://feeds.bbci.co.uk/news/business/rss.xml"),
+    ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
 ]
 
 
