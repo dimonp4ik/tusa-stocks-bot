@@ -1789,7 +1789,7 @@ def webhook():
     # /status — подробный статус
     elif text in ("/status", "/старт"):
         _reply(chat_id,
-               f"🤖 *TUSA CRYPTO BOT*\n"
+               f"🤖 *TUSA STOCKS BOT*\n"
                f"✅ Работает\n"
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
