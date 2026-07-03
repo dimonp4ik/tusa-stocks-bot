@@ -209,13 +209,19 @@ LOW_EDGE_SYMBOLS    = _parse_symbol_list(os.getenv("LOW_EDGE_SYMBOLS", ""))
 
 # 2026-06-05 A/B, 8640×15m: skipping NEAR FVG entries improved raw net (+9.99R),
 # WR/R-trade, and Monte Carlo while keeping trade count high.
+# QQQ: 2026-07-04 backtest (4mo, session-gated exits) — FVG entries 33tr −7.5R
+# vs OB +1.5R. Index intraday is mean-reverting; FVG-imbalance momentum entries
+# get chopped. OB entries (structural levels) survive. SPY unaffected (+9.8R).
 SOURCE_EDGE_FILTER     = os.getenv("SOURCE_EDGE_FILTER", "1") != "0"
-LOW_EDGE_FVG_SYMBOLS   = _parse_symbol_list(os.getenv("LOW_EDGE_FVG_SYMBOLS", ""))
+LOW_EDGE_FVG_SYMBOLS   = _parse_symbol_list(os.getenv("LOW_EDGE_FVG_SYMBOLS", "QQQ-USDT,QQQUSDT"))
 LOW_EDGE_OB_SYMBOLS    = _parse_symbol_list(os.getenv("LOW_EDGE_OB_SYMBOLS", ""))
 
 DIRECTION_EDGE_FILTER  = os.getenv("DIRECTION_EDGE_FILTER", "1") != "0"
 LOW_EDGE_LONG_SYMBOLS  = _parse_symbol_list(os.getenv("LOW_EDGE_LONG_SYMBOLS", ""))
-LOW_EDGE_SHORT_SYMBOLS = _parse_symbol_list(os.getenv("LOW_EDGE_SHORT_SYMBOLS", ""))
+# QQQ shorts: 9tr −8.7R (longs +2.7R). Structural, not noise: equity-index
+# return accrues overnight/up-drift (Elm "Night Moves"), dealer gamma flows
+# buy dips — 15m BOS shorts on the index fight that machinery.
+LOW_EDGE_SHORT_SYMBOLS = _parse_symbol_list(os.getenv("LOW_EDGE_SHORT_SYMBOLS", "QQQ-USDT,QQQUSDT"))
 
 # --- Context momentum pack (DEFAULT ON, validated together 2026-06-05) ----------
 # Weak relative strength and session-momentum mismatches → higher SL rate.
