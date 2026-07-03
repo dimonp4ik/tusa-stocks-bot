@@ -2709,9 +2709,9 @@ def start_bot():
         if not skip:
             open(_flag, "w").close()
             send_status(
-                "🤖 *Crypto Signal Bot Online*\n"
-                f"Сканирую акции/ETF/товары OKX (X-Perps) каждые {SCAN_INTERVAL_MINUTES} мин "
-                f"(Пн-Пт, 10:00–02:00 по Риге)."
+                "🤖 *TUSA Stocks Bot Online*\n"
+                f"Сканирую акции/ETF/товары OKX (X-Perps) каждые {SCAN_INTERVAL_MINUTES} мин, "
+                f"только пока открыт рынок США (Пн-Пт, часы/праздники — кнопка 🕐 Рынок США в панели)."
             )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
