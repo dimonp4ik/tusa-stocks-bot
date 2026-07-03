@@ -1,0 +1,41 @@
+# Secrets — never commit these
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pycache
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Database
+*.db
+signals.db
+
+# Backtest data cache (local pickles)
+backtest_cache/
+backtest_cache_hist/
+
+# Backtest scratch output
+bt_*.log
+*_trades.csv
+
+# Backtest dashboards
+*.html
+work_*.csv
+reports/*.csv
