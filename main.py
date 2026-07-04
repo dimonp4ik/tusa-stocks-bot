@@ -2293,6 +2293,22 @@ def run_scan():
             if len(coins) != before_xp:
                 log.info(f"X-Perp gate: {before_xp} → {len(coins)} coins tradable on OKX EU")
 
+        # Earnings blackout: no NEW signals on a ticker reporting today/tomorrow —
+        # the report gaps the stock 5-10% overnight, no 15m SMC setup prices that.
+        # Fail-open on calendar outage; open positions untouched (monitor handles).
+        try:
+            from src.earnings_calendar import is_earnings_blackout
+            _kept = []
+            for s in coins:
+                blackout, why = is_earnings_blackout(s)
+                if blackout:
+                    log.info(f"Earnings blackout: {s} skipped — {why}")
+                else:
+                    _kept.append(s)
+            coins = _kept
+        except Exception as e:
+            log.warning(f"Earnings blackout check failed (trading normally): {e}")
+
         mode = "whitelist" if ALLOWED_SYMBOLS else "auto top-volume"
         log.info(f"Fetched {len(coins)} coins ({mode})")
 
