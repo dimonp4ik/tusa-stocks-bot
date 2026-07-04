@@ -1,5 +1,5 @@
 """
-Crypto Signal Bot — entry point.
+TUSA Stocks Bot — entry point.
 
 Flow every N minutes:
   1. Fetch top 45 USDT pairs from KuCoin (by 24h volume)
@@ -146,7 +146,7 @@ ADMIN_PANEL_IMAGE_PATH = os.path.join(
 
 @app.route("/")
 def health():
-    return "Crypto Signal Bot is running.", 200
+    return "TUSA Stocks Bot is running.", 200
 
 
 @app.route("/status")
@@ -1394,7 +1394,7 @@ def _market_note(event_title: str, is_better: bool) -> str:
     return ""
 
 
-# Crypto digest cache — get_daily_digest() hits Groq + RSS, cache 30 min so
+# Market digest cache — get_daily_digest() hits Groq + RSS, cache 30 min so
 # repeated button presses don't spam the API.
 _digest_cache = {"at": 0.0, "items": []}
 
@@ -1421,15 +1421,15 @@ def _riga_tz():
 
 
 def _format_day_news() -> str:
-    """'📰 Новости на сегодня' — economic calendar + crypto headlines, ≤10 total."""
+    """'📰 Новости на сегодня' — economic calendar + market headlines, ≤10 total."""
     RIGA = _riga_tz()
 
     data   = get_day_events(max_events=10)
     events = data["events"]
     d      = data["date"]
-    crypto = _cached_digest()                      # ≤5 AI-picked crypto items
+    crypto = _cached_digest()                      # ≤5 AI-picked market headlines
 
-    # Budget: ≤10 total. Reserve up to 4 slots for crypto, grow if calendar small.
+    # Budget: ≤10 total. Reserve up to 4 slots for headlines, grow if calendar small.
     n_crypto = min(len(crypto), 4)
     n_macro  = min(len(events), 10 - n_crypto)
     n_crypto = min(len(crypto), 10 - n_macro)
@@ -1476,10 +1476,10 @@ def _format_day_news() -> str:
                 # Upcoming event
                 lines.append(f"   🔮 прогноз {f_ or '—'}{extra_prev}")
 
-    # ── Crypto headlines ──
+    # ── Market headlines ──
     if crypto:
         dir_emoji = {"BULLISH": "📈", "BEARISH": "📉", "NEUTRAL": "➡️"}
-        lines.append("\n🪙 *Крипто-новости*")
+        lines.append("\n📊 *Новости рынка*")
         for it in crypto:
             em = dir_emoji.get(it.get("direction", "NEUTRAL"), "➡️")
             lines.append(f"{em} *{it.get('title', '')}*")
@@ -2701,7 +2701,7 @@ def maybe_seed_backtest():
 
 
 def start_bot():
-    log.info("Starting Crypto Signal Bot...")
+    log.info("Starting TUSA Stocks Bot...")
     # Data source diagnostics — OKX public API (EU region: no geoblock, no proxy)
     _okx_base = os.environ.get("OKX_BASE_URL", "")
     log.info(f"Data source: OKX{' via '+_okx_base if _okx_base else ' (default hosts)'}")
