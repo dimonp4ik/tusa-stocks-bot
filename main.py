@@ -2653,8 +2653,11 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    ("backtest_seed_2024.csv",   "bt_seed_2024_done"),   # first 18 symbols
-    ("backtest_seed_2024_b.csv", "bt_seed_2024b_done"),  # remaining X-Perp universe
+    # 2022-2026 Dukascopy deep backtest: 1836 trades, 16 tickers (12 equities/
+    # ETF 4y + 4 commodities 1.2y), session-gated entries/exits. Gives Claude
+    # BT priors ("how do entries of this shape usually resolve on this ticker")
+    # from day one instead of waiting months for live history.
+    ("backtest_seed_stocks.csv", "bt_seed_stocks_v1_done"),
 ]
 
 
