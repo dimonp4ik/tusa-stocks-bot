@@ -385,7 +385,7 @@ def send_morning_digest(digest: dict) -> bool:
     overall = digest.get("overall", "NEUTRAL")
     theme   = digest.get("key_theme", "")
 
-    if not items:
+    if not items and not digest.get("calendar"):
         return _send_message("🌅 *УТРЕННИЙ ДАЙДЖЕСТ*\nНовостей за последние 18 часов не найдено.")
 
     _RU_MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"]
@@ -413,8 +413,16 @@ def send_morning_digest(digest: dict) -> bool:
     lines = [
         f"🌅 *УТРЕННИЙ ДАЙДЖЕСТ* — {date_str}",
         "━━━━━━━━━━━━━━━━━━━",
-        "📰 *ТОП НОВОСТЕЙ*\n",
     ]
+
+    calendar = digest.get("calendar") or []
+    if calendar:
+        lines.append("📅 *Важные события сегодня*\n")
+        lines.extend(calendar)
+        lines.append("")
+
+    if items:
+        lines.append("📰 *ТОП НОВОСТЕЙ*\n")
 
     for i, item in enumerate(items, 1):
         direction = item.get("direction", "NEUTRAL")

@@ -2549,13 +2549,32 @@ def run_scan():
 
 # ── Morning digest ────────────────────────────────────────────────────────────
 def run_morning_digest():
-    """Fetch last 18h headlines, ask Groq to rank top 5, send to Telegram."""
+    """Fetch last 18h headlines + today's high-impact econ calendar, send pre-market."""
     log.info("=== Morning digest started ===")
     try:
         digest = get_daily_digest()
+
+        # Fold in today's HIGH-impact econ events (CPI/FOMC/NFP...) — the
+        # single most actionable pre-market heads-up for equities, previously
+        # only visible via the separate "📰 Новости на сегодня" button.
+        try:
+            day = get_day_events(max_events=10)
+            high = [e for e in day["events"] if e["impact"] == "high" and not e["passed"]]
+            cal_lines = []
+            for e in high:
+                ru, _note = _ru_event(e["title"])
+                when = ("весь день" if e["all_day"] or not e["when_utc"]
+                        else e["when_utc"].astimezone(_riga_tz()).strftime("%H:%M"))
+                cc = f"{e['country']} " if e["country"] else ""
+                cal_lines.append(f"🔴 {cc}{ru} — {when} (Рига)")
+            digest["calendar"] = cal_lines
+        except Exception as e:
+            log.warning(f"Morning digest: calendar merge failed: {e}")
+
         send_morning_digest(digest)
         log.info(
             f"Morning digest sent — {len(digest.get('items', []))} items, "
+            f"{len(digest.get('calendar', []))} high-impact events, "
             f"overall={digest.get('overall')}"
         )
     except Exception as e:
@@ -2760,10 +2779,14 @@ def start_bot():
         timezone="UTC",
     )
 
+    # 09:00 America/New_York = 30 min before the 9:30 bell — pre-market
+    # briefing right when it's actionable. Fixed leftover from the crypto
+    # bot's 10:00 Riga slot (6+ hours before this bot's session even opens).
+    # NY timezone self-adjusts for US DST regardless of Riga's own DST dates.
     scheduler.add_job(
         run_morning_digest, "cron",
-        day_of_week="mon-fri", hour=10, minute=0,
-        timezone="Europe/Riga",
+        day_of_week="mon-fri", hour=9, minute=0,
+        timezone="America/New_York",
     )
 
     # Morning prayer — Mon–Fri 08:00 Riga
