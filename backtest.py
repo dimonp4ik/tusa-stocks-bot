@@ -240,7 +240,40 @@ def _normalize_cached_candles(obj) -> dict[str, list] | None:
     return {k: list(obj[k]) for k in required}
 
 
+# Data source switch: "okx" (default; the exact swap the bot trades, ~4mo) or
+# "duka" (Dukascopy CFDs, YEARS of history for 16/26 tickers — deep filter
+# validation). "duka" falls back to OKX for uncovered tickers.
+# Read from env so ProcessPoolExecutor workers (fresh module import) inherit it.
+DATA_SOURCE = os.getenv("BACKTEST_SOURCE", "okx").strip().lower()
+
+
 def fetch_history(
+    symbol: str,
+    interval: str,
+    interval_sec: int,
+    count: int,
+    *,
+    refresh_cache: bool = False,
+    end_date_ms: int | None = None,
+) -> dict[str, list]:
+    """Fetch historical candles (OKX by default, Dukascopy for deep runs)."""
+    if DATA_SOURCE == "duka":
+        try:
+            from src.dukascopy_client import covers, fetch_history_duka
+            if covers(symbol):
+                return fetch_history_duka(
+                    symbol, interval, interval_sec, count,
+                    refresh_cache=refresh_cache, end_date_ms=end_date_ms,
+                )
+        except ImportError:
+            pass  # dukascopy-python not installed — OKX fallback
+    return _fetch_history_okx(
+        symbol, interval, interval_sec, count,
+        refresh_cache=refresh_cache, end_date_ms=end_date_ms,
+    )
+
+
+def _fetch_history_okx(
     symbol: str,
     interval: str,
     interval_sec: int,
@@ -811,6 +844,16 @@ def backtest_symbol(
     started = time.perf_counter()
     result = SymbolResult(symbol=symbol)
 
+    # HTF candle counts: the /4, /16, /96 ratios assume a 24/7 tape (crypto
+    # clock). Dukascopy equity CFDs print only ~26 15m bars per trading day,
+    # so N 15m bars span ~4x more CALENDAR days — HTF windows must stretch
+    # accordingly or the oldest bars run with an empty 1d feed (daily-trend
+    # filters silently off → not what the live bot does).
+    if DATA_SOURCE == "duka":
+        div_1h, div_4h, div_1d = 3, 10, 20
+    else:
+        div_1h, div_4h, div_1d = 4, 16, 96
+
     try:
         c15 = fetch_history(symbol, TIMEFRAME_KUCOIN, KLINES_INTERVAL_SEC, candles,
                             refresh_cache=refresh_cache, end_date_ms=end_date_ms)
@@ -818,7 +861,7 @@ def backtest_symbol(
             symbol,
             TIMEFRAME_1H_KUCOIN,
             KLINES_1H_INTERVAL_SEC,
-            max(10, math.ceil(candles / 4) + 4),
+            max(10, math.ceil(candles / div_1h) + 4),
             refresh_cache=refresh_cache,
             end_date_ms=end_date_ms,
         )
@@ -826,14 +869,14 @@ def backtest_symbol(
             symbol,
             TIMEFRAME_4H_KUCOIN,
             KLINES_4H_INTERVAL_SEC,
-            max(10, math.ceil(candles / 16) + 4),
+            max(10, math.ceil(candles / div_4h) + 4),
             refresh_cache=refresh_cache,
             end_date_ms=end_date_ms,
         )
         try:
             c1d = fetch_history(
                 symbol, "1d", 86400,
-                max(8, math.ceil(candles / 96) + 4),
+                max(8, math.ceil(candles / div_1d) + 4),
                 refresh_cache=refresh_cache,
                 end_date_ms=end_date_ms,
             )
@@ -987,7 +1030,9 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Fast SMC backtest")
-    p.add_argument("--symbols", default=None, help="Comma-separated KuCoin symbols. Default: pinned set/env BACKTEST_SYMBOLS.")
+    p.add_argument("--symbols", default=None, help="Comma-separated symbols. Default: pinned set/env BACKTEST_SYMBOLS.")
+    p.add_argument("--source", choices=("okx", "duka"), default=None,
+                   help="Candle source: okx (live swap, ~4mo) or duka (Dukascopy CFD, years; OKX fallback for uncovered tickers).")
     p.add_argument("--top", type=int, default=0, help="Use current top N KuCoin USDT pairs by 24h volume.")
     p.add_argument("--candles", type=int, default=BACKTEST_CANDLES, help="15m candles per symbol.")
     p.add_argument(
@@ -1023,6 +1068,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.source:
+        global DATA_SOURCE
+        DATA_SOURCE = args.source
+        os.environ["BACKTEST_SOURCE"] = args.source  # propagate to pool workers
     end_date_ms = None
     if args.end_date:
         from datetime import datetime as _dt, timezone as _tz
