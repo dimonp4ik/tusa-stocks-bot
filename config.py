@@ -370,7 +370,11 @@ POST_TP1_WEAK_CLOSE_PROGRESS   = float(os.getenv("POST_TP1_WEAK_CLOSE_PROGRESS",
 # score<0.50 → WR ~59%. Used as a size multiplier (no gating) → +6% total R,
 # trade frequency unchanged. Edge needs a deep pool, so a ~1000-candle fetch is
 # done ONLY for symbols that already produced a setup (rare → cheap).
-KNN_RISK_OVERLAY   = os.getenv("KNN_RISK_OVERLAY", "1") != "0"
+# OFF for stocks (2026-07-04, 1836-trade deep backtest): kNN score bands are
+# FLAT here — >0.55 → +0.422R/tr vs <0.5 → +0.425R/tr, zero separation. The
+# crypto price-shape-analog edge (WR 68 vs 59) does not transfer to equities;
+# sizing off a non-predictive signal is noise. Flag kept for re-testing.
+KNN_RISK_OVERLAY   = os.getenv("KNN_RISK_OVERLAY", "0") != "0"
 KNN_DEEP_CANDLES   = int(os.getenv("KNN_DEEP_CANDLES", "1000"))   # 1 Bybit page
 KNN_MAX_HISTORY    = int(os.getenv("KNN_MAX_HISTORY", "800"))     # analog pool cap
 KNN_SHAPE_LEN      = int(os.getenv("KNN_SHAPE_LEN", "12"))        # query window (3h)
