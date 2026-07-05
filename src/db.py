@@ -121,9 +121,11 @@ def init_db():
                 username   TEXT,
                 first_name TEXT,
                 added_by   INTEGER,
-                added_at   REAL NOT NULL
+                added_at   REAL NOT NULL,
+                role       TEXT NOT NULL DEFAULT 'admin'
             )
         """)
+        _ensure_column(c, "admins", "role", "TEXT NOT NULL DEFAULT 'admin'")
 
         # ── Persistent bot state (survives restarts) ─────────────────────────
         c.execute("""
@@ -567,27 +569,30 @@ def get_users_count(query: str = "") -> int:
 # ── Dynamic admin management ──────────────────────────────────────────────────
 
 def add_dynamic_admin(user_id: int, username: str = None,
-                      first_name: str = None, added_by: int = None) -> None:
-    """Add (or update) a dynamic admin entry in DB."""
+                      first_name: str = None, added_by: int = None,
+                      role: str = "admin") -> None:
+    """Add (or update) a dynamic admin/moderator entry in DB.
+    role: 'admin' (full panel) | 'moderator' (monitoring + autotrade allow-list only)."""
     now = time_mod.time()
     with _conn() as c:
         c.execute("""
-            INSERT INTO admins (user_id, username, first_name, added_by, added_at)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO admins (user_id, username, first_name, added_by, added_at, role)
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT(user_id) DO UPDATE SET
                 username   = COALESCE(excluded.username,   username),
-                first_name = COALESCE(excluded.first_name, first_name)
-        """, (user_id, username, first_name, added_by, now))
+                first_name = COALESCE(excluded.first_name, first_name),
+                role       = excluded.role
+        """, (user_id, username, first_name, added_by, now, role))
 
 
 def remove_dynamic_admin(user_id: int) -> None:
-    """Remove a dynamic admin from DB."""
+    """Remove a dynamic admin/moderator from DB."""
     with _conn() as c:
         c.execute("DELETE FROM admins WHERE user_id = ?", (user_id,))
 
 
 def get_dynamic_admins() -> list:
-    """Return all dynamic admins ordered by when they were added."""
+    """Return all dynamic admins/moderators ordered by when they were added."""
     with _conn() as c:
         rows = c.execute(
             "SELECT * FROM admins ORDER BY added_at ASC"
@@ -596,11 +601,20 @@ def get_dynamic_admins() -> list:
 
 
 def is_dynamic_admin(user_id: int) -> bool:
-    """True when user_id has an entry in the admins table."""
+    """True when user_id has an entry in the admins table (admin OR moderator)."""
     with _conn() as c:
         return c.execute(
             "SELECT 1 FROM admins WHERE user_id = ?", (user_id,)
         ).fetchone() is not None
+
+
+def get_dynamic_role(user_id: int) -> str | None:
+    """'admin' | 'moderator' | None (not a dynamic admin/moderator)."""
+    with _conn() as c:
+        row = c.execute(
+            "SELECT role FROM admins WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return row["role"] if row else None
 
 
 # ── Claude budget tracking ────────────────────────────────────────────────────

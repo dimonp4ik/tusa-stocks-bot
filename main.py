@@ -56,6 +56,7 @@ from src.db import (
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users, get_users_count,
     add_dynamic_admin, remove_dynamic_admin, get_dynamic_admins, is_dynamic_admin,
+    get_dynamic_role,
     delete_signal, get_recent_signals,
     get_signals_count, get_signals_page, get_distinct_signal_symbols,
     get_claude_spend_stats,
@@ -83,6 +84,36 @@ def _is_admin(user_id: int) -> bool:
 def _is_super_admin(user_id: int) -> bool:
     """True only for hardcoded config admins (can manage other admins)."""
     return user_id in ADMIN_IDS
+
+
+def _admin_role(user_id: int) -> str:
+    """'super' | 'admin' | 'moderator' | 'none' — used to gate admin-panel actions."""
+    if user_id in ADMIN_IDS:
+        return "super"
+    return get_dynamic_role(user_id) or "none"
+
+
+# Moderators get monitoring + reversible actions + the autotrade allow-list —
+# NOT strategy/filter params, Claude budget, signal deletion, or admin management.
+_MODERATOR_ALLOWED_EXACT = {
+    "adm_sec_trading", "adm_sec_settings", "adm_sec_analytics", "adm_sec_people",
+    "adm_stats", "adm_open", "adm_setups", "adm_setups_today", "adm_setups_date",
+    "adm_manblock", "adm_mb_input",
+    "adm_top", "adm_worst", "adm_ai_acc",
+    "adm_users", "adm_users_p0", "adm_users_search",
+    "adm_autotrade", "adm_at_add",
+    "adm_back", "adm_open_new",
+}
+_MODERATOR_ALLOWED_PREFIX = (
+    "adm_setups_pg_", "adm_mb_block_", "adm_mb_unblock_",
+    "adm_top_d", "adm_worst_d",
+    "adm_users_p", "adm_users_q_",
+    "adm_at_rm_",
+)
+
+
+def _moderator_may(data: str) -> bool:
+    return data in _MODERATOR_ALLOWED_EXACT or data.startswith(_MODERATOR_ALLOWED_PREFIX)
 
 
 # State: super-admin is typing a new admin's Telegram ID.
@@ -643,6 +674,10 @@ def _render_users_page(chat_id: int, message_id: int, page: int, query: str = ""
 def _handle_admin_callback(callback_id: str, chat_id: int,
                            message_id: int, data: str, user_id: int = 0):
     """Dispatch inline-button presses for the admin panel."""
+    if _admin_role(user_id) == "moderator" and not _moderator_may(data):
+        _answer_callback(callback_id, "⛔ Недостаточно прав.")
+        return
+
     # Block/unblock use delayed answer with confirmation text — skip default here
     _silent_cb = data.startswith("adm_mb_block_") or data.startswith("adm_mb_unblock_")
     if not _silent_cb:
@@ -902,19 +937,27 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     elif data == "adm_admins":
         try:
-            dynamic = get_dynamic_admins()
+            dynamic  = get_dynamic_admins()
+            mods     = [a for a in dynamic if a.get("role") == "moderator"]
+            fulls    = [a for a in dynamic if a.get("role") != "moderator"]
             lines = ["👮 *Управление админами*\n"]
             lines.append("🔒 *Супер-админы (config):*")
             for aid in sorted(ADMIN_IDS):
                 lines.append(f"  `{aid}`")
-            if dynamic:
-                lines.append("\n➕ *Добавленные:*")
-                for a in dynamic:
+            if fulls:
+                lines.append("\n➕ *Добавленные админы:*")
+                for a in fulls:
                     fn   = a.get("first_name") or ""
                     un   = f" @{a['username']}" if a.get("username") else ""
                     lines.append(f"  • {fn}{un} `{a['user_id']}`")
-            else:
-                lines.append("\n_Добавленных админов нет._")
+            if mods:
+                lines.append("\n🛡 *Модераторы:*")
+                for a in mods:
+                    fn   = a.get("first_name") or ""
+                    un   = f" @{a['username']}" if a.get("username") else ""
+                    lines.append(f"  • {fn}{un} `{a['user_id']}`")
+            if not fulls and not mods:
+                lines.append("\n_Добавленных админов/модераторов нет._")
 
             kb_rows = []
             if _is_super_admin(user_id):
@@ -928,6 +971,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     "text": "➕ Добавить администратора",
                     "callback_data": "adm_add_admin",
                 }])
+                kb_rows.append([{
+                    "text": "➕ Добавить модератора",
+                    "callback_data": "adm_add_moderator",
+                }])
             kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
             _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
         except Exception as e:
@@ -940,22 +987,24 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         try:
             rm_id = int(data[len("adm_rm_admin_"):])
             remove_dynamic_admin(rm_id)
-            txt = f"✅ Администратор `{rm_id}` удалён.\n\nНажми 👮 Админы чтобы обновить список."
+            txt = f"✅ Удалено: `{rm_id}`.\n\nНажми 👮 Админы чтобы обновить список."
         except Exception as e:
             txt = f"Ошибка удаления: {e}"
         _edit_message(chat_id, message_id, txt)
 
-    elif data == "adm_add_admin":
+    elif data in ("adm_add_admin", "adm_add_moderator"):
         if not _is_super_admin(user_id):
             _edit_message(chat_id, message_id, "⛔ Только супер-администратор может добавлять.")
             return
-        _pending_add_admin[chat_id] = True
+        role = "moderator" if data == "adm_add_moderator" else "admin"
+        _pending_add_admin[chat_id] = role
+        label = "модератора" if role == "moderator" else "администратора"
         try:
             _requests.post(
                 f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
                 json={
                     "chat_id": chat_id,
-                    "text": "Отправь *Telegram ID* нового администратора.\nПример: `123456789`",
+                    "text": f"Отправь *Telegram ID* нового {label}.\nПример: `123456789`",
                     "parse_mode": "Markdown",
                 },
                 timeout=10,
@@ -1881,8 +1930,9 @@ def webhook():
             _reply(chat_id, f"❌ Что-то пошло не так. Нажми «🤖 Автотрейдинг» и попробуй заново.")
             return "ok", 200
 
-    # ── Pending "add admin" state — super-admin just typed a new admin's ID ──
-    if is_dm and _is_super_admin(user_id) and _pending_add_admin.pop(chat_id, False):
+    # ── Pending "add admin/moderator" state — super-admin just typed an ID ───
+    if is_dm and _is_super_admin(user_id) and chat_id in _pending_add_admin:
+        _pending_role = _pending_add_admin.pop(chat_id)
         raw_id = text_raw.strip()
         if raw_id.lstrip("-").isdigit():
             new_id = int(raw_id)
@@ -1893,9 +1943,11 @@ def webhook():
                 username=u_info.get("username"),
                 first_name=u_info.get("first_name"),
                 added_by=user_id,
+                role=_pending_role,
             )
+            label = "Модератор" if _pending_role == "moderator" else "Администратор"
             _reply(chat_id,
-                   f"✅ Администратор `{new_id}` добавлен.\n"
+                   f"✅ {label} `{new_id}` добавлен.\n"
                    f"Ему нужно написать /start чтобы получить панель.")
         else:
             _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
