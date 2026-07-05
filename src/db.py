@@ -197,6 +197,49 @@ def init_db():
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
+        # ── Autotrading: allow-listed users + their encrypted OKX keys ───────
+        # allowed  — admin put the user on the list (gate for the DM button)
+        # active   — onboarding finished, bot opens real positions
+        # size_mode 'percent' (1-10% of balance) | 'fixed' ($ per trade)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS autotrade_users (
+                user_id        INTEGER PRIMARY KEY,
+                allowed        INTEGER NOT NULL DEFAULT 1,
+                active         INTEGER NOT NULL DEFAULT 0,
+                api_key_enc    TEXT,
+                api_secret_enc TEXT,
+                passphrase_enc TEXT,
+                size_mode      TEXT,
+                size_value     REAL,
+                last_balance   REAL,
+                mode_prompt_pending INTEGER NOT NULL DEFAULT 0,
+                added_by       INTEGER,
+                added_at       REAL,
+                activated_at   REAL
+            )
+        """)
+
+        # ── Autotrading: one row per live position per user per signal ───────
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS autotrade_positions (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                signal_id   INTEGER NOT NULL,
+                user_id     INTEGER NOT NULL,
+                inst_id     TEXT NOT NULL,
+                direction   TEXT NOT NULL,
+                sz          REAL NOT NULL,
+                entry_px    REAL,
+                margin_usd  REAL,
+                sl_algo_id  TEXT,
+                sl_px       REAL,
+                status      TEXT NOT NULL DEFAULT 'OPEN',
+                opened_at   REAL NOT NULL,
+                closed_at   REAL,
+                close_reason TEXT,
+                error       TEXT
+            )
+        """)
+
 
 def get_bot_state(key: str) -> str | None:
     """Read a persistent bot state value. Returns None if key not set."""
@@ -1149,3 +1192,142 @@ def get_setups_by_date(date_str: str) -> list:
             (start_ts, end_ts),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+# ── Autotrading ────────────────────────────────────────────────────────────────
+
+def at_add_allowed(user_id: int, added_by: int) -> None:
+    """Admin puts a user on the autotrade allow-list (idempotent)."""
+    with _conn() as c:
+        c.execute("""
+            INSERT INTO autotrade_users (user_id, allowed, added_by, added_at)
+            VALUES (?, 1, ?, ?)
+            ON CONFLICT(user_id) DO UPDATE SET allowed = 1
+        """, (user_id, added_by, time_mod.time()))
+
+
+def at_remove(user_id: int) -> None:
+    """Admin removes a user: wipe keys, deactivate, drop from allow-list."""
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_users
+            SET allowed = 0, active = 0,
+                api_key_enc = NULL, api_secret_enc = NULL, passphrase_enc = NULL
+            WHERE user_id = ?
+        """, (user_id,))
+
+
+def at_get(user_id: int) -> dict | None:
+    with _conn() as c:
+        row = c.execute(
+            "SELECT * FROM autotrade_users WHERE user_id = ?", (user_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def at_all_allowed() -> list:
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM autotrade_users WHERE allowed = 1 ORDER BY added_at"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def at_get_active_traders() -> list:
+    """Users with finished onboarding — the ones real orders are opened for."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT * FROM autotrade_users
+            WHERE allowed = 1 AND active = 1
+              AND api_key_enc IS NOT NULL
+        """).fetchall()
+        return [dict(r) for r in rows]
+
+
+def at_set_keys(user_id: int, api_key_enc: str, api_secret_enc: str,
+                passphrase_enc: str) -> None:
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_users
+            SET api_key_enc = ?, api_secret_enc = ?, passphrase_enc = ?
+            WHERE user_id = ?
+        """, (api_key_enc, api_secret_enc, passphrase_enc, user_id))
+
+
+def at_set_mode(user_id: int, size_mode: str, size_value: float) -> None:
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_users
+            SET size_mode = ?, size_value = ?, mode_prompt_pending = 0
+            WHERE user_id = ?
+        """, (size_mode, size_value, user_id))
+
+
+def at_set_active(user_id: int, active: bool) -> None:
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_users
+            SET active = ?, activated_at = COALESCE(activated_at, ?)
+            WHERE user_id = ?
+        """, (1 if active else 0, time_mod.time(), user_id))
+
+
+def at_set_balance(user_id: int, balance: float) -> None:
+    with _conn() as c:
+        c.execute("UPDATE autotrade_users SET last_balance = ? WHERE user_id = ?",
+                  (balance, user_id))
+
+
+def at_set_mode_prompt(user_id: int, pending: bool) -> None:
+    with _conn() as c:
+        c.execute("UPDATE autotrade_users SET mode_prompt_pending = ? WHERE user_id = ?",
+                  (1 if pending else 0, user_id))
+
+
+def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
+                    sz: float, entry_px: float, margin_usd: float,
+                    sl_algo_id: str, sl_px: float) -> int:
+    with _conn() as c:
+        cur = c.execute("""
+            INSERT INTO autotrade_positions
+                (signal_id, user_id, inst_id, direction, sz, entry_px, margin_usd,
+                 sl_algo_id, sl_px, status, opened_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?)
+        """, (signal_id, user_id, inst_id, direction, sz, entry_px, margin_usd,
+              sl_algo_id, sl_px, time_mod.time()))
+        return cur.lastrowid
+
+
+def at_open_positions_for_signal(signal_id: int) -> list:
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT * FROM autotrade_positions
+            WHERE signal_id = ? AND status = 'OPEN'
+        """, (signal_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def at_update_position_sl(pos_id: int, sl_px: float) -> None:
+    with _conn() as c:
+        c.execute("UPDATE autotrade_positions SET sl_px = ? WHERE id = ?",
+                  (sl_px, pos_id))
+
+
+def at_close_position(pos_id: int, close_reason: str, error: str = None) -> None:
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_positions
+            SET status = 'CLOSED', closed_at = ?, close_reason = ?, error = ?
+            WHERE id = ?
+        """, (time_mod.time(), close_reason, error, pos_id))
+
+
+def get_latest_open_signal(symbol: str) -> dict | None:
+    """The signal row just written by log_signal (autotrade open hook)."""
+    with _conn() as c:
+        row = c.execute("""
+            SELECT * FROM signals
+            WHERE symbol = ? AND status = 'OPEN'
+            ORDER BY id DESC LIMIT 1
+        """, (symbol,)).fetchone()
+        return dict(row) if row else None

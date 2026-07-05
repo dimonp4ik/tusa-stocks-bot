@@ -450,3 +450,12 @@ BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
 BACKTEST_USE_BTC_FILTER = os.getenv("BACKTEST_USE_BTC_FILTER", "1") != "0"
+
+# --- Autotrading (real OKX EU orders for allow-listed users) ---
+AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"
+AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
+AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
+AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
+# Fernet key for encrypting user API keys at rest — generate once:
+#   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+# and set AUTOTRADE_ENC_KEY on the host. Keys are unreadable without it.

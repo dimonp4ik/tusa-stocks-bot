@@ -64,8 +64,14 @@ from src.db import (
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     get_similar_resolved_setups, seed_backtest_outcomes,
     get_weekly_stats,
+    at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
+    at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
+    get_latest_open_signal,
 )
-from config import ADMIN_IDS
+from src import autotrader
+from src.keystore import keystore_ready, encrypt_secret
+from src import okx_trader as _okx_trade
+from config import ADMIN_IDS, AUTOTRADE_BALANCE_THRESHOLD, AUTOTRADE_CONTACT
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
 
@@ -87,6 +93,12 @@ _pending_block_chat: dict = {}
 _pending_users_search: dict = {}
 # State: admin is typing a date to view setup history.
 _pending_setups_date: dict = {}
+# State: admin is typing a user ID to allow autotrading.
+_pending_add_autotrade: dict = {}
+# State: user is inside the autotrade onboarding dialog.
+# chat_id → {"step": str, "data": {...}}  (steps: api_key → api_secret →
+# passphrase → size_percent | size_fixed; 'switch_*' reuse the size steps)
+_at_onboarding: dict = {}
 # State: which admin sub-section each chat is currently in, so detail-view
 # "« Назад" returns to that section menu instead of the top-level panel.
 _admin_section: dict = {}
@@ -160,7 +172,7 @@ def status():
 _USER_KB = {
     "keyboard": [
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
-        [{"text": "📰 Новости на сегодня"}],
+        [{"text": "🤖 Автотрейдинг"}, {"text": "📰 Новости на сегодня"}],
         [{"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True,
@@ -169,6 +181,16 @@ _USER_KB = {
 _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🤖 Автотрейдинг"}, {"text": "📰 Новости на сегодня"}],
+        [{"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True,
+    "is_persistent":   True,
+}
+# Group chats get no autotrade button — it's a DM-only feature.
+_GROUP_KB = {
+    "keyboard": [
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
         [{"text": "📰 Новости на сегодня"}],
         [{"text": "❓ Помощь"}],
@@ -234,12 +256,15 @@ _KB_ANALYTICS = {"inline_keyboard": [[
 _KB_PEOPLE = {"inline_keyboard": [[
     {"text": "👥 Пользователи", "callback_data": "adm_users"},
     {"text": "👮 Админы",       "callback_data": "adm_admins"},
+], [
+    {"text": "🤖 Автотрейдинг", "callback_data": "adm_autotrade"},
 ], [_BACK_ROW[0]]]}
 
 
-def _send_persistent_menu(chat_id: int, is_admin: bool = False):
-    """Send the persistent bottom-bar keyboard. Admins get extra admin button."""
-    kb   = _ADMIN_KB if is_admin else _USER_KB
+def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = True):
+    """Send the persistent bottom-bar keyboard. Admins get extra admin button;
+    groups get the keyboard without the DM-only autotrade button."""
+    kb = (_ADMIN_KB if is_admin else _USER_KB) if is_dm else _GROUP_KB
     text = ("✅ Меню активировано.\n🛠 Админ панель доступна."
             if is_admin else
             "✅ Меню активировано. Кнопки внизу всегда доступны.")
@@ -938,6 +963,64 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             log.warning(f"add_admin prompt failed: {e}")
 
+    elif data == "adm_autotrade":
+        try:
+            rows = at_all_allowed()
+            lines = ["🤖 *Автотрейдинг — доступ*\n"]
+            if rows:
+                for r in rows:
+                    u_info = get_user_by_id(r["user_id"]) or {}
+                    un = f"@{u_info['username']}" if u_info.get("username") else ""
+                    st = "🟢 активен" if r.get("active") else ("🟡 ждёт настройки" if r.get("allowed") else "⚪")
+                    lines.append(f"• {un} `{r['user_id']}` — {st}")
+            else:
+                lines.append("_Никто не добавлен._")
+            if not keystore_ready():
+                lines.append("\n⚠️ *AUTOTRADE\\_ENC\\_KEY не настроен* — подключение ключей не заработает.")
+            kb_rows = []
+            for r in rows:
+                if r.get("allowed"):
+                    kb_rows.append([{
+                        "text": f"❌ Убрать {r['user_id']}",
+                        "callback_data": f"adm_at_rm_{r['user_id']}",
+                    }])
+            kb_rows.append([{"text": "➕ Добавить в автотрейдинг", "callback_data": "adm_at_add"}])
+            kb_rows.append([{"text": "« Назад", "callback_data": _sec_back_cb(chat_id)}])
+            _edit_with_keyboard(chat_id, message_id, "\n".join(lines), kb_rows)
+        except Exception as e:
+            _edit_message(chat_id, message_id, f"Ошибка: {e}")
+
+    elif data == "adm_at_add":
+        _pending_add_autotrade[chat_id] = True
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={
+                    "chat_id": chat_id,
+                    "text": "Отправь *Telegram ID* пользователя для автотрейдинга.\nПример: `123456789`",
+                    "parse_mode": "Markdown",
+                },
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f"at_add prompt failed: {e}")
+
+    elif data.startswith("adm_at_rm_"):
+        try:
+            rm_id = int(data[len("adm_at_rm_"):])
+            at_remove(rm_id)
+            txt = (f"✅ Пользователь `{rm_id}` убран из автотрейдинга.\n"
+                   f"Его API-ключи удалены из базы. Открытые позиции (если есть) "
+                   f"остаются на бирже — управлять ими бот больше не будет.")
+            try:
+                autotrader._dm(rm_id, "🤖 Автотрейдинг отключён администратором. "
+                                      f"Вопросы — {AUTOTRADE_CONTACT}.")
+            except Exception:
+                pass
+        except Exception as e:
+            txt = f"Ошибка: {e}"
+        _edit_message(chat_id, message_id, txt)
+
     elif data == "adm_deals" or data == "adm_deals_p0":
         _render_deals_page(chat_id, message_id, 0)
 
@@ -1495,6 +1578,236 @@ def _format_day_news() -> str:
 
 
 # ── Telegram webhook — handles incoming messages ──────────────────────────────
+# ── Autotrade onboarding (DM dialog) ──────────────────────────────────────────
+
+def _at_delete_msg(chat_id: int, message_id: int):
+    """Delete a user's message that contains a secret (API key / passphrase)."""
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/deleteMessage",
+            json={"chat_id": chat_id, "message_id": message_id},
+            timeout=5,
+        )
+    except Exception as e:
+        log.warning(f"_at_delete_msg failed: {e}")
+
+
+def _at_reply_kb(chat_id: int, text: str, kb_rows: list):
+    try:
+        _requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
+                  "reply_markup": {"inline_keyboard": kb_rows}},
+            timeout=10,
+        )
+    except Exception as e:
+        log.warning(f"_at_reply_kb failed: {e}")
+
+
+def _at_ask_size(chat_id: int, balance: float, resize: bool = False):
+    """Route to percent (≥$100) or fixed (<$100) size question."""
+    prefix = "resize_" if resize else "size_"
+    if balance >= AUTOTRADE_BALANCE_THRESHOLD:
+        _at_onboarding[chat_id]["step"] = prefix + "percent"
+        _reply(chat_id,
+               f"💰 Твой баланс: *${balance:.2f}*.\n\n"
+               f"Какой *процент депозита* ставить на каждую сделку?\n"
+               f"Отправь число от *1 до 10* (например `2`).")
+    else:
+        _at_onboarding[chat_id]["step"] = prefix + "fixed"
+        _reply(chat_id,
+               f"💰 Твой баланс: *${balance:.2f}* (меньше ${AUTOTRADE_BALANCE_THRESHOLD:.0f}).\n\n"
+               f"Какую *фиксированную сумму в $* ставить на каждую сделку?\n"
+               f"Отправь число (например `5`). Это маржа сделки, позиция будет с плечом 10x.")
+
+
+def _at_show_menu(chat_id: int, u: dict):
+    """Status panel for an onboarded (active or paused) autotrader."""
+    mode = u.get("size_mode")
+    mode_str = (f"{u['size_value']:.0f}% от депозита" if mode == "percent"
+                else f"${u['size_value']:.2f} на сделку" if mode == "fixed" else "—")
+    bal = u.get("last_balance")
+    bal_str = f"${bal:.2f}" if bal is not None else "—"
+    state = "🟢 включён" if u.get("active") else "⏸ выключен"
+    rows = [[{"text": ("⏸ Выключить" if u.get("active") else "▶️ Включить"),
+              "callback_data": "at_toggle"}],
+            [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
+            [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
+    _at_reply_kb(chat_id,
+                 f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nРазмер: *{mode_str}*\n"
+                 f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа",
+                 rows)
+
+
+def _at_begin_keys(chat_id: int):
+    """Start (or restart) the API-key part of onboarding."""
+    _at_onboarding[chat_id] = {"step": "api_key", "data": {}}
+    _reply(chat_id,
+           "🔐 *Подключение OKX*\n\n"
+           "Создай API-ключ на OKX: Профиль → API → *Торговля API*.\n"
+           "Права: *Чтение + Торговля* (⚠️ БЕЗ вывода средств).\n\n"
+           "Шаг 1/3 — отправь *API Key*.\n"
+           "_Сообщения с ключами я сразу удаляю из чата._")
+
+
+def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) -> bool:
+    """Autotrade onboarding step machine. Returns True if the message was consumed."""
+    st = _at_onboarding.get(chat_id)
+    if not st:
+        return False
+    step = st["step"]
+    val  = text_raw.strip()
+
+    # A command or a menu button aborts the dialog instead of being eaten as input
+    if val.startswith("/") or val.lower() in (
+        "🤖 автотрейдинг", "❓ помощь", "📋 открытые сделки",
+        "📈 результаты", "📰 новости на сегодня", "🛠 админ панель",
+    ):
+        _at_onboarding.pop(chat_id, None)
+        return False
+
+    if step == "api_key":
+        _at_delete_msg(chat_id, message_id)
+        st["data"]["api_key"] = val
+        st["step"] = "api_secret"
+        _reply(chat_id, "Шаг 2/3 — отправь *Secret Key*.")
+        return True
+
+    if step == "api_secret":
+        _at_delete_msg(chat_id, message_id)
+        st["data"]["api_secret"] = val
+        st["step"] = "passphrase"
+        _reply(chat_id, "Шаг 3/3 — отправь *пасс-фразу* (passphrase), которую ты указал при создании ключа.")
+        return True
+
+    if step == "passphrase":
+        _at_delete_msg(chat_id, message_id)
+        st["data"]["passphrase"] = val
+        _reply(chat_id, "⏳ Проверяю ключи на OKX...")
+        creds = dict(st["data"])
+        ok, balance = _okx_trade.get_balance(creds)
+        if not ok:
+            _at_onboarding.pop(chat_id, None)
+            _reply(chat_id,
+                   f"❌ Не получилось подключиться к OKX:\n`{balance}`\n\n"
+                   f"Проверь ключи и нажми «🤖 Автотрейдинг» чтобы попробовать заново.")
+            return True
+        try:
+            at_set_keys(user_id,
+                        encrypt_secret(creds["api_key"]),
+                        encrypt_secret(creds["api_secret"]),
+                        encrypt_secret(creds["passphrase"]))
+            at_set_balance(user_id, balance)
+        except Exception as e:
+            _at_onboarding.pop(chat_id, None)
+            log.warning(f"at_set_keys failed for {user_id}: {e}")
+            _reply(chat_id, f"❌ Ошибка сохранения ключей. Напиши {AUTOTRADE_CONTACT}.")
+            return True
+        st["data"] = {}
+        _reply(chat_id, "✅ Ключи работают и сохранены (в зашифрованном виде).")
+        _at_ask_size(chat_id, balance)
+        return True
+
+    if step in ("size_percent", "resize_percent"):
+        try:
+            pct = float(val.replace(",", "."))
+        except ValueError:
+            _reply(chat_id, "Нужно число от 1 до 10. Например `2`.")
+            return True
+        if not (1 <= pct <= 10):
+            _reply(chat_id, "Процент должен быть от *1 до 10*. Попробуй ещё раз.")
+            return True
+        at_set_mode(user_id, "percent", pct)
+        _at_finish_size(chat_id, user_id, step, f"{pct:.0f}% от депозита")
+        return True
+
+    if step in ("size_fixed", "resize_fixed"):
+        try:
+            usd = float(val.replace(",", ".").lstrip("$"))
+        except ValueError:
+            _reply(chat_id, "Нужно число — сумма в $. Например `5`.")
+            return True
+        if usd <= 0:
+            _reply(chat_id, "Сумма должна быть больше 0.")
+            return True
+        at_set_mode(user_id, "fixed", usd)
+        _at_finish_size(chat_id, user_id, step, f"${usd:.2f} на сделку")
+        return True
+
+    return False
+
+
+def _at_finish_size(chat_id: int, user_id: int, step: str, mode_str: str):
+    _at_onboarding.pop(chat_id, None)
+    if step.startswith("resize_"):
+        _reply(chat_id, f"✅ Размер сделки обновлён: *{mode_str}*.")
+        return
+    # First-time onboarding → final confirmation before going live
+    _at_reply_kb(chat_id,
+                 f"⚠️ *Последний шаг*\n\n"
+                 f"Бот будет *сам открывать реальные сделки* на твоём OKX:\n"
+                 f"• размер: *{mode_str}*\n"
+                 f"• плечо: 10x, изолированная маржа\n"
+                 f"• стоп-лосс и тейки ставятся автоматически\n\n"
+                 f"Торговля с плечом = риск потерять депозит. Включаем?",
+                 [[{"text": "✅ Включить автотрейдинг", "callback_data": "at_confirm"},
+                   {"text": "❌ Отмена", "callback_data": "at_cancel"}]])
+
+
+def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bool:
+    """Autotrade inline-button presses (user side). Returns True if handled."""
+    if not data.startswith("at_"):
+        return False
+    u = at_get(user_id)
+    if not u or not u.get("allowed"):
+        _answer_callback(cb_id, "Нет доступа.")
+        return True
+
+    if data == "at_confirm":
+        at_set_active(user_id, True)
+        _answer_callback(cb_id, "Автотрейдинг включён!")
+        _reply(chat_id, "🟢 *Автотрейдинг включён.* Сделки будут открываться автоматически по сигналам бота.")
+    elif data == "at_cancel":
+        _answer_callback(cb_id)
+        _reply(chat_id, "Ок, автотрейдинг не включён. Нажми «🤖 Автотрейдинг» когда будешь готов.")
+    elif data == "at_toggle":
+        newly_active = not u.get("active")
+        at_set_active(user_id, newly_active)
+        _answer_callback(cb_id)
+        if newly_active:
+            _reply(chat_id, "🟢 Автотрейдинг снова включён.")
+        else:
+            _reply(chat_id, "⏸ Автотрейдинг выключен. Новые сделки открываться не будут.\n"
+                            "Уже открытые позиции бот продолжит вести до закрытия.")
+    elif data == "at_resize":
+        bal = u.get("last_balance")
+        creds = autotrader._creds_of(u)
+        if creds:
+            ok, live_bal = _okx_trade.get_balance(creds)
+            if ok:
+                bal = live_bal
+                at_set_balance(user_id, bal)
+        _at_onboarding[chat_id] = {"step": "", "data": {}}
+        _at_ask_size(chat_id, float(bal or 0), resize=True)
+        _answer_callback(cb_id)
+    elif data == "at_rekey":
+        _answer_callback(cb_id)
+        _at_begin_keys(chat_id)
+    elif data == "at_mode_keep":
+        at_set_mode_prompt(user_id, False)
+        _answer_callback(cb_id, "Ок, оставляем как есть.")
+    elif data == "at_mode_switch":
+        at_set_mode_prompt(user_id, False)
+        bal = float(u.get("last_balance") or 0)
+        # Switch = pick the mode matching the CURRENT balance side
+        _at_onboarding[chat_id] = {"step": "", "data": {}}
+        _at_ask_size(chat_id, bal, resize=True)
+        _answer_callback(cb_id)
+    else:
+        _answer_callback(cb_id)
+    return True
+
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = flask_request.get_json(silent=True)
@@ -1517,6 +1830,8 @@ def webhook():
         elif cb_data == "evening_ritual":
             _answer_callback(cb_id)
             send_evening_ritual(chat_id)
+        elif cb_data.startswith("at_"):
+            _at_handle_callback(cb_id, chat_id, user_id, cb_data)
         elif _is_admin(user_id):
             _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
@@ -1554,6 +1869,18 @@ def webhook():
     # DM = positive chat_id (private chat with bot)
     is_dm = isinstance(chat_id, int) and chat_id > 0
 
+    # ── Autotrade onboarding dialog (DM only, consumes key/size inputs) ──────
+    if is_dm and chat_id in _at_onboarding:
+        try:
+            msg_id = message.get("message_id")
+            if _at_handle_text(chat_id, user_id, text_raw, msg_id):
+                return "ok", 200
+        except Exception as e:
+            log.warning(f"autotrade onboarding failed for {user_id}: {e}")
+            _at_onboarding.pop(chat_id, None)
+            _reply(chat_id, f"❌ Что-то пошло не так. Нажми «🤖 Автотрейдинг» и попробуй заново.")
+            return "ok", 200
+
     # ── Pending "add admin" state — super-admin just typed a new admin's ID ──
     if is_dm and _is_super_admin(user_id) and _pending_add_admin.pop(chat_id, False):
         raw_id = text_raw.strip()
@@ -1570,6 +1897,25 @@ def webhook():
             _reply(chat_id,
                    f"✅ Администратор `{new_id}` добавлен.\n"
                    f"Ему нужно написать /start чтобы получить панель.")
+        else:
+            _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
+        return "ok", 200
+
+    # ── Pending "add autotrade" state — admin typed a user's ID ──────────────
+    if is_dm and _is_admin(user_id) and _pending_add_autotrade.pop(chat_id, False):
+        raw_id = text_raw.strip()
+        if raw_id.lstrip("-").isdigit():
+            new_id = int(raw_id)
+            at_add_allowed(new_id, added_by=user_id)
+            _reply(chat_id,
+                   f"✅ Пользователь `{new_id}` добавлен в автотрейдинг.\n"
+                   f"Теперь у него в личке с ботом заработает кнопка 🤖 Автотрейдинг.")
+            try:
+                autotrader._dm(new_id,
+                               "🤖 Тебе открыт доступ к автотрейдингу!\n"
+                               "Нажми /start и выбери кнопку «🤖 Автотрейдинг» для подключения.")
+            except Exception:
+                pass
         else:
             _reply(chat_id, "❌ Не похоже на Telegram ID. Нужно число, например `123456789`.")
         return "ok", 200
@@ -1623,9 +1969,10 @@ def webhook():
         return "ok", 200
 
     # /start → постоянное меню (у админов расширенное — ЛС и группа, группа
-    # для этого бота admin-only, так что гейт по is_dm тут не нужен)
+    # для этого бота admin-only, так что гейт по is_dm тут не нужен для админки;
+    # автотрейдинг всё равно DM-only, is_dm решает какую клавиатуру слать)
     if text == "/start":
-        _send_persistent_menu(chat_id, is_admin=_is_admin(user_id))
+        _send_persistent_menu(chat_id, is_admin=_is_admin(user_id), is_dm=is_dm)
 
     # 🛠 Кнопка "Админ панель" → инлайн-панель
     elif text == "🛠 админ панель":
@@ -1633,6 +1980,23 @@ def webhook():
             _send_keyboard(chat_id, "🛠 *TUSA Admin Panel*\nВыбери раздел:")
         else:
             _reply(chat_id, "Нет доступа.")
+
+    # 🤖 Автотрейдинг — только в личке, только для допущенных админом
+    elif text == "🤖 автотрейдинг":
+        if not is_dm:
+            _reply(chat_id, "🤖 Автотрейдинг настраивается только в личном чате с ботом.")
+        else:
+            u = at_get(user_id)
+            if not u or not u.get("allowed"):
+                _reply(chat_id,
+                       f"⛔ У тебя нет права доступа к автотрейдингу.\n"
+                       f"Чтобы подключиться — напиши `{AUTOTRADE_CONTACT}`.")
+            elif not keystore_ready():
+                _reply(chat_id, f"⚠️ Автотрейдинг временно недоступен (техническая настройка). Напиши `{AUTOTRADE_CONTACT}`.")
+            elif u.get("api_key_enc") and u.get("size_mode"):
+                _at_show_menu(chat_id, u)
+            else:
+                _at_begin_keys(chat_id)
 
     # 📋 Открытые сделки
     elif text == "📋 открытые сделки":
@@ -1832,13 +2196,20 @@ def webhook():
 
 
 def _reply(chat_id: int, text: str):
-    """Send a reply to a specific chat."""
+    """Send a reply to a specific chat. Falls back to plain text when Telegram
+    rejects the Markdown (e.g. an unbalanced `_` from a @username)."""
     try:
-        _requests.post(
+        resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
             timeout=10,
         )
+        if resp.status_code != 200 and "parse" in _telegram_error(resp).lower():
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": chat_id, "text": text},
+                timeout=10,
+            )
     except Exception as e:
         log.warning(f"Reply failed: {e}")
 
@@ -2008,6 +2379,7 @@ def _check_open_signals():
             new_status   = None
             realized_r   = None
             runner_trail_atr_mult = None   # frozen at TP1 candle, reused next cycles
+            live_trail_stop = None         # current trail level → autotrade SL amend
             exit_px      = df_all["close"][-1] if df_all.get("close") else entry
 
             # Runner exit after TP1 (post_tp1_v2): keep TP1_CLOSE_FRAC of the position
@@ -2063,6 +2435,7 @@ def _check_open_signals():
                         if direction == "LONG":
                             best_price = max(best_price, high)
                             trail_stop = max(entry, best_price - atr * trail_atr_mult)
+                            live_trail_stop = trail_stop
                             if low <= trail_stop:
                                 runner_r   = max(0.0, (trail_stop - entry) / risk)
                                 realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
@@ -2073,6 +2446,7 @@ def _check_open_signals():
                         else:
                             best_price = min(best_price, low)
                             trail_stop = min(entry, best_price + atr * trail_atr_mult)
+                            live_trail_stop = trail_stop
                             if high >= trail_stop:
                                 runner_r   = max(0.0, (entry - trail_stop) / risk)
                                 realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
@@ -2109,6 +2483,18 @@ def _check_open_signals():
                     send_signal_update(sig, new_status, exit_px)
                 except Exception as _e:
                     log.warning(f"  Update notification failed #{sig['id']}: {_e}")
+                # Autotrade: mirror the transition on the exchange (close /
+                # start-trailing) for every user holding this signal live.
+                try:
+                    autotrader.mirror_transition(sig, new_status, exit_px)
+                except Exception as _ae:
+                    log.warning(f"  Autotrade mirror failed #{sig['id']}: {_ae}")
+            elif status == "TP1_PARTIAL" and live_trail_stop is not None:
+                # No transition, trail may have moved — sync users' exchange SL.
+                try:
+                    autotrader.update_trailing(sig, live_trail_stop)
+                except Exception as _ae:
+                    log.warning(f"  Autotrade trail sync failed #{sig['id']}: {_ae}")
 
         except Exception as e:
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
@@ -2532,6 +2918,13 @@ def run_scan():
                             mark_setup_sent(analysis.get("_setup_log_id"))
                         except Exception:
                             pass
+                        # Autotrade: mirror the just-published signal into real
+                        # OKX positions for onboarded users (async, fail-safe).
+                        try:
+                            _sig_row = get_latest_open_signal(analysis["symbol"])
+                            autotrader.open_positions_for_signal(_sig_row)
+                        except Exception as _ae:
+                            log.warning(f"  Autotrade open hook failed: {_ae}")
                     else:
                         log.warning(
                             f"  Signal NOT sent: {analysis['symbol']} {direction} "
