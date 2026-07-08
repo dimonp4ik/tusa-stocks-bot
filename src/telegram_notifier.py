@@ -219,8 +219,8 @@ def send_signal(analysis: dict) -> bool:
         f"💰 Вход:        `{_format_price(price)}`\n"
         f"{zone_range_line}"
         f"{drift_line}"
-        f"🎯 TP1 (50%):   `{_format_price(tp1)}`  → SL в б/у\n"
-        f"🎯 TP2 (50%):   `{_format_price(tp2)}`\n"
+        f"🎯 TP1:         `{_format_price(tp1)}`  → включаем трейлинг-стоп\n"
+        f"🎯 TP2:         `{_format_price(tp2)}`  → потолок всей позиции\n"
         f"❌ Стоп лосс:   `{_format_price(sl)}`\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"⚡ Плечо: *{lev}x*  ({lev_info['rating']})  🏦 OKX\n"
@@ -275,24 +275,19 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     if new_status == "TP1_PARTIAL":
         icon  = "✅"
         title = "TP1 ДОСТИГНУТ"
-        atr_val   = float(sig.get("atr") or 0.0)
-        trail_val = round(atr_val * 0.75, 8) if atr_val > 0 else 0.0
-        trail_line = (
-            f"\n🔄 *Трейлинг-стоп на остаток 50%:* `{_format_price(trail_val)}`\n"
-            f"   _Выставь на OKX: Позиция → Трейлинг-стоп → {_format_price(trail_val)}_"
-        ) if trail_val > 0 else ""
         body  = (
-            f"Закрыто 50% по `{_format_price(exit_price)}`\n"
+            f"Цена дошла до `{_format_price(exit_price)}`\n"
             f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
-            f"🛡 SL перенесён в безубыток: `{_format_price(entry)}`\n"
-            f"{trail_line}\n"
-            f"Остаток идёт к TP2: `{_format_price(tp2)}`"
+            f"🛡 Позиция остаётся ПОЛНОСТЬЮ открытой — 100% объёма\n"
+            f"🔄 Включён автоматический трейлинг-стоп "
+            f"(минимум — вход `{_format_price(entry)}`, дальше подтягивается по силе движения)\n"
+            f"Цель: TP2 `{_format_price(tp2)}`"
         )
     elif new_status == "TP2_HIT":
         icon  = "🎯"
         title = "TP2 ДОСТИГНУТ"
         body  = (
-            f"Закрыто 50% по `{_format_price(exit_price)}`\n"
+            f"Закрыто 100% по `{_format_price(exit_price)}`\n"
             f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
             f"✅ Сделка полностью закрыта"
         )
