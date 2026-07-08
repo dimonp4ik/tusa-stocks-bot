@@ -236,6 +236,8 @@ def init_db():
                 margin_usd  REAL,
                 sl_algo_id  TEXT,
                 sl_px       REAL,
+                tp1_algo_id TEXT,
+                tp1_sz      REAL,
                 status      TEXT NOT NULL DEFAULT 'OPEN',
                 opened_at   REAL NOT NULL,
                 closed_at   REAL,
@@ -243,6 +245,8 @@ def init_db():
                 error       TEXT
             )
         """)
+        _ensure_column(c, "autotrade_positions", "tp1_algo_id", "TEXT")
+        _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
 
 
 def get_bot_state(key: str) -> str | None:
@@ -1310,15 +1314,16 @@ def at_set_tp1_close_pct(user_id: int, pct: float) -> None:
 
 def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
                     sz: float, entry_px: float, margin_usd: float,
-                    sl_algo_id: str, sl_px: float) -> int:
+                    sl_algo_id: str, sl_px: float,
+                    tp1_algo_id: str = None, tp1_sz: float = None) -> int:
     with _conn() as c:
         cur = c.execute("""
             INSERT INTO autotrade_positions
                 (signal_id, user_id, inst_id, direction, sz, entry_px, margin_usd,
-                 sl_algo_id, sl_px, status, opened_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?)
+                 sl_algo_id, sl_px, tp1_algo_id, tp1_sz, status, opened_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?)
         """, (signal_id, user_id, inst_id, direction, sz, entry_px, margin_usd,
-              sl_algo_id, sl_px, time_mod.time()))
+              sl_algo_id, sl_px, tp1_algo_id, tp1_sz, time_mod.time()))
         return cur.lastrowid
 
 

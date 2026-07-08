@@ -217,27 +217,6 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> 
         return True, ""
 
 
-def place_partial_close(creds: dict, inst_id: str, direction: str, sz: float) -> tuple:
-    """Reduce-only market close of `sz` contracts (e.g. the user's chosen %
-    at TP1). The resting protection OCO (closeFraction=1) auto-covers
-    whatever remains — no need to touch/recreate it after this."""
-    close_side = "sell" if str(direction).upper() == "LONG" else "buy"
-    ok, data = _request(creds, "POST", "/api/v5/trade/order", body={
-        "instId":     inst_id,
-        "tdMode":     "isolated",
-        "side":       close_side,
-        "ordType":    "market",
-        "reduceOnly": "true",
-        "sz":         _fmt_sz(sz),
-    })
-    if not ok:
-        return False, data
-    try:
-        return True, data[0]["ordId"]
-    except Exception:
-        return True, ""
-
-
 def place_protection_oco(creds: dict, inst_id: str, direction: str,
                          sl_px: float, tp_px: float) -> tuple:
     """Reduce-only OCO covering the WHOLE position (closeFraction=1):
@@ -255,6 +234,32 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         "slOrdPx":       "-1",     # market on trigger
         "tpTriggerPx":   str(tp_px),
         "tpOrdPx":       "-1",
+    })
+    if not ok:
+        return False, data
+    try:
+        return True, data[0]["algoId"]
+    except Exception:
+        return True, ""
+
+
+def place_tp1_partial(creds: dict, inst_id: str, direction: str,
+                      tp1_px: float, sz: float) -> tuple:
+    """Standalone reduce-only conditional TP order for a FIXED size (the
+    user's chosen % of the position) — placed at trade-open alongside the
+    main OCO, so the exchange itself fires the partial close the instant
+    TP1 triggers (no bot round-trip latency for this piece). Independent of
+    the OCO's SL/TP2 legs. Returns (ok, algoId|err)."""
+    close_side = "sell" if str(direction).upper() == "LONG" else "buy"
+    ok, data = _request(creds, "POST", "/api/v5/trade/order-algo", body={
+        "instId":      inst_id,
+        "tdMode":      "isolated",
+        "side":        close_side,
+        "ordType":     "conditional",
+        "reduceOnly":  "true",
+        "sz":          _fmt_sz(sz),
+        "tpTriggerPx": str(tp1_px),
+        "tpOrdPx":     "-1",
     })
     if not ok:
         return False, data

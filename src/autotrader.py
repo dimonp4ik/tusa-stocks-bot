@@ -187,13 +187,38 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _dm(uid, f"❌ Автотрейдинг: не смог поставить стоп по {disp} — позиция закрыта для безопасности.\n`{algo_id}`")
         return
 
+    # Optional: pre-place the user's chosen TP1 partial-close as its OWN real
+    # exchange order (fixed size, reduceOnly) right now — so the exchange
+    # itself fires it the instant TP1 triggers, no bot round-trip latency.
+    # Independent of the OCO above (SL/TP2 keep covering whatever remains).
+    tp1_algo_id = None
+    tp1_sz      = None
+    try:
+        close_pct = float(u.get("tp1_close_pct") or 0)
+    except (TypeError, ValueError):
+        close_pct = 0.0
+    tp1_line = "TP1 и трейлинг ведёт бот автоматически."
+    if close_pct > 0:
+        lot = (spec or {}).get("lotSz") or 1.0
+        raw_tp1_sz = sz if close_pct >= 100 else int((sz * close_pct / 100.0) / lot) * lot
+        if raw_tp1_sz > 0:
+            tp1_px = okx.round_to_tick(float(sig["tp1"]), tick)
+            ok, tp1_result = okx.place_tp1_partial(creds, inst_id, sig["direction"], tp1_px, raw_tp1_sz)
+            if ok:
+                tp1_algo_id, tp1_sz = tp1_result, raw_tp1_sz
+                tp1_line = (f"На TP1 ({tp1_px}) закроется {close_pct:.0f}% "
+                            f"({okx._fmt_sz(raw_tp1_sz)} контр.), остаток — под трейлинг.")
+            else:
+                log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
+                tp1_line = "⚠️ Не смог поставить ордер на частичное закрытие TP1 — весь объём пойдёт под трейлинг."
+
     at_log_position(sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
-                    algo_id, sl_px)
+                    algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
     lev = AUTOTRADE_LEVERAGE
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
               f"Объём: {okx._fmt_sz(sz)} контр. (~${margin * lev:.2f} позиция, ${margin:.2f} маржа, {lev}x)\n"
               f"Вход: ~{px}\nSL: {sl_px}\nTP2: {tp_px}\n"
-              f"TP1 и трейлинг ведёт бот автоматически."))
+              f"{tp1_line}"))
 
 
 def open_positions_for_signal(sig: dict) -> None:
@@ -271,20 +296,24 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
 
             if new_status in _CLOSE_STATUSES:
                 # Cancel protection first so its market close can't double-fire,
-                # then flatten whatever the algo hasn't already closed.
+                # then flatten whatever the algo hasn't already closed. Also
+                # cancel any still-resting TP1 partial-close order — if TP1
+                # was never reached (e.g. straight SL_HIT) it would otherwise
+                # sit orphaned on the exchange after the position is flat.
                 okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+                if pos.get("tp1_algo_id"):
+                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
                 ok, err = okx.close_position_market(creds, pos["inst_id"])
                 at_close_position(pos["id"], new_status,
                                   error=None if ok else str(err))
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
-                # Full position stays on (TP1_CLOSE_FRAC=0). Move the exchange
-                # stop to breakeven RIGHT NOW — don't wait for the next
-                # monitor cycle's trail computation, which would leave the
-                # original (loss) SL live on the exchange for up to ~1 min
-                # after TP1 actually triggered. update_trailing() only ever
-                # raises this further (max(entry, ...)), so moving to entry
-                # immediately is always safe, never premature.
+                # Move the exchange stop to breakeven RIGHT NOW — don't wait
+                # for the next monitor cycle's trail computation, which would
+                # leave the original (loss) SL live on the exchange for up to
+                # ~1 min after TP1 actually triggered. update_trailing() only
+                # ever raises this further (max(entry, ...)), so moving to
+                # entry immediately is always safe, never premature.
                 try:
                     tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
                     be_px = okx.round_to_tick(float(sig["entry_price"]), tick)
@@ -296,41 +325,30 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
 
-                # Optional per-user partial close at TP1 (opt-in in onboarding /
-                # settings; 0 = default, keep the full position on trailing —
-                # the validated post_tp1_v2 strategy). The resting protection
-                # OCO (closeFraction=1) auto-covers whatever remains, so a
-                # partial close here needs no OCO changes.
-                try:
-                    close_pct = float(u.get("tp1_close_pct") or 0)
-                except (TypeError, ValueError):
-                    close_pct = 0.0
-                if close_pct > 0:
+                # If the user has a TP1 %, the exchange's own pre-placed order
+                # (set at trade-open, see _open_for_user) should have fired
+                # the instant TP1 triggered — no need to re-issue anything
+                # here. Just sync our record to the REAL remaining size so
+                # bookkeeping/notifications reflect what actually happened.
+                if pos.get("tp1_algo_id"):
                     try:
-                        spec     = okx.get_xperp_spec(pos["inst_id"]) or {}
-                        lot      = spec.get("lotSz") or 1.0
-                        total_sz = float(pos["sz"])
-                        close_sz = total_sz if close_pct >= 100 else int(
-                            (total_sz * close_pct / 100.0) / lot) * lot
-                        if close_sz > 0:
-                            ok, err = okx.place_partial_close(
-                                creds, pos["inst_id"], sig["direction"], close_sz)
-                            if ok:
-                                remaining = round(total_sz - close_sz, 10)
-                                if remaining <= 0:
-                                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
-                                    at_close_position(pos["id"], "TP1_FULL_CLOSE")
-                                    _dm(pos["user_id"],
-                                        f"🤖 *{disp}*: {label}.\nЗакрыто {close_pct:.0f}% (вся позиция) по твоей настройке.")
-                                    continue
-                                at_reduce_position_sz(pos["id"], remaining)
+                        ok, real_sz = okx.get_position_size(creds, pos["inst_id"])
+                        if ok and real_sz < float(pos["sz"]):
+                            if real_sz <= 0:
+                                at_close_position(pos["id"], "TP1_FULL_CLOSE")
                                 _dm(pos["user_id"],
-                                    f"🤖 *{disp}*: {label}.\nЗакрыто {close_pct:.0f}% по твоей настройке, "
-                                    f"остаток ({okx._fmt_sz(remaining)} контр.) идёт под трейлинг.")
+                                    f"🤖 *{disp}*: {label}.\nЗакрыто по твоей настройке — вся позиция.")
                                 continue
-                            log.warning(f"autotrade TP1 partial close failed pos#{pos['id']}: {err}")
+                            at_reduce_position_sz(pos["id"], real_sz)
+                            _dm(pos["user_id"],
+                                f"🤖 *{disp}*: {label}.\nЗакрыто по твоей настройке, "
+                                f"остаток ({okx._fmt_sz(real_sz)} контр.) идёт под трейлинг.")
+                            continue
+                        elif ok:
+                            log.warning(f"autotrade TP1 order pos#{pos['id']} hasn't filled yet "
+                                       f"(real_sz={real_sz} >= tracked {pos['sz']}) — will recheck next cycle")
                     except Exception as e:
-                        log.warning(f"autotrade TP1 partial close failed pos#{pos['id']}: {e}")
+                        log.warning(f"autotrade TP1 size sync failed pos#{pos['id']}: {e}")
 
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label}.")
         except Exception as e:
@@ -364,6 +382,8 @@ def poll_exchange_closes() -> None:
             # already fired for real. Close out the record and tell the user
             # right away; the signal's own status message follows separately.
             okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+            if pos.get("tp1_algo_id"):
+                okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
             _dm(pos["user_id"],
