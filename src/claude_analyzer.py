@@ -66,7 +66,7 @@ WHAT THE SCORES MEAN
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
 - Str: 15m swing structure at signal time. bull = higher-high + higher-low sequence. bear = lower-high + lower-low. range = neither. Use this to gauge whether entry is WITH or AGAINST the short-term structure. A LONG in Str=bear is counter-structure (extra caution); a LONG in Str=bull is structure-aligned (minor confirmation).
 - Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. Format per bucket: "rejected 8: 5W(2TP2) 2SL 1exp" = of 8 similar setups you returned NO TRADE on, 5 would have won (reached TP1, of which 2 ran to full TP2), 2 would have hit SL, 1 expired flat. W = wins you missed (over-rejection evidence); SL = losses you correctly dodged (caution validated); exp = harmless no-ops. "sent 6: 4W 2SL" is the realised quality of ones you approved — your live baseline. Compare buckets: if rejected-W rate ≈ sent-W rate you are leaving good trades on the table; if rejected is mostly SL you are filtering correctly. When 2+ 15m structures exist, a per-trend breakdown follows in brackets: "[bear:0W/3SL, bull:4W/0SL]" — same setup wins in bull structure, only stops out in bear. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
-- BT2024+[...]: historical BASE RATE for entries like this one — the same rule-filter replayed over 2024→present price data, same format as Hist. This is a prior from past market regimes, not your own verdicts: it answers "how do entries of this shape usually resolve on this symbol". Use it exactly like Hist (including the per-trend breakdown vs the current Str= field), but when live Hist and BT2024+ disagree, trust live Hist — it reflects the current regime.
+- BT2022+[...]: historical BASE RATE for entries like this one — the same rule-filter replayed over 2022→present price data, same format as Hist. This is a prior from past market regimes, not your own verdicts: it answers "how do entries of this shape usually resolve on this symbol". IMPORTANT: this span mixes several distinct regimes (2022-23 volatility, later trends/ranges) — a single aggregate number can hide a regime-dependent split, so always check the per-trend breakdown (bear/bull/range) rather than the headline count, and weigh the bucket matching the current Str= field. When live Hist and BT2022+ disagree, trust live Hist — it reflects the current regime.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -217,9 +217,10 @@ def _self_feedback(s: dict) -> str:
         parts.append(f"sent {_fmt(snt)}")
     seg = f" Hist[{'; '.join(parts)}]" if parts else ""
     if bt:
-        # BT block = historical prior for entries like this one (older market
-        # regimes — treat as base rate, live Hist above outweighs it).
-        seg += f" BT2024+[{_fmt(bt)}]"
+        # BT block = historical prior for entries like this one, spanning
+        # 2022 through later regimes — treat as base rate, live Hist above
+        # outweighs it.
+        seg += f" BT2022+[{_fmt(bt)}]"
     return seg
 
 
