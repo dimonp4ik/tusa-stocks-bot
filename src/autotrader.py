@@ -36,7 +36,7 @@ from config import (
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
-    at_close_position, at_all_open_positions,
+    at_close_position, at_all_open_positions, at_reduce_position_sz,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -295,6 +295,43 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                         log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
+
+                # Optional per-user partial close at TP1 (opt-in in onboarding /
+                # settings; 0 = default, keep the full position on trailing —
+                # the validated post_tp1_v2 strategy). The resting protection
+                # OCO (closeFraction=1) auto-covers whatever remains, so a
+                # partial close here needs no OCO changes.
+                try:
+                    close_pct = float(u.get("tp1_close_pct") or 0)
+                except (TypeError, ValueError):
+                    close_pct = 0.0
+                if close_pct > 0:
+                    try:
+                        spec     = okx.get_xperp_spec(pos["inst_id"]) or {}
+                        lot      = spec.get("lotSz") or 1.0
+                        total_sz = float(pos["sz"])
+                        close_sz = total_sz if close_pct >= 100 else int(
+                            (total_sz * close_pct / 100.0) / lot) * lot
+                        if close_sz > 0:
+                            ok, err = okx.place_partial_close(
+                                creds, pos["inst_id"], sig["direction"], close_sz)
+                            if ok:
+                                remaining = round(total_sz - close_sz, 10)
+                                if remaining <= 0:
+                                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+                                    at_close_position(pos["id"], "TP1_FULL_CLOSE")
+                                    _dm(pos["user_id"],
+                                        f"🤖 *{disp}*: {label}.\nЗакрыто {close_pct:.0f}% (вся позиция) по твоей настройке.")
+                                    continue
+                                at_reduce_position_sz(pos["id"], remaining)
+                                _dm(pos["user_id"],
+                                    f"🤖 *{disp}*: {label}.\nЗакрыто {close_pct:.0f}% по твоей настройке, "
+                                    f"остаток ({okx._fmt_sz(remaining)} контр.) идёт под трейлинг.")
+                                continue
+                            log.warning(f"autotrade TP1 partial close failed pos#{pos['id']}: {err}")
+                    except Exception as e:
+                        log.warning(f"autotrade TP1 partial close failed pos#{pos['id']}: {e}")
+
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label}.")
         except Exception as e:
             log.warning(f"autotrade mirror failed pos#{pos['id']}: {e}")

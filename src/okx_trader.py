@@ -217,6 +217,27 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> 
         return True, ""
 
 
+def place_partial_close(creds: dict, inst_id: str, direction: str, sz: float) -> tuple:
+    """Reduce-only market close of `sz` contracts (e.g. the user's chosen %
+    at TP1). The resting protection OCO (closeFraction=1) auto-covers
+    whatever remains — no need to touch/recreate it after this."""
+    close_side = "sell" if str(direction).upper() == "LONG" else "buy"
+    ok, data = _request(creds, "POST", "/api/v5/trade/order", body={
+        "instId":     inst_id,
+        "tdMode":     "isolated",
+        "side":       close_side,
+        "ordType":    "market",
+        "reduceOnly": "true",
+        "sz":         _fmt_sz(sz),
+    })
+    if not ok:
+        return False, data
+    try:
+        return True, data[0]["ordId"]
+    except Exception:
+        return True, ""
+
+
 def place_protection_oco(creds: dict, inst_id: str, direction: str,
                          sl_px: float, tp_px: float) -> tuple:
     """Reduce-only OCO covering the WHOLE position (closeFraction=1):

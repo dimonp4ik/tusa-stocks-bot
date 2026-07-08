@@ -215,11 +215,13 @@ def init_db():
                 size_value     REAL,
                 last_balance   REAL,
                 mode_prompt_pending INTEGER NOT NULL DEFAULT 0,
+                tp1_close_pct  REAL NOT NULL DEFAULT 0,
                 added_by       INTEGER,
                 added_at       REAL,
                 activated_at   REAL
             )
         """)
+        _ensure_column(c, "autotrade_users", "tp1_close_pct", "REAL NOT NULL DEFAULT 0")
 
         # ── Autotrading: one row per live position per user per signal ───────
         c.execute("""
@@ -1298,6 +1300,14 @@ def at_set_mode_prompt(user_id: int, pending: bool) -> None:
                   (1 if pending else 0, user_id))
 
 
+def at_set_tp1_close_pct(user_id: int, pct: float) -> None:
+    """% of the position to market-close when TP1 first hits (0-100).
+    0 = keep the full position on trailing (current default strategy)."""
+    with _conn() as c:
+        c.execute("UPDATE autotrade_users SET tp1_close_pct = ? WHERE user_id = ?",
+                  (pct, user_id))
+
+
 def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
                     sz: float, entry_px: float, margin_usd: float,
                     sl_algo_id: str, sl_px: float) -> int:
@@ -1335,6 +1345,15 @@ def at_update_position_sl(pos_id: int, sl_px: float) -> None:
     with _conn() as c:
         c.execute("UPDATE autotrade_positions SET sl_px = ? WHERE id = ?",
                   (sl_px, pos_id))
+
+
+def at_reduce_position_sz(pos_id: int, new_sz: float) -> None:
+    """Shrink the tracked size after a partial close at TP1 — the remaining
+    protection (OCO, closeFraction=1) auto-covers whatever's left on the
+    exchange, this just keeps our own record in sync."""
+    with _conn() as c:
+        c.execute("UPDATE autotrade_positions SET sz = ? WHERE id = ?",
+                  (new_sz, pos_id))
 
 
 def at_close_position(pos_id: int, close_reason: str, error: str = None) -> None:

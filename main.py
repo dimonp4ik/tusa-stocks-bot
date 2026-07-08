@@ -67,6 +67,7 @@ from src.db import (
     get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
+    at_set_tp1_close_pct,
     get_latest_open_signal,
 )
 from src import autotrader
@@ -1678,12 +1679,16 @@ def _at_show_menu(chat_id: int, u: dict):
     bal = u.get("last_balance")
     bal_str = f"${bal:.2f}" if bal is not None else "—"
     state = "🟢 включён" if u.get("active") else "⏸ выключен"
+    tp1_pct = float(u.get("tp1_close_pct") or 0)
+    tp1_str = "не закрывать (весь объём под трейлинг)" if tp1_pct <= 0 else f"{tp1_pct:.0f}%"
     rows = [[{"text": ("⏸ Выключить" if u.get("active") else "▶️ Включить"),
               "callback_data": "at_toggle"}],
             [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
+            [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
                  f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nРазмер: *{mode_str}*\n"
+                 f"Закрытие на TP1: *{tp1_str}*\n"
                  f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа",
                  rows)
 
@@ -1783,20 +1788,65 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
         _at_finish_size(chat_id, user_id, step, f"${usd:.2f} на сделку")
         return True
 
+    if step == "tp1pct":
+        try:
+            pct = float(val.replace(",", ".").rstrip("%"))
+        except ValueError:
+            _reply(chat_id, "Нужно число от 0 до 100. Например `0` или `50`.")
+            return True
+        if not (0 <= pct <= 100):
+            _reply(chat_id, "Процент должен быть от *0 до 100*.")
+            return True
+        at_set_tp1_close_pct(user_id, pct)
+        mode_str = st["data"].get("mode_str", "")
+        _at_onboarding.pop(chat_id, None)
+        _at_show_final_confirm(chat_id, mode_str, pct)
+        return True
+
+    if step == "tp1pct_change":
+        try:
+            pct = float(val.replace(",", ".").rstrip("%"))
+        except ValueError:
+            _reply(chat_id, "Нужно число от 0 до 100. Например `0` или `50`.")
+            return True
+        if not (0 <= pct <= 100):
+            _reply(chat_id, "Процент должен быть от *0 до 100*.")
+            return True
+        at_set_tp1_close_pct(user_id, pct)
+        _at_onboarding.pop(chat_id, None)
+        label = "не закрывать (весь объём под трейлинг)" if pct <= 0 else f"{pct:.0f}% на TP1"
+        _reply(chat_id, f"✅ Обновлено: {label}.")
+        return True
+
     return False
 
 
 def _at_finish_size(chat_id: int, user_id: int, step: str, mode_str: str):
-    _at_onboarding.pop(chat_id, None)
     if step.startswith("resize_"):
+        _at_onboarding.pop(chat_id, None)
         _reply(chat_id, f"✅ Размер сделки обновлён: *{mode_str}*.")
         return
-    # First-time onboarding → final confirmation before going live
+    # First-time onboarding → ask the TP1 partial-close preference before
+    # the final confirmation (default stays 0 = full position on trailing).
+    _at_onboarding[chat_id] = {"step": "tp1pct", "data": {"mode_str": mode_str}}
+    _reply(chat_id,
+           "🎯 *Закрытие части позиции на TP1*\n\n"
+           "По умолчанию стратегия держит ВСЮ позицию после TP1 и ведёт трейлинг-стопом "
+           "(это провалидированный на бэктестах режим).\n\n"
+           "Хочешь вместо этого закрывать часть позиции сразу на TP1? Напиши процент от "
+           "*0 до 100* (0 = не закрывать, оставить всё под трейлинг; например `50` = "
+           "закрыть половину на TP1, остаток — под трейлинг).")
+
+
+def _at_show_final_confirm(chat_id: int, mode_str: str, tp1_pct: float):
+    tp1_line = ("держим всю позицию, трейлинг с самого TP1" if tp1_pct <= 0
+                else f"закрываем {tp1_pct:.0f}% на TP1, остаток — трейлинг")
     _at_reply_kb(chat_id,
                  f"⚠️ *Последний шаг*\n\n"
                  f"Бот будет *сам открывать реальные сделки* на твоём OKX:\n"
                  f"• размер: *{mode_str}*\n"
                  f"• плечо: 10x, изолированная маржа\n"
+                 f"• TP1: {tp1_line}\n"
                  f"• стоп-лосс и тейки ставятся автоматически\n\n"
                  f"Торговля с плечом = риск потерять депозит. Включаем?",
                  [[{"text": "✅ Включить автотрейдинг", "callback_data": "at_confirm"},
@@ -1842,6 +1892,12 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
     elif data == "at_rekey":
         _answer_callback(cb_id)
         _at_begin_keys(chat_id)
+    elif data == "at_tp1pct":
+        _at_onboarding[chat_id] = {"step": "tp1pct_change", "data": {}}
+        _answer_callback(cb_id)
+        _reply(chat_id,
+               "Какой % позиции закрывать на TP1? Напиши число *0-100* "
+               "(0 = не закрывать, оставить всё под трейлинг).")
     elif data == "at_mode_keep":
         at_set_mode_prompt(user_id, False)
         _answer_callback(cb_id, "Ок, оставляем как есть.")
