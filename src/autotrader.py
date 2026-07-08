@@ -278,8 +278,23 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                                   error=None if ok else str(err))
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
-                # Full position stays on (TP1_CLOSE_FRAC=0) — trailing takes
-                # over from the next monitor cycle. Just tell the user.
+                # Full position stays on (TP1_CLOSE_FRAC=0). Move the exchange
+                # stop to breakeven RIGHT NOW — don't wait for the next
+                # monitor cycle's trail computation, which would leave the
+                # original (loss) SL live on the exchange for up to ~1 min
+                # after TP1 actually triggered. update_trailing() only ever
+                # raises this further (max(entry, ...)), so moving to entry
+                # immediately is always safe, never premature.
+                try:
+                    tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
+                    be_px = okx.round_to_tick(float(sig["entry_price"]), tick)
+                    ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
+                    if ok:
+                        at_update_position_sl(pos["id"], be_px)
+                    else:
+                        log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
+                except Exception as e:
+                    log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label}.")
         except Exception as e:
             log.warning(f"autotrade mirror failed pos#{pos['id']}: {e}")
