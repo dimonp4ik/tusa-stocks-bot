@@ -3118,6 +3118,13 @@ def _monitor_open_signals():
         _check_open_signals()
     except Exception as e:
         log.warning(f"Open-signal monitor failed: {e}")
+    # Real exchange position state, independent of the engine's own (slower,
+    # kline-based) status detection — catches SL/TP/trail fires within one
+    # cycle instead of waiting minutes for _check_open_signals to notice.
+    try:
+        autotrader.poll_exchange_closes()
+    except Exception as e:
+        log.warning(f"Autotrade exchange-close poll failed: {e}")
 
 
 def _shadow_tracker_job():

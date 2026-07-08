@@ -1321,6 +1321,16 @@ def at_open_positions_for_signal(signal_id: int) -> list:
         return [dict(r) for r in rows]
 
 
+def at_all_open_positions() -> list:
+    """Every OPEN autotrade position across all users/signals — used by the
+    fast exchange-side close poll (doesn't wait for the signal engine)."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM autotrade_positions WHERE status = 'OPEN'"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def at_update_position_sl(pos_id: int, sl_px: float) -> None:
     with _conn() as c:
         c.execute("UPDATE autotrade_positions SET sl_px = ? WHERE id = ?",

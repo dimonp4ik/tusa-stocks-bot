@@ -166,6 +166,36 @@ def set_leverage(creds: dict, inst_id: str, lever: int = 10) -> tuple:
     return ok, data
 
 
+# Per (api_key, inst_id) leverage-already-set cache — skips a redundant
+# set-leverage round-trip on every trade once it's confirmed on the exchange.
+_leverage_cache: set = set()
+
+
+def ensure_leverage(creds: dict, inst_id: str, lever: int = 10) -> tuple:
+    """Like set_leverage, but skips the API call if we've already set this
+    exact (key, instrument, leverage) combo this process lifetime."""
+    cache_key = (creds["api_key"], inst_id, lever)
+    if cache_key in _leverage_cache:
+        return True, "cached"
+    ok, data = set_leverage(creds, inst_id, lever)
+    if ok:
+        _leverage_cache.add(cache_key)
+    return ok, data
+
+
+def get_position_size(creds: dict, inst_id: str) -> tuple:
+    """(ok, size_float). 0.0 means flat (position closed, by SL/TP/trail/manually)."""
+    ok, data = _request(creds, "GET", "/api/v5/account/positions", params={"instId": inst_id})
+    if not ok:
+        return False, data
+    try:
+        if not data:
+            return True, 0.0
+        return True, abs(float(data[0].get("pos") or 0))
+    except Exception as e:
+        return False, f"position parse failed: {e}"
+
+
 # ── Orders ────────────────────────────────────────────────────────────────────
 
 def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> tuple:

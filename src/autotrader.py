@@ -6,6 +6,12 @@ Lifecycle glue (called from main.py):
   open_positions_for_signal(sig)  — after a signal is published
   update_trailing(sig, stop_px)   — every monitor cycle while TP1_PARTIAL
   mirror_transition(sig, status)  — when the engine closes/transitions a signal
+  poll_exchange_closes()          — every monitor cycle, ALL open positions:
+    the exchange-side OCO fires the instant SL/TP is touched, but the signal
+    engine only learns about it on its own kline-based check (adds minutes
+    of lag for the DM). This polls real position size directly so the user
+    is notified within one monitor cycle of the real close, independent of
+    when/whether the engine's own status transition catches up.
 
 Per-user flow on open:
   decrypt keys → balance (threshold-cross check) → size → set 10x isolated →
@@ -30,7 +36,7 @@ from config import (
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
-    at_close_position,
+    at_close_position, at_all_open_positions,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -162,7 +168,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _dm(uid, f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
         return
 
-    okx.set_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
+    okx.ensure_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
 
     ok, ord_id = okx.place_market_entry(creds, inst_id, sig["direction"], sz)
     if not ok:
@@ -277,3 +283,39 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label}.")
         except Exception as e:
             log.warning(f"autotrade mirror failed pos#{pos['id']}: {e}")
+
+
+def poll_exchange_closes() -> None:
+    """Every monitor cycle: check the REAL position size on the exchange for
+    every DB-open autotrade position. The exchange-side OCO closes the
+    position the instant SL/TP triggers — this catches that immediately
+    instead of waiting for the signal engine's own (slower, kline-based)
+    status transition to reach mirror_transition()."""
+    if not AUTOTRADE_ENABLED:
+        return
+    positions = at_all_open_positions()
+    if not positions:
+        return
+    for pos in positions:
+        try:
+            u = at_get(pos["user_id"])
+            creds = _creds_of(u) if u else None
+            if not creds:
+                continue
+            ok, size = okx.get_position_size(creds, pos["inst_id"])
+            if not ok:
+                continue   # transient API error — retry next cycle
+            if size > 0:
+                continue   # still open on the exchange, nothing to do
+
+            # Exchange is flat but our DB still says OPEN → SL/TP/trail
+            # already fired for real. Close out the record and tell the user
+            # right away; the signal's own status message follows separately.
+            okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+            at_close_position(pos["id"], "EXCHANGE_FLAT")
+            base = pos["inst_id"].split("-")[0]
+            _dm(pos["user_id"],
+                f"🤖 *{base}/USDC*: позиция закрыта на бирже (стоп/тейк сработал).\n"
+                f"Детали сигнала придут отдельным сообщением.")
+        except Exception as e:
+            log.warning(f"autotrade exchange-close poll failed pos#{pos['id']}: {e}")
