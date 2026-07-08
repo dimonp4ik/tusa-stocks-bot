@@ -2,6 +2,7 @@ import anthropic
 import logging
 import sys
 import os
+import time as _time_mod
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -482,21 +483,48 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
 # ── HEAVY tier (Sonnet, single setup, coin memory) ────────────────────────────
 
 def _memory_block(history: list) -> str:
-    """Render recent per-coin outcomes as compact memory for the HEAVY call."""
+    """Render recent per-coin outcomes as compact memory for the HEAVY call.
+
+    Includes elapsed time since each trade closed — without it Sonnet can't
+    tell "this symbol stopped us out 3h ago" from "3 weeks ago", so it can't
+    catch a same-symbol whipsaw (stop, then an immediate opposite-direction
+    re-entry that also stops) even though the raw outcome was right there.
+    """
     if not history:
         return "No prior closed trades on this symbol.\n"
+    now = _time_mod.time()
     lines = []
-    for h in history[:CLAUDE_MEMORY_LIMIT]:
+    whipsaw_warned = False
+    for idx, h in enumerate(history[:CLAUDE_MEMORY_LIMIT]):
         entry = h.get("entry_price")
         exitp = h.get("exit_price")
         try:
             move = f"{(exitp - entry) / entry * 100:+.1f}%" if entry and exitp else "?"
         except (TypeError, ZeroDivisionError):
             move = "?"
+        closed_at = h.get("closed_at")
+        age_s = ""
+        age_hours = None
+        if closed_at:
+            try:
+                age_hours = (now - float(closed_at)) / 3600
+                age_s = f", {age_hours:.1f}h ago" if age_hours < 48 else f", {age_hours/24:.0f}d ago"
+            except (TypeError, ValueError):
+                pass
         lines.append(
             f"- {h.get('direction','?')} {h.get('status','?')} "
-            f"({move}, conf={h.get('confidence','?')}, S={h.get('mtf_score','?')})"
+            f"({move}, conf={h.get('confidence','?')}, S={h.get('mtf_score','?')}{age_s})"
         )
+        # Flag the specific whipsaw pattern: the most recent close was a stop
+        # within the last 6h — a fresh setup right now (any direction) on
+        # this symbol is entering right after that got invalidated.
+        if idx == 0 and not whipsaw_warned and h.get("status") == "SL_HIT" \
+           and age_hours is not None and age_hours <= 6:
+            lines.append(
+                f"  ⚠️ WHIPSAW WATCH: this symbol stopped out {age_hours:.1f}h ago — "
+                f"a fresh setup this soon after may just be chop, not a real move."
+            )
+            whipsaw_warned = True
     return "Recent outcomes on this symbol (newest first):\n" + "\n".join(lines) + "\n"
 
 
@@ -533,7 +561,10 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
         f"3. MOMENTUM — Does RSI/volume/funding confirm or fight the move? "
         f"Any squeeze risk from crowded positioning?\n"
         f"4. COIN HISTORY — Based on recent outcomes above, does this symbol "
-        f"reliably follow through on this setup type, or does it repeatedly fail?\n"
+        f"reliably follow through on this setup type, or does it repeatedly fail? "
+        f"Pay attention to elapsed time: a stop-out within the last few hours followed "
+        f"by a fresh setup (especially the opposite direction) is a whipsaw/chop warning, "
+        f"not confirmation the reversal is real — demand extra confluence before trusting it.\n"
         f"5. DEVIL'S ADVOCATE — Argue the strongest case AGAINST this trade. "
         f"What specific price action would prove this setup wrong?\n"
         f"6. VERDICT — After weighing all of the above, give your final decision.\n\n"

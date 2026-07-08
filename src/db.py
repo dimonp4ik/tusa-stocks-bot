@@ -422,11 +422,13 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
 
 
 def get_recent_outcomes(symbol: str, limit: int = 8) -> list:
-    """Recent final outcomes for one symbol — fuel for HEAVY coin memory."""
+    """Recent final outcomes for one symbol — fuel for HEAVY coin memory.
+    Includes closed_at so the prompt can show recency (a same-symbol reversal
+    a few hours after a stop is a whipsaw signal Sonnet can't see otherwise)."""
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
-            f"SELECT direction, status, entry_price, exit_price, confidence, mtf_score "
+            f"SELECT direction, status, entry_price, exit_price, confidence, mtf_score, closed_at "
             f"FROM signals WHERE symbol = ? AND status IN ({placeholders}) "
             f"ORDER BY opened_at DESC LIMIT ?",
             [symbol, *FINAL_STATUSES, limit],
