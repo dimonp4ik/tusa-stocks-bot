@@ -196,6 +196,10 @@ def init_db():
             # 'live' = judged by Claude in production; 'backtest' = seeded
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
+            # Realised R of the trade (backtest: real net_r incl. trailed
+            # runner; live: left NULL, derived from bracket at read time).
+            # Powers expectancy (avg R) in Claude's self-feedback block.
+            "net_r":        "REAL",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -1032,6 +1036,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
         live = c.execute(
             """SELECT symbol, direction, mtf_score, session, entry_source,
                       decision, sent, outcome, reached_tp1, reached_tp2, ts, trend,
+                      entry_price, tp1, tp2, sl, net_r,
                       COALESCE(source,'live') AS source
                FROM setup_log
                WHERE resolved=1 AND ts >= ? AND direction=?
@@ -1043,6 +1048,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
         bt = c.execute(
             """SELECT symbol, direction, mtf_score, session, entry_source,
                       decision, sent, outcome, reached_tp1, reached_tp2, ts, trend,
+                      entry_price, tp1, tp2, sl, net_r,
                       source
                FROM setup_log
                WHERE resolved=1 AND direction=? AND source='backtest'
@@ -1071,15 +1077,24 @@ def seed_backtest_outcomes(rows: list) -> int:
                 ts = float(r.get("entry_time") or 0)
                 if ts <= 0 or not r.get("symbol") or not r.get("direction"):
                     continue
+                # Real realised R (net of costs, incl. trailed runner). Prefer
+                # net_r; fall back to gross_r if a batch lacks the net column.
+                try:
+                    net_r = float(r.get("net_r"))
+                except (TypeError, ValueError):
+                    try:
+                        net_r = float(r.get("gross_r"))
+                    except (TypeError, ValueError):
+                        net_r = None
                 c.execute("""
                     INSERT INTO setup_log
                         (ts, symbol, direction, entry_price, tp1, tp2, sl,
                          mtf_score, decision, confidence, risk_score, reason, sent,
                          session, entry_source, trend,
                          outcome, reached_tp1, reached_tp2, resolved, resolved_ts,
-                         source)
+                         source, net_r)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'BACKTEST', NULL, '', 1,
-                            ?, ?, ?, ?, ?, ?, 1, ?, 'backtest')
+                            ?, ?, ?, ?, ?, ?, 1, ?, 'backtest', ?)
                 """, (
                     ts,
                     str(r["symbol"]),
@@ -1097,11 +1112,42 @@ def seed_backtest_outcomes(rows: list) -> int:
                     reached_tp1,
                     reached_tp2,
                     float(r.get("exit_time") or 0) or None,
+                    net_r,
                 ))
                 ins += 1
             except Exception:
                 continue
     return ins
+
+
+def backfill_backtest_net_r(rows: list) -> int:
+    """One-shot: fill net_r on already-seeded backtest rows (seeded before the
+    net_r column existed). Matches on (symbol, direction, ts=entry_time).
+    Returns updated count. Caller gates via bot_state so it runs once."""
+    upd = 0
+    with _conn() as c:
+        for r in rows:
+            try:
+                ts = float(r.get("entry_time") or 0)
+                if ts <= 0 or not r.get("symbol") or not r.get("direction"):
+                    continue
+                try:
+                    net_r = float(r.get("net_r"))
+                except (TypeError, ValueError):
+                    try:
+                        net_r = float(r.get("gross_r"))
+                    except (TypeError, ValueError):
+                        continue
+                cur = c.execute(
+                    """UPDATE setup_log SET net_r = ?
+                       WHERE source='backtest' AND net_r IS NULL
+                         AND symbol=? AND direction=? AND ts=?""",
+                    (net_r, str(r["symbol"]), str(r["direction"]), ts),
+                )
+                upd += cur.rowcount
+            except Exception:
+                continue
+    return upd
 
 
 def get_weekly_stats() -> dict:

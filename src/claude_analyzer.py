@@ -66,8 +66,8 @@ WHAT THE SCORES MEAN
 - Confs: additional confirmations beyond FVG/OB/SW — ChoCH (Change of Character, micro-structure shift), RSI_Div (RSI divergence), MACD_Div, Engulfing, BullWick/BearWick (rejection wick pressure), StochCross (stochastic momentum cross). More = stronger.
 - PRE-FILTERS ALREADY APPLIED: upstream code removed: ER<0.15 (chop), RSI exhaustion, bear-trend hot-vol (overcrowded shorts), BOS-without-RSI-midline (momentum gap). What you see has already passed a strict quality stack.
 - Str: 15m swing structure at signal time. bull = higher-high + higher-low sequence. bear = lower-high + lower-low. range = neither. Use this to gauge whether entry is WITH or AGAINST the short-term structure. A LONG in Str=bear is counter-structure (extra caution); a LONG in Str=bull is structure-aligned (minor confirmation).
-- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. Format per bucket: "rejected 8: 5W(2TP2) 2SL 1exp" = of 8 similar setups you returned NO TRADE on, 5 would have won (reached TP1, of which 2 ran to full TP2), 2 would have hit SL, 1 expired flat. W = wins you missed (over-rejection evidence); SL = losses you correctly dodged (caution validated); exp = harmless no-ops. "sent 6: 4W 2SL" is the realised quality of ones you approved — your live baseline. Compare buckets: if rejected-W rate ≈ sent-W rate you are leaving good trades on the table; if rejected is mostly SL you are filtering correctly. When 2+ 15m structures exist, a per-trend breakdown follows in brackets: "[bear:0W/3SL, bull:4W/0SL]" — same setup wins in bull structure, only stops out in bear. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
-- BT2022+[...]: historical BASE RATE for entries like this one — the same rule-filter replayed over 2022→present price data, same format as Hist. This is a prior from past market regimes, not your own verdicts: it answers "how do entries of this shape usually resolve on this symbol". IMPORTANT: this span mixes several distinct regimes (2022-23 volatility, later trends/ranges) — a single aggregate number can hide a regime-dependent split, so always check the per-trend breakdown (bear/bull/range) rather than the headline count, and weigh the bucket matching the current Str= field. When live Hist and BT2022+ disagree, trust live Hist — it reflects the current regime.
+- Hist[...]: YOUR OWN track record on similar past setups (same direction + same symbol or nearby score), measured by what actually happened. Format per bucket: "rejected 8: 5W(2TP2) 2SL 1exp avg+0.31R" = of 8 similar setups you returned NO TRADE on, 5 would have won (reached TP1, of which 2 ran to full TP2), 2 would have hit SL, 1 expired flat, and the AVERAGE realised outcome was +0.31R. W = wins you missed (over-rejection evidence); SL = losses you correctly dodged; exp = harmless no-ops. "sent 6: 4W 2SL avg+0.45R" is the realised quality of ones you approved — your live baseline. **avg±R is expectancy — the single most important number**: a bucket can be 60% wins yet NEGATIVE avg R if the wins are tiny and the losses are full -1R, meaning that setup type LOSES money over time despite "winning often". A high win-count with weak/negative avg R is a trap, not a green light; a modest win-count with strong positive avg R (big runners) is a real edge. avg R shown only when ≥5 samples carry a resolved R. When 2+ 15m structures exist, a per-trend breakdown follows: "[bear:0W/3SL/-1.00R, bull:4W/0SL/+1.8R]" — same setup is a disaster in bear structure, a strong edge in bull. Cross-reference with the current Str= field. Small samples are weak evidence — weigh accordingly. Absent = not enough resolved history yet.
+- BT2022+[...]: historical BASE RATE for entries like this one — the same rule-filter replayed over 2022→present price data, same format as Hist (including avg R expectancy). This is a prior from past market regimes, not your own verdicts: it answers "how do entries of this shape usually resolve on this symbol, and did they actually make money". IMPORTANT: this span mixes several distinct regimes (2022-23 volatility, later trends/ranges) — a single aggregate can hide a regime-dependent split, so check the per-trend breakdown (bear/bull/range) and its avg R rather than the headline count, and weigh the bucket matching the current Str= field. A positive headline win-rate with negative avg R in the trend bucket that matches NOW is a red flag. When live Hist and BT2022+ disagree, trust live Hist — it reflects the current regime.
 
 HOW TO DECIDE
 1. Confirm the suggested side only. If you would not take that exact side, return NO TRADE.
@@ -80,7 +80,7 @@ HOW TO DECIDE
 8. News overrides structure: BEARISH news → no LONGs; BULLISH news → no SHORTs. Major event live → prefer NO TRADE.
 9. Premium setups (💎PREM) already have OB+FVG overlap + sweep — treat as FVG+OB+SW all effectively confirmed. Lean HIGH confidence when trend and zone also agree.
 10. Low ER (0.15–0.25) with both HTFs neutral = marginal chop even with BOS. Demand sweep confirmation or return NO TRADE.
-11. Learn from Hist[...] when present: a strong rejected-similar TP1 rate is a signal you have been over-rejecting this setup type — give the borderline ones the benefit of the doubt. A weak one confirms caution. When Hist shows a trend breakdown (bull:X/N, bear:X/N), prioritize the bucket matching the current Str= field — e.g. if Hist shows bear:0/4 and current Str=bear, that is a direct warning. Never let it override a hard red flag (counter-trend, RSI exhaustion, hostile news); it breaks ties, it does not justify a bad trade.
+11. Learn from Hist[...] when present, and read avg R (expectancy) as the primary signal, win-count as secondary: a strong rejected-similar TP1 rate WITH positive avg R means you have been over-rejecting a profitable setup type — give borderline ones the benefit of the doubt. But a high win-count with weak or negative avg R is NOT a green light — that setup type bleeds out over time (small wins, full-R losses), so keep rejecting it. When Hist/BT shows a per-trend breakdown, prioritize the bucket matching the current Str= field and read BOTH its W/SL and its avg R — e.g. bear:0W/4SL/-1.00R with current Str=bear is a direct, strong warning; bull:5W/1SL/+1.6R with Str=bull is a genuine edge. Never let it override a hard red flag (counter-trend, RSI exhaustion, hostile news); it breaks ties, it does not justify a bad trade.
 
 RISK SCORE (0–10): how dangerous is this trade RIGHT NOW. 0–3 = clean, trend-aligned, well-located. 4–7 = tradeable with a real concern. 8–10 = serious problem (chasing, fighting trend, crowded funding, hostile news, far from zone). High risk_score should almost always pair with NO TRADE — be honest.
 
@@ -150,6 +150,38 @@ def _verdict_tool() -> dict:
     }
 
 
+def _row_r(row: dict):
+    """Realised R for one resolved setup row. Backtest rows carry the real
+    net_r (incl. trailed runner). Live rows lack it → derive from the bracket
+    geometry + categorical outcome: SL=-1, EXPIRED=0, TP2=full tp2_r,
+    TP1/TRAIL=tp1_r (a conservative floor; the trailed runner usually did
+    better). Returns None when no R can be established."""
+    nr = row.get("net_r")
+    if nr is not None:
+        try:
+            return float(nr)
+        except (TypeError, ValueError):
+            pass
+    outcome = (row.get("outcome") or "").upper()
+    if outcome == "SL":
+        return -1.0
+    if outcome == "EXPIRED":
+        return 0.0
+    try:
+        entry = float(row.get("entry_price"))
+        sl    = float(row.get("sl"))
+        risk  = abs(entry - sl)
+        if risk <= 0:
+            return None
+        if outcome == "TP2":
+            return abs(float(row.get("tp2")) - entry) / risk
+        if outcome in ("TP1", "TRAIL"):
+            return abs(float(row.get("tp1")) - entry) / risk
+    except (TypeError, ValueError):
+        return None
+    return None
+
+
 def _self_feedback(s: dict) -> str:
     """Compact track-record of how SIMILAR past setups actually resolved.
 
@@ -179,6 +211,14 @@ def _self_feedback(s: dict) -> str:
         exp = sum(1 for r in subset if (r.get("outcome") or "") == "EXPIRED")
         return w, sl, exp
 
+    def _expectancy(subset: list):
+        """Avg realised R across the subset — the real edge number, not just
+        win-rate. Uses stored net_r (backtest, includes trailed runner); for
+        live rows without net_r, derives R from the bracket + outcome. Returns
+        (avg_R, n_with_R) or (None, 0) when nothing has a usable R."""
+        rs = [v for v in (_row_r(x) for x in subset) if v is not None]
+        return (sum(rs) / len(rs), len(rs)) if rs else (None, 0)
+
     def _fmt(subset: list) -> str:
         n = len(subset)
         w, sl, exp = _counts(subset)
@@ -189,6 +229,11 @@ def _self_feedback(s: dict) -> str:
         seg += f" {sl}SL"
         if exp:
             seg += f" {exp}exp"
+        # Expectancy: the honest edge — 60%WR of tiny wins vs full -1R losses
+        # is still -EV. Only shown when ≥5 rows carry a usable R (avoid noise).
+        avg_r, n_r = _expectancy(subset)
+        if avg_r is not None and n_r >= 5:
+            seg += f" avg{avg_r:+.2f}R"
         # Per-trend W/SL breakdown only when 2+ distinct structures present.
         by_trend: dict = {}
         for r in subset:
@@ -197,9 +242,13 @@ def _self_feedback(s: dict) -> str:
                 continue
             by_trend.setdefault(t, []).append(r)
         if len(by_trend) >= 2:
+            def _trend_seg(rs):
+                w_, sl_, _ = _counts(rs)
+                a, na = _expectancy(rs)
+                r_s = f"/{a:+.2f}R" if a is not None and na >= 5 else ""
+                return f"{w_}W/{sl_}SL{r_s}"
             bd = ", ".join(
-                f"{t}:{_counts(rs)[0]}W/{_counts(rs)[1]}SL"
-                for t, rs in sorted(by_trend.items())
+                f"{t}:{_trend_seg(rs)}" for t, rs in sorted(by_trend.items())
             )
             seg += f" [{bd}]"
         return seg

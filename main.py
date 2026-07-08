@@ -63,7 +63,7 @@ from src.db import (
     get_bot_state, set_bot_state,
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
-    get_similar_resolved_setups, seed_backtest_outcomes,
+    get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
     get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
@@ -3226,6 +3226,25 @@ def maybe_seed_backtest():
             log.info(f"Claude memory seeded: {n} trades from {fname} → setup_log[source=backtest]")
         except Exception as e:
             log.warning(f"Backtest seeding {fname} failed (will retry next boot): {e}")
+
+    # One-shot backfill: rows seeded before the net_r column existed have
+    # net_r=NULL → re-read the CSVs and fill it so expectancy (avg R) works
+    # on the existing priors without a full re-seed. Gated once.
+    if not get_bot_state("bt_net_r_backfilled"):
+        total = 0
+        for fname, _flag in _BT_SEED_BATCHES:
+            try:
+                path = os.path.join(_BT_SEED_DIR, fname)
+                if not os.path.exists(path):
+                    continue
+                with open(path, newline="", encoding="utf-8") as f:
+                    rows = list(_csv.DictReader(f))
+                total += backfill_backtest_net_r(rows)
+            except Exception as e:
+                log.warning(f"net_r backfill {fname} failed (will retry next boot): {e}")
+                return
+        set_bot_state("bt_net_r_backfilled", str(total))
+        log.info(f"Backtest net_r backfilled on {total} seeded rows")
 
 
 def start_bot():
