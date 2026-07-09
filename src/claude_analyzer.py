@@ -12,7 +12,7 @@ from config import (
 )
 from src.db import (
     log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
-    get_setup_accuracy,
+    get_setup_accuracy, get_calibration_rows,
 )
 
 # Minimum resolved similar setups before self-feedback is shown (avoid noise).
@@ -305,6 +305,72 @@ def _global_feedback() -> str:
     )
 
 
+_SCORECARD_MIN_BUCKET = 8    # min resolved rows per bucket before it's shown
+_SCORECARD_MIN_TOTAL  = 20   # min rows overall before the block appears
+_SCORECARD_WINDOW_D   = 60
+
+
+def _scorecard_feedback() -> str:
+    """Calibration of Claude's OWN scales against realised outcomes.
+
+    Answers two questions his other feedback can't: (1) does his risk_score
+    actually separate winners from losers, (2) does HIGH confidence really
+    outperform MEDIUM. Purely descriptive (shadow-resolved outcomes of his
+    own past verdicts) — teaches the scale, never overrides a verdict.
+    """
+    try:
+        rows = get_calibration_rows(_time_mod.time() - _SCORECARD_WINDOW_D * 86400)
+    except Exception:
+        return ""
+    if len(rows) < _SCORECARD_MIN_TOTAL:
+        return ""
+
+    def _agg(subset: list) -> str:
+        n = len(subset)
+        w = sum(1 for r in subset if r.get("reached_tp1"))
+        rs = [v for v in (_row_r(x) for x in subset) if v is not None]
+        avg = f" avg{sum(rs)/len(rs):+.2f}R" if len(rs) >= _SCORECARD_MIN_BUCKET else ""
+        return f"{n} setups {w/n*100:.0f}%TP1{avg}"
+
+    parts = []
+    # Risk-score buckets — over ALL evaluated setups (approved AND rejected;
+    # the shadow tracker resolves both, and risk describes the setup itself).
+    def _rband(lo, hi):
+        out = []
+        for r in rows:
+            try:
+                if lo <= int(r.get("risk_score")) <= hi:
+                    out.append(r)
+            except (TypeError, ValueError):
+                continue
+        return out
+    rbands = [("risk0-3", _rband(0, 3)), ("risk4-6", _rband(4, 6)), ("risk7-10", _rband(7, 10))]
+    rparts = [f"{name} → {_agg(sub)}" for name, sub in rbands if len(sub) >= _SCORECARD_MIN_BUCKET]
+    if len(rparts) >= 2:
+        parts.append("; ".join(rparts))
+    # Confidence buckets — only directional verdicts (confidence on a NO TRADE
+    # measures a different thing).
+    conf_rows = [r for r in rows if (r.get("decision") or "") in ("LONG", "SHORT")]
+    cparts = []
+    for cname in ("HIGH", "MEDIUM"):
+        sub = [r for r in conf_rows if (r.get("confidence") or "").upper() == cname]
+        if len(sub) >= _SCORECARD_MIN_BUCKET:
+            cparts.append(f"conf{cname} → {_agg(sub)}")
+    if len(cparts) >= 2:
+        parts.append("; ".join(cparts))
+    if not parts:
+        return ""
+    return (
+        "\nSCORECARD — how your own scores mapped to reality (last 60d, shadow-resolved): "
+        + " | ".join(parts)
+        + ". Read: if neighboring buckets show the same TP1%/avg R, that scale of yours "
+        "is not discriminating — spread your scores more decisively. If low-risk buckets "
+        "underperform higher ones, your notion of 'clean' is miscalibrated — rethink what "
+        "you call low-risk. Descriptive feedback on your scoring; not an instruction to "
+        "change any specific verdict.\n"
+    )
+
+
 def _setup_line(i: int, s: dict) -> str:
     fvg     = "Y" if s.get("fvg")         else "N"
     ob      = "Y" if s.get("order_block") else "N"
@@ -479,6 +545,7 @@ def analyze_batch_with_claude(setups: list, news_context: dict = None) -> list:
     user_text = (
         f"{_news_block(news_context)}"
         f"{_global_feedback()}"
+        f"{_scorecard_feedback()}"
         f"Validate these {len(setups)} setups. Return exactly {len(setups)} verdicts "
         f"(one per index) via submit_verdicts:\n{coins_text}"
     )
@@ -600,6 +667,7 @@ def analyze_heavy(setup: dict, news_context: dict = None, history: list = None) 
     user_text = (
         f"{_news_block(news_context)}"
         f"{_global_feedback()}"
+        f"{_scorecard_feedback()}"
         f"{_memory_block(history)}\n"
         f"Setup to analyze:\n{setup_line}\n\n"
         f"Work through these questions before submitting your verdict:\n"

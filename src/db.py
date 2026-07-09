@@ -200,6 +200,10 @@ def init_db():
             # runner; live: left NULL, derived from bracket at read time).
             # Powers expectancy (avg R) in Claude's self-feedback block.
             "net_r":        "REAL",
+            # Claude's stated strongest failure mode for the trade — collected
+            # for future counter-argument-vs-outcome analysis (which of its
+            # own worries actually materialize).
+            "counter":      "TEXT",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -918,8 +922,8 @@ def log_setup_candidate(analysis: dict) -> int:
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, trend,
-                 oi_delta_pct, oi_regime, oi_confirms)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)
+                 oi_delta_pct, oi_regime, oi_confirms, counter)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -939,6 +943,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("oi_delta_pct"),
             analysis.get("oi_regime"),
             analysis.get("oi_confirms"),
+            analysis.get("counter", ""),
         ))
         return cur.lastrowid
 
@@ -1118,6 +1123,23 @@ def seed_backtest_outcomes(rows: list) -> int:
             except Exception:
                 continue
     return ins
+
+
+def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
+    """Resolved live Claude-evaluated setups for the SCORECARD block: does his
+    risk_score / confidence scale actually separate outcomes. Backtest priors
+    excluded (they carry no Claude verdict)."""
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT decision, confidence, risk_score, outcome, reached_tp1,
+                      entry_price, tp1, tp2, sl, net_r
+               FROM setup_log
+               WHERE resolved=1 AND ts >= ? AND COALESCE(source,'live')='live'
+                 AND risk_score IS NOT NULL
+               ORDER BY ts DESC LIMIT ?""",
+            (since_ts, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def backfill_backtest_net_r(rows: list) -> int:
