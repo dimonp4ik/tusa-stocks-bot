@@ -459,3 +459,11 @@ AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 # Fernet key for encrypting user API keys at rest — generate once:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 # and set AUTOTRADE_ENC_KEY on the host. Keys are unreadable without it.
+
+# --- Reject cooldown + kill-switch (added after 8-SL chop cluster 2026-07-10) ---
+# After Claude rejects a setup, don't re-ask the same symbol+direction while
+# price is still in the same zone (1 ATR) — stops "ask every scan until yes".
+REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
+# N consecutive SL among today's closed signals → pause new signals until the
+# next Riga day. 0 = off.
+KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "3"))

@@ -1125,6 +1125,25 @@ def seed_backtest_outcomes(rows: list) -> int:
     return ins
 
 
+def get_today_sl_streak(day_start_ts: float) -> int:
+    """Consecutive SL_HIT streak among signals closed since day_start_ts,
+    counted from the most recent close backwards. Any non-SL close breaks it.
+    Powers the daily kill-switch."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT status FROM signals WHERE closed_at IS NOT NULL AND closed_at >= ? "
+            "ORDER BY closed_at DESC",
+            (day_start_ts,),
+        ).fetchall()
+    n = 0
+    for r in rows:
+        if r["status"] == "SL_HIT":
+            n += 1
+        else:
+            break
+    return n
+
+
 def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
     """Resolved live Claude-evaluated setups for the SCORECARD block: does his
     risk_score / confidence scale actually separate outcomes. Backtest priors

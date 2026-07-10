@@ -64,6 +64,7 @@ from src.db import (
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
+    get_today_sl_streak,
     get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
@@ -74,6 +75,7 @@ from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
 from config import ADMIN_IDS, AUTOTRADE_BALANCE_THRESHOLD, AUTOTRADE_CONTACT
+from config import REJECT_COOLDOWN_HOURS, KILL_SWITCH_SL_STREAK
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
 
@@ -2365,6 +2367,40 @@ def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
 
 
+# ── Reject cooldown ────────────────────────────────────────────────────────────
+# Claude said NO TRADE → the setup used to come back on EVERY 5-min scan at the
+# same price, and его non-determinism eventually approved one of the retries.
+# Cooldown: same symbol + direction is not re-asked while price stays within
+# 1 ATR of the rejected entry, for REJECT_COOLDOWN_HOURS.
+# {(symbol, direction): (rejected_price, atr, ts)}
+_reject_cache: dict = {}
+
+
+def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
+    ent = _reject_cache.get((symbol, direction))
+    if not ent:
+        return False
+    r_price, r_atr, r_ts = ent
+    if (time.time() - r_ts) / 3600 >= REJECT_COOLDOWN_HOURS:
+        _reject_cache.pop((symbol, direction), None)
+        return False
+    eff_atr = float(atr or 0) or r_atr
+    try:
+        if eff_atr > 0 and abs(float(price) - r_price) > eff_atr:
+            _reject_cache.pop((symbol, direction), None)   # left the zone
+            return False
+    except (TypeError, ValueError):
+        pass
+    return True
+
+
+def _cache_rejection(symbol: str, direction: str, price, atr) -> None:
+    try:
+        _reject_cache[(symbol, direction)] = (float(price or 0), float(atr or 0), time.time())
+    except (TypeError, ValueError):
+        pass
+
+
 def _apply_knn_overlay(setup: dict, symbol: str) -> None:
     """
     k-NN price-shape analog risk overlay (Kronos-inspired, CPU-only).
@@ -2735,6 +2771,28 @@ def run_scan():
         log.info("US market closed — new-signal scan skipped (monitoring continues)")
         return
 
+    # Daily kill-switch: N consecutive SL among today's closed signals →
+    # stop generating new signals until the next Riga day. Monitoring of
+    # already-open positions continues (separate 1-min job).
+    if KILL_SWITCH_SL_STREAK > 0:
+        try:
+            _now_riga  = datetime.now(_riga_tz())
+            _day_start = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+            _streak    = get_today_sl_streak(_day_start)
+            if _streak >= KILL_SWITCH_SL_STREAK:
+                _ks_key = f"kill_switch_notified_{_now_riga.strftime('%Y%m%d')}"
+                if not get_bot_state(_ks_key):
+                    set_bot_state(_ks_key, str(_streak))
+                    send_status(
+                        f"🛑 *Дневной стоп: {_streak} стопа подряд.*\n"
+                        f"Новые сигналы приостановлены до завтра — рынок сегодня "
+                        f"рубит стопы, пересидим. Открытые позиции ведутся как обычно."
+                    )
+                log.warning(f"Kill-switch: {_streak} consecutive SL today — scan skipped")
+                return
+        except Exception as e:
+            log.warning(f"Kill-switch check failed (scan continues): {e}")
+
     log.info("=== Scan started (SMC mode) ===")
 
     try:
@@ -2855,6 +2913,9 @@ def run_scan():
             if sym in _active_now:
                 log.info(f"  Skip {sym} — already have open position")
                 return True
+            if _is_reject_cooled(sym, s["direction"], s.get("current_price"), s.get("atr")):
+                log.info(f"  Skip {sym} {s['direction']} — Claude rejected recently, price still in zone")
+                return True
             return _is_duplicate(sym, s["direction"])
         fresh = [s for s in setups if not _blocked(s)]
         log.info(f"After dedup: {len(fresh)} fresh setups")
@@ -2944,6 +3005,14 @@ def run_scan():
                 _a["_setup_log_id"] = log_setup_candidate(_a)
             except Exception as _e:
                 log.debug(f"setup_log insert failed: {_e}")
+            # Reject cooldown: remember NO TRADEs so the next scans don't
+            # re-ask the same setup at the same price ("ask until yes").
+            try:
+                if _a.get("decision", "NO TRADE") == "NO TRADE":
+                    _cache_rejection(_a.get("symbol", ""), _a.get("direction", ""),
+                                     _a.get("current_price"), _a.get("atr"))
+            except Exception:
+                pass
 
         # Upcoming high-impact macro events (CPI/FOMC/NFP) — warn on signals
         event_warning = ""
