@@ -30,6 +30,7 @@ signals.db
 # Backtest data cache (local pickles)
 backtest_cache/
 backtest_cache_hist/
+backtest_cache_duka/
 
 # Backtest scratch output
 bt_*.log

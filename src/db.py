@@ -1093,6 +1093,16 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
         return [dict(r) for r in live] + [dict(r) for r in bt]
 
 
+def delete_backtest_seed_rows() -> int:
+    """Wipe all source='backtest' setup_log rows — used when re-seeding with
+    a corrected batch (e.g. a fixed BACKTEST_TP_WINDOW) so stale, understated
+    priors don't sit alongside the corrected ones. Returns rows deleted.
+    """
+    with _conn() as c:
+        cur = c.execute("DELETE FROM setup_log WHERE source='backtest'")
+        return cur.rowcount
+
+
 def seed_backtest_outcomes(rows: list) -> int:
     """Bulk-insert historical backtest trades as resolved setup_log rows
     (source='backtest'). These are Claude memory PRIORS — every stats consumer

@@ -256,16 +256,19 @@ QUALITY_RISK_VOL_MIN    = float(os.getenv("QUALITY_RISK_VOL_MIN", "0.8"))
 QUALITY_RISK_VOL_MAX    = float(os.getenv("QUALITY_RISK_VOL_MAX", "1.2"))
 QUALITY_RISK_RSI_MIN    = float(os.getenv("QUALITY_RISK_RSI_MIN", "50"))
 QUALITY_RISK_RSI_MAX    = float(os.getenv("QUALITY_RISK_RSI_MAX", "60"))
-# 2026-07-04 deep backtest (1836tr, 2022-2026): all 4 commodities and these 6
-# stocks were positive EVERY year sampled (only NVDA had one near-flat 2022,
-# n=7) at +0.45-0.66R/tr — clearly above the +0.35-0.42R/tr book average.
-# Mid-tier performers (AAPL/AMZN/GOOGL/MSFT) and weak SPY deliberately left
-# off: solid but not standout, boosting them would be curve-fitting.
+# 2026-07-22 re-validation (1811tr, 2022-2026, corrected BACKTEST_TP_WINDOW —
+# see backtest_seed_stocks.csv comment): all 4 commodities + 7 stocks positive
+# EVERY year sampled (INTC/NVDA had one near-flat/tiny-sample 2022) at
+# +0.42-0.63R/tr, clearly above AAPL/AMZN/MSFT's +0.44-0.46R/tr and well above
+# SPY's +0.14R/tr (3 of 5 years negative). GOOGL added this pass — 184tr,
+# +0.528R/tr, 0 negative years, was wrongly bucketed as "mid-tier" under the
+# old understated window. AAPL/AMZN/MSFT stay off: solid but not standout.
 HIGH_EDGE_RISK_SYMBOLS  = _parse_symbol_list(os.getenv(
     "HIGH_EDGE_RISK_SYMBOLS",
     "XAU-USDT,XAUUSDT,XAG-USDT,XAGUSDT,CL-USDT,CLUSDT,BZ-USDT,BZUSDT,"
     "MU-USDT,MUUSDT,META-USDT,METAUSDT,INTC-USDT,INTCUSDT,"
-    "TSLA-USDT,TSLAUSDT,MRVL-USDT,MRVLUSDT,NVDA-USDT,NVDAUSDT",
+    "TSLA-USDT,TSLAUSDT,MRVL-USDT,MRVLUSDT,NVDA-USDT,NVDAUSDT,"
+    "GOOGL-USDT,GOOGLUSDT",
 ))
 REL_STRENGTH_RISK_UP          = os.getenv("REL_STRENGTH_RISK_UP", "1") != "0"
 REL_STRENGTH_RISK_UP_MIN_PCT  = float(os.getenv("REL_STRENGTH_RISK_UP_MIN_PCT", "0.5"))

@@ -65,6 +65,7 @@ from src.db import (
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
+    delete_backtest_seed_rows,
     get_today_sl_streak,
     get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
@@ -3327,12 +3328,18 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    # 2022-2026 Dukascopy deep backtest: 1836 trades, 16 tickers (12 equities/
-    # ETF 4y + 4 commodities 1.2y), session-gated entries/exits. Gives Claude
-    # BT priors ("how do entries of this shape usually resolve on this ticker")
-    # from day one instead of waiting months for live history.
-    ("backtest_seed_stocks.csv", "bt_seed_stocks_v1_done"),
+    # v2 (2026-07-22): corrected BACKTEST_TP_WINDOW unit bug (was 48 candles
+    # =12h, meant to mirror SIGNAL_EXPIRY_HOURS=48h — same fix ported from the
+    # crypto bot). v1 measured every trade against a 4x-too-short clock:
+    # EXPIRED 135->3, WR 69.8->73.9%, +0.426->+0.475R/tr net on the same 2022-
+    # 2026/16-ticker set. v1's rows are deleted (see _BT_SEED_V1_FLAGS below)
+    # before this batch loads so stale/understated priors don't sit alongside
+    # the corrected ones.
+    ("backtest_seed_stocks.csv", "bt_seed_stocks_v2_done"),
 ]
+# Old batch flags whose CSV no longer matches the file on disk — if any of
+# these fired, wipe all source='backtest' rows once before re-seeding v2.
+_BT_SEED_V1_FLAGS = ["bt_seed_stocks_v1_done"]
 
 
 def maybe_seed_backtest():
@@ -3341,6 +3348,15 @@ def maybe_seed_backtest():
     redeploys never re-seed and new batches load on top of old ones.
     """
     import csv as _csv
+
+    if any(get_bot_state(f) for f in _BT_SEED_V1_FLAGS) and not get_bot_state("bt_seed_v1_purged"):
+        try:
+            n = delete_backtest_seed_rows()
+            set_bot_state("bt_seed_v1_purged", str(n))
+            log.info(f"Purged {n} stale backtest-prior rows (understated TP-window bug) before v2 reseed")
+        except Exception as e:
+            log.warning(f"Backtest-seed v1 purge failed: {e}")
+
     for fname, flag in _BT_SEED_BATCHES:
         try:
             if get_bot_state(flag):
