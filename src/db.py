@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
+    TP1_R_MULT,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -992,6 +993,23 @@ def get_setup_accuracy(since_ts: float) -> dict:
 
     Returns counts and rates so the admin can see whether Claude's gate (the
     rejected bucket) actually has a worse outcome than what it let through.
+
+    For the REJECTED bucket also computes a MIRROR estimate (shadow experiment,
+    ported from the sister crypto bot 2026-07-22): what if we'd taken the
+    OPPOSITE direction on each rejected setup with the levels swapped (original
+    SL becomes the mirror's TP1, original TP1 becomes the mirror's stop)? Near-
+    clean inverse computable from the already-resolved outcome, no new
+    simulation needed:
+      - original hit SL (price ran 1R against it) → mirror reaches its TP1 (+1R)
+      - original reached TP1 (price ran TP1_R_MULT·R for it) → mirror hits its
+        stop (-TP1_R_MULT·R)
+      - original EXPIRED (no decisive move) → mirror also flat (~0)
+    Mirror is +EV only when the rejected SL-rate clears TP1_R_MULT/(1+TP1_R_MULT)
+    (e.g. ~41% at TP1_R_MULT=0.7, ~50% at 1.0). Watch it populate on live data
+    before trusting it (small samples, first-order R est, ignores mirror
+    trailing upside + live fees/slippage on a tight stop). NOT yet validated on
+    stock/commodity data — the crypto bot's rejected-pool SL-rate (~54%/30d)
+    happened to clear its own breakeven; this bot's numbers may differ.
     """
     out = {"sent": {}, "rejected": {}}
     with _conn() as c:
@@ -1012,6 +1030,17 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 "tp1_pct": (tp1 / n * 100) if n else 0.0,
                 "sl_pct":  (sl / n * 100) if n else 0.0,
             }
+            if key == "rejected":
+                m_win, m_loss = sl, tp1
+                m_dec = m_win + m_loss
+                m_r = m_win * 1.0 - m_loss * float(TP1_R_MULT)
+                out[key].update({
+                    "mirror_wins":   m_win,
+                    "mirror_losses": m_loss,
+                    "mirror_wr":     (m_win / m_dec * 100) if m_dec else 0.0,
+                    "mirror_r":      round(m_r, 2),
+                    "mirror_r_avg":  round(m_r / m_dec, 3) if m_dec else 0.0,
+                })
     return out
 
 

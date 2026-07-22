@@ -767,6 +767,18 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                     f"  🚫 Отклонено: {r['n']}"
                     + (f" · TP1 {r['tp1_pct']:.0f}% · SL {r['sl_pct']:.0f}%" if r['n'] else " · нет данных")
                 )
+                # Mirror shadow experiment: flip the rejected setups (levels swapped)
+                m_dec = r.get('mirror_wins', 0) + r.get('mirror_losses', 0)
+                if m_dec:
+                    m_r = r.get('mirror_r', 0.0)
+                    icon = "🟢" if m_r > 0 else ("🔴" if m_r < 0 else "➖")
+                    lines.append(
+                        f"  🔄 Отклон. перевёрнутые: {m_dec}"
+                        f" · WR {r.get('mirror_wr', 0):.0f}%"
+                        f" · {icon} {m_r:+.1f}R ({r.get('mirror_r_avg', 0):+.2f}/сд)"
+                    )
+                else:
+                    lines.append("  🔄 Отклон. перевёрнутые: нет данных")
                 # Verdict: is the rejected bucket actually worse?
                 if s['n'] >= 10 and r['n'] >= 10:
                     gap = s['tp1_pct'] - r['tp1_pct']
@@ -784,8 +796,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "(теневой трекинг по реальным котировкам)._\n\n"
                 f"{_acc_block('За 7 дней', since7)}\n\n"
                 f"{_acc_block('За 30 дней', since30)}\n\n"
-                "_TP1% = доля дошедших до первого тейка. Данные копятся "
-                "с момента запуска трекера._"
+                "_TP1% = доля дошедших до первого тейка._\n"
+                "_🔄 перевёрнутые = эксперимент: если бы зеркалили отклонённые "
+                "(стоп↔тейк). +R = зеркало в плюс. Нужна выборка ≥20-30 и пару "
+                "недель, прежде чем верить._"
             )
         except Exception as e:
             txt = f"Ошибка: {e}"
