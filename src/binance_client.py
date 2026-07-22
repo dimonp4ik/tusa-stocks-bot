@@ -304,13 +304,24 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     }
 
 
-def get_klines_xperp(symbol, limit=60):
+def get_klines_xperp(symbol, limit=60, include_forming=False):
     """Closed 15m candles of the X-Perp contract (the user's actual market).
 
     Used by the open-position monitor so TP/SL hits are judged on the prices
     the user's position actually experiences (X-Perp wicks can differ slightly
     from the global feed). Returns None on any failure — caller falls back to
     the global analysis feed.
+
+    include_forming=True appends the currently-forming (unclosed) candle as
+    the last row, with its live high/low-so-far and last-traded close. Without
+    this, a SL/TP touch is only detectable once the 15m candle CLOSES — since
+    the 1-min monitor polls every minute but candles close every 15, that adds
+    up to ~15min (avg ~7.5min) of pure notification lag versus the real fill
+    (autotrade's exchange-side stop order fires the instant price touches it,
+    independent of candle closes). Safe for breach detection: a real price
+    touch already happened and can't un-happen even if the candle's close
+    later differs. Only enable where immediate SL/TP detection matters, not
+    for logic that specifically wants a settled/closed candle's close price.
     """
     try:
         inst_id = get_xperp_instruments().get(_base_of(symbol))
@@ -319,8 +330,14 @@ def get_klines_xperp(symbol, limit=60):
         raw = _okx_get("/api/v5/market/candles",
                        {"instId": inst_id, "bar": "15m",
                         "limit": min(limit + 2, 300)}).get("data", [])
-        candles = [c for c in reversed(raw) if len(c) > 8 and c[8] == "1"]
-        candles = candles[-limit:]
+        raw_newest_first = raw  # OKX order: newest-first
+        closed = [c for c in reversed(raw_newest_first) if len(c) > 8 and c[8] == "1"]
+        closed = closed[-limit:]
+        candles = list(closed)
+        if include_forming and raw_newest_first:
+            forming = raw_newest_first[0]
+            if len(forming) > 8 and forming[8] == "0":
+                candles = candles + [forming]
         if not candles:
             return None
         return {

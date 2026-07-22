@@ -445,7 +445,15 @@ DB_PATH = os.getenv("DB_PATH", "stocks.db")  # Railway: set DB_PATH=/data/stocks
 
 # --- Backtest ---
 BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 15m ≈ 12 days
-BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "48"))
+# 192 × 15m = 48h, matching live SIGNAL_EXPIRY_HOURS. Was "48" (=48 candles=12h,
+# a 4x-too-short window) — same unit-mismatch bug found and fixed 2026-07-22 in
+# the sister crypto bot (candles vs hours), ported here. Distinct from the
+# 2026-07-04 "expiry-clock fix" in this repo (that one fixed the HTF-fetch
+# candle-count divisors for equities' ~26-bars/day session, not this window).
+# Not yet independently re-measured on stock/commodity data — the crypto bot's
+# corrected numbers (WR 63%->73%, understated maxDD -22R->-32R) don't transfer
+# directly; re-run backtests here before trusting any pre-2026-07-22 result.
+BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))

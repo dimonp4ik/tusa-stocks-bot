@@ -2504,7 +2504,12 @@ def _check_open_signals():
             candle_lim = max(8, min(220, int(age_hours * 4) + 6))
             # Judge TP/SL on the X-Perp (user's actual market) — its wicks are
             # what the user's position really experiences. Global feed = fallback.
-            df_all     = get_klines_xperp(sig["symbol"], limit=candle_lim) \
+            # include_forming=True: catch SL/TP touches within the current still-
+            # forming 15m candle instead of waiting up to ~15min (avg ~7.5min) for
+            # it to close — was causing SL_HIT notifications to lag the real
+            # exchange-side stop fill by minutes (found 2026-07-22 in the sister
+            # crypto bot, same code pattern here — ported fix).
+            df_all     = get_klines_xperp(sig["symbol"], limit=candle_lim, include_forming=True) \
                          or get_klines(sig["symbol"], limit=candle_lim)
 
             # Cache last close price — used by "open trades" display (no extra API call)
