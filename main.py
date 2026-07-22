@@ -50,6 +50,7 @@ from src.news_agent import (
     generate_weekly_commentary,
 )
 from config import EVENT_WARN_HOURS
+from config import LIVE_PRICE_MAX_DRIFT_PCT
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
@@ -3085,13 +3086,22 @@ def run_scan():
                     # levels re-anchor to it so entry/TP/SL match the user's
                     # chart. Falls back to the analysis feed price if X-Perp
                     # ticker is unavailable.
+                    #
+                    # Drift guard is capped at LIVE_PRICE_MAX_DRIFT_PCT (= our
+                    # own RISK_MAX_PCT, 1.5%) — NOT a flat 3% crypto leftover.
+                    # A stock's SL band is 0.4-1.5%; a 3% "sanity" gap is
+                    # 2-7x that, wide enough for a thin overnight/open-gap
+                    # tick to already sit past TP1/TP2 and still get accepted
+                    # as the anchor — the setup's structural zone is stale by
+                    # then, not a valid entry (this is the bug behind signals
+                    # that "opened" already resolved as an instant win/loss).
+                    stale_move = False
                     try:
                         live_px = get_xperp_price(analysis["symbol"]) or get_current_price(analysis["symbol"])
                         if live_px and live_px > 0:
                             zone_px = float(analysis.get("current_price") or live_px)
                             drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
-                            # Only use live price if within 3% of zone (sanity guard)
-                            if drift <= 0.03:
+                            if drift <= LIVE_PRICE_MAX_DRIFT_PCT:
                                 analysis["zone_entry_price"] = zone_px   # keep zone for reference
                                 analysis["current_price"]    = round(live_px, 8)
                                 analysis["market_price"]     = round(live_px, 8)
@@ -3101,11 +3111,43 @@ def run_scan():
                                 )
                             else:
                                 log.warning(
-                                    f"  Live price {live_px} vs zone {zone_px}: "
-                                    f"drift {drift*100:.1f}% > 3% — keeping zone price"
+                                    f"  Live price {live_px} vs zone {zone_px}: drift "
+                                    f"{drift*100:.2f}% > {LIVE_PRICE_MAX_DRIFT_PCT*100:.1f}% "
+                                    f"— setup stale, skipping signal"
                                 )
+                                stale_move = True
                     except Exception as e:
                         log.warning(f"  Live price fetch failed for {analysis['symbol']}: {e}")
+
+                    if stale_move:
+                        continue
+
+                    # Second guard: even within the drift band, verify the live
+                    # price hasn't ALREADY reached what TP1/SL would be at this
+                    # entry — i.e. the move already happened before we could
+                    # publish. Recompute the same levels send_signal() will use.
+                    try:
+                        _price = analysis["current_price"]
+                        _atr   = analysis.get("atr", 0.0)
+                        _rhi   = analysis.get("recent_high", _price * 1.03)
+                        _rlo   = analysis.get("recent_low",  _price * 0.97)
+                        _tp1, _tp2, _sl = calculate_tp_sl(
+                            _price, direction, _atr, _rhi, _rlo,
+                            tp1_level=analysis.get("tp1_level"),
+                            tp2_level=analysis.get("tp2_level"),
+                        )
+                        already_resolved = (
+                            (direction == "LONG"  and (_price >= _tp1 or _price <= _sl)) or
+                            (direction == "SHORT" and (_price <= _tp1 or _price >= _sl))
+                        )
+                        if already_resolved:
+                            log.warning(
+                                f"  {analysis['symbol']}: live price {_price} already past "
+                                f"TP1 {_tp1} / SL {_sl} at publish time — stale setup, skipping"
+                            )
+                            continue
+                    except Exception as e:
+                        log.warning(f"  Already-resolved check failed for {analysis['symbol']}: {e}")
 
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)

@@ -347,6 +347,14 @@ ATR_PERIOD    = 14
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1.5%
+
+# Live-price re-anchor sanity guard (main.py, publish-time X-Perp reprice).
+# Crypto's flat 3% made sense next to a 1.2-3% SL band; here SL is 0.4-1.5%,
+# so 3% drift is 2-7x a normal stop — thin overnight/open-gap ticks could
+# already be past TP1/TP2 by the time this check ran and still pass. Cap
+# drift at RISK_MAX_PCT itself: if the ticker moved further than the widest
+# stop we'd ever set, the structural zone is stale, don't anchor to it.
+LIVE_PRICE_MAX_DRIFT_PCT = float(os.getenv("LIVE_PRICE_MAX_DRIFT_PCT", "0.015"))
 # 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
 # (+13-16pp, 65-76% across 30/60/90d) at equal-or-better total R and half the DD.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
