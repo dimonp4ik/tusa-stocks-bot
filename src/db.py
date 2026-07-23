@@ -89,6 +89,12 @@ def init_db():
             "atr":           "REAL",
             "realized_r":    "REAL",
             "runner_trail_atr_mult": "REAL",
+            # SL-wick diagnostic (ported 2026-07-22): on an SL_HIT, 1 = the deep
+            # global feed ALSO breached the stop (real reversal), 0 = only the
+            # thin X-Perp wicked to it (execution noise). NULL = not an SL /
+            # check unavailable. Especially relevant for stock/commodity X-Perps
+            # whose books can be thinner than crypto majors.
+            "sl_xperp_only": "INTEGER",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -385,6 +391,32 @@ def update_signal_status(signal_id: int, status: str, exit_price=None, realized_
                 UPDATE signals SET status = ?, closed_at = ?, exit_price = ?, realized_r = ?
                 WHERE id = ?
             """, (status, now, exit_price, realized_r, signal_id))
+
+
+def set_sl_xperp_only(signal_id: int, xperp_only: int) -> None:
+    """Record the SL-wick diagnostic on a stopped-out signal (see schema note)."""
+    with _conn() as c:
+        c.execute("UPDATE signals SET sl_xperp_only = ? WHERE id = ?",
+                  (int(xperp_only), signal_id))
+
+
+def get_sl_wick_stats(since_ts: float) -> dict:
+    """Of SL closes since since_ts, how many were X-Perp-only wicks (thin-book
+    noise) vs confirmed by the deep global feed (real reversals)."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT sl_xperp_only FROM signals "
+            "WHERE status = 'SL_HIT' AND closed_at >= ? AND sl_xperp_only IS NOT NULL",
+            (since_ts,),
+        ).fetchall()
+    n = len(rows)
+    xperp_only = sum(1 for r in rows if r["sl_xperp_only"] == 1)
+    return {
+        "n": n,
+        "xperp_only": xperp_only,
+        "confirmed": n - xperp_only,
+        "xperp_only_pct": (xperp_only / n * 100) if n else 0.0,
+    }
 
 
 def _status_to_r(status: str) -> float:

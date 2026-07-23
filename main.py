@@ -53,6 +53,7 @@ from config import EVENT_WARN_HOURS
 from config import LIVE_PRICE_MAX_DRIFT_PCT
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
+    set_sl_xperp_only, get_sl_wick_stats,
     auto_block_bad_symbols, is_symbol_auto_blocked, get_active_symbol_blocks,
     get_recent_outcomes, unblock_symbol, set_symbol_block, get_symbols_performance,
     upsert_user, get_user_by_id, get_all_users, get_users_count,
@@ -802,6 +803,23 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "_🔄 перевёрнутые = эксперимент: если бы зеркалили отклонённые "
                 "(стоп↔тейк). +R = зеркало в плюс. Нужна выборка ≥20-30 и пару "
                 "недель, прежде чем верить._"
+            )
+
+            # SL-wick diagnostic: how many live stops were thin-X-Perp noise
+            def _wick_line(label, since):
+                w = get_sl_wick_stats(since)
+                if not w["n"]:
+                    return f"*{label}:* нет данных"
+                return (f"*{label}:* стопов {w['n']} · "
+                        f"🌊 X-Perp шум {w['xperp_only']} ({w['xperp_only_pct']:.0f}%) · "
+                        f"📉 реальный разворот {w['confirmed']}")
+            txt += (
+                "\n\n━━━━━━━━━\n"
+                "🎯 *Природа стопов* (X-Perp фитиль vs реальный разворот)\n"
+                f"{_wick_line('7 дней', since7)}\n"
+                f"{_wick_line('30 дней', since30)}\n"
+                "_🌊 = стоп задело только на тонком X-Perp, глубокий рынок нет "
+                "(шум исполнения). Если доля высокая — стоит расширить буфер стопа._"
             )
         except Exception as e:
             txt = f"Ошибка: {e}"
@@ -2644,6 +2662,19 @@ def _check_open_signals():
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult)
+                # SL-wick diagnostic: real reversal (deep global feed also breached
+                # SL) or thin-X-Perp execution noise (only X-Perp wicked to it)?
+                if new_status == "SL_HIT":
+                    try:
+                        g = get_klines(sig["symbol"], limit=candle_lim)  # global feed
+                        gd = _slice_candles_from_open(g, monitor_from)
+                        if direction == "LONG":
+                            g_breached = any(float(x) <= sl for x in gd.get("low", []))
+                        else:
+                            g_breached = any(float(x) >= sl for x in gd.get("high", []))
+                        set_sl_xperp_only(sig["id"], 0 if g_breached else 1)
+                    except Exception as _we:
+                        log.debug(f"  SL-wick check failed #{sig['id']}: {_we}")
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
                 try:
                     send_signal_update(sig, new_status, exit_px)
