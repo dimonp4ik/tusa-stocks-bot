@@ -134,6 +134,7 @@ _pending_block_chat: dict = {}
 _pending_users_search: dict = {}
 # State: admin is typing a date to view setup history.
 _pending_setups_date: dict = {}
+_pending_report_date: dict = {}
 # State: admin is typing a user ID to allow autotrading.
 _pending_add_autotrade: dict = {}
 # State: user is inside the autotrade onboarding dialog.
@@ -150,6 +151,145 @@ def _sec_back_cb(chat_id) -> str:
     """Callback for a detail-view back button: the chat's current section,
     or the top-level panel if no section is tracked."""
     return _admin_section.get(chat_id, "adm_back")
+
+
+def _parse_date_to_ts(date_str: str):
+    """DD.MM / DD.MM.YYYY / YYYY-MM-DD -> epoch at Riga midnight. None if unparseable."""
+    from datetime import datetime as _dt
+    s = (date_str or "").strip()
+    for fmt in ("%d.%m.%Y", "%d.%m", "%Y-%m-%d"):
+        try:
+            p = _dt.strptime(s, fmt)
+            if fmt == "%d.%m":
+                p = p.replace(year=_dt.now().year)
+            return p.replace(tzinfo=_riga_tz()).timestamp()
+        except ValueError:
+            continue
+    return None
+
+
+def _build_and_send_report(chat_id: int, message_id, since_ts: float,
+                           window_label: str) -> None:
+    """Full report over an explicit window, as a text file + raw CSV dumps.
+
+    The window is caller-chosen on purpose: filter settings change, and a fixed
+    look-back silently mixes results produced by different configs, which makes
+    every rate in here meaningless.
+    """
+    try:
+        rz = _riga_tz()
+        now = time.time()
+        since7 = now - 7 * 86400
+        L = []
+        A = L.append
+        A("# ПОЛНЫЙ ОТЧЁТ БОТА (АКЦИИ)")
+        A(f"Сформирован: {datetime.now(rz).strftime('%Y-%m-%d %H:%M')} Riga")
+        A(f"ОКНО ДАННЫХ: {window_label}")
+        if since_ts > 0:
+            A(f"  с {datetime.fromtimestamp(since_ts, rz).strftime('%Y-%m-%d %H:%M')} по сейчас")
+            A(f"  длительность: {(now - since_ts) / 86400:.1f} дней")
+        else:
+            A("  всё, что есть в базе")
+        A("")
+
+        for label, cut in ([(window_label, since_ts)] +
+                           ([("последние 7 дней", since7)] if since_ts < since7 else [])):
+            s = get_stats(since_ts=cut) if cut > 0 else get_stats(days=36500)
+            A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
+            A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
+              f"открыто: {s['open']}+{s['tp1_partial_open']}")
+            A(f"  винрейт: {s['win_rate']}%")
+            A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
+              f"SL: {s['sl_hit']}  истекло: {s['expired']}")
+            A(f"  итог: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
+            _l, _sh = s.get("long") or {}, s.get("short") or {}
+            A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
+            A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
+            A("")
+
+        A(f"## КЛОД: ТОЧНОСТЬ И ДОЛЯ ОДОБРЕНИЙ ({window_label})")
+        acc = get_setup_accuracy(since_ts)
+        _s, _r = acc.get("sent") or {}, acc.get("rejected") or {}
+        _tot = (_s.get("n") or 0) + (_r.get("n") or 0)
+        if _tot:
+            A(f"  одобрил и отправлено: {_s.get('n', 0)}  отклонил: {_r.get('n', 0)}  "
+              f"доля одобрений: {(_s.get('n', 0) / _tot * 100):.0f}%")
+            A(f"  TP1 у отправленных: {_s.get('tp1_rate', 0)}%")
+            A(f"  TP1 у отклонённых:  {_r.get('tp1_rate', 0)}%")
+            A(f"  разрыв (больше = лучше отбирает): "
+              f"{(_s.get('tp1_rate', 0) - _r.get('tp1_rate', 0)):+.0f}пп")
+            A(f"  зеркало отклонённых: {_r.get('mirror_r', 0):+.1f}R (n={_r.get('n', 0)})")
+        else:
+            A("  данных нет")
+        A("")
+
+        A("## ПРИРОДА СТОПОВ (X-Perp фитиль vs реальный разворот)")
+        for label, cut in (("последние 7 дней", since7), (window_label, since_ts)):
+            w = get_sl_wick_stats(cut)
+            if w["n"]:
+                A(f"  {label}: стопов {w['n']}  "
+                  f"X-Perp шум {w['xperp_only']} ({w['xperp_only_pct']:.0f}%)  "
+                  f"реальный разворот {w['confirmed']}")
+            else:
+                A(f"  {label}: данных нет")
+        A("")
+
+        A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
+        _caps = get_cap_impact_stats(since_ts) or {}
+        for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
+                            ("scan_cap", "лимит 3 за скан")):
+            st = _caps.get(code) or {}
+            if st.get("n"):
+                A(f"  {title}: срезано {st['n']}  "
+                  f"дошли бы до TP1 {st['reached_tp1']} ({st['tp1_pct']:.0f}%)  "
+                  f"в стоп {st['sl']} ({st['sl_pct']:.0f}%)  итог {st['saved_r']:+.1f}R")
+            else:
+                A(f"  {title}: не срабатывал")
+        A("")
+        A(f"## РЕАКЦИЯ КЛОДА НА ПЕРЕКОС КНИГИ ({window_label})")
+        sk = get_skew_response_stats(since_ts)
+        if sk:
+            for b in sk:
+                A(f"  открыто {b['bucket']}: одобрил {b['approve_pct']:.0f}% из {b['n']}  "
+                  f"(TP1 {b['tp1_pct']:.0f}%, закрыто {b['resolved']})")
+        else:
+            A("  данных нет")
+        A("")
+        A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
+        A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  TP1_R_MULT={TP1_R_MULT}")
+        A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
+        A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}")
+
+        report = "\n".join(L)
+        if message_id:
+            _edit_admin_text(chat_id, message_id,
+                             f"📦 *Полный отчёт* — {window_label}\n"
+                             "Отправляю файлы, перешли их Клоду.", _KB_ANALYTICS)
+
+        import csv as _csv, io as _io
+        stamp = datetime.now(rz).strftime("%Y%m%d")
+        files = [("отчёт", f"stocks_report_{stamp}.txt", report.encode("utf-8"))]
+        for name, rows in (("setups", get_all_setups_since(since_ts)),
+                           ("signals", get_all_signals_since(since_ts))):
+            if not rows:
+                continue
+            buf = _io.StringIO()
+            w = _csv.DictWriter(buf, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            w.writerows(rows)
+            files.append((name, f"stocks_{name}_{stamp}.csv", buf.getvalue().encode("utf-8")))
+        for lbl, fn, blob in files:
+            try:
+                _requests.post(
+                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendDocument",
+                    data={"chat_id": chat_id, "caption": f"📦 {lbl} — {window_label}"},
+                    files={"document": (fn, blob)}, timeout=45,
+                )
+            except Exception as e:
+                log.warning(f"full report send failed ({lbl}): {e}")
+    except Exception as e:
+        log.warning(f"full report failed: {e}")
+        _send_admin_text(chat_id, f"❌ Ошибка отчёта: {e}", _KB_ANALYTICS)
 
 
 def _send_setups_for_date(chat_id, date_input: str):
@@ -292,6 +432,8 @@ _KB_ANALYTICS = {"inline_keyboard": [[
     {"text": "💀 Худшие тикеры", "callback_data": "adm_worst"},
 ], [
     {"text": "🎯 Точность ИИ",   "callback_data": "adm_ai_acc"},
+], [
+    {"text": "📦 Полный отчёт", "callback_data": "adm_fullreport"},
 ], [_BACK_ROW[0]]]}
 
 _KB_PEOPLE = {"inline_keyboard": [[
@@ -756,6 +898,45 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)
+
+    elif data == "adm_fullreport":
+        _edit_admin_text(
+            chat_id, message_id,
+            "📦 *Полный отчёт*\n\nС какой даты считать?\n"
+            "_Настройки фильтров менялись — данные до и после смешивать нельзя, "
+            "иначе цифры ни о чём._",
+            {"inline_keyboard": [
+                [{"text": "7 дней",  "callback_data": "adm_rep_7"},
+                 {"text": "30 дней", "callback_data": "adm_rep_30"}],
+                [{"text": "📅 Своя дата", "callback_data": "adm_rep_date"},
+                 {"text": "🗄 Всё время",  "callback_data": "adm_rep_all"}],
+                [{"text": "« Назад", "callback_data": "adm_sec_analytics"}],
+            ]},
+        )
+
+    elif data == "adm_rep_date":
+        _pending_report_date[chat_id] = message_id
+        try:
+            _requests.post(
+                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+                json={"chat_id": chat_id,
+                      "text": "📅 С какой даты считать отчёт?\n"
+                              "Формат: `26.07` или `26.07.2026`\n"
+                              "Возьму всё, что есть с этой даты по сейчас.",
+                      "parse_mode": "Markdown"},
+                timeout=10,
+            )
+        except Exception as e:
+            log.warning(f"report date prompt failed: {e}")
+
+    elif data in ("adm_rep_7", "adm_rep_30", "adm_rep_all"):
+        _answer_callback(callback_id, "Собираю отчёт…")
+        _since, _label = {
+            "adm_rep_7":   (time.time() - 7 * 86400,  "последние 7 дней"),
+            "adm_rep_30":  (time.time() - 30 * 86400, "последние 30 дней"),
+            "adm_rep_all": (0.0, "всё время"),
+        }[data]
+        _build_and_send_report(chat_id, message_id, _since, _label)
 
     elif data == "adm_ai_acc":
         try:
@@ -2100,6 +2281,21 @@ def webhook():
     if _is_admin(user_id) and chat_id in _pending_setups_date:
         _pending_setups_date.pop(chat_id, None)
         _send_setups_for_date(chat_id, text_raw.strip())
+        return "ok", 200
+
+    # ── Full-report start date — armed by "Своя дата" ────────────────────────
+    if _is_admin(user_id) and chat_id in _pending_report_date:
+        _pending_report_date.pop(chat_id, None)
+        _raw = text_raw.strip()
+        _ts = _parse_date_to_ts(_raw)
+        if _ts is None:
+            _send_admin_text(
+                chat_id,
+                f"❌ Не понял дату *{_raw}*.\nФормат: `26.07` или `26.07.2026`",
+                _KB_ANALYTICS,
+            )
+        else:
+            _build_and_send_report(chat_id, None, _ts, f"с {_raw}")
         return "ok", 200
 
     # ── Pending "manual block" state — admin typed a symbol to block ──────────
