@@ -32,6 +32,7 @@ from config import (
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
+    STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
@@ -177,7 +178,20 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     tick  = (spec or {}).get("tickSz", 0)
-    sl_px = okx.round_to_tick(float(sig["sl"]), tick)
+    # Close-confirmed stop: the bot closes the position itself once a 15m candle
+    # CLOSES beyond the signal's stop, so the exchange stop must NOT sit on that
+    # same level or it fires first on every wick and defeats the mechanism. It
+    # moves out to STOP_EXCHANGE_BACKSTOP_R purely as a disaster backstop for
+    # when the bot is down (deploy/restart/network) — without it a 10x position
+    # would be naked. TP levels are untouched: still anchored to the original 1R.
+    _sl_level = float(sig["sl"])
+    if STOP_CLOSE_CONFIRM:
+        _entry = float(sig["entry_price"])
+        _risk  = abs(_entry - _sl_level)
+        if _risk > 0:
+            _back = _risk * max(1.0, float(STOP_EXCHANGE_BACKSTOP_R))
+            _sl_level = (_entry - _back) if sig["direction"] == "LONG" else (_entry + _back)
+    sl_px = okx.round_to_tick(_sl_level, tick)
     tp_px = okx.round_to_tick(float(sig["tp2"]), tick)
     ok, algo_id = okx.place_protection_oco(creds, inst_id, sig["direction"], sl_px, tp_px)
     if not ok:

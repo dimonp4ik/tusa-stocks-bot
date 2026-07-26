@@ -211,6 +211,17 @@ def init_db():
             # for future counter-argument-vs-outcome analysis (which of its
             # own worries actually materialize).
             "counter":      "TEXT",
+            # Why a setup Claude APPROVED was still not published. Empty for
+            # normal rows. Without this a capped setup is indistinguishable
+            # from one Claude rejected (both land at sent=0), which understates
+            # Claude's accuracy and pollutes the mirror experiment with setups
+            # it actually liked. Values: 'scan_cap' (MAX_SIGNALS_PER_SCAN),
+            # 'dir_cap' (same-direction correlation cap).
+            "block_reason": "TEXT",
+            # How many positions in THIS setup's direction were already open
+            # when Claude judged it — lets us ask whether Claude's own approval
+            # rate responds to a skewed book, separately from any hard cap.
+            "open_same_dir": "INTEGER",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -955,8 +966,8 @@ def log_setup_candidate(analysis: dict) -> int:
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, trend,
-                 oi_delta_pct, oi_regime, oi_confirms, counter)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
+                 oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -977,8 +988,94 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("oi_regime"),
             analysis.get("oi_confirms"),
             analysis.get("counter", ""),
+            analysis.get("open_same_dir"),
         ))
         return cur.lastrowid
+
+
+def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
+    """Record that a Claude-APPROVED setup was withheld by a cap, not rejected."""
+    if not setup_log_id:
+        return
+    with _conn() as c:
+        c.execute("UPDATE setup_log SET block_reason=? WHERE id=?", (reason, setup_log_id))
+
+
+def get_cap_impact_stats(since_ts: float) -> dict:
+    """Outcomes of setups Claude approved but a cap withheld.
+
+    Directly answers "did the cap save money or cost it": the shadow tracker
+    resolves these rows regardless of whether a trade was ever opened, so their
+    realised outcomes are known. Reported per cap so each can be judged alone.
+    """
+    out = {}
+    with _conn() as c:
+        for reason in ("dir_cap", "scan_cap"):
+            rows = c.execute(
+                """SELECT outcome, reached_tp1 FROM setup_log
+                   WHERE resolved=1 AND ts >= ? AND block_reason=?
+                     AND COALESCE(source,'live')='live'""",
+                (since_ts, reason),
+            ).fetchall()
+            n = len(rows)
+            tp1 = sum(1 for r in rows if r["reached_tp1"])
+            sl = sum(1 for r in rows if r["outcome"] == "SL")
+            # Same first-order basis the mirror experiment uses: a stop avoided
+            # is +1R, a TP1 missed is -TP1_R_MULT (this bot's own value).
+            saved_r = sl * 1.0 - tp1 * float(TP1_R_MULT)
+            out[reason] = {
+                "n": n, "reached_tp1": tp1, "sl": sl,
+                "tp1_pct": (tp1 / n * 100) if n else 0.0,
+                "sl_pct": (sl / n * 100) if n else 0.0,
+                "saved_r": saved_r,
+            }
+    return out
+
+
+def get_skew_response_stats(since_ts: float) -> list:
+    """Claude's own approval rate bucketed by how skewed the book already was."""
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT decision, open_same_dir, reached_tp1, outcome, resolved
+               FROM setup_log
+               WHERE ts >= ? AND open_same_dir IS NOT NULL
+                 AND COALESCE(source,'live')='live'""",
+            (since_ts,),
+        ).fetchall()
+    out = []
+    for name, lo, hi in (("0-1", 0, 1), ("2-3", 2, 3), ("4+", 4, 10**6)):
+        sub = [r for r in rows if lo <= int(r["open_same_dir"] or 0) <= hi]
+        if not sub:
+            continue
+        ok = [r for r in sub if (r["decision"] or "") in ("LONG", "SHORT")]
+        res = [r for r in sub if r["resolved"]]
+        tp1 = sum(1 for r in res if r["reached_tp1"])
+        out.append({
+            "bucket": name, "n": len(sub), "approved": len(ok),
+            "approve_pct": len(ok) / len(sub) * 100,
+            "resolved": len(res),
+            "tp1_pct": (tp1 / len(res) * 100) if res else 0.0,
+        })
+    return out
+
+
+def get_all_setups_since(since_ts: float) -> list:
+    """Every logged setup since a cutoff, raw — for the full-report CSV dump."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM setup_log WHERE ts >= ? ORDER BY ts ASC", (since_ts,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_all_signals_since(since_ts: float) -> list:
+    """Every published signal since a cutoff, raw — for the full-report CSV dump."""
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT * FROM signals WHERE opened_at >= ? ORDER BY opened_at ASC",
+            (since_ts,),
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def mark_setup_sent(setup_log_id: int) -> None:
@@ -1047,9 +1144,15 @@ def get_setup_accuracy(since_ts: float) -> dict:
     with _conn() as c:
         for sent_val, key in ((1, "sent"), (0, "rejected")):
             rows = c.execute(
+                # block_reason filter: a setup Claude APPROVED but a cap
+                # withheld also sits at sent=0. Counting it as a rejection
+                # understates Claude's accuracy and feeds the mirror experiment
+                # setups Claude actually liked. Judged separately by
+                # get_cap_impact_stats().
                 """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
                    WHERE resolved=1 AND ts >= ? AND sent=?
-                     AND COALESCE(source,'live')='live'""",
+                     AND COALESCE(source,'live')='live'
+                     AND COALESCE(block_reason,'')=''""",
                 (since_ts, sent_val),
             ).fetchall()
             n = len(rows)

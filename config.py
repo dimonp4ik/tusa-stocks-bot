@@ -424,6 +424,48 @@ SKIP_WEEKDAYS  = {d for d in os.getenv("SKIP_WEEKDAYS", "").split(",") if d.stri
 MARKET_PROXY_SYMBOL     = os.getenv("MARKET_PROXY_SYMBOL", "SPYUSDT")
 BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 
+# --- Close-confirmed stop (ported 2026-07-26, DEFAULT OFF — must be measured) --
+# A stop firing on a WICK touching the level exits trades that never broke.
+# Requiring the 15m candle to CLOSE beyond it keeps those alive. On the sister
+# crypto bot this was the one change that improved WR and profit on two
+# independent windows (WR 80.8->82.8% / 78.0->80.6%, netR +4.5% / +5.7%).
+#
+# DEFAULT OFF here because this market is NOT the same shape, in both directions:
+#   FOR  — off-session X-Perp candles are thin MM drift (see OFF_SESSION_SIGNALS
+#          below, this bot's own note). Thin off-session wicks nicking a stop is
+#          exactly what close-confirmation removes, so the upside may be LARGER
+#          than crypto's.
+#   AGAINST — stocks GAP. Positions are monitored 24/7 while signals are gated to
+#          the US session, so a position can sit through a gap open. A gap blows
+#          straight past the level and the close-confirmed exit then books a much
+#          worse price. Crypto's worst close-stop exit was -1.9R over ~3600
+#          trades; a gapping instrument can do far worse, and STOP_EXCHANGE_
+#          BACKSTOP_R almost certainly needs to be wider than crypto's 2.0.
+# Measure both on this bot's own backtest before enabling: run with
+# STOP_CLOSE_CONFIRM=0 and =1, compare WR/netR/maxDD, and check the worst
+# realised stop R to pick the backstop.
+STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "0") != "0"
+# Exchange-side stop stays in place as a disaster backstop, widened to this
+# multiple of R so it cannot fire before the close confirmation. It is what
+# protects the position while the bot itself is down (deploy/restart/network).
+STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.5"))
+
+# --- Concurrent same-direction exposure cap (ported 2026-07-26, DEFAULT OFF) ---
+# Nothing caps total open positions: only per-symbol dedup and
+# MAX_SIGNALS_PER_SCAN=3, while signals live SIGNAL_EXPIRY_HOURS, so same-side
+# positions accumulate. Stock X-Perps in one direction are correlated through
+# SPY and sector, so N same-side positions are not N independent trades.
+#
+# DELIBERATELY 0 (off). On the sister crypto bot this exact cap was shipped at
+# 4 on reasoning alone and measured NEGATIVE: it cost 12-15% of profit for an
+# inconsistent drawdown benefit, because the trades it removes are BETTER than
+# average (a crowded book forms in a strong trend, and trend trades win more).
+# It was corrected to 8 only after portfolio_sim.py measured it. Do the same
+# here before enabling: run portfolio_sim.py on a backtest CSV from THIS bot,
+# sweep the value, and only then set a number. Crypto's 8 is not transferable —
+# stock correlation runs through SPY, not BTC.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "0"))
+
 # --- US market session gate (see src/market_hours.py) ---
 # Signals only while NYSE/Nasdaq is open — off-session X-Perp candles are thin
 # MM drift. Open-position monitoring (TP/SL) stays 24/7 regardless.

@@ -26,6 +26,8 @@ from config import (
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
+    STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
+    MTF_MIN_SCORE, TP1_R_MULT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
@@ -64,6 +66,8 @@ from src.db import (
     get_claude_spend_stats,
     get_bot_state, set_bot_state,
     log_setup_candidate, mark_setup_sent, get_setups_by_date,
+    mark_setup_blocked, get_cap_impact_stats, get_skew_response_stats,
+    get_all_setups_since, get_all_signals_since,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
     delete_backtest_seed_rows,
@@ -1219,12 +1223,15 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 QUALITY_RISK_OVERLAY, QUALITY_RISK_MULT,
                 REL_STRENGTH_RISK_UP, REL_STRENGTH_RISK_UP_MULT,
                 TREND_PAIR_RISK_UP, TREND_PAIR_RISK_UP_MULT,
-                TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
                 AUTO_BLOCK_ENABLED, AUTO_BLOCK_MIN_TRADES,
                 AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE,
                 ADAPTIVE_FILTER_PACKS, REQUIRE_STRICT_HTF,
-                MTF_MIN_SCORE, SCAN_INTERVAL_MINUTES,
             )
+            # MTF_MIN_SCORE / TRAIL_RUNNER_ENABLED / TRAIL_ATR_MULT / SCAN_INTERVAL_MINUTES are
+            # imported at module level and MUST NOT be re-imported here: a name
+            # bound anywhere inside a function is local to ALL of it, so any
+            # branch reading one of them BEFORE this line raises
+            # UnboundLocalError. This exact trap fired on the sister crypto bot.
             import time as _t
             stats = _last_scan_stats
             if stats["ts"] > 0:
@@ -2587,15 +2594,38 @@ def _check_open_signals():
             else:
                 trail_atr_mult = max(0.0, float(TRAIL_ATR_MULT))
 
+            _conf_flags = df.get("confirmed") or []
             for i in range(len(df.get("close", []))):
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
                 exit_px = close
+                # Close-confirmed stop: the level must be breached by a CLOSED
+                # candle's close, not a wick. Unconfirmed (still-forming)
+                # candles never trigger it — their "close" is just the current
+                # price. Falls back to wick-touch when the feed carries no
+                # confirmed flags (global-feed fallback path).
+                _is_confirmed = bool(_conf_flags[i]) if i < len(_conf_flags) else True
+                if STOP_CLOSE_CONFIRM:
+                    _sl_breached = _is_confirmed and (
+                        close <= sl if direction == "LONG" else close >= sl
+                    )
+                else:
+                    _sl_breached = low <= sl if direction == "LONG" else high >= sl
+                # Exit price is the real close when confirmed on a close —
+                # booking it at the SL level would understate the loss. Matters
+                # more here than on crypto: a gap can close far past the level.
+                _sl_exit_px = close if STOP_CLOSE_CONFIRM else sl
+                _sl_r = -1.0
+                if STOP_CLOSE_CONFIRM and risk > 0:
+                    _sl_r = round(
+                        ((_sl_exit_px - entry) if direction == "LONG" else (entry - _sl_exit_px)) / risk,
+                        4,
+                    )
 
                 if status == "OPEN":
                     if direction == "LONG":
-                        if low <= sl:             realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if high >= tp2:
                             realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                             new_status, exit_px = "TP2_HIT", tp2; break
@@ -2603,7 +2633,7 @@ def _check_open_signals():
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
                     else:
-                        if high >= sl:            realized_r = -1.0; new_status, exit_px = "SL_HIT", sl;  break
+                        if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if low <= tp2:
                             realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                             new_status, exit_px = "TP2_HIT", tp2; break
@@ -3051,8 +3081,21 @@ def run_scan():
                 except Exception as e:
                     log.warning(f"  HEAVY check failed {analysis.get('symbol','?')}: {e}")
 
+        # Book state at judgment time — how many positions in each direction were
+        # already open when Claude saw these setups. Snapshotted once here so the
+        # logged value is what Claude actually reasoned against, and reused as the
+        # starting count for the correlation cap in the send loop below.
+        _dir_open = {"LONG": 0, "SHORT": 0}
+        for _s in get_open_signals():
+            _d = str(_s.get("direction", "")).upper()
+            if _d in _dir_open:
+                _dir_open[_d] += 1
+
         # Log all Claude-evaluated setups (approved and rejected) for admin history
         for _a in analyses:
+            _a["open_same_dir"] = _dir_open.get(
+                str(_a.get("direction", "")).upper(), 0
+            )
             try:
                 _a["_setup_log_id"] = log_setup_candidate(_a)
             except Exception as _e:
@@ -3109,8 +3152,27 @@ def run_scan():
                     continue
 
                 if decision != "NO TRADE":
+                    # Both caps withhold a setup Claude APPROVED. Tag why, so it
+                    # is not later counted as one of Claude's rejections and can
+                    # be judged on its own outcome (get_cap_impact_stats).
                     if sent_count >= MAX_SIGNALS_PER_SCAN:
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "scan_cap")
+                        except Exception:
+                            pass
+                        continue
+
+                    if (MAX_SAME_DIRECTION_POSITIONS > 0
+                            and _dir_open.get(decision, 0) >= MAX_SAME_DIRECTION_POSITIONS):
+                        log.info(
+                            f"  Skip {analysis['symbol']} — {_dir_open[decision]} {decision} "
+                            f"already open, correlation cap {MAX_SAME_DIRECTION_POSITIONS} reached"
+                        )
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
+                        except Exception:
+                            pass
                         continue
 
                     # Snapshot the live X-Perp price (the instrument the user
@@ -3184,6 +3246,8 @@ def run_scan():
                     if send_signal(analysis):
                         _cache_signal(analysis["symbol"], direction)
                         sent_count += 1
+                        if direction in _dir_open:
+                            _dir_open[direction] += 1
                         log.info(f"  Signal sent: {analysis['symbol']} {direction}")
                         try:
                             mark_setup_sent(analysis.get("_setup_log_id"))
