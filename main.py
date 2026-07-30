@@ -237,7 +237,8 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
-                            ("scan_cap", "лимит 3 за скан")):
+                            ("scan_cap", "лимит 3 за скан"),
+                            ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
             if st.get("n"):
                 A(f"  {title}: срезано {st['n']}  "
@@ -3474,6 +3475,13 @@ def run_scan():
                             f"  Signal NOT sent: {analysis['symbol']} {direction} "
                             f"({analysis.get('confidence','?')}) — send_signal returned False"
                         )
+                        # Ported from the crypto bot: a setup Claude APPROVED
+                        # that failed to send otherwise sits at sent=0 with no
+                        # block_reason, silently counted as a Claude rejection.
+                        try:
+                            mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
+                        except Exception:
+                            pass
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 

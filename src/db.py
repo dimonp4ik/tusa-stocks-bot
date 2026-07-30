@@ -1002,15 +1002,16 @@ def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
 
 
 def get_cap_impact_stats(since_ts: float) -> dict:
-    """Outcomes of setups Claude approved but a cap withheld.
+    """Outcomes of setups Claude approved but never sent.
 
-    Directly answers "did the cap save money or cost it": the shadow tracker
-    resolves these rows regardless of whether a trade was ever opened, so their
-    realised outcomes are known. Reported per cap so each can be judged alone.
+    Directly answers "did withholding it save money or cost it": the shadow
+    tracker resolves these rows regardless of whether a trade was ever opened.
+    Reported per reason — the two caps are deliberate risk controls,
+    'send_failed' is a delivery bug and should read near-zero n.
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap"):
+        for reason in ("dir_cap", "scan_cap", "send_failed"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
                    WHERE resolved=1 AND ts >= ? AND block_reason=?

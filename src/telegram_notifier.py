@@ -680,17 +680,45 @@ def send_status(text: str) -> bool:
 
 
 def _send_message(text: str) -> bool:
+    """POST a signal message. Two failure modes get a fallback, ported from the
+    sister crypto bot after it lost a real signal to a single failed attempt
+    with no retry: a parse error retries as plain text (mirrors
+    _edit_admin_text's existing fallback), any other failure gets one bare
+    retry after a short pause.
+    """
+    def _post(parse_mode: bool):
+        payload = {"chat_id": TELEGRAM_CHAT_ID, "text": text}
+        if parse_mode:
+            payload["parse_mode"] = "Markdown"
+        return requests.post(f"{TELEGRAM_API}/sendMessage", json=payload, timeout=15)
+
     try:
-        resp = requests.post(
-            f"{TELEGRAM_API}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"},
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            _log.error(
-                f"[Telegram] HTTP {resp.status_code}: {resp.text[:300]}"
-            )
-        return resp.status_code == 200
+        resp = _post(True)
+        if resp.status_code == 200:
+            return True
+
+        try:
+            desc = str(resp.json().get("description", ""))
+        except Exception:
+            desc = resp.text[:300]
+        _log.error(f"[Telegram] HTTP {resp.status_code}: {desc[:300]}")
+
+        if "parse" in desc.lower():
+            resp2 = _post(False)
+            if resp2.status_code == 200:
+                _log.warning("[Telegram] sent as plain text after a Markdown parse failure")
+                return True
+            _log.error(f"[Telegram] plain-text retry also failed: HTTP {resp2.status_code}: {resp2.text[:300]}")
+            return False
+
+        import time as _time
+        _time.sleep(2)
+        resp3 = _post(True)
+        if resp3.status_code == 200:
+            _log.warning("[Telegram] sent on retry after a transient failure")
+            return True
+        _log.error(f"[Telegram] retry also failed: HTTP {resp3.status_code}: {resp3.text[:300]}")
+        return False
     except Exception as e:
         _log.error(f"[Telegram] send failed: {e}")
         return False
