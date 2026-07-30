@@ -2925,7 +2925,8 @@ def _check_open_signals():
 
 # ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
 def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
-                            sl: float, highs: list, lows: list) -> tuple:
+                            sl: float, highs: list, lows: list,
+                            closes: list = None) -> tuple:
     """Replay a setup's bracket over forward candles (same order as the validated
     backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
     reached_tp2). outcome is None while still live (no TP1/SL hit yet).
@@ -2933,19 +2934,30 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
     After TP1 the stop moves to breakeven (mirrors live TP1=50%→SL-to-BE); the
     runner either reaches TP2 or exits flat at BE. We only need the categorical
     result (SL / TP1 / TP2) for the learning signal, not the runner's exact R.
+
+    STOP_CLOSE_CONFIRM must mirror the live position monitor and backtest.py
+    here too — this is a THIRD independent place the stop rule is implemented
+    (setup_log / "Точность ИИ" / the mirror experiment). Currently harmless
+    since STOP_CLOSE_CONFIRM defaults 0 on this bot (unmeasured — see
+    portfolio_sim findings), but if it is ever enabled without this fix, a
+    setup that is both sent (real position) and logged gets two different
+    outcomes for the same trade.
     """
     tp1_reached = False
     risk = abs(entry - sl)
     if risk <= 0:
         return None, 0, 0
-    for h, l in zip(highs, lows):
+    use_close = STOP_CLOSE_CONFIRM and closes is not None
+    for idx, (h, l) in enumerate(zip(highs, lows)):
         if not tp1_reached:
             if direction == "LONG":
-                if l <= sl:   return "SL", 0, 0
+                _sl_hit = (closes[idx] <= sl) if use_close else (l <= sl)
+                if _sl_hit:   return "SL", 0, 0
                 if h >= tp2:  return "TP2", 1, 1
                 if h >= tp1:  tp1_reached = True
             else:
-                if h >= sl:   return "SL", 0, 0
+                _sl_hit = (closes[idx] >= sl) if use_close else (h >= sl)
+                if _sl_hit:   return "SL", 0, 0
                 if l <= tp2:  return "TP2", 1, 1
                 if l <= tp1:  tp1_reached = True
         else:
@@ -2984,12 +2996,13 @@ def _track_setup_outcomes():
                 continue
             for s in rows:
                 df = _slice_candles_from_open(df_all, float(s["ts"]))
-                highs = [float(x) for x in df.get("high", [])]
-                lows  = [float(x) for x in df.get("low", [])]
+                highs  = [float(x) for x in df.get("high", [])]
+                lows   = [float(x) for x in df.get("low", [])]
+                closes = [float(x) for x in df.get("close", [])]
                 outcome, r1, r2 = _simulate_setup_outcome(
                     s["direction"], float(s["entry_price"]),
                     float(s["tp1"]), float(s["tp2"]), float(s["sl"]),
-                    highs, lows,
+                    highs, lows, closes,
                 )
                 age_h = (time.time() - float(s["ts"])) / 3600
                 if outcome is None:
