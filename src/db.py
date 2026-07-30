@@ -1131,17 +1131,16 @@ def mark_setup_resolved(setup_id: int, outcome: str,
 def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
     """Mark a setup_log row as backed by a real position (signals.id).
 
-    Always resets resolved=0 so a row already resolved by the shadow
-    simulation BEFORE it got linked gets corrected from the real result on
-    the next tick (ported from crypto bot — the exact bug this fixes).
+    Deliberately does NOT touch `resolved`: resolve_sent_setups_from_signals()
+    re-checks every linked row and corrects any that disagree, so a stale row
+    never has to be un-resolved. Un-resolving would make it vanish from
+    get_setup_accuracy until the next tick succeeded — and permanently if that
+    tick ever failed (hit in production on the crypto bot 2026-07-31).
     """
     if not setup_log_id or not signal_id:
         return
     with _conn() as c:
-        c.execute(
-            "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
-            (signal_id, setup_log_id),
-        )
+        c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (signal_id, setup_log_id))
 
 
 _SIGNAL_STATUS_TO_OUTCOME = {
@@ -1158,19 +1157,36 @@ def resolve_sent_setups_from_signals(limit: int = 80) -> int:
     """Copy the REAL outcome onto setup_log rows linked to a closed signal."""
     n = 0
     with _conn() as c:
+        # Every linked row whose signal is FINAL, not just resolved=0 ones, so
+        # a row already resolved with a wrong shadow-simulated outcome gets
+        # corrected without ever having to be un-resolved (which would make it
+        # invisible to get_setup_accuracy in the meantime).
         rows = c.execute(
-            """SELECT sl.id AS setup_id, s.status, s.realized_r
+            """SELECT sl.id AS setup_id, sl.resolved, sl.outcome AS cur_outcome,
+                      s.status, s.realized_r
                FROM setup_log sl JOIN signals s ON s.id = sl.signal_id
-               WHERE sl.resolved=0 AND sl.signal_id IS NOT NULL
-               LIMIT ?""",
+               WHERE sl.signal_id IS NOT NULL
+               ORDER BY sl.ts DESC LIMIT ?""",
             (limit,),
         ).fetchall()
+        # Write on THIS connection: mark_setup_resolved() would open a SECOND
+        # connection to the same SQLite file while this one holds the read
+        # transaction above, risking a silent "database is locked".
+        now = time_mod.time()
         for r in rows:
             mapped = _SIGNAL_STATUS_TO_OUTCOME.get(r["status"])
             if mapped is None:
                 continue
             outcome, r1, r2 = mapped
-            mark_setup_resolved(r["setup_id"], outcome, r1, r2, net_r=r["realized_r"])
+            if r["resolved"] and r["cur_outcome"] == outcome:
+                continue
+            c.execute(
+                """UPDATE setup_log
+                   SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1,
+                       resolved_ts=?, net_r=COALESCE(?, net_r)
+                   WHERE id=?""",
+                (outcome, int(r1), int(r2), now, r["realized_r"], r["setup_id"]),
+            )
             n += 1
     return n
 
@@ -1197,10 +1213,7 @@ def backfill_setup_signal_links(window_sec: float = 300) -> int:
                  r["ts"] - window_sec, r["ts"] + window_sec, r["ts"]),
             ).fetchone()
             if sig:
-                c.execute(
-                    "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
-                    (sig["id"], r["id"]),
-                )
+                c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (sig["id"], r["id"]))
                 n += 1
     return n
 
