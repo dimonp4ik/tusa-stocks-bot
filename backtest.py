@@ -76,6 +76,7 @@ from config import (  # noqa: E402
     POST_TP1_WEAK_CLOSE_PROGRESS,
     MIN_24H_QUOTE_VOLUME_USDT,
     OFF_SESSION_SIGNALS,
+    MARKET_PROXY_SYMBOL,
 )
 from datetime import datetime as _datetime, timezone as _tz  # noqa: E402
 from src.signal_filter import analyze_coin_smc  # noqa: E402
@@ -911,6 +912,23 @@ def backtest_symbol(
             )
         except Exception:
             c1d = {}
+        # Market-proxy (SPY) 1h series, so btc_change_pct can be REAL instead of
+        # a constant 0.0. Passing 0.0 — as this did until 2026-07-31, same bug
+        # the crypto bot had — silently handed every backtest trade the maximum
+        # market-alignment bonus: the scorer does `LONG and chg >= 0 -> +2 /
+        # SHORT and chg <= 0 -> +2 / else +1`, and 0.0 satisfies BOTH, so the
+        # +1 branch never ran. It also disabled the market-move block filter
+        # (BTC_BLOCK_THRESHOLD_PCT, which cannot trigger at 0.0) and fed a wrong
+        # rel_strength to the momentum pack.
+        try:
+            proxy_1h = fetch_history(
+                MARKET_PROXY_SYMBOL, TIMEFRAME_1H_KUCOIN, KLINES_1H_INTERVAL_SEC,
+                max(10, math.ceil(candles / div_1h) + 4),
+                refresh_cache=refresh_cache,
+                end_date_ms=end_date_ms,
+            )
+        except Exception:
+            proxy_1h = {}
     except Exception as exc:
         result.error = str(exc)
         result.elapsed_sec = time.perf_counter() - started
@@ -947,8 +965,18 @@ def backtest_symbol(
         snap_4h = aligned_slice_by_time(c4h, t_cur, window_4h, max(1, i // 16))
         snap_1d = aligned_slice_by_time(c1d, t_cur, 8, max(1, i // 96)) if c1d else None
 
+        # Same definition the live bot uses (get_btc_change_1h): pct move of the
+        # last CLOSED 1h proxy candle vs the one before, as of this scan bar.
+        _mkt_chg = 0.0
+        if proxy_1h:
+            _psnap = aligned_slice_by_time(proxy_1h, t_cur, 3, max(1, i // div_1h))
+            _pc = (_psnap or {}).get("close") or []
+            if len(_pc) >= 2 and _pc[-2]:
+                _mkt_chg = (_pc[-1] - _pc[-2]) / _pc[-2] * 100.0
+
         result.analyzed += 1
-        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h, btc_change_pct=0.0,
+        setup = analyze_coin_smc(snap_15, snap_1h, symbol, snap_4h,
+                                 btc_change_pct=_mkt_chg,
                                  candles_1d=snap_1d)
         if not setup:
             continue
