@@ -3402,8 +3402,43 @@ def run_scan():
                     # that "opened" already resolved as an instant win/loss).
                     stale_move = False
                     try:
-                        live_px = get_xperp_price(analysis["symbol"]) or get_current_price(analysis["symbol"])
+                        _xp_px = get_xperp_price(analysis["symbol"])
+                        live_px = _xp_px or get_current_price(analysis["symbol"])
                         if live_px and live_px > 0:
+                            # Structure is measured on the deep GLOBAL swap feed
+                            # but the position is opened/monitored on the X-Perp,
+                            # which trades at a persistent discount (measured
+                            # 2026-07-31: -0.17%..-0.21%). Rescale global-derived
+                            # levels into X-Perp space so entry and levels share
+                            # one price space. NOTE: the basis is noisier here
+                            # than on crypto (stdev up to 0.18pp vs 0.01-0.04pp),
+                            # so the +/-1% sanity bound matters more.
+                            _basis = 1.0
+                            if _xp_px:
+                                try:
+                                    _gp = get_current_price(analysis["symbol"])
+                                    if _gp and _gp > 0:
+                                        _b = _xp_px / _gp
+                                        if 0.99 <= _b <= 1.01:
+                                            _basis = _b
+                                        else:
+                                            log.warning(
+                                                f"  {analysis['symbol']}: implausible X-Perp basis "
+                                                f"{(_b-1)*100:+.2f}% — levels left unscaled"
+                                            )
+                                except Exception as _be:
+                                    log.debug(f"  basis calc failed {analysis['symbol']}: {_be}")
+                            if _basis != 1.0:
+                                for _k in ("recent_high", "recent_low", "tp1_level",
+                                           "tp2_level", "entry_low", "entry_high", "atr"):
+                                    try:
+                                        _v = analysis.get(_k)
+                                        if _v:
+                                            analysis[_k] = float(_v) * _basis
+                                    except (TypeError, ValueError):
+                                        continue
+                                log.info(f"  Levels rescaled to X-Perp space "
+                                         f"(basis {(_basis-1)*100:+.3f}%)")
                             zone_px = float(analysis.get("current_price") or live_px)
                             drift   = abs(live_px - zone_px) / zone_px if zone_px else 0
                             if drift <= LIVE_PRICE_MAX_DRIFT_PCT:
