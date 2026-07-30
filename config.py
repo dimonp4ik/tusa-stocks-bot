@@ -15,7 +15,9 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "30"))  # non-crypto X-Perp pool is ~26 — take all
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
-KLINES_LIMIT = 200         # 200 × 15m = ~50 hours of data for SMC
+# Lookback windows MUST match backtest.py's WINDOW_15M/WINDOW_1H/WINDOW_4H
+# (300/90/50) — see KLINES_1H_LIMIT below for what happened when they did not.
+KLINES_LIMIT = 300         # 300 × 15m (= WINDOW_15M)
 
 # --- Symbol quality filter ---
 # ALLOWED_SYMBOLS="" (default) → auto top-volume mode, top 45 by 24h USDT volume.
@@ -69,12 +71,23 @@ KLINES_INTERVAL_SEC = 15 * 60
 
 # --- 1h candles for trend direction ---
 TIMEFRAME_1H_KUCOIN = "1hour"
-KLINES_1H_LIMIT = 50
+# 50 -> 90 (= backtest WINDOW_1H) on 2026-07-31, ported from the crypto bot.
+# get_1h_trend() computes its "strong" flag (EMA9>EMA21>EMA50) only when
+# len(closes) >= 51 — at 50 candles that branch NEVER RAN LIVE, so
+# trend_1h_strong was permanently False in production while the backtest (90)
+# computed it for real. It awards +1 mtf_score, emits the StrongTrend1h
+# confirmation, and adds +10 trend quality — on the crypto bot 87-89% of ALL
+# backtest trades carried that bonus and ~13% sat exactly on the score gate,
+# meaning live silently ran a one-point stricter filter than anything measured.
+KLINES_1H_LIMIT = 90
 KLINES_1H_INTERVAL_SEC = 3600
 
 # --- 4h candles for higher timeframe bias ---
 TIMEFRAME_4H_KUCOIN = "4hour"
-KLINES_4H_LIMIT = 30
+# Matched to backtest WINDOW_4H, NOT raised past 51: trend_4h_strong stays
+# False on both sides (confirmed dead in the crypto data), and raising only the
+# live side would recreate the very mismatch this fixes.
+KLINES_4H_LIMIT = 50
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
 # --- 1D candles for macro trend ---
