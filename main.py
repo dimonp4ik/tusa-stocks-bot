@@ -69,6 +69,7 @@ from src.db import (
     mark_setup_blocked, get_cap_impact_stats, get_skew_response_stats,
     get_all_setups_since, get_all_signals_since,
     get_unresolved_setups, mark_setup_resolved, get_setup_accuracy,
+    link_setup_to_signal, resolve_sent_setups_from_signals, backfill_setup_signal_links,
     get_similar_resolved_setups, seed_backtest_outcomes, backfill_backtest_net_r,
     delete_backtest_seed_rows,
     get_today_sl_streak,
@@ -3463,10 +3464,22 @@ def run_scan():
                             mark_setup_sent(analysis.get("_setup_log_id"))
                         except Exception:
                             pass
+                        _sig_row = None
+                        try:
+                            _sig_row = get_latest_open_signal(analysis["symbol"])
+                        except Exception as _ge:
+                            log.warning(f"  Could not fetch new signal row: {_ge}")
+                        # Link so this setup's outcome comes from the real
+                        # signal's close, not an independent shadow simulation
+                        # (ported from crypto bot after the two disagreed there).
+                        try:
+                            if _sig_row:
+                                link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
+                        except Exception:
+                            pass
                         # Autotrade: mirror the just-published signal into real
                         # OKX positions for onboarded users (async, fail-safe).
                         try:
-                            _sig_row = get_latest_open_signal(analysis["symbol"])
                             autotrader.open_positions_for_signal(_sig_row)
                         except Exception as _ae:
                             log.warning(f"  Autotrade open hook failed: {_ae}")
@@ -3628,11 +3641,23 @@ def _monitor_open_signals():
 
 
 def _shadow_tracker_job():
-    """15-min job: resolve would-be outcomes of rejected + sent setups."""
+    """15-min job: resolve outcomes for logged setups.
+
+    Rejected/shadow setups (no real position) are simulated by
+    _track_setup_outcomes(); sent setups have a real position, so
+    resolve_sent_setups_from_signals() copies its actual close instead of
+    running a second, independent simulation that could contradict it.
+    """
     try:
         _track_setup_outcomes()
     except Exception as e:
         log.warning(f"Shadow tracker job failed: {e}")
+    try:
+        n = resolve_sent_setups_from_signals()
+        if n:
+            log.info(f"Shadow tracker: resolved {n} sent setup(s) from real signal outcomes")
+    except Exception as e:
+        log.warning(f"Sent-setup resolution failed: {e}")
 
 
 # Each (csv, flag) seeds once. Add new batches as new tuples — already-seeded
@@ -3720,6 +3745,16 @@ def start_bot():
 
     # One-shot Claude memory seeding from historical backtest (2024+)
     maybe_seed_backtest()
+
+    # Self-healing backfill (ported 2026-07-31): link pre-fix sent setup_log
+    # rows to their real signal so the next shadow-tracker tick corrects any
+    # wrong independently-simulated outcome. Cheap, idempotent, self-limiting.
+    try:
+        _n = backfill_setup_signal_links()
+        if _n:
+            log.info(f"Linked {_n} pre-fix sent setup(s) to their real signal")
+    except Exception as e:
+        log.warning(f"Setup-signal backfill failed: {e}")
 
     # Dedup guard: only send once per 60s per container (prevents
     # double-message during Render zero-downtime deploys where old + new

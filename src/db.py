@@ -222,6 +222,13 @@ def init_db():
             # when Claude judged it — lets us ask whether Claude's own approval
             # rate responds to a skewed book, separately from any hard cap.
             "open_same_dir": "INTEGER",
+            # FK to signals.id once this setup is actually sent. Ported
+            # 2026-07-31 from the crypto bot: a sent setup was independently
+            # shadow-tracked on a different feed AND separately monitored for
+            # real — these can disagree. A setup with a real position has an
+            # authoritative outcome; it must not also run an independent
+            # simulation that can contradict it.
+            "signal_id":    "INTEGER",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -1098,7 +1105,7 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
     with _conn() as c:
         rows = c.execute(
             """SELECT * FROM setup_log
-               WHERE resolved=0 AND sl IS NOT NULL
+               WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
                  AND ts <= ? AND ts >= ?
                ORDER BY ts ASC LIMIT ?""",
             (now - 900, now - max_age_sec, limit),
@@ -1107,15 +1114,95 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
 
 
 def mark_setup_resolved(setup_id: int, outcome: str,
-                        reached_tp1: int, reached_tp2: int) -> None:
-    """Record the shadow outcome of a tracked setup."""
+                        reached_tp1: int, reached_tp2: int,
+                        net_r: float = None) -> None:
+    """Record the outcome of a tracked setup (shadow-simulated, or copied from
+    a real signal — see resolve_sent_setups_from_signals)."""
     with _conn() as c:
         c.execute(
             """UPDATE setup_log
-               SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1, resolved_ts=?
+               SET outcome=?, reached_tp1=?, reached_tp2=?, resolved=1, resolved_ts=?,
+                   net_r=COALESCE(?, net_r)
                WHERE id=?""",
-            (outcome, int(reached_tp1), int(reached_tp2), time_mod.time(), setup_id),
+            (outcome, int(reached_tp1), int(reached_tp2), time_mod.time(), net_r, setup_id),
         )
+
+
+def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
+    """Mark a setup_log row as backed by a real position (signals.id).
+
+    Always resets resolved=0 so a row already resolved by the shadow
+    simulation BEFORE it got linked gets corrected from the real result on
+    the next tick (ported from crypto bot — the exact bug this fixes).
+    """
+    if not setup_log_id or not signal_id:
+        return
+    with _conn() as c:
+        c.execute(
+            "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
+            (signal_id, setup_log_id),
+        )
+
+
+_SIGNAL_STATUS_TO_OUTCOME = {
+    "SL_HIT":      ("SL", 0, 0),
+    "TP2_HIT":     ("TP2", 1, 1),
+    "TP1_TRAIL":   ("TP1", 1, 0),
+    "BREAKEVEN":   ("TP1", 1, 0),
+    "TP1_EXPIRED": ("TP1", 1, 0),
+    "EXPIRED":     ("EXPIRED", 0, 0),
+}
+
+
+def resolve_sent_setups_from_signals(limit: int = 80) -> int:
+    """Copy the REAL outcome onto setup_log rows linked to a closed signal."""
+    n = 0
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT sl.id AS setup_id, s.status, s.realized_r
+               FROM setup_log sl JOIN signals s ON s.id = sl.signal_id
+               WHERE sl.resolved=0 AND sl.signal_id IS NOT NULL
+               LIMIT ?""",
+            (limit,),
+        ).fetchall()
+        for r in rows:
+            mapped = _SIGNAL_STATUS_TO_OUTCOME.get(r["status"])
+            if mapped is None:
+                continue
+            outcome, r1, r2 = mapped
+            mark_setup_resolved(r["setup_id"], outcome, r1, r2, net_r=r["realized_r"])
+            n += 1
+    return n
+
+
+def backfill_setup_signal_links(window_sec: float = 300) -> int:
+    """One-shot, idempotent: link any already-sent setup_log row that predates
+    signal_id to its real signals row, matched by symbol + direction +
+    opened_at within window_sec. Self-limiting: only sent=1 AND signal_id IS
+    NULL rows ever match.
+    """
+    n = 0
+    with _conn() as c:
+        rows = c.execute(
+            "SELECT id, symbol, direction, ts FROM setup_log "
+            "WHERE sent=1 AND signal_id IS NULL"
+        ).fetchall()
+        for r in rows:
+            sig = c.execute(
+                """SELECT id FROM signals
+                   WHERE symbol=? AND direction=?
+                     AND opened_at BETWEEN ? AND ?
+                   ORDER BY ABS(opened_at - ?) ASC LIMIT 1""",
+                (r["symbol"], r["direction"],
+                 r["ts"] - window_sec, r["ts"] + window_sec, r["ts"]),
+            ).fetchone()
+            if sig:
+                c.execute(
+                    "UPDATE setup_log SET signal_id=?, resolved=0 WHERE id=?",
+                    (sig["id"], r["id"]),
+                )
+                n += 1
+    return n
 
 
 def get_setup_accuracy(since_ts: float) -> dict:
