@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
-    TP1_R_MULT,
+    TP1_R_MULT, LIVE_HIST_EPOCH_TS,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -1296,8 +1296,17 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
     same direction, and either the same symbol OR a nearby mtf_score band.
     Newest first within each tier; каждый row carries `source` so the prompt
     builder can label live vs backtest separately.
+
+    block_reason is excluded: _self_feedback splits these rows into "sent" vs
+    "rejected" by the `sent` flag, but a setup Claude APPROVED and a cap or a
+    send-failure withheld also sits at sent=0 — so Claude was being shown his
+    own approvals as if he had rejected them. get_setup_accuracy got the same
+    filter earlier; this call site is the one that actually feeds the prompt.
+
+    The live tier is also floored at LIVE_HIST_EPOCH_TS: rows older than that
+    came from a materially different bot and are not evidence about this one.
     """
-    since = time_mod.time() - lookback_days * 86400
+    since = max(time_mod.time() - lookback_days * 86400, LIVE_HIST_EPOCH_TS or 0.0)
     try:
         score = int(mtf_score or 0)
     except (TypeError, ValueError):
@@ -1311,6 +1320,7 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                FROM setup_log
                WHERE resolved=1 AND ts >= ? AND direction=?
                  AND COALESCE(source,'live')='live'
+                 AND COALESCE(block_reason,'')=''
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
                ORDER BY ts DESC LIMIT ?""",
             (since, direction, symbol, score, limit),

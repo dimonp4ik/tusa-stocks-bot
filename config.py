@@ -352,6 +352,15 @@ CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # p
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
 CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
 
+# Epoch for the LIVE tier of Claude's self-feedback history (unix ts, 0 = off).
+# That tier looks back 30 days, which reaches into the pre-parity-fix bot: a
+# filter with a 50-candle 1h lookback (Strong1h could never fire) and a stop
+# that triggered on wicks. Those outcomes describe software that no longer
+# exists. On the crypto bot the stale record deadlocked Claude into rejecting
+# every setup. Live tier only — admin stats keep the full history.
+# 1785456000 = 2026-07-31 00:00 UTC, the day the parity fixes shipped.
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
+
 # --- Structure-based stops/takes (swing mode, 15m, 10x X-Perp leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
 # clamped to safe leverage bounds. Stocks move 3-5x less than crypto per 15m:

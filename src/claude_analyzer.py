@@ -17,6 +17,8 @@ from src.db import (
 
 # Minimum resolved similar setups before self-feedback is shown (avoid noise).
 _SELF_FEEDBACK_MIN = 6
+# Minimum rows in a single sent/rejected bucket before that bucket is rendered.
+_BUCKET_MIN = int(os.getenv("SELF_FEEDBACK_BUCKET_MIN", "8"))
 
 # Global calibration: min resolved REJECTED setups before the macro skew line is
 # injected, and the min TP1% gap (rejected − sent) that counts as "too strict".
@@ -260,10 +262,18 @@ def _self_feedback(s: dict) -> str:
 
     rej = [r for r in live if not r.get("sent")]
     snt = [r for r in live if r.get("sent")]
+    # A bucket below _BUCKET_MIN is noise, but it does not READ like noise:
+    # "sent 3: 0W 3SL" looks like a damning verdict. Observed on the crypto bot
+    # 2026-07-31 — with exactly 3 lifetime sent trades (all stopped) Claude
+    # rejected 6 of 6 live setups, quoted that 0W/3SL line in every rejection,
+    # and all 6 rejections that resolved went on to hit TP1/TP2. That is a
+    # deadlock: he needs sent trades to improve the record and refuses to send
+    # because of it. Suppressed entirely rather than shown with a caveat — the
+    # evidence is that he anchors on the number regardless.
     parts = []
-    if rej:
+    if len(rej) >= _BUCKET_MIN:
         parts.append(f"rejected {_fmt(rej)}")
-    if snt:
+    if len(snt) >= _BUCKET_MIN:
         parts.append(f"sent {_fmt(snt)}")
     seg = f" Hist[{'; '.join(parts)}]" if parts else ""
     if bt:
