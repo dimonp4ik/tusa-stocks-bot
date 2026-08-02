@@ -23,6 +23,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import requests
 
@@ -230,9 +231,9 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         "ordType":       "oco",
         "reduceOnly":    "true",
         "closeFraction": "1",
-        "slTriggerPx":   str(sl_px),
+        "slTriggerPx":   _fmt_px(sl_px),
         "slOrdPx":       "-1",     # market on trigger
-        "tpTriggerPx":   str(tp_px),
+        "tpTriggerPx":   _fmt_px(tp_px),
         "tpOrdPx":       "-1",
     })
     if not ok:
@@ -258,7 +259,7 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
         "ordType":     "conditional",
         "reduceOnly":  "true",
         "sz":          _fmt_sz(sz),
-        "tpTriggerPx": str(tp1_px),
+        "tpTriggerPx": _fmt_px(tp1_px),
         "tpOrdPx":     "-1",
     })
     if not ok:
@@ -274,7 +275,7 @@ def amend_protection_sl(creds: dict, inst_id: str, algo_id: str, new_sl_px: floa
     return _request(creds, "POST", "/api/v5/trade/amend-algos", body={
         "instId":         inst_id,
         "algoId":         algo_id,
-        "newSlTriggerPx": str(new_sl_px),
+        "newSlTriggerPx": _fmt_px(new_sl_px),
         "newSlOrdPx":     "-1",
     })
 
@@ -303,6 +304,23 @@ def _fmt_sz(sz: float) -> str:
     """Contracts as clean string: 3.0 → '3', 0.5 → '0.5'."""
     s = f"{sz:.8f}".rstrip("0").rstrip(".")
     return s or "0"
+def _fmt_px(px: float) -> str:
+    """Price as a plain decimal string OKX will accept.
+
+    Python renders any float below 1e-4 in scientific notation, and `str()` was
+    being sent straight to the API — a stop at 2.82e-06 went out as "2.82e-06"
+    and OKX answered 51000 (parameter slTriggerPx error). Hit live on the
+    crypto bot 2026-08-01 (PEPE); ported here because the module is shared and
+    a cheap enough instrument would trip it the same way.
+
+    repr() keeps full float precision, Decimal parses its exponent form, and
+    format(..., 'f') forces fixed point at any magnitude. Callers tick-round
+    first (round_to_tick), so no precision is invented here.
+    """
+    try:
+        return format(Decimal(repr(float(px))).normalize(), "f")
+    except Exception:
+        return str(px)
 
 
 def calc_contracts(margin_usd: float, leverage: float, price: float, spec: dict) -> float:
