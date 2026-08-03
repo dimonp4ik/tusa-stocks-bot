@@ -1445,7 +1445,13 @@ def get_today_sl_streak(day_start_ts: float) -> int:
 def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
     """Resolved live Claude-evaluated setups for the SCORECARD block: does his
     risk_score / confidence scale actually separate outcomes. Backtest priors
-    excluded (they carry no Claude verdict)."""
+    excluded (they carry no Claude verdict).
+
+    Floored at LIVE_HIST_EPOCH_TS like the other live-history reads: the 60-day
+    window otherwise reaches into the pre-parity-fix bot, mixing outcomes from
+    software that no longer exists into the calibration of scales he applies
+    today."""
+    since_ts = max(float(since_ts), LIVE_HIST_EPOCH_TS or 0.0)
     with _conn() as c:
         rows = c.execute(
             """SELECT decision, confidence, risk_score, outcome, reached_tp1,
