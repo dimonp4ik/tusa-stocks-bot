@@ -241,7 +241,7 @@ def send_signal(analysis: dict) -> bool:
         # Log to DB
         try:
             from src.db import log_signal
-            log_signal(analysis, tp1, tp2, sl)
+            analysis["_signal_id"] = log_signal(analysis, tp1, tp2, sl)
         except Exception as e:
             print(f"[DB] log_signal failed: {e}")
         return True

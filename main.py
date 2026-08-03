@@ -9,6 +9,7 @@ Flow every N minutes:
   5. Telegram receives only actionable signals
 """
 
+import json
 import logging
 import os
 import time
@@ -77,7 +78,7 @@ from src.db import (
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys,
     at_set_mode, at_set_active, at_set_balance, at_set_mode_prompt,
     at_set_tp1_close_pct,
-    get_latest_open_signal,
+    get_latest_open_signal, get_signal_by_id,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -2593,6 +2594,41 @@ def _is_alert_duplicate(name: str) -> bool:
     return False
 
 
+def _cooldowns_load() -> None:
+    """Restore both cooldown caches from the DB at boot.
+
+    They used to live only in process memory, so every redeploy silently reset
+    SIGNAL_COOLDOWN_HOURS and REJECT_COOLDOWN_HOURS to zero. The open-position
+    guard covered the worst case, but a symbol whose trade had already CLOSED
+    could be re-signalled right after a restart, and a setup Claude had just
+    rejected could be re-asked on the very next scan.
+    """
+    global _signal_cache, _reject_cache
+    try:
+        raw = get_bot_state("cooldown_signals")
+        if raw:
+            _signal_cache = {k: (v[0], float(v[1])) for k, v in json.loads(raw).items()}
+        raw = get_bot_state("cooldown_rejects")
+        if raw:
+            _reject_cache = {tuple(k.split("|", 1)): (float(v[0]), float(v[1]), float(v[2]))
+                             for k, v in json.loads(raw).items()}
+        log.info(f"Cooldowns restored: {len(_signal_cache)} signal, {len(_reject_cache)} reject")
+    except Exception as e:
+        log.warning(f"Cooldown restore failed (starting empty): {e}")
+
+
+def _cooldowns_save() -> None:
+    """Persist both caches after every mutation — they are tiny and a scan is
+    minutes apart."""
+    try:
+        set_bot_state("cooldown_signals", json.dumps(
+            {k: [v[0], v[1]] for k, v in _signal_cache.items()}))
+        set_bot_state("cooldown_rejects", json.dumps(
+            {f"{k[0]}|{k[1]}": [v[0], v[1], v[2]] for k, v in _reject_cache.items()}))
+    except Exception as e:
+        log.warning(f"Cooldown save failed: {e}")
+
+
 def _is_duplicate(symbol: str, direction: str) -> bool:
     if symbol in _signal_cache:
         cached_dir, cached_ts = _signal_cache[symbol]
@@ -2604,6 +2640,7 @@ def _is_duplicate(symbol: str, direction: str) -> bool:
 
 def _cache_signal(symbol: str, direction: str):
     _signal_cache[symbol] = (direction, time.time())
+    _cooldowns_save()
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -2622,11 +2659,13 @@ def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
     r_price, r_atr, r_ts = ent
     if (time.time() - r_ts) / 3600 >= REJECT_COOLDOWN_HOURS:
         _reject_cache.pop((symbol, direction), None)
+        _cooldowns_save()
         return False
     eff_atr = float(atr or 0) or r_atr
     try:
         if eff_atr > 0 and abs(float(price) - r_price) > eff_atr:
             _reject_cache.pop((symbol, direction), None)   # left the zone
+            _cooldowns_save()
             return False
     except (TypeError, ValueError):
         pass
@@ -2636,6 +2675,7 @@ def _is_reject_cooled(symbol: str, direction: str, price, atr) -> bool:
 def _cache_rejection(symbol: str, direction: str, price, atr) -> None:
     try:
         _reject_cache[(symbol, direction)] = (float(price or 0), float(atr or 0), time.time())
+        _cooldowns_save()
     except (TypeError, ValueError):
         pass
 
@@ -3497,11 +3537,16 @@ def run_scan():
                         log.info(f"  Signal sent: {analysis['symbol']} {direction}")
                         try:
                             mark_setup_sent(analysis.get("_setup_log_id"))
-                        except Exception:
-                            pass
+                        except Exception as _me:
+                            log.warning(f"  mark_setup_sent failed: {_me}")
+                        # Keyed on the id log_signal returned, not "newest OPEN
+                        # row for this symbol" — that was a guess that held only
+                        # while one setup per symbol per scan is generated.
                         _sig_row = None
                         try:
-                            _sig_row = get_latest_open_signal(analysis["symbol"])
+                            _sid = analysis.get("_signal_id")
+                            _sig_row = (get_signal_by_id(_sid) if _sid
+                                        else get_latest_open_signal(analysis["symbol"]))
                         except Exception as _ge:
                             log.warning(f"  Could not fetch new signal row: {_ge}")
                         # Link so this setup's outcome comes from the real
@@ -3510,8 +3555,11 @@ def run_scan():
                         try:
                             if _sig_row:
                                 link_setup_to_signal(analysis.get("_setup_log_id"), _sig_row["id"])
-                        except Exception:
-                            pass
+                        except Exception as _le:
+                            # Must be loud: the row stays sent=1 with no
+                            # signal_id and is then excluded from BOTH resolvers
+                            # until backfill_setup_signal_links() repairs it.
+                            log.warning(f"  link_setup_to_signal failed: {_le}")
                         # Autotrade: mirror the just-published signal into real
                         # OKX positions for onboarded users (async, fail-safe).
                         try:
@@ -3779,6 +3827,9 @@ def start_bot():
         log.warning(f"DB init failed: {e}")
 
     # One-shot Claude memory seeding from historical backtest (2024+)
+    # Cooldowns survive redeploys (2026-08-03) — load before the first scan.
+    _cooldowns_load()
+
     maybe_seed_backtest()
 
     # Self-healing backfill (ported 2026-07-31): link pre-fix sent setup_log
