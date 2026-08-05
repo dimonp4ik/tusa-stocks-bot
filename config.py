@@ -530,7 +530,16 @@ BACKTEST_CANDLES        = int(os.getenv("BACKTEST_CANDLES", "1152"))  # 1152 × 
 # directly; re-run backtests here before trusting any pre-2026-07-22 result.
 BACKTEST_TP_WINDOW      = int(os.getenv("BACKTEST_TP_WINDOW", "192"))
 BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.001"))
+# 0.0005 = OKX X-Perps standard-tier TAKER fee (verified 2026-07-22 against
+# okx.com/en-eu/help/okx-x-perps-eea-fees-overview: maker 0.02%, taker 0.05%).
+# The bot enters and exits with market orders (src/okx_trader.py: ordType
+# "market", SL/TP algo triggers market-close), so taker applies both sides.
+# Was 0.001 — a crypto-bot leftover, 2x the real rate. Costs are charged as a
+# fraction of R, so on this bot's 0.4-1.5% stop band that error was eating
+# 0.317R/trade instead of 0.211R: it understated net edge by ~21% (+826R ->
+# +1003R on the 1679-trade 2022-2026 deep set). Slippage kept at 0.05%/side,
+# which is conservative for liquid stock X-Perps inside the US session.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
 BACKTEST_USE_BTC_FILTER = os.getenv("BACKTEST_USE_BTC_FILTER", "1") != "0"
 
