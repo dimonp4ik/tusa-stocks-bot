@@ -30,7 +30,22 @@ _log = logging.getLogger(__name__)
 _ET = ZoneInfo("America/New_York")
 
 # tickers that can never have earnings — skip the lookup entirely
-_NON_EQUITY_BASES = {"SPY", "QQQ", "EWY", "SPCX", "XAU", "XAG", "CL", "BZ", "DRAM", "CBRS"}
+# Funds and commodities only — these have no earnings date, so the calendar
+# lookup is skipped for them. A ticker must NOT be listed here unless it is
+# genuinely not a company: anything left in by mistake trades straight through
+# its own earnings report, which is the exact gap risk this module exists to
+# avoid. Verify with Nasdaq's quote API before adding
+# (api.nasdaq.com/api/quote/<SYM>/info?assetclass=etf -> "...ETF" name).
+# 2026-07-22: CBRS (Cerebras Systems) and SPCX (Space Exploration Technologies)
+# were wrongly listed here and have been removed — both are real companies.
+_NON_EQUITY_BASES = {
+    "SPY",    # SPDR S&P 500 ETF
+    "QQQ",    # Invesco QQQ Trust
+    "EWY",    # iShares MSCI South Korea ETF
+    "SOXL",   # Direxion Daily Semiconductor Bull 3X ETF
+    "DRAM",   # Roundhill Memory ETF
+    "XAU", "XAG", "CL", "BZ",   # gold, silver, WTI, Brent
+}
 
 _CACHE_TTL = 6 * 3600
 _cache: dict[str, tuple[float, set]] = {}  # date_str -> (fetched_at, {symbols})

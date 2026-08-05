@@ -61,7 +61,18 @@ MIN_SIGNALS_TO_PASS = 2
 SIGNAL_COOLDOWN_HOURS = 3  # 15m swing signals hold 2-8h — 3h cooldown per coin/direction
 
 # --- Signal expiry (no TP1/SL within this window → EXPIRED) ---
+# Counted in MARKET-OPEN hours (src/market_hours.session_hours_between), not
+# wall-clock. 2026-07-22: with a wall-clock clock, 25.7% of Friday entries
+# expired vs 1.7-5.3% Mon-Thu — 62% of ALL expiries came from Fridays, because
+# the weekend burned the budget while the underlying could not move. A
+# session-gated stock bot must age positions on session time.
 SIGNAL_EXPIRY_HOURS = int(os.getenv("SIGNAL_EXPIRY_HOURS", "48"))
+# Hard calendar ceiling on top of the session clock. 48 session hours starting
+# Friday afternoon would otherwise run ~11.8 calendar days — long enough for the
+# position to sit through the ticker's own earnings report (the blackout only
+# gates ENTRY, it cannot protect an already-open position) and to accumulate
+# weekend gap risk. Whichever limit is hit first ends the trade.
+SIGNAL_EXPIRY_MAX_DAYS = float(os.getenv("SIGNAL_EXPIRY_MAX_DAYS", "5"))
 
 # --- KuCoin (accessible from cloud/US servers) ---
 KUCOIN_BASE_URL = "https://api.kucoin.com"

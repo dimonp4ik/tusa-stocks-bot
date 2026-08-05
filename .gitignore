@@ -40,3 +40,8 @@ bt_*.log
 *.html
 work_*.csv
 reports/*.csv
+
+# Backtest scratch exports (backtest_seed_stocks.csv stays tracked)
+bt_*.csv
+sweep_*.log
+seed_regen.log

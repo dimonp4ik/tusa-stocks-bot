@@ -49,6 +49,8 @@ from config import (  # noqa: E402
     BACKTEST_FEE_RATE,
     BACKTEST_SLIPPAGE_RATE,
     BACKTEST_TP_WINDOW,
+    SIGNAL_EXPIRY_HOURS,
+    SIGNAL_EXPIRY_MAX_DAYS,
     BLOCKED_SYMBOLS,
     BLOCK_STABLE_BASES,
     KLINES_1H_INTERVAL_SEC,
@@ -685,12 +687,22 @@ def simulate_trade_direct(
     # again (stocks bot: 48 session bars ≈ 2 trading days). SL/TP hits are
     # still checked on EVERY bar — the X-Perp trades 24/7 and the live monitor
     # watches open positions round the clock.
+    #
+    # PARITY with _check_open_signals: it ages a position on the SAME session
+    # clock, with SIGNAL_EXPIRY_MAX_DAYS as a hard calendar ceiling so a Friday
+    # entry cannot run ~12 calendar days into its own earnings report. Whichever
+    # limit is reached first ends the trade, in both engines.
+    _wall_cap_sec = SIGNAL_EXPIRY_MAX_DAYS * 86400 if SIGNAL_EXPIRY_MAX_DAYS > 0 else None
     if times:
         bar_indices: list[int] = []
         session_used = 0
         j = fill_bar
         n_all = len(highs)
+        t_open = times[fill_bar] if fill_bar < len(times) else None
         while j < n_all and session_used < window:
+            if _wall_cap_sec is not None and t_open is not None and j < len(times):
+                if int(times[j]) - int(t_open) > _wall_cap_sec:
+                    break
             bar_indices.append(j)
             try:
                 if _is_market_open(_datetime.fromtimestamp(int(times[j]), tz=_tz.utc)):

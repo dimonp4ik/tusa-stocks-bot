@@ -25,6 +25,7 @@ from config import (
     SCAN_INTERVAL_MINUTES, SIGNAL_COOLDOWN_HOURS, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID,
     TRADING_HOURS_START, TRADING_HOURS_END, TRADE_WEEKENDS,
     MAX_SETUPS_TO_CLAUDE, ALLOWED_SYMBOLS, KLINES_INTERVAL_SEC, SIGNAL_EXPIRY_HOURS,
+    SIGNAL_EXPIRY_MAX_DAYS,
     CLAUDE_HEAVY_MIN_SCORE, CLAUDE_HEAVY_MAX_PER_SCAN, CLAUDE_MEMORY_LIMIT,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT,
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
@@ -54,6 +55,7 @@ from src.news_agent import (
 )
 from config import EVENT_WARN_HOURS
 from config import LIVE_PRICE_MAX_DRIFT_PCT
+from src.market_hours import session_hours_between
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     set_sl_xperp_only, get_sl_wick_stats,
@@ -2923,7 +2925,17 @@ def _check_open_signals():
                                 realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
                                 new_status, exit_px = "TP2_HIT", tp2; break
 
-            if new_status is None and age_hours > SIGNAL_EXPIRY_HOURS:
+            # Expire on MARKET-OPEN hours, not wall-clock: a weekend must not
+            # age out a Friday signal whose underlying cannot move. Measured on
+            # the 2022-2026 deep set, wall-clock expiry killed 25.7% of Friday
+            # entries vs 1.7-5.3% Mon-Thu (62% of ALL expiries were Fridays).
+            # SIGNAL_EXPIRY_MAX_DAYS is a hard calendar ceiling on top, so a
+            # Friday entry cannot ride ~12 calendar days into its own earnings.
+            _session_age = session_hours_between(opened_at, now)
+            if new_status is None and (
+                _session_age > SIGNAL_EXPIRY_HOURS
+                or (SIGNAL_EXPIRY_MAX_DAYS > 0 and age_hours > SIGNAL_EXPIRY_MAX_DAYS * 24)
+            ):
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
                 realized_r = round(tp1_close_frac * tp1_r, 4) if status == "TP1_PARTIAL" else 0.0
 
@@ -3748,7 +3760,7 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    ("backtest_seed_stocks.csv", "bt_seed_stocks_v3_done"),
+    ("backtest_seed_stocks.csv", "bt_seed_stocks_v4_done"),
 ]
 
 # Bump whenever the seed CSV is regenerated under different trade geometry or a
@@ -3761,8 +3773,9 @@ _BT_SEED_BATCHES = [
 #   v1: original run          (BACKTEST_TP_WINDOW unit bug, 12h not 48h)
 #   v2: TP-window fixed       (WR 73.9%, +0.475R/tr)
 #   v3: fee corrected to OKX's real 0.05% taker + TP1_R_MULT 1.0 -> 0.7
-#       (1679tr, WR 80.8%, +0.577R/tr)
-_BT_SEED_GENERATION = "v3"
+#   v4: expiry made session-aware + 5-day calendar ceiling, matching live
+#       (1679tr, WR 80.2%, +0.572R/tr)
+_BT_SEED_GENERATION = "v4"
 
 
 def maybe_seed_backtest():

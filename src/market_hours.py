@@ -168,6 +168,34 @@ def session_phase(dt=None) -> str:
     return "CLOSE"
 
 
+def session_hours_between(start_ts: float, end_ts: float) -> float:
+    """Market-open hours elapsed between two unix timestamps.
+
+    Weekends, holidays and overnight gaps do not advance this clock, so a
+    signal fired Friday afternoon is not aged out by a weekend during which
+    its underlying could not move. Walks calendar days (cheap: a 48-session-
+    hour budget spans ~8 trading days), intersecting each day's session with
+    the requested span.
+    """
+    if end_ts <= start_ts:
+        return 0.0
+    start = datetime.fromtimestamp(start_ts, tz=ET)
+    end = datetime.fromtimestamp(end_ts, tz=ET)
+
+    total = 0.0
+    d = start.date()
+    while d <= end.date():
+        if _is_trading_day(d):
+            open_dt = datetime.combine(d, SESSION_OPEN, tzinfo=ET)
+            close_dt = datetime.combine(d, _close_time_for(d), tzinfo=ET)
+            lo = max(open_dt, start)
+            hi = min(close_dt, end)
+            if hi > lo:
+                total += (hi - lo).total_seconds() / 3600.0
+        d += timedelta(days=1)
+    return total
+
+
 def next_open(dt=None) -> datetime:
     now = (dt or datetime.now(ET)).astimezone(ET)
     d = now.date()
