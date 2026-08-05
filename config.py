@@ -380,9 +380,22 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1
 # drift at RISK_MAX_PCT itself: if the ticker moved further than the widest
 # stop we'd ever set, the structural zone is stale, don't anchor to it.
 LIVE_PRICE_MAX_DRIFT_PCT = float(os.getenv("LIVE_PRICE_MAX_DRIFT_PCT", "0.015"))
-# 2026-06-11 TP1 sweep (20 sym, 90d×15m, trail 0.5): TP1=1.0R beats 1.5R on WR
-# (+13-16pp, 65-76% across 30/60/90d) at equal-or-better total R and half the DD.
-TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
+# 2026-07-22 stock sweep (16 sym, 2022-2026 Dukascopy, corrected 0.05% fee),
+# TP1 in {0.7, 0.8, 1.0, 1.2, 1.4}:
+#   0.7 -> WR 79.9%  net +492R  maxDD -5.31  net/DD 92.7
+#   1.0 -> WR 74.8%  net +530R  maxDD -6.26  net/DD 84.7   (previous default)
+#   1.4 -> WR 67.1%  net +533R  maxDD -6.54  net/DD 81.4
+# Net R is flat from 1.0 up (1.4's +0.5% is noise), so raising TP1 buys nothing;
+# lowering it trades ~7% of total R for +5pp WR and a 15% smaller drawdown —
+# the best risk-adjusted point on the curve. Chosen deliberately for drawdown,
+# not for the win-rate number itself.
+# Holds per year (WR up +3.0 to +5.4pp in ALL of 2022-2026) and per class
+# (stocks +4.8pp, commodities +4.7pp, index +7.2pp), so it is not one period's
+# artifact. In the choppiest year (2025) it is strictly free: WR 69.8 -> 75.7%
+# at identical net R.
+# NOTE: with TP1_CLOSE_FRAC=0 nothing closes at TP1 — this level only decides
+# when the runner switches to the ATR trail, and the trail floors at breakeven.
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.7"))      # TP1 = entry ± risk * 0.7
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
@@ -399,6 +412,17 @@ TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.25"))  # base trail;
 # are harvested, never which trades are taken. "fixed" = legacy 50%-at-TP1 + BE.
 TP1_CLOSE_FRAC = max(0.0, min(1.0, float(os.getenv("TP1_CLOSE_FRAC", "0.0"))))
 EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
+# 2026-07-22 trail-width sweep (16 sym, 2022-2026, TP1 fixed at 1.0), tested
+# (strong/weak) = 0.35/0.15, 0.50/0.25, 0.75/0.35, 1.00/0.50, 1.50/0.75:
+#   net R falls MONOTONICALLY as the trail widens (+530R -> +513 -> +504 ->
+#   +498 -> +498), win rate identical (74.8%) at every width, max DD identical.
+# The "widen the trail to let stock winners run" idea was tested and REJECTED:
+# 48% of wins cluster at 1-1.5R and a wider trail just gives that back before
+# exiting — US equities mean-revert intraday enough that locking gains tight
+# wins. Win rate is width-invariant because the trail floors at breakeven, so
+# a trade that has touched TP1 can never revert to a loss. 0.35/0.15 is the
+# measured optimum here, not just an inherited crypto default — don't re-widen
+# without new evidence.
 POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.35"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
