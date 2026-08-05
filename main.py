@@ -3748,18 +3748,21 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    # v2 (2026-07-22): corrected BACKTEST_TP_WINDOW unit bug (was 48 candles
-    # =12h, meant to mirror SIGNAL_EXPIRY_HOURS=48h — same fix ported from the
-    # crypto bot). v1 measured every trade against a 4x-too-short clock:
-    # EXPIRED 135->3, WR 69.8->73.9%, +0.426->+0.475R/tr net on the same 2022-
-    # 2026/16-ticker set. v1's rows are deleted (see _BT_SEED_V1_FLAGS below)
-    # before this batch loads so stale/understated priors don't sit alongside
-    # the corrected ones.
-    ("backtest_seed_stocks.csv", "bt_seed_stocks_v2_done"),
+    ("backtest_seed_stocks.csv", "bt_seed_stocks_v3_done"),
 ]
-# Old batch flags whose CSV no longer matches the file on disk — if any of
-# these fired, wipe all source='backtest' rows once before re-seeding v2.
-_BT_SEED_V1_FLAGS = ["bt_seed_stocks_v1_done"]
+
+# Bump whenever the seed CSV is regenerated under different trade geometry or a
+# corrected cost/exit model. Priors are per-ticker base rates ("setups shaped
+# like this resolved TP1 X% of the time"), so they are only meaningful while the
+# geometry that produced them matches what the bot trades live — a mismatch
+# feeds Claude a systematically wrong prior. On a generation change every
+# source='backtest' row is wiped before the new batch loads, so a redeployed bot
+# converges to exactly one generation instead of stacking contradictory ones.
+#   v1: original run          (BACKTEST_TP_WINDOW unit bug, 12h not 48h)
+#   v2: TP-window fixed       (WR 73.9%, +0.475R/tr)
+#   v3: fee corrected to OKX's real 0.05% taker + TP1_R_MULT 1.0 -> 0.7
+#       (1679tr, WR 80.8%, +0.577R/tr)
+_BT_SEED_GENERATION = "v3"
 
 
 def maybe_seed_backtest():
@@ -3769,13 +3772,18 @@ def maybe_seed_backtest():
     """
     import csv as _csv
 
-    if any(get_bot_state(f) for f in _BT_SEED_V1_FLAGS) and not get_bot_state("bt_seed_v1_purged"):
+    _prev_gen = get_bot_state("bt_seed_generation")
+    if _prev_gen != _BT_SEED_GENERATION:
         try:
             n = delete_backtest_seed_rows()
-            set_bot_state("bt_seed_v1_purged", str(n))
-            log.info(f"Purged {n} stale backtest-prior rows (understated TP-window bug) before v2 reseed")
+            set_bot_state("bt_seed_generation", _BT_SEED_GENERATION)
+            if n:
+                log.info(
+                    f"Backtest priors: wiped {n} rows from generation "
+                    f"{_prev_gen or 'v1/unversioned'} before seeding {_BT_SEED_GENERATION}"
+                )
         except Exception as e:
-            log.warning(f"Backtest-seed v1 purge failed: {e}")
+            log.warning(f"Backtest-seed generation purge failed: {e}")
 
     for fname, flag in _BT_SEED_BATCHES:
         try:
