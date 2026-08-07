@@ -45,3 +45,5 @@ reports/*.csv
 bt_*.csv
 sweep_*.log
 seed_regen.log
+seed_tp10.log
+src_compare.log
