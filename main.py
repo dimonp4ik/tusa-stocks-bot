@@ -3760,7 +3760,7 @@ def _shadow_tracker_job():
 # batches load independently of old ones.
 _BT_SEED_DIR = os.path.dirname(os.path.abspath(__file__))
 _BT_SEED_BATCHES = [
-    ("backtest_seed_stocks.csv", "bt_seed_stocks_v4_done"),
+    ("backtest_seed_stocks.csv", "bt_seed_stocks_v5_done"),
 ]
 
 # Bump whenever the seed CSV is regenerated under different trade geometry or a
@@ -3774,8 +3774,9 @@ _BT_SEED_BATCHES = [
 #   v2: TP-window fixed       (WR 73.9%, +0.475R/tr)
 #   v3: fee corrected to OKX's real 0.05% taker + TP1_R_MULT 1.0 -> 0.7
 #   v4: expiry made session-aware + 5-day calendar ceiling, matching live
-#       (1679tr, WR 80.2%, +0.572R/tr)
-_BT_SEED_GENERATION = "v4"
+#   v5: TP1_R_MULT reverted 0.7 -> 1.0 (final geometry)
+#       (1676tr, WR 73.9%, +0.591R/tr)
+_BT_SEED_GENERATION = "v5"
 
 
 def maybe_seed_backtest():
