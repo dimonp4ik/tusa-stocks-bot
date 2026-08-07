@@ -8,10 +8,37 @@ analyses the OKX swap — this source exists purely to give filter validation
 enough data for train/test splits.
 
 Known basis differences vs the OKX feed (acceptable for SMC structure work):
-  - stock/ETF CFDs carry bid-side pricing and a small basis (AAPL ~0.2%)
+  - stock/ETF CFDs carry bid-side pricing and a small basis (AAPL ~0.09%)
   - volume units differ (CFD lots vs swap contracts) — all volume filters in
     signal_filter are RATIOS (current/median), so units cancel out
   - equity CFD bars exist only during exchange hours; metals/oil nearly 24/5
+
+*** THE HTF WINDOWS ARE NOT THE SAME INDICATOR AS LIVE (measured 2026-07-22) ***
+OKX prints ~96 15m bars/day (24/7 tape); Dukascopy equity CFDs print ~26 (session
+only). The filter's windows are defined in BARS (WINDOW_1H=90, WINDOW_4H=50), so
+the same bar count spans a very different calendar:
+
+      window        OKX (live)    Dukascopy
+      1h x 90        3.7 days     16.9 days
+      4h x 50        8.2 days     35.2 days
+
+So the live bot judges its 4h trend over ~8 days and a duka backtest judges it
+over ~35. Sampled head-to-head on 6 tickers, trend_1h/trend_4h agreed on only
+3 — on AAPL and META the 4h read was outright opposite. Over an identical
+124-day window the two feeds produce materially different trade SELECTION
+(OKX 211 trades, duka 108).
+
+What this means in practice:
+  - AGGREGATE EDGE TRANSFERS. Same window: OKX +0.599 R/trade (WR 75.8%) vs the
+    duka deep run's +0.591 R/trade — duka is not producing fantasy results.
+  - EXIT-GEOMETRY questions (TP1 multiple, trail width) are about what happens
+    after entry and are safe to explore on duka's depth.
+  - SELECTION questions (which symbol/direction/pocket to block or boost) must
+    be confirmed with --source okx, because they depend on exactly the HTF read
+    that differs. Do not ship a selection rule measured only on duka.
+There is no way to fix this by tuning bar counts: matching the calendar span
+would leave too few bars for the EMAs the trend functions need. The two feeds
+are genuinely different views, and only OKX is the one the bot trades.
 
 Interface mirrors backtest.fetch_history: returns dict-of-lists candles
 (time seconds, oldest-first) with a local pickle cache.

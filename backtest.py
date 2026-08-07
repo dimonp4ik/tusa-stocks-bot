@@ -247,6 +247,15 @@ def _normalize_cached_candles(obj) -> dict[str, list] | None:
 # "duka" (Dukascopy CFDs, YEARS of history for 16/26 tickers — deep filter
 # validation). "duka" falls back to OKX for uncovered tickers.
 # Read from env so ProcessPoolExecutor workers (fresh module import) inherit it.
+#
+# THESE TWO SOURCES DO NOT SELECT THE SAME TRADES. The HTF windows are counted
+# in bars, and duka's session-only tape means 90x1h spans 16.9 days there vs 3.7
+# on OKX — so the 4h/1h trend reads differ (opposite on some tickers) and the
+# same 124 days yield 211 OKX trades vs 108 duka ones. Aggregate edge still
+# matches (+0.599 vs +0.591 R/trade), so duka is fine for exit-geometry work and
+# for confirming the edge exists across regimes; anything that decides WHICH
+# trades to take must be re-checked with --source okx. Details in
+# src/dukascopy_client.py.
 DATA_SOURCE = os.getenv("BACKTEST_SOURCE", "okx").strip().lower()
 
 
