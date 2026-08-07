@@ -391,22 +391,26 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1
 # drift at RISK_MAX_PCT itself: if the ticker moved further than the widest
 # stop we'd ever set, the structural zone is stale, don't anchor to it.
 LIVE_PRICE_MAX_DRIFT_PCT = float(os.getenv("LIVE_PRICE_MAX_DRIFT_PCT", "0.015"))
-# 2026-07-22 stock sweep (16 sym, 2022-2026 Dukascopy, corrected 0.05% fee),
-# TP1 in {0.7, 0.8, 1.0, 1.2, 1.4}:
-#   0.7 -> WR 79.9%  net +492R  maxDD -5.31  net/DD 92.7
-#   1.0 -> WR 74.8%  net +530R  maxDD -6.26  net/DD 84.7   (previous default)
-#   1.4 -> WR 67.1%  net +533R  maxDD -6.54  net/DD 81.4
-# Net R is flat from 1.0 up (1.4's +0.5% is noise), so raising TP1 buys nothing;
-# lowering it trades ~7% of total R for +5pp WR and a 15% smaller drawdown —
-# the best risk-adjusted point on the curve. Chosen deliberately for drawdown,
-# not for the win-rate number itself.
-# Holds per year (WR up +3.0 to +5.4pp in ALL of 2022-2026) and per class
-# (stocks +4.8pp, commodities +4.7pp, index +7.2pp), so it is not one period's
-# artifact. In the choppiest year (2025) it is strictly free: WR 69.8 -> 75.7%
-# at identical net R.
+# 2026-07-22 stock sweep (16 sym, 2022-2026 Dukascopy), re-measured AFTER the
+# session-aware expiry fix — the pre-fix sweep is superseded, see below:
+#   0.7 -> WR 79.4%  net +490R  maxDD -5.31  net/DD 92.3
+#   0.8 -> WR 77.9%  net +502R  maxDD -5.31  net/DD 94.6
+#   1.0 -> WR 73.7%  net +523R  maxDD -5.41  net/DD 96.7   <- best on both
+# Net R is flat above 1.0 (1.2/1.4 land within 1%, i.e. noise), so raising TP1
+# buys nothing; lowering it is now a pure win-rate-for-profit trade.
+#
+# WHY 0.7 WAS BRIEFLY SET AND REVERTED: on the pre-fix numbers 0.7 looked like
+# it bought a 15% smaller drawdown for ~7% of profit (net/DD 92.7 vs 84.7). That
+# edge was an artifact of the wall-clock expiry bug — the calendar timer killed
+# long-running trades, and a nearer TP1 partially rescued them by banking the
+# runner sooner. With expiry aged on session hours, drawdown is essentially
+# identical across 0.7/0.8/1.0 (-5.31/-5.31/-5.41) and the ranking inverts:
+# 1.0 is best on profit AND on risk-adjusted return. Do not re-lower TP1 for
+# "smaller drawdown" without re-measuring — that reason no longer exists.
+#
 # NOTE: with TP1_CLOSE_FRAC=0 nothing closes at TP1 — this level only decides
 # when the runner switches to the ATR trail, and the trail floors at breakeven.
-TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "0.7"))      # TP1 = entry ± risk * 0.7
+TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
 TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
