@@ -233,8 +233,16 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             ok, tp1_result = okx.place_tp1_partial(creds, inst_id, sig["direction"], tp1_px, raw_tp1_sz)
             if ok:
                 tp1_algo_id, tp1_sz = tp1_result, raw_tp1_sz
-                tp1_line = (f"На TP1 ({tp1_px}) закроется {close_pct:.0f}% "
-                            f"({okx._fmt_sz(raw_tp1_sz)} контр.), остаток — под трейлинг.")
+                # Report the share that will REALLY close, not the setting.
+                # raw_tp1_sz is floored to lotSz, so "50%" of an odd contract
+                # count is never exactly 50% — 50% of 99 lots is 49, i.e. 49.5%.
+                _act_pct = raw_tp1_sz / sz * 100.0 if sz else close_pct
+                _pct_s = (f"{_act_pct:.0f}%" if abs(_act_pct - close_pct) < 0.5
+                          else f"{_act_pct:.1f}% (просил {close_pct:.0f}%, "
+                               f"ровно не делится на контракты)")
+                tp1_line = (f"На TP1 ({tp1_px}) закроется {_pct_s} "
+                            f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(sz)} контр.), "
+                            f"остаток — под трейлинг.")
             else:
                 log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
                 tp1_line = "⚠️ Не смог поставить ордер на частичное закрытие TP1 — весь объём пойдёт под трейлинг."
@@ -383,9 +391,17 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                                     f"🤖 *{disp}*: {label}.\nЗакрыто по твоей настройке — вся позиция.")
                                 continue
                             at_reduce_position_sz(pos["id"], real_sz)
+                            # Say how much actually closed: the exchange fills in
+                            # whole lots, so the realised share is rarely the
+                            # configured one.
+                            _orig = float(pos["sz"])
+                            _closed = _orig - real_sz
+                            _pct = _closed / _orig * 100.0 if _orig else 0.0
                             _dm(pos["user_id"],
-                                f"🤖 *{disp}*: {label}.\nЗакрыто по твоей настройке, "
-                                f"остаток ({okx._fmt_sz(real_sz)} контр.) идёт под трейлинг.")
+                                f"🤖 *{disp}*: {label}.\n"
+                                f"Закрыто {_pct:.1f}% "
+                                f"({okx._fmt_sz(_closed)} из {okx._fmt_sz(_orig)} контр.), "
+                                f"остаток {okx._fmt_sz(real_sz)} контр. идёт под трейлинг.")
                             continue
                         elif ok:
                             log.warning(f"autotrade TP1 order pos#{pos['id']} hasn't filled yet "
