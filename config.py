@@ -514,21 +514,32 @@ STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "0") != "0"
 # protects the position while the bot itself is down (deploy/restart/network).
 STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.5"))
 
-# --- Concurrent same-direction exposure cap (ported 2026-07-26, DEFAULT OFF) ---
-# Nothing caps total open positions: only per-symbol dedup and
+# --- Concurrent same-direction exposure cap (ported 2026-07-26) ---
+# Nothing else caps total open positions: only per-symbol dedup and
 # MAX_SIGNALS_PER_SCAN=3, while signals live SIGNAL_EXPIRY_HOURS, so same-side
 # positions accumulate. Stock X-Perps in one direction are correlated through
 # SPY and sector, so N same-side positions are not N independent trades.
 #
-# DELIBERATELY 0 (off). On the sister crypto bot this exact cap was shipped at
-# 4 on reasoning alone and measured NEGATIVE: it cost 12-15% of profit for an
-# inconsistent drawdown benefit, because the trades it removes are BETTER than
-# average (a crowded book forms in a strong trend, and trend trades win more).
-# It was corrected to 8 only after portfolio_sim.py measured it. Do the same
-# here before enabling: run portfolio_sim.py on a backtest CSV from THIS bot,
-# sweep the value, and only then set a number. Crypto's 8 is not transferable —
-# stock correlation runs through SPY, not BTC.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "0"))
+# ENABLED at 5 on 2026-08-16, after the sweep this comment demanded. Measured on
+# THIS bot's 18k-candle backtest (396 trades), replaying the cap over the merged
+# trade list in entry order:
+#   off  396 tr  73.7%  +225.0R  DD -7.90R
+#   5    384 tr  74.2%  +225.2R  DD -6.93R   <- same profit, 12% less drawdown
+#   3    333 tr  75.4%  +205.7R  DD -6.47R
+#
+# 5 is the only value that survives a time split. Half 1: DD -6.93 against -7.90
+# for -1.0R of profit. Half 2: DD -5.67, identical to no cap, profit +1.2R.
+# Better in one half, neutral in the other, worse in neither.
+#
+# 3 was REJECTED by that same split: it looks best overall (-6.47R) but its
+# drawdown gets WORSE than no cap in half 2 (-6.47 against -5.67) while costing
+# profit in both halves — the overall figure is one half flattering the other.
+#
+# Be honest about the size: 5's benefit is modest and concentrated in one half.
+# It ships because it never hurts, not because it is a large edge. The original
+# warning stands — crypto's 8 is not transferable, stock correlation runs
+# through SPY, not BTC.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "5"))
 
 # --- US market session gate (see src/market_hours.py) ---
 # Signals only while NYSE/Nasdaq is open — off-session X-Perp candles are thin

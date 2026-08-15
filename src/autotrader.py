@@ -39,6 +39,7 @@ from src.db import (
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
+    at_has_open_position,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -151,6 +152,17 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     uid = u["user_id"]
     creds = _creds_of(u)
     if not creds:
+        return
+
+    # One instrument, one position. A second entry on the same instId cannot be
+    # protected: OKX permits a single closeFraction=1 TP/SL algo per position,
+    # so place_protection_oco below would fail and the handler would close the
+    # position — flattening the FIRST trade too. Cost a live trade on the sister
+    # crypto bot 2026-08-13 (PUMP), caused by a duplicate signal.
+    if at_has_open_position(uid, inst_id):
+        log.warning(f"autotrade: {uid} already holds {inst_id} — second entry refused")
+        _dm(uid, f"ℹ️ Автотрейдинг: по {disp} уже есть открытая позиция — "
+                 f"повторный сигнал пропущен.")
         return
 
     ok, balance = okx.get_balance(creds)

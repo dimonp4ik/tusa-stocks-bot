@@ -1729,6 +1729,25 @@ def at_open_positions_for_signal(signal_id: int) -> list:
         return [dict(r) for r in rows]
 
 
+def at_has_open_position(user_id: int, inst_id: str) -> bool:
+    """True if this user already holds an open position on this instrument.
+
+    OKX allows exactly ONE closeFraction=1 TP/SL algo per position, so a second
+    entry on the same instId cannot be protected: the OCO call fails with
+    "You can only place 1 TP/SL order to close an entire position" and the
+    caller then flattens the position, killing the FIRST (legitimate) trade
+    along with it. Hit live on the sister crypto bot 2026-08-13 (PUMP) after a
+    duplicate signal; ported here before it can cost a stock trade.
+    """
+    with _conn() as c:
+        row = c.execute("""
+            SELECT 1 FROM autotrade_positions
+            WHERE user_id = ? AND inst_id = ? AND status != 'CLOSED'
+            LIMIT 1
+        """, (user_id, inst_id)).fetchone()
+        return row is not None
+
+
 def at_all_open_positions() -> list:
     """Every OPEN autotrade position across all users/signals — used by the
     fast exchange-side close poll (doesn't wait for the signal engine)."""
