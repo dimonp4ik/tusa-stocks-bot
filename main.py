@@ -447,6 +447,47 @@ def _off_session_enabled() -> bool:
     return OFF_SESSION_SIGNALS
 
 
+def _session_windows_text() -> str:
+    """Human-readable summary of when the bot is allowed to look for setups.
+
+    The single toggle was misleading: it read "вне сессии ВЫКЛ" while the bot
+    in fact also scans the London window, and reading "ВКЛ" silently opened the
+    post-market and weekends — the worst hours of the day per the 2026-08-20
+    measurement. The panel now states the real windows.
+    """
+    from zoneinfo import ZoneInfo
+    RG = ZoneInfo("Europe/Riga")
+    ET = ZoneInfo("America/New_York")
+    try:
+        now = datetime.now(ET)
+        shift = int((now.astimezone(RG).utcoffset() - now.utcoffset()).total_seconds() // 3600)
+    except Exception:
+        shift = 7
+    lines_out = ["🇺🇸 Сессия США — всегда (16:30-23:00 Рига)"]
+    # Merge windows that touch, so 20-24 and 0-4 read as one night block
+    # instead of two adjacent lines the reader has to join up themselves.
+    merged: list = []
+    for lo, hi in sorted(EXTENDED_SESSION_WINDOWS):
+        if merged and lo <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], hi))
+        else:
+            merged.append((lo, hi))
+    if len(merged) > 1 and merged[0][0] == 0 and merged[-1][1] == 24:
+        merged = [(merged[-1][0], merged[0][1] + 24)] + merged[1:-1]
+    for lo, hi in merged:
+        a, b = (lo + shift) % 24, (hi + shift) % 24
+        lines_out.append(f"🌍 {a:02d}:00-{b:02d}:00 Рига  ({lo % 24:02d}-{hi % 24:02d} Нью-Йорк)")
+    if not EXTENDED_SESSION_WINDOWS:
+        lines_out.append("🌍 Доп. окна: выключены")
+    lines_out.append("🚫 Выходные — закрыты всегда")
+    if _off_session_enabled():
+        lines_out.append("")
+        lines_out.append("⚠️ Тумблер «вне сессии» ВКЛ — он перекрывает окна и "
+                         "открывает пост-маркет и выходные, худшие часы суток.")
+    return chr(10).join(lines_out)
+
+
+
 def _kb_settings():
     """Settings keyboard — built per-render so the off-session toggle shows
     its live state."""
@@ -876,7 +917,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _edit_admin_text(chat_id, message_id, "📈 *Торговля*\nВыбери раздел:", _KB_TRADING)
 
     elif data == "adm_sec_settings":
-        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\nВыбери раздел:", _kb_settings())
+        _hdr = "🔧 *Настройки*\n\n*Когда бот ищет сетапы:*\n"
+        _edit_admin_text(chat_id, message_id,
+                         _hdr + _session_windows_text() + "\n\nВыбери раздел:",
+                         _kb_settings())
 
     elif data == "adm_night_toggle":
         new_val = "0" if _off_session_enabled() else "1"

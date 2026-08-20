@@ -583,7 +583,14 @@ OFF_SESSION_SIGNALS = os.getenv("OFF_SESSION_SIGNALS", "0") != "0"
 # inferred".
 #
 # Format: comma-separated ET hour ranges, e.g. "4-9" or "4-9,20-24,0-4".
-EXTENDED_SESSION_HOURS_ET = os.getenv("EXTENDED_SESSION_HOURS_ET", "").strip()
+# ENABLED 2026-08-20 at London + night, post-market and weekends excluded.
+# That combination measured 1152 сд / 70.2% WR / +649.8R / DD -8.02R (ratio
+# 81.0) against 384 сд / 74.2% / +256.8R / DD -6.43R (39.9) for the regular
+# session alone: 2.5x the profit for 1.25x the drawdown, win rate still at the
+# 70% target. Adding the post-market window back is worth only +16R and drags
+# in the single losing hour of the day (18:00 ET, 62.2% stops, -0.239R, both
+# halves negative), so it stays out.
+EXTENDED_SESSION_HOURS_ET = os.getenv("EXTENDED_SESSION_HOURS_ET", "4-9,20-24,0-4").strip()
 
 
 def _parse_hour_windows(raw: str) -> list:
