@@ -547,6 +547,63 @@ MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "5"
 # OFF_SESSION_SIGNALS=1 → scan around the clock (admin toggle, use at own risk).
 OFF_SESSION_SIGNALS = os.getenv("OFF_SESSION_SIGNALS", "0") != "0"
 
+# --- Extended session windows (measured 2026-08-20) ---
+# OFF_SESSION_SIGNALS is all-or-nothing, and that turned out to be wrong: it
+# lumps the London/US-pre-market window together with genuinely dead hours.
+# Measured on 12 tickers, candle volume relative to the regular session:
+#   регулярная 09-16 ET   100%
+#   Лондон     04-09 ET    51%   <- half of session volume, real trading
+#   ночь       20-04 ET    23%
+#   пост-маркет 16-20      21%
+#   выходные                5%   <- effectively dead
+# Candle range tells the same story: 04-08 ET runs 0.8-1.2x the average bar,
+# with 08:00 ET (13:00 London) WIDER than 14:00 ET inside the regular session.
+# Order books were sampled live at 06:15 ET across all 26 tickers: median spread
+# 3.63 bps, worst (AAPL) 10.77, and not one above the 25 bps gate. So the
+# comment claiming off-session candles are "thin MM drift" is simply untrue for
+# this window.
+#
+# Trade outcomes from a 24/7 backtest (3587 trades), under the live gates:
+#   только регулярная (сейчас)   384 сд  74.2%  +256.8R  DD  -6.43R  ratio 39.9
+#   + Лондон 04-09               821 сд  71.1%  +509.1R  DD -10.85R  ratio 46.9
+#   + Лондон и ночь             1152 сд  70.2%  +649.8R  DD  -8.02R  ratio 81.0
+#   всё кроме выходных          1215 сд  69.9%  +665.7R  DD  -8.02R  ratio 83.0
+#   всё подряд                  1528 сд  68.6%  +799.4R  DD -10.62R  ratio 75.3
+#
+# Note the shape: London ALONE makes drawdown worse (-6.43 -> -10.85), while
+# adding the night window on top brings it back to -8.02. More trades spread
+# across more hours smooth the equity curve — the pair is better than either.
+#
+# DEFAULT OFF. This is a genuine trade-off, not a bug fix: 2.5x the profit for
+# 1.25x the drawdown and 4pp of win rate. Weekends stay excluded regardless —
+# 5% volume and the only window whose halves fall apart (+0.520 -> +0.202).
+# Night spreads have NOT been sampled (they fall outside working hours here);
+# the volume figure says thin-but-real, and our $34 notional is tiny against it,
+# but the spread is unmeasured and the honest state is "London verified, night
+# inferred".
+#
+# Format: comma-separated ET hour ranges, e.g. "4-9" or "4-9,20-24,0-4".
+EXTENDED_SESSION_HOURS_ET = os.getenv("EXTENDED_SESSION_HOURS_ET", "").strip()
+
+
+def _parse_hour_windows(raw: str) -> list:
+    out = []
+    for part in (raw or "").split(","):
+        part = part.strip()
+        if "-" not in part:
+            continue
+        a, _, b = part.partition("-")
+        try:
+            lo, hi = int(a), int(b)
+        except ValueError:
+            continue
+        if 0 <= lo < hi <= 24:
+            out.append((lo, hi))
+    return out
+
+
+EXTENDED_SESSION_WINDOWS = _parse_hour_windows(EXTENDED_SESSION_HOURS_ET)
+
 # --- News filter (per-coin keywords) ---
 CRYPTOPANIC_API_KEY = os.getenv("CRYPTOPANIC_API_KEY", "")
 NEWS_BLOCK_KEYWORDS = ["hack", "exploit", "scam", "lawsuit", "sec ", "ban", "delist", "rug"]

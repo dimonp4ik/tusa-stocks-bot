@@ -55,6 +55,7 @@ from src.news_agent import (
 )
 from config import EVENT_WARN_HOURS
 from config import LIVE_PRICE_MAX_DRIFT_PCT
+from config import EXTENDED_SESSION_WINDOWS
 from src.market_hours import session_hours_between
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
@@ -407,6 +408,34 @@ _KB_TRADING = {"inline_keyboard": [[
     {"text": "🗑 Управление",      "callback_data": "adm_deals"},
     {"text": "🔍 История сетапов", "callback_data": "adm_setups"},
 ], [_BACK_ROW[0]]]}
+
+def _in_extended_window(now=None) -> bool:
+    """Inside an allowed extended-session window (see EXTENDED_SESSION_WINDOWS).
+
+    Separate from the all-or-nothing off-session toggle because the two are not
+    the same thing. Measured 2026-08-20: the London / US-pre-market window
+    (04:00-09:00 ET) carries 51% of regular-session candle volume and quoted a
+    3.63 bps median spread across all 26 tickers, while weekends carry 5% and
+    are the one window whose backtest halves fall apart. Lumping them together
+    was costing real trades to protect against a risk only some hours carry.
+
+    Weekends are excluded here regardless of what the windows say.
+    """
+    if not EXTENDED_SESSION_WINDOWS:
+        return False
+    try:
+        from zoneinfo import ZoneInfo
+        et = (now or datetime.now(ZoneInfo("America/New_York")))
+        if et.tzinfo is None:
+            et = et.replace(tzinfo=ZoneInfo("America/New_York"))
+        et = et.astimezone(ZoneInfo("America/New_York"))
+        if et.weekday() >= 5:
+            return False
+        h = et.hour
+        return any(lo <= h < hi for lo, hi in EXTENDED_SESSION_WINDOWS)
+    except Exception:
+        return False
+
 
 def _off_session_enabled() -> bool:
     """Off-session scanning toggle: DB state wins, env OFF_SESSION_SIGNALS is
@@ -3112,7 +3141,7 @@ def run_scan():
     # filters (weekends, holidays, half-days and DST all handled inside).
     # Admin toggle "вне сессии" overrides for 24/7 scanning.
     from src.market_hours import is_market_open
-    if not is_market_open() and not _off_session_enabled():
+    if not is_market_open() and not _off_session_enabled() and not _in_extended_window():
         log.info("US market closed — new-signal scan skipped (monitoring continues)")
         return
 
