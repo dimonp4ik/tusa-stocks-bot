@@ -56,6 +56,9 @@ from config import (  # noqa: E402
     KLINES_1H_INTERVAL_SEC,
     KLINES_4H_INTERVAL_SEC,
     KLINES_INTERVAL_SEC,
+    MAX_SAME_DIRECTION_POSITIONS,
+    SIGNAL_COOLDOWN_HOURS,
+    KILL_SWITCH_SL_STREAK,
     LEVERAGED_TOKEN_SUFFIXES,
     QUOTE_ASSET,
     RISK_MAX_PCT,
@@ -1062,6 +1065,62 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
     return total
 
 
+_LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
+
+
+def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
+    """Trades that survive the live bot's throughput gates.
+
+    Ported from the crypto bot 2026-08-20, where an audit found NINE gates
+    run_scan applies and ZERO of them modelled in the backtest: funding, news,
+    spread, stale-entry, kill-switch, auto-blocked symbols, reject cooldown, the
+    per-scan signal cap and the per-coin signal cooldown. This file has the same
+    gap — every headline it prints describes a book production cannot carry.
+    There it cost 29% of the trade count and 28% of the profit.
+
+    The four expressible from a trade list alone are replayed here in entry
+    order. News, spread, funding and the Claude gates need live state, so even
+    this figure is an upper bound.
+    """
+    ordered = sorted(trades, key=lambda t: (t.entry_time or 0, t.symbol, t.entry_bar))
+    last_sig: dict = {}
+    per_bar: dict = {}
+    open_by_dir: dict = {}
+    kept: list[TradeRecord] = []
+    streak = 0
+    cur_day = None
+    blocked_day = None
+    for t in ordered:
+        raw = t.entry_time or 0
+        ts = raw / 1000 if raw > 1e11 else raw
+        day = int(ts // 86400)
+        if day != cur_day:
+            cur_day, streak, blocked_day = day, 0, None
+        if KILL_SWITCH_SL_STREAK > 0 and blocked_day == day:
+            continue
+        key = (t.symbol, t.direction)
+        if SIGNAL_COOLDOWN_HOURS > 0 and key in last_sig and (ts - last_sig[key]) / 3600 < SIGNAL_COOLDOWN_HOURS:
+            continue
+        bar = int(ts // (KLINES_INTERVAL_SEC or 900))
+        if _LIVE_MAX_PER_SCAN > 0 and per_bar.get(bar, 0) >= _LIVE_MAX_PER_SCAN:
+            continue
+        if MAX_SAME_DIRECTION_POSITIONS > 0:
+            live = [o for o in open_by_dir.get(t.direction, [])
+                    if (o.exit_time or 0) > raw]
+            if len(live) >= MAX_SAME_DIRECTION_POSITIONS:
+                continue
+            live.append(t)
+            open_by_dir[t.direction] = live
+        last_sig[key] = ts
+        per_bar[bar] = per_bar.get(bar, 0) + 1
+        kept.append(t)
+        if KILL_SWITCH_SL_STREAK > 0:
+            streak = streak + 1 if t.outcome == "SL" else 0
+            if streak >= KILL_SWITCH_SL_STREAK:
+                blocked_day = day
+    return kept
+
+
 def max_drawdown_r(trades: list[TradeRecord], *, net: bool = True) -> float:
     equity = peak = 0.0
     max_dd = 0.0
@@ -1234,6 +1293,26 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Net R est.:    {total.net_r:+.2f}R total ({net_rpt:+.3f}R/trade)")
     print(f"Max DD gross:  {max_drawdown_r(total.trade_records, net=False):+.2f}R")
     print(f"Max DD net:    {max_drawdown_r(total.trade_records, net=True):+.2f}R")
+
+    # What the live bot could actually have carried — see apply_live_gates.
+    if total.trade_records:
+        gated = apply_live_gates(total.trade_records)
+        if len(gated) != len(total.trade_records):
+            g_net = sum(t.net_r for t in gated)
+            g_wins = sum(1 for t in gated if t.outcome in ("TP1", "TP2", "TRAIL"))
+            g_dd = max_drawdown_r(gated, net=True)
+            print()
+            print(
+                f"With live gates (cooldown {SIGNAL_COOLDOWN_HOURS}h, "
+                f"{_LIVE_MAX_PER_SCAN}/scan, {MAX_SAME_DIRECTION_POSITIONS}/dir, "
+                f"kill {KILL_SWITCH_SL_STREAK}): "
+                f"{len(gated)} trades "
+                f"({len(total.trade_records) - len(gated)} refused), "
+                f"WR {g_wins / len(gated) * 100:.1f}%, "
+                f"net {g_net:+.2f}R, "
+                f"Max DD {g_dd:+.2f}R, "
+                f"profit/DD {g_net / abs(g_dd):.1f}"
+            )
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
 
     if args.export_trades:

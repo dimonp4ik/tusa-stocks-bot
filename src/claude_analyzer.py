@@ -9,6 +9,7 @@ from config import (
     CLAUDE_API_KEY, CLAUDE_LIGHT_MODEL, CLAUDE_HEAVY_MODEL,
     CLAUDE_MAX_RISK_SCORE, CLAUDE_CACHE_TTL, CLAUDE_MEMORY_LIMIT,
     CLAUDE_DAILY_BUDGET_USD, CLAUDE_BUDGET_RESERVE_USD,
+    TP1_R_MULT,
 )
 from src.db import (
     log_claude_call, get_claude_spend_today, get_similar_resolved_setups,
@@ -28,8 +29,16 @@ _GLOBAL_FEEDBACK_MIN_GAP  = 8.0
 # this the corrector falls back to the absolute rate of the rejected pool.
 _GLOBAL_FEEDBACK_MIN_SENT = 8
 # Absolute TP1% of the rejected pool that counts as over-rejection on its own.
-# The bracket breaks even near 59% (TP1 pays 0.7R, SL costs 1R).
-_GLOBAL_FEEDBACK_MIN_REJ_TP1 = 65.0
+# DERIVED, not hardcoded: TP1 pays TP1_R_MULT and a stop costs 1R, so the
+# bracket breaks even at 1/(1+TP1_R_MULT). Plus a modest margin.
+#
+# It was written down as 65.0 with a comment reading "breaks even near 59%
+# (TP1 pays 0.7R)" — true when TP1 was 0.7, and silently wrong ever since
+# TP1_R_MULT went to 1.0, where break-even is 50%. The threshold sat 15 points
+# too strict, making the "you have been TOO STRICT" correction harder to fire
+# than intended. Same class as the crypto bot's fix on 2026-08-09.
+_BREAK_EVEN_TP1_PCT = 100.0 / (1.0 + float(TP1_R_MULT))
+_GLOBAL_FEEDBACK_MIN_REJ_TP1 = _BREAK_EVEN_TP1_PCT + 6.0
 
 _log = logging.getLogger(__name__)
 

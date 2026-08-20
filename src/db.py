@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
-    TP1_R_MULT, LIVE_HIST_EPOCH_TS,
+    TP1_R_MULT, TP2_R_MULT, TP1_CLOSE_FRAC, LIVE_HIST_EPOCH_TS,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -450,16 +450,15 @@ def get_sl_wick_stats(since_ts: float) -> dict:
 
 
 def _status_to_r(status: str) -> float:
-    """Approximate R for symbol-level blocking."""
-    if status == "TP2_HIT":
-        return 1.5   # 50% at 1R + 50% at 2R
-    if status == "TP1_TRAIL":
-        return 0.75  # TP1 taken + trailed runner in profit
-    if status in ("BREAKEVEN", "TP1_EXPIRED", "TP1_HIT"):
-        return 0.5
-    if status == "SL_HIT":
-        return -1.0
-    return 0.0
+    """Approximate R from a status alone. Delegates — do not reimplement.
+
+    This was a second hand-written copy of the R model carrying the same dead
+    50%-at-TP1 arithmetic as _status_r. It feeds get_symbol_performance and
+    therefore auto_block_bad_symbols — a real decision that stops the bot
+    trading a symbol. Scoring BREAKEVEN as +0.5R also made it count as a WIN,
+    inflating win rate and profit factor, so bad symbols were under-blocked.
+    """
+    return _status_r(status)
 
 
 def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
@@ -810,21 +809,35 @@ def get_symbols_performance(days: int = 30, since_ts: float = None) -> list:
     return results
 
 
-def _status_r(status: str) -> float:
-    """R value of a closed trade outcome (fixed R model, TP1=1.0R TP2=2.0R SL=1R).
+# Banked at TP1 itself. Under the live exit profile (post_tp1_v2) TP1_CLOSE_FRAC
+# is 0 — nothing closes there, TP1 only arms the trail — so this is 0.0. Derived
+# rather than written down so it stays true if the profile ever changes.
+_TP1_BANKED_R = float(TP1_CLOSE_FRAC) * float(TP1_R_MULT)
+# The runner has no closed form. Conservative placeholder; the real value is in
+# realized_r on every row the monitor closed.
+_TRAIL_FALLBACK_R = float(TP1_R_MULT)
 
-    NOTE: for TP1_TRAIL the real R is variable and stored in the realized_r column;
-    this fixed value is only a fallback when realized_r is missing.
+
+def _status_r(status: str) -> float:
+    """R of a closed outcome — FALLBACK ONLY, for rows with no realized_r.
+
+    The values here used to encode a 50%-at-TP1 model ("TP2: 50% closed at TP1
+    + 50% at TP2 = 1.5R"), a geometry this bot does not run: EXIT_PROFILE is
+    post_tp1_v2 with TP1_CLOSE_FRAC=0, so nothing is banked at TP1 and the whole
+    position trails. TP2_HIT was reported as 1.5R when it is really 2.0R, and
+    BREAKEVEN as +0.5R when nothing was banked at all.
+
+    Ported from the crypto bot 2026-08-20, where the same three stale copies
+    were found. A silent fallback that lies is worse than one that is missing.
     """
-    # TP2: 50% closed at TP1 (0.5R) + 50% at TP2 (1.0R) = 1.5R
-    if status == "TP2_HIT":    return  1.50
-    # Trailed runner — fallback estimate (real value comes from realized_r)
-    if status == "TP1_TRAIL":  return  0.75
-    # TP1 only outcomes: 50% at TP1 = 0.5R
-    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"): return 0.5
-    # Full SL before TP1
-    if status == "SL_HIT":     return -1.00
-    # Expired before any TP — no profit, small fee drag (treat as 0)
+    if status == "TP2_HIT":
+        return _TP1_BANKED_R + (1.0 - float(TP1_CLOSE_FRAC)) * float(TP2_R_MULT)
+    if status == "TP1_TRAIL":
+        return _TP1_BANKED_R + (1.0 - float(TP1_CLOSE_FRAC)) * _TRAIL_FALLBACK_R
+    if status in ("TP1_HIT", "BREAKEVEN", "TP1_EXPIRED"):
+        return _TP1_BANKED_R
+    if status == "SL_HIT":
+        return -1.00
     return 0.0
 
 
