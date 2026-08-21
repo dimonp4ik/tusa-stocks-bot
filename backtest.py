@@ -81,12 +81,31 @@ from config import (  # noqa: E402
     POST_TP1_WEAK_CLOSE_PROGRESS,
     MIN_24H_QUOTE_VOLUME_USDT,
     OFF_SESSION_SIGNALS,
+    EXTENDED_SESSION_WINDOWS,
     MARKET_PROXY_SYMBOL,
 )
 from datetime import datetime as _datetime, timezone as _tz  # noqa: E402
 from src.signal_filter import analyze_coin_smc  # noqa: E402
 from src.knn_analog import knn_direction_score  # noqa: E402
+from zoneinfo import ZoneInfo as _ZoneInfo  # noqa: E402
 from src.market_hours import is_market_open as _is_market_open  # noqa: E402
+
+
+def _in_extended_window_bt(dt_utc) -> bool:
+    """Mirror of main._in_extended_window — see EXTENDED_SESSION_WINDOWS.
+
+    Duplicated rather than imported because importing main from the backtest
+    would drag in the scheduler and the Telegram client. Keep the two in sync.
+    """
+    if not EXTENDED_SESSION_WINDOWS:
+        return False
+    try:
+        et = dt_utc.astimezone(_ZoneInfo("America/New_York"))
+        if et.weekday() >= 5:
+            return False
+        return any(lo <= et.hour < hi for lo, hi in EXTENDED_SESSION_WINDOWS)
+    except Exception:
+        return False
 
 
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -967,17 +986,22 @@ def backtest_symbol(
     for i in range(warmup, n - tp_window, max(1, stride)):
         result.scanned += 1
 
-        # US session gate — the live scanner only fires while NYSE is open
-        # (unless OFF_SESSION_SIGNALS). Entering off-session here would test
-        # trades the bot never takes. Judge on the just-closed candle (i-1),
-        # matching how the live indicator labels the session.
+        # Session gate — must match run_scan exactly: NYSE open, OR the
+        # off-session toggle, OR an EXTENDED_SESSION_WINDOWS hour on a weekday.
+        #
+        # The window mechanism was added live on 2026-08-20 and this gate was
+        # NOT updated with it, so for a day the backtest measured session-only
+        # trading while production also scanned London and the overnight block —
+        # the same live-vs-backtest divergence the live-gate work had just been
+        # fixing. Judged on the just-closed candle (i-1), matching how the live
+        # indicator labels the session.
         if not OFF_SESSION_SIGNALS:
             _ts = c15["time"][i - 1] if c15.get("time") and i > 0 else None
-            if _ts is not None and not _is_market_open(
-                _datetime.fromtimestamp(int(_ts), tz=_tz.utc)
-            ):
-                result.off_session += 1
-                continue
+            if _ts is not None:
+                _dt_utc = _datetime.fromtimestamp(int(_ts), tz=_tz.utc)
+                if not _is_market_open(_dt_utc) and not _in_extended_window_bt(_dt_utc):
+                    result.off_session += 1
+                    continue
 
         if use_prefilter and not cheap_prefilter_at(c15, i, window_15m):
             result.prefiltered += 1
