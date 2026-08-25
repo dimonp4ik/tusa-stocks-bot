@@ -185,8 +185,12 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _risk_pct = abs(_e - _sl) / _e if _e > 0 else 0.0
             if _risk_pct > RISK_REFERENCE_PCT:
                 _size_mult *= max(RISK_SIZE_MULT_MIN, RISK_REFERENCE_PCT / _risk_pct)
-        except (TypeError, ValueError, ZeroDivisionError, KeyError):
-            pass
+        except (TypeError, ValueError, ZeroDivisionError, KeyError) as _e:
+            # Fails OPEN: without this the multiplier stays 1.0 and a wide-stop
+            # trade goes out at FULL size, which is the case this whole block
+            # exists to prevent. Say so rather than sizing up in silence.
+            log.warning(f"risk-normalised sizing failed for {sig.get('symbol')} "
+                        f"({_e}) — full size used")
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
