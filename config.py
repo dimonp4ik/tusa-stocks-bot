@@ -434,7 +434,12 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.25"))  # base trail; post_tp1_v2 overrides per-context
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.05"))  # base trail; post_tp1_v2 overrides per-context
+# 2026-08-25: 0.25 -> 0.05, measured on the corrected trail model (BT_TRAIL_LAG).
+# Monotone across the range: 0.05 +639.2R / 0.15 +624.5 / 0.25 +609.4 / 0.35
+# +604.6 / 0.50 +592.9, drawdown flat at -9.6 throughout, so +5.8% at equal
+# risk. Same direction as the crypto bot, smaller size (+10% there): stock
+# runners give back less after the first failure to extend.
 
 # Exit profile: "post_tp1_v2" keeps the FULL position past TP1 (TP1_CLOSE_FRAC=0)
 # and trails by an ATR multiple chosen from the TP1-acceptance candle — strong
@@ -455,7 +460,7 @@ EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
 # a trade that has touched TP1 can never revert to a loss. 0.35/0.15 is the
 # measured optimum here, not just an inherited crypto default — don't re-widen
 # without new evidence.
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.35"))
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.05"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))

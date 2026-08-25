@@ -219,10 +219,14 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         if _tot:
             A(f"  одобрил и отправлено: {_s.get('n', 0)}  отклонил: {_r.get('n', 0)}  "
               f"доля одобрений: {(_s.get('n', 0) / _tot * 100):.0f}%")
-            A(f"  TP1 у отправленных: {_s.get('tp1_rate', 0)}%")
-            A(f"  TP1 у отклонённых:  {_r.get('tp1_rate', 0)}%")
+            # get_setup_accuracy returns tp1_pct, not tp1_rate. The mismatched
+            # key meant this block printed 0%/0%/+0пп for every window since it
+            # was written — the one number that says whether Claude's filtering
+            # helps at all was silently blank.
+            A(f"  TP1 у отправленных: {_s.get('tp1_pct', 0):.1f}%")
+            A(f"  TP1 у отклонённых:  {_r.get('tp1_pct', 0):.1f}%")
             A(f"  разрыв (больше = лучше отбирает): "
-              f"{(_s.get('tp1_rate', 0) - _r.get('tp1_rate', 0)):+.0f}пп")
+              f"{(_s.get('tp1_pct', 0) - _r.get('tp1_pct', 0)):+.1f}пп")
             A(f"  зеркало отклонённых: {_r.get('mirror_r', 0):+.1f}R (n={_r.get('n', 0)})")
         else:
             A("  данных нет")
