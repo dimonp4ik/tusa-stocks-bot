@@ -383,6 +383,16 @@ ATR_PERIOD    = 14
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1.5%
+# Raising this was tested 2026-08-25 and REJECTED, though the diagnosis that
+# suggested it was sound: 35% of trades sit pinned at the cap and do worse
+# than free-stopped ones (64.6% / +0.443R against 67.2% / +0.491R). In the
+# crypto bot the same signature meant the clamp was pushing stops into noise
+# and raising it improved every axis at once. Here it does the opposite
+# (equal-risk, 36bps + close-confirm): 0.015 +195.1 / 0.018 +135.3 /
+# 0.020 +134.1 / 0.025 +120.0.
+# Reading: a wide structural stop marks an UNCERTAIN setup, it does not mark
+# a mis-placed one. "This group performs worse" is not the same claim as
+# "loosening the constraint that binds it will help".
 
 # Risk-normalised sizing, ported from the crypto bot 2026-08-25. Without it a
 # wide stop and a tight one use the SAME margin, so they risk very different
