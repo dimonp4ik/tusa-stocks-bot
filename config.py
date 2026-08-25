@@ -527,7 +527,20 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 # Measure both on this bot's own backtest before enabling: run with
 # STOP_CLOSE_CONFIRM=0 and =1, compare WR/netR/maxDD, and check the worst
 # realised stop R to pick the backstop.
-STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "0") != "0"
+# 2026-08-25: turned ON. The live report shows 64% of stops (9 of 14 over a
+# week) are X-Perp wick noise rather than a real reversal, and a level-touch
+# exit is maximally exposed to exactly that.
+# The verdict depends on which entry model you believe, which is why it was
+# measured at three (equal-risk against the 0-bps baseline):
+#   0 bps:  +413.8 vs +609.4  -> WORSE by 32%
+#  18 bps:  +401.3 vs +306.0  -> better by 31%
+#  36 bps:  +252.8 vs +155.0  -> better by 63%
+# Live win rate (57.5% over 87 setups, 63.9% over the last 36) matches the
+# costed models, not the free one, so the costed reading is the real one.
+# Validated on the GATED book in both halves: +46% and +10%, win rate up in
+# both (54.7->58.1, 54.1->59.5). The ungated export disagreed on the first
+# half; it describes 2414 trades production never takes.
+STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 # Exchange-side stop stays in place as a disaster backstop, widened to this
 # multiple of R so it cannot fire before the close confirmation. It is what
 # protects the position while the bot itself is down (deploy/restart/network).

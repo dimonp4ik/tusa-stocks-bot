@@ -1372,7 +1372,12 @@ def main(argv: list[str] | None = None) -> int:
         pass
 
     if args.export_trades:
-        write_trades_csv(args.export_trades, total.trade_records)
+        # Export the GATED book by default — an ungated dump cannot be compared
+        # against the headline numbers, which are all post-gate, and its halves
+        # describe a book production never trades. BT_EXPORT_RAW=1 restores the
+        # full pre-gate list (used for Claude prior seeding in the crypto bot).
+        _export = total.trade_records if os.getenv("BT_EXPORT_RAW") == "1"             else apply_live_gates(total.trade_records)
+        write_trades_csv(args.export_trades, _export)
         print(f"Trades CSV:    {args.export_trades}")
 
     return 1 if errors and len(errors) == len(symbols) else 0
