@@ -550,9 +550,16 @@ def get_upcoming_high_impact_events(within_hours: float = 3.0) -> list[dict]:
                     parsed = _parse_ff_event(ev)
                     if parsed:
                         events.append(parsed)
-            _calendar_cache["events"] = events
+            # Only REPLACE the cache when the fetch actually produced something.
+            # Writing [] on any failure and stamping it for 6 hours blinds the
+            # bot to the calendar for half a day in silence; the feed answers
+            # HTTP 429 readily, so that is not hypothetical. Ported from the
+            # crypto bot 2026-08-26.
+            if events or not _calendar_cache["events"]:
+                _calendar_cache["events"] = events
             _calendar_cache["fetched_at"] = now
-        except Exception:
+        except Exception as _ce:
+            log.warning(f"calendar fetch failed ({_ce}) — keeping previous events")
             _calendar_cache["fetched_at"] = now  # don't hammer on failure
 
     now_utc = datetime.now(timezone.utc)
