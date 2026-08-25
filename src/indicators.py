@@ -270,16 +270,23 @@ def find_swing_points(highs: list, lows: list, lookback: int = SMC_SWING_LOOKBAC
 # ── SMC: Break of Structure ───────────────────────────────────────────────────
 
 def detect_bos(closes: list, swing_highs: list, swing_lows: list,
-               recent_candles: int = 10) -> str | None:
+               recent_candles: int = 10) -> tuple:
     """
     Detect Break of Structure in the last `recent_candles` candles.
-    Returns 'bullish', 'bearish', or None.
+    Returns (direction, break_index, break_level) — direction is
+    'bullish'/'bearish'/None; break_index/break_level are None when no BOS.
 
     Bullish BOS: recent close breaks above a confirmed swing high.
     Bearish BOS: recent close breaks below a confirmed swing low.
+
+    break_index is the candle where the break FIRST occurred within the
+    scan window — not necessarily the current candle, since the window
+    looks back `recent_candles` bars. Callers that care how stale/extended
+    the break already is (vs. chasing an exhausted move) should use it —
+    see bos_candles_ago / bos_extension_atr in get_smc_indicators.
     """
     if not swing_highs or not swing_lows or len(closes) < recent_candles:
-        return None
+        return None, None, None
 
     # Use last confirmed swing high/low (exclude very recent — not yet confirmed)
     last_sh = swing_highs[-1][1] if swing_highs else None
@@ -296,11 +303,11 @@ def detect_bos(closes: list, swing_highs: list, swing_lows: list,
             continue
         c = closes[i]
         if last_sh and c > last_sh:
-            return "bullish"
+            return "bullish", i, last_sh
         if last_sl and c < last_sl:
-            return "bearish"
+            return "bearish", i, last_sl
 
-    return None
+    return None, None, None
 
 
 # ── SMC: Fair Value Gap ───────────────────────────────────────────────────────
@@ -643,7 +650,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     swing_highs, swing_lows = find_swing_points(highs, lows)
 
     # BOS
-    bos = detect_bos(closes, swing_highs, swing_lows)
+    bos, bos_break_idx, bos_break_level = detect_bos(closes, swing_highs, swing_lows)
 
     # FVG
     fvg = detect_fvg(opens, highs, lows, closes)
@@ -686,6 +693,17 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     atr = calculate_atr(highs, lows, closes)
 
     # Volatility regime (dead vs spike) — quality gate
+    # BOS staleness/extension — ported from the crypto bot 2026-08-25, where
+    # bos_extension_atr turned out to be the one microstructure feature that
+    # predicts: expectancy falls monotone across its quartiles, both window
+    # halves agreeing at every step. It measures how LATE the entry is.
+    bos_candles_ago = None
+    bos_extension_atr = None
+    if bos_break_idx is not None:
+        bos_candles_ago = (len(closes) - 1) - bos_break_idx
+        if atr > 0:
+            bos_extension_atr = abs(closes[-1] - bos_break_level) / atr
+
     vol_reg = volatility_regime(highs, lows, closes)
 
     # Efficiency ratio (chop vs trend) — quality gate
@@ -771,6 +789,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
 
     return {
         "bos":              bos,
+        "bos_candles_ago":  bos_candles_ago,
+        "bos_extension_atr": bos_extension_atr,
         "bos_body_strong":  bos_body_strong,
         "bullish_fvg":      fvg["bullish"],
         "bearish_fvg":      fvg["bearish"],

@@ -656,6 +656,8 @@ class TradeRecord:
     trend_4h: str = ""
     entry_source: str = ""
     signals: str = ""
+    bos_extension_atr: float = 0.0
+    bos_candles_ago: int = -1
     score_tags: str = ""
     premium: int = 0
     knn_score: float = -1.0
@@ -905,6 +907,8 @@ def simulate_trade_direct(
         trend_1h=str(setup.get("trend_1h", "") or ""),
         trend_4h=str(setup.get("trend_4h", "") or ""),
         entry_source=str(setup.get("entry_source", "") or ""),
+        bos_extension_atr=round(float(setup.get("bos_extension_atr") or 0.0), 3),
+        bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
         signals=" | ".join(setup.get("signals", [])),
         score_tags=" | ".join(setup.get("score_tags", [])),
         premium=int(bool(setup.get("premium"))),
@@ -1199,6 +1203,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
+        "bos_extension_atr", "bos_candles_ago",
         "signals", "score_tags", "premium", "knn_score", "swing_trend",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
