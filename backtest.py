@@ -544,6 +544,13 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
 # drift apart (config already applies the STOP_CLOSE_CONFIRM env override).
 from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 
+# Anchor the runner trail to PRIOR bars only, so a trail exit can never be
+# filled off the same bar that printed the peak. Ported from the crypto bot
+# 2026-08-25, where the same code inflated headline profit by ~7%. Default ON:
+# the honest convention is the default, BT_TRAIL_LAG=0 restores the old one for
+# comparison.
+_BT_TRAIL_LAG = os.getenv("BT_TRAIL_LAG", "1") == "1"
+
 
 def _r_from_price(entry: float, exit_px: float, sl: float, direction: str) -> float:
     """Actual R of an exit at an arbitrary price (pre-TP1, full position open).
@@ -799,8 +806,17 @@ def simulate_trade_direct(
         else:
             if direction == "LONG":
                 if exit_policy == "trail":
-                    best_price = max(best_price, h)
+                    # Ported from the crypto bot 2026-08-25. Anchoring the trail
+                    # to THIS bar's own high and then testing THIS bar's low
+                    # assumes the high printed first, which OHLC does not
+                    # record. It pays out on every bar once the trail is
+                    # narrower than the average bar range — worth ~7% of
+                    # headline profit there.
+                    if not _BT_TRAIL_LAG:
+                        best_price = max(best_price, h)
                     trailing_stop = max(entry, best_price - max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
+                    if _BT_TRAIL_LAG:
+                        best_price = max(best_price, h)
                     if l <= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop
@@ -819,8 +835,11 @@ def simulate_trade_direct(
                     break
             else:
                 if exit_policy == "trail":
-                    best_price = min(best_price, l)
+                    if not _BT_TRAIL_LAG:
+                        best_price = min(best_price, l)
                     trailing_stop = min(entry, best_price + max(0.0, float(setup.get("atr", 0.0) or 0.0)) * trail_mult_eff)
+                    if _BT_TRAIL_LAG:
+                        best_price = min(best_price, l)
                     if h >= trailing_stop:
                         outcome = "TRAIL"
                         trail_exit_price = trailing_stop

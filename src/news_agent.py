@@ -25,7 +25,81 @@ from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import logging
 from config import GROQ_API_KEY, NEWS_LOOKBACK_HOURS
+
+log = logging.getLogger(__name__)
+
+GROQ_URL = "https://api.groq.com/openai/v1"
+# Ported from the crypto bot 2026-08-25. Groq retires models without notice —
+# the most likely reason a digest that worked for months goes quiet — so this is
+# a preference, not a pin: _groq_chat falls back to whatever /models lists.
+_GROQ_MODELS = [
+    os.getenv("GROQ_MODEL", "").strip(),
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+]
+_live_model = {"name": "", "ts": 0.0}
+
+
+def _groq_pick_model() -> str:
+    """Ask Groq what it actually serves. Cached for an hour."""
+    import time as _t
+    if _live_model["name"] and _t.time() - _live_model["ts"] < 3600:
+        return _live_model["name"]
+    try:
+        r = _req.get(f"{GROQ_URL}/models",
+                     headers={"Authorization": f"Bearer {GROQ_API_KEY}"}, timeout=10)
+        ids = [m.get("id", "") for m in (r.json().get("data") or [])]
+    except Exception as e:
+        log.warning(f"groq: /models unreachable ({e})")
+        return ""
+    for want in _GROQ_MODELS:
+        if want and want in ids:
+            _live_model.update(name=want, ts=_t.time())
+            return want
+    for mid in ids:
+        if "whisper" not in mid and "guard" not in mid and "tts" not in mid:
+            log.warning(f"groq: preferred models gone, falling back to {mid}")
+            _live_model.update(name=mid, ts=_t.time())
+            return mid
+    return ""
+
+
+def _groq_chat(prompt: str, max_tokens: int, temperature: float, timeout: int) -> str:
+    """One Groq completion. Raises RuntimeError carrying the API error text.
+
+    The old call sites read resp.json()["choices"][0] with no status check, so a
+    decommissioned model surfaced as KeyError('choices') and stayed invisible.
+    """
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY не задан")
+    tried = []
+    for model in [m for m in _GROQ_MODELS if m] + [_groq_pick_model()]:
+        if not model or model in tried:
+            continue
+        tried.append(model)
+        try:
+            r = _req.post(
+                f"{GROQ_URL}/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_API_KEY}",
+                         "Content-Type": "application/json"},
+                json={"model": model,
+                      "messages": [{"role": "user", "content": prompt}],
+                      "max_tokens": max_tokens, "temperature": temperature},
+                timeout=timeout)
+        except Exception as e:
+            log.warning(f"groq {model}: request failed ({e})")
+            continue
+        if r.status_code == 200:
+            try:
+                return r.json()["choices"][0]["message"]["content"].strip()
+            except Exception as e:
+                raise RuntimeError(f"неожиданный ответ Groq: {e}")
+        log.warning(f"groq {model}: HTTP {r.status_code} {(r.text or '')[:200]}")
+        if r.status_code in (401, 403):
+            raise RuntimeError(f"ключ отклонён (HTTP {r.status_code})")
+    raise RuntimeError("ни одна модель не ответила (пробовал: " + (", ".join(tried) or "—") + ")")
 
 # RSS sources — all public, no registration. Crypto feeds (CoinDesk/Decrypt/
 # Cointelegraph/etc, inherited from the crypto bot fork) removed — this bot
@@ -105,21 +179,7 @@ PAUSE=YES ONLY for: market-wide circuit breaker / trading halt, active major war
 PAUSE=NO for EVERYTHING else including: general bearish sentiment, geopolitics, single-stock earnings misses, inflation fears, scheduled Fed meetings, rate hike talk, uncertainty, tariffs, trade wars, normal market corrections, crypto crashes."""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  100,
-                "temperature": 0.1,
-            },
-            timeout=12,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
+        raw = _groq_chat(prompt, 100, 0.1, 12)
         return _parse_groq(raw)
 
     except Exception as e:
@@ -194,21 +254,7 @@ Impact scale: 1=moderate, 2=significant, 3=major market mover
 If NO high impact events found, reply only: NONE"""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  150,
-                "temperature": 0.1,
-            },
-            timeout=12,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
+        raw = _groq_chat(prompt, 150, 0.1, 12)
         return _parse_events(raw)
     except Exception:
         return []
@@ -283,10 +329,16 @@ def get_daily_digest() -> dict:
     """
     raw_items = fetch_headlines_with_meta(hours=18)
     if not raw_items:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": "Нет новостей за последние 18 часов"}
+        # Every path carries `raw` and `error` so "no news" stays separable
+        # from "could not read the news" — see the crypto bot, where one
+        # line for both hid a dead Groq call for days.
+        return {"items": [], "overall": "NEUTRAL", "raw": [],
+                "key_theme": "Нет новостей за последние 18 часов", "error": ""}
 
     if not GROQ_API_KEY:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": "GROQ_API_KEY не задан"}
+        log.warning("get_daily_digest: GROQ_API_KEY not set — headlines only")
+        return {"items": [], "overall": "NEUTRAL", "raw": raw_items,
+                "key_theme": "", "error": "GROQ_API_KEY не задан"}
 
     # Build headlines text with source + time
     lines = []
@@ -307,24 +359,12 @@ ITEM|[название на рус., макс 8 слов]|[время HH:MM UTC 
 OVERALL|BULLISH или BEARISH или NEUTRAL|[ключевая тема дня на рус., макс 10 слов]"""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            json={
-                "model":       "llama-3.1-8b-instant",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  550,
-                "temperature": 0.2,
-            },
-            timeout=25,
-        )
-        raw = resp.json()["choices"][0]["message"]["content"].strip()
+        raw = _groq_chat(prompt, 550, 0.2, 25)
         return _parse_digest(raw)
     except Exception as e:
-        return {"items": [], "overall": "NEUTRAL", "key_theme": f"Ошибка Groq: {e}"}
+        log.warning(f"get_daily_digest: Groq failed ({e}) — headlines only")
+        return {"items": [], "overall": "NEUTRAL", "raw": raw_items,
+                "key_theme": "", "error": f"Groq недоступен: {e}"}
 
 
 def _parse_digest(raw: str) -> dict:
@@ -438,21 +478,7 @@ AI ФИЛЬТР:
 Напиши разбор недели на РУССКОМ. Максимум 5 предложений. Без воды. Что сработало, что нет, на что смотреть на следующей неделе."""
 
     try:
-        resp = _req.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {GROQ_API_KEY}",
-                "Content-Type":  "application/json",
-            },
-            json={
-                "model":       "llama-3.3-70b-versatile",
-                "messages":    [{"role": "user", "content": prompt}],
-                "max_tokens":  350,
-                "temperature": 0.4,
-            },
-            timeout=25,
-        )
-        return resp.json()["choices"][0]["message"]["content"].strip()
+        return _groq_chat(prompt, 350, 0.4, 25)
     except Exception as e:
         return f"(комментарий недоступен: {e})"
 

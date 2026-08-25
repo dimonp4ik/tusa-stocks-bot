@@ -398,7 +398,19 @@ def send_morning_digest(digest: dict) -> bool:
     theme   = digest.get("key_theme", "")
 
     if not items and not digest.get("calendar"):
-        return _send_message("🌅 *УТРЕННИЙ ДАЙДЖЕСТ*\nНовостей за последние 18 часов не найдено.")
+        # No AI analysis is not the same as no news — send the headlines.
+        raw = digest.get("raw") or []
+        err = digest.get("error") or ""
+        if not raw:
+            return _send_message("🌅 *УТРЕННИЙ ДАЙДЖЕСТ*\nНовостей за последние 18 часов не найдено.")
+        head = ["🌅 *УТРЕННИЙ ДАЙДЖЕСТ*", "", f"📰 Заголовков за 18ч: *{len(raw)}*", ""]
+        for it in raw[:12]:
+            pub = it.get("published")
+            t = pub.astimezone(_RIGA).strftime("%H:%M") if pub else "?"
+            head.append(f"`{t}` *{str(it.get("source") or "?")}* — {_esc(str(it.get("title") or ""))[:110]}")
+        if err:
+            head += ["", f"_Разбор новостей недоступен: {_esc(err)}_"]
+        return _send_message(chr(10).join(head))
 
     _RU_MONTHS = ["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"]
     _RU_DAYS   = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
