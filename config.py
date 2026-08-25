@@ -408,6 +408,23 @@ RISK_NORMALIZED_SIZING = os.getenv("RISK_NORMALIZED_SIZING", "1") != "0"
 RISK_REFERENCE_PCT     = float(os.getenv("RISK_REFERENCE_PCT", "0.010"))
 RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
 
+# Fresh-break trim, 2026-08-25. bos_extension_atr is how far price has run from
+# the level where structure broke, in ATR. The crypto bot trims LATE entries on
+# it; here the relationship is INVERTED — the least-extended entries are the
+# worst — so this bot trims the opposite end:
+#   <=0.71  252 сд  53.2%  +0.087R      1.33-2.13  251 сд  59.4%  +0.149R
+#   0.71-1.33 253 сд 62.5% +0.279R      >2.13      251 сд  60.2%  +0.256R
+#   base +0.193R
+# It is not the same effect seen from the other side, it is a different one:
+# the crypto bot WAITS for price to return to the zone, so a small extension
+# means a clean retest. This bot enters at market, so a small extension means
+# entering right at the break, before anything confirms it — and on a thin
+# X-Perp book a break is often false.
+# Equal-risk, both halves, six of eight tested cells pass: 0.71/x0.75 = +13.5%,
+# 0.71/x0.5 = +29%. Mild chosen over maximal, as in the crypto bot.
+EXTENSION_FRESH_THRESHOLD = float(os.getenv("EXTENSION_FRESH_THRESHOLD", "0.7"))
+EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75"))
+
 # Live-price re-anchor sanity guard (main.py, publish-time X-Perp reprice).
 # Crypto's flat 3% made sense next to a 1.2-3% SL band; here SL is 0.4-1.5%,
 # so 3% drift is 2-7x a normal stop — thin overnight/open-gap ticks could

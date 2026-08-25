@@ -95,6 +95,10 @@ def init_db():
             # check unavailable. Especially relevant for stock/commodity X-Perps
             # whose books can be thinner than crypto majors.
             "sl_xperp_only": "INTEGER",
+            # Sizing context (2026-08-25). The autotrader sizes from the DB row,
+            # not the in-memory setup, so a field a size rule keys on has to
+            # survive the insert or the rule applies in the backtest only.
+            "bos_extension_atr": "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -364,9 +368,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium, atr
+                mtf_score, mtf_score_max, premium, atr, bos_extension_atr
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -376,6 +380,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("mtf_score"), analysis.get("mtf_score"),
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
+            analysis.get("bos_extension_atr"),
         ))
         return cur.lastrowid
 

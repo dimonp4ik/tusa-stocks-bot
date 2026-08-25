@@ -44,7 +44,8 @@ if importlib.util.find_spec("dotenv") is None:
     dotenv_stub.load_dotenv = lambda *args, **kwargs: None
     sys.modules["dotenv"] = dotenv_stub
 
-from config import (  # noqa: E402
+from config import (
+    EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
     BACKTEST_CANDLES,
     BACKTEST_FEE_RATE,
     BACKTEST_SLIPPAGE_RATE,
@@ -873,6 +874,15 @@ def simulate_trade_direct(
         gross_r = gross_r_for_outcome(outcome, entry, tp1, tp2, sl)
     cost_r = estimate_cost_r(entry, sl, fee_rate, slippage_rate)
     net_r = gross_r - cost_r
+    # Fresh-break trim — see EXTENSION_FRESH_THRESHOLD in config.py. Entering
+    # right at the break, before anything confirms it, is this bot's worst
+    # bucket (53.2% WR against a 63.6% book).
+    try:
+        if float(setup.get("bos_extension_atr") or 99.0) <= EXTENSION_FRESH_THRESHOLD:
+            _fm = float(EXTENSION_FRESH_SIZE_MULT)
+            gross_r *= _fm; net_r *= _fm; cost_r *= _fm
+    except (TypeError, ValueError):
+        pass
 
     return TradeRecord(
         symbol=symbol,

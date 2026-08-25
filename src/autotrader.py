@@ -31,6 +31,7 @@ import requests
 
 from config import (
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
+    EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
@@ -191,6 +192,14 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             # exists to prevent. Say so rather than sizing up in silence.
             log.warning(f"risk-normalised sizing failed for {sig.get('symbol')} "
                         f"({_e}) — full size used")
+    # Fresh-break trim — see EXTENSION_FRESH_THRESHOLD in config.py. Reads None
+    # on signals written before the 2026-08-25 migration, which falls through to
+    # no trim rather than mis-sizing.
+    try:
+        if float(sig.get("bos_extension_atr") or 99.0) <= EXTENSION_FRESH_THRESHOLD:
+            _size_mult *= float(EXTENSION_FRESH_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
