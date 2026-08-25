@@ -30,6 +30,7 @@ import time
 import requests
 
 from config import (
+    RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
@@ -173,7 +174,20 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     at_set_balance(uid, balance)
     _check_threshold_cross(u, balance)
 
-    margin = _margin_for(u, balance)
+    # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
+    # same money regardless of where structure put the stop. See config.py —
+    # stop distance here spans 0.40%-1.50%, so without this the widest trades
+    # risk 3.8x the tightest ones under an identical "size".
+    _size_mult = 1.0
+    if RISK_NORMALIZED_SIZING:
+        try:
+            _e, _sl = float(sig["entry_price"]), float(sig["sl"])
+            _risk_pct = abs(_e - _sl) / _e if _e > 0 else 0.0
+            if _risk_pct > RISK_REFERENCE_PCT:
+                _size_mult *= max(RISK_SIZE_MULT_MIN, RISK_REFERENCE_PCT / _risk_pct)
+        except (TypeError, ValueError, ZeroDivisionError, KeyError):
+            pass
+    margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
     if margin > balance:

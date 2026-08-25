@@ -384,6 +384,20 @@ SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1.5%
 
+# Risk-normalised sizing, ported from the crypto bot 2026-08-25. Without it a
+# wide stop and a tight one use the SAME margin, so they risk very different
+# money while the backtest books both as 1R — which means the R totals in every
+# report here do not correspond to any achievable dollar outcome, and a run of
+# wide-stop losses hurts more than the drawdown figure implies.
+# Measured over 2414 backtest trades: stop distance runs 0.40% to 1.50% (median
+# 1.06%), so the extremes differ by 3.8x. Reference is set at the median: 53% of
+# trades get trimmed, mean multiplier 0.851, tightest 0.667.
+# Downward only — a tight stop never gets sized UP, because that would raise
+# exposure on the trades whose stop sits closest to the noise.
+RISK_NORMALIZED_SIZING = os.getenv("RISK_NORMALIZED_SIZING", "1") != "0"
+RISK_REFERENCE_PCT     = float(os.getenv("RISK_REFERENCE_PCT", "0.010"))
+RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
+
 # Live-price re-anchor sanity guard (main.py, publish-time X-Perp reprice).
 # Crypto's flat 3% made sense next to a 1.2-3% SL band; here SL is 0.4-1.5%,
 # so 3% drift is 2-7x a normal stop — thin overnight/open-gap ticks could

@@ -1358,6 +1358,19 @@ def main(argv: list[str] | None = None) -> int:
             )
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
 
+    # Rejection funnel. Only meaningful with --serial: the workers have their
+    # own REJECT_COUNTS and nothing collects them across processes.
+    try:
+        from src.signal_filter import REJECT_COUNTS as _RC
+        if _RC:
+            _tot = sum(_RC.values())
+            print("")
+            print(f"Воронка отказов ({_tot} шт., только --serial):")
+            for _k, _v in sorted(_RC.items(), key=lambda kv: -kv[1])[:15]:
+                print(f"  {_k:<38}{_v:>7}  {100*_v/_tot:>5.1f}%")
+    except Exception:
+        pass
+
     if args.export_trades:
         write_trades_csv(args.export_trades, total.trade_records)
         print(f"Trades CSV:    {args.export_trades}")
