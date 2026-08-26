@@ -1380,6 +1380,11 @@ def main(argv: list[str] | None = None) -> int:
             g_dd = max_drawdown_r(gated, net=True)
             print()
             print(
+                # Candle count on the verdict line, not just the header —
+                # a run that fell back to the small live default prints an
+                # otherwise normal-looking summary. Ported from the crypto
+                # bot, where exactly that cost a comparison.
+                f"[{args.candles} candles] "
                 f"With live gates (cooldown {SIGNAL_COOLDOWN_HOURS}h, "
                 f"{_LIVE_MAX_PER_SCAN}/scan, {MAX_SAME_DIRECTION_POSITIONS}/dir, "
                 f"kill {KILL_SWITCH_SL_STREAK}): "
