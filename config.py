@@ -425,6 +425,33 @@ RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
 EXTENSION_FRESH_THRESHOLD = float(os.getenv("EXTENSION_FRESH_THRESHOLD", "0.7"))
 EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75"))
 
+# --- Clean trend on a calm tape: REJECTED, kept so it is not retried --------
+# Efficiency ratio >= 0.31 with ATR percent < 0.0044 — a directional move that
+# is not also violent — genuinely outperforms per trade, and unlike most
+# candidates its edge GROWS across the book's three consecutive stretches:
+#
+#            subset                  rest of that third        lift
+#   1/3   132tr 75.8% +0.541       276tr 68.1% +0.371        +0.170
+#   2/3   107tr 83.2% +0.742       301tr 72.8% +0.521        +0.221
+#   3/3   112tr 79.5% +0.723       297tr 72.1% +0.483        +0.240
+#
+# Sizing it up anyway fails, and fails in the way that names itself:
+#   base   1225tr +634.62R  worst 9.53 (66.6)   ulcer 2.87 (221.4)
+#   x1.25  1225tr +692.48R  worst 10.91 (63.5)  ulcer 3.11 (222.9)
+#   x1.5   1225tr +750.34R  worst 12.45 (60.3)  ulcer 3.38 (222.1)
+# Profit climbs 9% then 18%, the worst-windows ratio falls monotonically, and
+# the ulcer ratio does not move at all. A flat ratio under a rising multiplier
+# IS leverage — it is what scaling the entire book looks like.
+#
+# The reason is size, not quality. The crypto boosts that survived this test
+# cover 8-15% of their book; this subset is 29% of ours and its members cluster
+# in time, because calm trending stretches arrive in runs. Scaling a third of a
+# book that moves together is leverage however it is labelled.
+#
+# Lesson worth keeping: a per-trade lift, even a growing one, does not convert
+# into money when the subset is large. Check the subset's SHARE of the book
+# before believing a sizing rule.
+
 # Live-price re-anchor sanity guard (main.py, publish-time X-Perp reprice).
 # Crypto's flat 3% made sense next to a 1.2-3% SL band; here SL is 0.4-1.5%,
 # so 3% drift is 2-7x a normal stop — thin overnight/open-gap ticks could
