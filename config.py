@@ -425,6 +425,63 @@ RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
 EXTENSION_FRESH_THRESHOLD = float(os.getenv("EXTENSION_FRESH_THRESHOLD", "0.7"))
 EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75"))
 
+# --- Opening-bell session rides bigger (2026-08-26) --------------------------
+# This bot had no session multiplier at all. Split by session:
+#   session  share   win rate  R/trade   t      thirds (lift over the rest)
+#   OFF      78.7%    72.7%    +0.501  -0.85   +0.070 / +0.014 / -0.406
+#   OPEN     12.2%    78.7%    +0.723  +2.07   +0.136 / +0.100 / +0.517
+#   MIDDAY    4.9%    75.0%    +0.478  -0.28
+#   CLOSE     4.2%    68.6%    +0.278  -1.18
+#
+# OPEN is 12.2% of the book — inside the 8-15% band where every sizing rule
+# that survived today lives — significant on R, and above the rest in all
+# three stretches. Same shape as the crypto bot's London finding: the bell is
+# when real participation arrives, not merely a time of day.
+#
+# Default 1.0 = off until measured end-to-end. The per-trade lift is not the
+# test; a 29%-of-book candidate with a LARGER lift than this one turned out to
+# be pure leverage earlier today.
+# Boosting OPEN as a whole was measured and REJECTED — the two risk measures
+# move against each other, monotonically, across the sweep:
+#   base   +634.62R  worst 66.6  ulcer 221.4
+#   1.25   +661.74R  worst 64.7  ulcer 225.9
+#   1.5    +688.87R  worst 62.8  ulcer 229.6
+#   1.75   +715.99R  worst 61.0  ulcer 232.7
+# The deep stretches get deeper while time-underwater shrinks. The crypto
+# rules that passed had BOTH measures rising together.
+#
+# The session also fails the checks London passed. It is partly a volume
+# proxy — average volume 4.45 against 3.15, over-represented at vol>3 (18% of
+# those trades against 12% of the book), where London was UNDER-represented —
+# the edge REVERSES in the middle volume band (+0.494 against +0.615), and
+# breadth is 11 tickers of 19 where London was 14 of 16.
+#
+# What survives is the same session-plus-volume shape as the crypto bot:
+#   threshold  share  trades  win rate  R/trade   thirds
+#   vol>=2.5    8.0%    98     79.6%    +0.736   +0.242/+0.061/+0.444
+#   vol>=3.0    6.0%    73     84.9%    +0.925   +0.412/+0.182/+0.863
+#   vol>=4.0    4.0%    49     87.8%    +1.035   +0.498/+0.353/+0.796
+# Tighter is stronger and thinner; at 3.0 a stretch holds 18-29 trades, which
+# is where one trade moves the estimate. 2.5 keeps 8% of the book, the bottom
+# of the band where today's surviving rules live, and its middle stretch is
+# weak (+0.061) — recorded as the candidate's honest weakness.
+# Gated on volume it passes cleanly, and the gate is what flips it:
+#   base   +634.62R  worst 9.53 (66.6)  ulcer 2.87 (221.4)  MaxDD -14.18R
+#   x1.5   +670.68R  worst 9.67 (69.4)  ulcer 2.84 (236.0)  MaxDD -14.02R
+#   x1.75  +688.71R  worst 9.77 (70.5)  ulcer 2.84 (242.5)  MaxDD -13.93R
+# Both ratios rise, profit rises, and max drawdown FALLS. Ungated, the
+# worst-windows ratio fell instead — the same volume gate that rescued the
+# London boost in the crypto bot rescues this one.
+#
+# Shipped at 1.5 although 1.75 measured better on every number. That choice is
+# about evidence, not data: this bot has no historical regimes at all, so the
+# whole finding rests on one window cut into thirds, its middle third is the
+# weak one (+0.061), and the subset holds 98 trades. 1.75 is not better
+# supported than 1.5 — it is a larger bet on the same uncertain claim. Revisit
+# once there is a second regime to test against.
+OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volume requirement
+OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
+
 # --- Clean trend on a calm tape: REJECTED, kept so it is not retried --------
 # Efficiency ratio >= 0.31 with ATR percent < 0.0044 — a directional move that
 # is not also violent — genuinely outperforms per trade, and unlike most

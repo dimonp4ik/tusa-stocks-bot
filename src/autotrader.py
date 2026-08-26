@@ -32,6 +32,7 @@ import requests
 from config import (
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
+    OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
@@ -200,6 +201,19 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _size_mult *= float(EXTENSION_FRESH_SIZE_MULT)
     except (TypeError, ValueError):
         pass
+    # Opening bell WITH volume rides bigger — see OPEN_SESSION_SIZE_MULT in
+    # config.py. Ungated by volume the rule fails, so a row missing
+    # volume_ratio (written before the 2026-08-27 migration) gets NO boost
+    # rather than an unconditional one: granting extra size on absent evidence
+    # is the wrong direction to fail in. Matches what the backtest does with an
+    # absent field, so the two paths agree.
+    if OPEN_SESSION_SIZE_MULT != 1.0 and str(sig.get("session") or "") == "OPEN":
+        try:
+            _vr = sig.get("volume_ratio")
+            if _vr is not None and float(_vr) >= OPEN_VOL_MIN:
+                _size_mult *= float(OPEN_SESSION_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return

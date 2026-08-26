@@ -99,6 +99,12 @@ def init_db():
             # not the in-memory setup, so a field a size rule keys on has to
             # survive the insert or the rule applies in the backtest only.
             "bos_extension_atr": "REAL",
+            # 2026-08-27, same reason: OPEN_SESSION_SIZE_MULT keys on session
+            # AND volume_ratio, and neither was on the row. Without them the
+            # opening boost would size correctly in the backtest and do nothing
+            # in production.
+            "session":       "TEXT",
+            "volume_ratio":  "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -368,9 +374,10 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             INSERT INTO signals (
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
-                mtf_score, mtf_score_max, premium, atr, bos_extension_atr
+                mtf_score, mtf_score_max, premium, atr, bos_extension_atr,
+                session, volume_ratio
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -381,6 +388,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             1 if analysis.get("premium") else 0,
             analysis.get("atr"),
             analysis.get("bos_extension_atr"),
+            analysis.get("session"),
+            analysis.get("volume_ratio"),
         ))
         return cur.lastrowid
 

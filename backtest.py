@@ -46,6 +46,7 @@ if importlib.util.find_spec("dotenv") is None:
 
 from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
+    OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,  # noqa: E402
     BACKTEST_CANDLES,
     BACKTEST_FEE_RATE,
     BACKTEST_SLIPPAGE_RATE,
@@ -902,6 +903,15 @@ def simulate_trade_direct(
             gross_r *= _fm; net_r *= _fm; cost_r *= _fm
     except (TypeError, ValueError):
         pass
+    # Opening bell rides bigger — see OPEN_SESSION_SIZE_MULT in config.py.
+    if OPEN_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OPEN":
+        try:
+            _vok = float(setup.get("volume_ratio") or 0.0) >= OPEN_VOL_MIN
+        except (TypeError, ValueError):
+            _vok = False
+        if _vok:
+            _om = float(OPEN_SESSION_SIZE_MULT)
+            gross_r *= _om; net_r *= _om; cost_r *= _om
 
     return TradeRecord(
         symbol=symbol,
