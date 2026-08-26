@@ -1197,6 +1197,43 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
     return kept
 
 
+def risk_profile(rs: list[float]) -> dict:
+    """Downside measures that do NOT hang on a single week.
+
+    Ported from the crypto bot, where max drawdown turned out to be one
+    stretch: the whole -6.87R of a 922-trade book came from FIFTEEN trades
+    across five days in April. Every equal-risk ranking divided by that, so
+    thresholds jumped and halves disagreed on changes that were really noise.
+    Without these two numbers the stocks bot had only Max DD to decide on,
+    which is the measure that misled over there.
+
+    worst_windows averages the k deepest rolling N-trade stretches, so several
+    bad patches are needed to move it. ulcer is RMS of the underwater curve —
+    it counts how LONG we sit below water, not only how deep. Both are
+    downside-only: plain volatility punishes big wins too, which is not the
+    risk being managed here.
+    """
+    import statistics as _st
+    if not rs:
+        return {"max_dd": 0.0, "worst_windows": 0.0, "ulcer": 0.0}
+    cum = peak = 0.0
+    worst = 0.0
+    sq = []
+    for x in rs:
+        cum += x
+        peak = max(peak, cum)
+        worst = min(worst, cum - peak)
+        sq.append((cum - peak) ** 2)
+    win, k = 25, 5
+    ww = 0.0
+    if len(rs) >= win:
+        sums = [sum(rs[i:i + win]) for i in range(len(rs) - win + 1)]
+        ww = -_st.mean(sorted(sums)[:k])
+    return {"max_dd": -worst,
+            "worst_windows": ww,
+            "ulcer": (sum(sq) / len(sq)) ** 0.5}
+
+
 def max_drawdown_r(trades: list[TradeRecord], *, net: bool = True) -> float:
     equity = peak = 0.0
     max_dd = 0.0
@@ -1394,6 +1431,17 @@ def main(argv: list[str] | None = None) -> int:
                 f"net {g_net:+.2f}R, "
                 f"Max DD {g_dd:+.2f}R, "
                 f"profit/DD {g_net / abs(g_dd):.1f}"
+            )
+            _ordered = sorted(gated, key=lambda t: (t.entry_time or 0, t.symbol))
+            _rp = risk_profile([t.net_r for t in _ordered])
+            print(
+                f"   устойчивый риск: "
+                f"худшие окна {_rp['worst_windows']:.2f}R "
+                f"(прибыль/риск "
+                f"{g_net / _rp['worst_windows'] if _rp['worst_windows'] else 0:.1f})   "
+                f"ulcer {_rp['ulcer']:.2f} "
+                f"(прибыль/ulcer "
+                f"{g_net / _rp['ulcer'] if _rp['ulcer'] else 0:.1f})"
             )
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
 
