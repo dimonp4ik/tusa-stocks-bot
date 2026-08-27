@@ -482,6 +482,47 @@ EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75")
 OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volume requirement
 OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
 
+# --- Orderly trend rides bigger (2026-08-27) ---------------------------------
+# The PAIR "clean trend on a calm tape" was rejected above: at 29% of the book
+# it behaved as pure leverage. The triple search narrows the same idea to a
+# workable width by adding a third condition — the break must also be a late
+# one, not fresh:
+#
+#   eff_ratio>=0.31 & vol_atr_pct<0.0044 & bos_extension_atr>=1.271
+#     1/3   87tr 74.7% lift +0.207
+#     2/3   66tr 81.8% lift +0.262
+#     3/3   68tr 85.3% lift +0.440
+#   221 trades, 18% of the book, lift GROWING across the stretches.
+#
+# Note this is the MIRROR of what the crypto bot wants. There the winning
+# state is LOW efficiency with HIGH volatility — busy, violent, not travelling
+# cleanly. Here it is high efficiency with low volatility. Plausible: stocks
+# are slower and more institutional, so ragged movement is more often news
+# noise than money arriving. Two bots, opposite states, each confirmed across
+# three stretches.
+#
+# 18% is above the 8-15% band where every surviving rule lives, and the 29%
+# version of this idea already failed once, so the end-to-end measurement
+# decides rather than the per-trade lift.
+ORDERLY_EFF_MIN   = float(os.getenv("ORDERLY_EFF_MIN", "0.31"))
+ORDERLY_ATR_MAX   = float(os.getenv("ORDERLY_ATR_MAX", "0.0044"))
+ORDERLY_EXT_MIN   = float(os.getenv("ORDERLY_EXT_MIN", "1.271"))
+# Swept to the turn:
+#   mult   profit      worst   ulcer   MaxDD
+#   1.0    +670.68R    69.4    236.0   -14.02R
+#   1.25   +710.21R    77.5    246.1   -13.05R
+#   1.5    +752.04R    81.7    252.4   -12.79R   <- best drawdown
+#   1.75   +793.87R    83.4    254.7   -14.19R   <- ratios peak
+#   2.0    +835.70R    82.0    253.9   -15.60R
+#
+# Shipped at 1.5, one step below the measured peak, for the same reason as
+# OPEN_SESSION_SIZE_MULT: this bot has no historical regimes, so everything
+# rests on one window cut into thirds. Sizing exactly onto the peak of a curve
+# measured that way is the largest available bet on the weakest available
+# evidence. 1.5 also holds the smallest max drawdown, and drawdown is what
+# limits how large the book can be carried at all.
+ORDERLY_SIZE_MULT = float(os.getenv("ORDERLY_SIZE_MULT", "1.5"))
+
 # --- Clean trend on a calm tape: REJECTED, kept so it is not retried --------
 # Efficiency ratio >= 0.31 with ATR percent < 0.0044 — a directional move that
 # is not also violent — genuinely outperforms per trade, and unlike most

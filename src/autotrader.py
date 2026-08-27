@@ -33,6 +33,7 @@ from config import (
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
+    ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
@@ -201,6 +202,21 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _size_mult *= float(EXTENSION_FRESH_SIZE_MULT)
     except (TypeError, ValueError):
         pass
+    # Orderly trend rides bigger — see ORDERLY_SIZE_MULT in config.py. All
+    # three fields are absent on rows written before the 2026-08-27 migration,
+    # and an absent field means no boost rather than one granted on no
+    # evidence — matching what the backtest does with a missing field.
+    if ORDERLY_SIZE_MULT != 1.0:
+        try:
+            _er, _ap, _ex = (sig.get("eff_ratio"), sig.get("vol_atr_pct"),
+                             sig.get("bos_extension_atr"))
+            if (_er is not None and _ap is not None and _ex is not None
+                    and float(_er) >= ORDERLY_EFF_MIN
+                    and float(_ap) < ORDERLY_ATR_MAX
+                    and float(_ex) >= ORDERLY_EXT_MIN):
+                _size_mult *= float(ORDERLY_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Opening bell WITH volume rides bigger — see OPEN_SESSION_SIZE_MULT in
     # config.py. Ungated by volume the rule fails, so a row missing
     # volume_ratio (written before the 2026-08-27 migration) gets NO boost

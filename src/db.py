@@ -105,6 +105,12 @@ def init_db():
             # in production.
             "session":       "TEXT",
             "volume_ratio":  "REAL",
+            # 2026-08-27: ORDERLY_SIZE_MULT keys on all three of eff_ratio,
+            # vol_atr_pct and bos_extension_atr. The last was already here; the
+            # other two were not, so without this the rule would size correctly
+            # in the backtest and do nothing in production.
+            "eff_ratio":     "REAL",
+            "vol_atr_pct":   "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -375,9 +381,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price,
                 mtf_score, mtf_score_max, premium, atr, bos_extension_atr,
-                session, volume_ratio
+                session, volume_ratio, eff_ratio, vol_atr_pct
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -390,6 +396,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("bos_extension_atr"),
             analysis.get("session"),
             analysis.get("volume_ratio"),
+            analysis.get("eff_ratio"),
+            analysis.get("vol_atr_pct"),
         ))
         return cur.lastrowid
 
