@@ -48,6 +48,7 @@ from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
+    SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
     BACKTEST_FEE_RATE,
     BACKTEST_SLIPPAGE_RATE,
@@ -904,6 +905,10 @@ def simulate_trade_direct(
             gross_r *= _fm; net_r *= _fm; cost_r *= _fm
     except (TypeError, ValueError):
         pass
+    # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Applied
+    # as a correction after the boosts, since the multipliers here are folded
+    # straight into gross/net/cost rather than accumulated in one variable.
+    _stack = 1.0
     # Orderly trend rides bigger — see ORDERLY_SIZE_MULT in config.py.
     if ORDERLY_SIZE_MULT != 1.0:
         try:
@@ -911,7 +916,7 @@ def simulate_trade_direct(
                     and float(setup.get("vol_atr_pct") or 99.0) < ORDERLY_ATR_MAX
                     and float(setup.get("bos_extension_atr") or 0.0) >= ORDERLY_EXT_MIN):
                 _sm = float(ORDERLY_SIZE_MULT)
-                gross_r *= _sm; net_r *= _sm; cost_r *= _sm
+                gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm
         except (TypeError, ValueError):
             pass
     # Opening bell rides bigger — see OPEN_SESSION_SIZE_MULT in config.py.
@@ -922,7 +927,11 @@ def simulate_trade_direct(
             _vok = False
         if _vok:
             _om = float(OPEN_SESSION_SIZE_MULT)
-            gross_r *= _om; net_r *= _om; cost_r *= _om
+            gross_r *= _om; net_r *= _om; cost_r *= _om; _stack *= _om
+
+    if _stack > SIZE_MULT_MAX:
+        _fix = SIZE_MULT_MAX / _stack
+        gross_r *= _fix; net_r *= _fix; cost_r *= _fix
 
     return TradeRecord(
         symbol=symbol,
@@ -1442,7 +1451,8 @@ def main(argv: list[str] | None = None) -> int:
                 # a run that fell back to the small live default prints an
                 # otherwise normal-looking summary. Ported from the crypto
                 # bot, where exactly that cost a comparison.
-                f"[{args.candles} candles] "
+                f"[{args.candles} candles"
+                f"{' to ' + args.end_date if args.end_date else ' — ОКНО ПОЛЗЁТ'}] "
                 f"With live gates (cooldown {SIGNAL_COOLDOWN_HOURS}h, "
                 f"{_LIVE_MAX_PER_SCAN}/scan, {MAX_SAME_DIRECTION_POSITIONS}/dir, "
                 f"kill {KILL_SWITCH_SL_STREAK}): "

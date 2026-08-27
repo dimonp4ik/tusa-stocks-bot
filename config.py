@@ -523,6 +523,21 @@ ORDERLY_EXT_MIN   = float(os.getenv("ORDERLY_EXT_MIN", "1.271"))
 # limits how large the book can be carried at all.
 ORDERLY_SIZE_MULT = float(os.getenv("ORDERLY_SIZE_MULT", "1.5"))
 
+# --- Ceiling on the stacked product (2026-08-27) -----------------------------
+# This bot had NO ceiling. The crypto bot has carried SIZE_MULT_MAX=2.0 for a
+# while, swept and kept there, but nothing bounded the product here — today
+# ORDERLY 1.5 x OPEN_SESSION 1.5 reaches 2.25 on 8 trades, and the only reason
+# it stops at 2.25 is that there are exactly two boosts. Another one and
+# nothing catches it.
+#
+# Risk-normalised sizing is not a bound: it is guarded by `if _risk_pct >
+# RISK_REFERENCE_PCT`, so it only ever scales DOWN.
+#
+# Set to 2.0 to match the crypto bot. The cost today is 8 trades (0.65% of the
+# book) going from 2.25 to 2.0. This is a rail, not a tuning knob — its job is
+# to bound a stack that does not exist yet.
+SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
+
 # --- Shake without participation: REJECTED ----------------------------------
 # Mirror of ORDERLY above, taken from the negative side of the same triple
 # search: off-session, thin volume, HIGH volatility.

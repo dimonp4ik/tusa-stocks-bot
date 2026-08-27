@@ -34,6 +34,7 @@ from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
+    SIZE_MULT_MAX,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
     AUTOTRADE_CONTACT,
@@ -230,6 +231,9 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 _size_mult *= float(OPEN_SESSION_SIZE_MULT)
         except (TypeError, ValueError):
             pass
+    # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
+    # backtest.py, which applies the same cap to the folded multipliers.
+    _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
