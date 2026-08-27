@@ -480,6 +480,26 @@ EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75")
 # supported than 1.5 — it is a larger bet on the same uncertain claim. Revisit
 # once there is a second regime to test against.
 OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volume requirement
+# Swept again on a PINNED window (the first sweep ran on a sliding one — see
+# the note at the candle stamp in backtest.py). No turn appears through 2.0:
+#   mult   profit      worst   ulcer   MaxDD
+#   1.25   +733.35R    78.1    245.5   -12.79R
+#   1.5    +750.71R    81.6    252.1   -12.79R
+#   1.75   +767.42R    85.2    258.0   -12.79R
+#   2.0    +784.12R    87.6    263.6   -12.79R
+#
+# Max drawdown does not move AT ALL across the sweep, so the book's deepest
+# hole is made by trades outside this subset and the rule neither helps nor
+# hurts it. Worst-windows does fall in absolute terms (9.39 -> 8.95), so the
+# improvement is not merely profit rising against a fixed denominator.
+#
+# Held at 1.5 anyway. The case for restraint was never about measurement
+# quality — it is about the evidence for the RULE, which is one window cut in
+# thirds, with the symbol hold-out underpowered for this subset. Monotone
+# improvement inside those same thin data does not thicken them; it only says
+# that IF the rule is right, more is better. A larger multiplier is a larger
+# bet on the same uncertain claim, which is exactly the reason 1.5 was chosen
+# in the first place.
 OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
 
 # --- Orderly trend rides bigger (2026-08-27) ---------------------------------
