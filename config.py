@@ -523,6 +523,32 @@ ORDERLY_EXT_MIN   = float(os.getenv("ORDERLY_EXT_MIN", "1.271"))
 # limits how large the book can be carried at all.
 ORDERLY_SIZE_MULT = float(os.getenv("ORDERLY_SIZE_MULT", "1.5"))
 
+# --- Shake without participation: REJECTED ----------------------------------
+# Mirror of ORDERLY above, taken from the negative side of the same triple
+# search: off-session, thin volume, HIGH volatility.
+#   session=OFF & volume_ratio<2.42 & vol_atr_pct>=0.0044
+#   203 trades, 16.6% of the book, 6.6-11.8 points of win rate below each
+#   stretch's own book, lag -0.293 to -0.409, no decay.
+#
+# Trimming it makes things WORSE on both measures, monotonically:
+#            base        x0.75      x0.6
+#   profit  +752.04R   +739.65R  +732.21R
+#   worst      81.7       76.2      73.1
+#   ulcer     252.4      252.0     250.4
+# The absolute worst-windows figure RISES under the trim (9.20 -> 9.71 ->
+# 10.02) even though size is being cut, which is the tell: the subset earns
+# +0.242R per trade, so removing its contribution slows the equity curve and
+# the deepest 25-trade stretches get relatively deeper.
+#
+# 🔑 Second confirmation, now in both bots, of the rule that decides trims:
+#   thin London    +0.265 against a book of +0.286  -> trim WORKED
+#   bearish 1h     +0.264 against ~+0.30            -> failed
+#   shake (here)   +0.242 against +0.518            -> failed
+# Lagging the book and being trimmable are different things. This subset lags
+# by HALF the book and still must not be cut, because it earns. What decides is
+# the subset's ABSOLUTE expectancy being near zero, not its distance from the
+# average.
+
 # --- Clean trend on a calm tape: REJECTED, kept so it is not retried --------
 # Efficiency ratio >= 0.31 with ATR percent < 0.0044 — a directional move that
 # is not also violent — genuinely outperforms per trade, and unlike most
