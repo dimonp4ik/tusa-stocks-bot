@@ -47,6 +47,7 @@ if importlib.util.find_spec("dotenv") is None:
 from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,  # noqa: E402
+    OFF_SESSION_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
     SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
@@ -919,6 +920,10 @@ def simulate_trade_direct(
                 gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm
         except (TypeError, ValueError):
             pass
+    # OFF session rides smaller — see OFF_SESSION_SIZE_MULT in config.py.
+    if OFF_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OFF":
+        _fm = float(OFF_SESSION_SIZE_MULT)
+        gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _stack *= _fm
     # Opening bell rides bigger — see OPEN_SESSION_SIZE_MULT in config.py.
     if OPEN_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OPEN":
         try:

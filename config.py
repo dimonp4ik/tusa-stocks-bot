@@ -628,6 +628,14 @@ OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volum
 # bet on the same uncertain claim, which is exactly the reason 1.5 was chosen
 # in the first place.
 OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
+# Research handle, default 1.0 = no change. Live data 2026-08-28 showed the
+# whole live/backtest gap on this desk sits in OFF-session stops filling BEYOND
+# the stop level (average -1.209R instead of -1.00R, -4.88R of unmodelled excess
+# over 23 stops). The backtest cannot see that — it resolves stops on 15m bars
+# and books -1R — so this knob exists to price the trade-off the owner has to
+# make: OFF is ~79% of the book, and trimming it costs profit the model DOES
+# see while saving losses the model does NOT.
+OFF_SESSION_SIZE_MULT = float(os.getenv("OFF_SESSION_SIZE_MULT", "1.0"))
 
 # --- Orderly trend rides bigger (2026-08-27) ---------------------------------
 # The PAIR "clean trend on a calm tape" was rejected above: at 29% of the book
