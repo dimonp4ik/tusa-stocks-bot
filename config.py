@@ -112,9 +112,44 @@ TRADING_HOURS_END   = 21   # 21:00 UTC = 00:00 Riga
 TRADE_WEEKENDS      = False
 
 # --- SMC settings ---
-SMC_SWING_LOOKBACK    = 5
-SMC_FVG_MIN_PCT       = 0.0005
-SMC_OB_LOOKBACK       = 30
+# These three were plain literals with no os.getenv until 2026-08-28, which is
+# the same "hardcoded" class as a bare number in code — it just hides better.
+# Made readable so they can be swept; defaults unchanged.
+#
+# 🔑 SWEPT AND ALL THREE KEPT. The crypto desk moved off all three strict values
+# and gained from each; NONE of that transfers here. Against base 1218tr 73.2%
+# +762.17R 106.2/280.9:
+#                         trades  WR      profit    prof/worst  prof/ulcer
+#   swing 5 -> 3           1236  74.0%  +798.90R      99.3        331.7
+#   eff-lookback 20 -> 10  1269  73.5%  +799.91R      94.7        270.8
+#   FVG 0.0005 -> 0.0003   1231  72.5%  +713.75R      85.3        254.3
+# The FVG threshold is the single best find of the whole crypto effort (+26-29
+# trades AND lower risk in all three windows) and here it LOSES money: -6.4%
+# profit, win rate down 0.7pp, both risk measures worse. Eff-lookback buys
+# trades and profit but worsens both risk measures.
+#
+# Swing 3 looked like the one candidate (+18 trades, +4.8% profit, +0.8pp win
+# rate, ulcer -11%) so it was re-tested on genuinely DISJOINT windows — capped
+# at --candles 4000 (~42 days) with end-dates 2026-06-15 and 2026-08-26, because
+# two different --end-date values at full depth give a window and a SUBSET of it
+# (visible as identical worst-windows in both) and confirm nothing:
+#   to 15.06   swing5 263tr 73.4% +172.87R ulcer-ratio 92.5
+#              swing3 277tr 72.6% +177.43R ulcer-ratio 82.7
+#   to 26.08   swing5 301tr 75.4% +224.69R ulcer-ratio 125.0
+#              swing3 308tr 76.0% +221.29R ulcer-ratio 136.0
+# The two disagree — the earlier slice loses on ulcer and win rate, the later
+# one loses on profit. Not shipped.
+# ⚠️ worst-windows is UNUSABLE at that sample size: it came back NEGATIVE in all
+# four runs (-3.83, -0.32, -0.54, -5.44), which a drawdown cannot be. Read only
+# profit, win rate and ulcer on slices this small.
+#
+# Reading: I had argued recognition parameters port more safely than edge claims
+# because "the bot is blind" assumes little about the market. That is wrong.
+# What counts as a meaningful gap is a property of the instrument, and stock
+# perps gap differently from alt perps. Measure every port.
+SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
+SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
+SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
