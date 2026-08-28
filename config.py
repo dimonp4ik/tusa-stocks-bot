@@ -452,6 +452,38 @@ LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
 ATR_PERIOD    = 14
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
+# --- 2026-08-28: swept, and REJECTED despite looking like the biggest find yet -
+# This clamp is not a rare safety net on this desk, it is the main mechanism
+# placing stops: 44-47% of trades sit exactly at this ceiling and another
+# 11-15% at RISK_MIN_PCT, so only ~4 in 10 get the stop structure asked for.
+# Never swept before. Loosening is monotonically worse (2.0% -> -9.2% profit,
+# 2.5% -> -13.0%, both risk measures down, and FEWER trades — a wider stop
+# stretches the targets too, so positions live longer and hold slots).
+#
+# Tightening looked spectacular on the full windows:
+#   ceiling  to 30.06 tr/WR/profit  ratios      to 26.08 tr/WR/profit  ratios
+#   1.0%     936 76.6% +719.69R  71.4/267.9     1387 75.8% +1006.73R  99.9/366.9
+#   1.2%     917 76.0% +659.25R 155.7/287.6     1366 75.2%  +928.20R 114.6/374.1
+#   1.5%     885 73.7% +547.62R  88.9/204.0     1316 74.0%  +817.57R 116.7/311.8  <- KEPT
+# +13.5% and +20.4% profit, more trades, higher win rate. Money units check out:
+# above the 1.0% reference the sizing normalisation holds money at risk constant
+# whatever the stop width, so the R gain is a real money gain, not the unit trap.
+#
+# It does not survive disjoint thirds, and the effect DECAYS monotonically:
+#   third      profit 1.5%   profit 1.2%   change   win rate  profit/ulcer
+#   to 05.06     +121.72       +149.71     +23.0%    +2.7pp      +68%
+#   to 15.07     +105.53       +119.58     +13.3%    +0.4pp       +5%
+#   to 26.08     +160.39       +161.77      +0.9%    -1.0pp      -14%
+# In the most recent third — the best proxy for what happens next — it buys
+# nothing and costs win rate and drawdown. Decay in order is a regime signature;
+# noise would scatter.
+#
+# 🔑 METHOD NOTE, the part worth keeping: the two "windows" that made this look
+# proven are NESTED. The to-26.08 window CONTAINS the to-30.06 one, so its
+# +13.5% is largely the same early trades counted again. With only ~6 months of
+# history this desk cannot produce independent full windows at all — disjoint
+# thirds are the only honest test here, and they must be run BEFORE believing a
+# result, not after.
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1.5%
 # Raising this was tested 2026-08-25 and REJECTED, though the diagnosis that
 # suggested it was sound: 35% of trades sit pinned at the cap and do worse
