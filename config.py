@@ -647,7 +647,24 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.05"))  # base trail; post_tp1_v2 overrides per-context
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# 2026-08-28: 0.05 -> 0.02, ported from the crypto bot but measured here first.
+#   mult    to 30.06 profit  worst/ulcer     to 26.08 profit  worst/ulcer
+#   0.05      +493.51R        53.6/154.5       +742.90R        80.7/249.1
+#   0.02      +497.98R        54.8/157.2       +749.66R        82.4/253.4  <- shipped
+#   0.01      +499.35R        55.1/158.1       +751.81R        83.0/254.8
+#   0.00      +500.16R        55.4/158.8       +753.51R        83.5/256.1
+# Same monotone shape as crypto, same sign on every measure, but the effect is
+# a third the size: +0.9% profit and ~+2% on both ratios.
+#
+# ⚠️ Read the two columns as ONE window, not two. Both report the SAME max
+# drawdown (-12.79R) and the same worst-windows (9.20R) — the June cut is a
+# subset of the August one, since this desk's history only starts Feb-Mar 2026
+# when the OKX perps listed. The evidence for this change is the crypto bot's
+# three independent windows; these columns only confirm the sign here.
+# Not shipped at 0.00 for the same reason as there: an optimum on the edge of
+# the tested range says "further", not "here", and 0.00 puts the stop on a
+# level price has just traded.
 # 2026-08-25: 0.25 -> 0.05, measured on the corrected trail model (BT_TRAIL_LAG).
 # Monotone across the range: 0.05 +639.2R / 0.15 +624.5 / 0.25 +609.4 / 0.35
 # +604.6 / 0.50 +592.9, drawdown flat at -9.6 throughout, so +5.8% at equal
@@ -673,7 +690,14 @@ EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
 # a trade that has touched TP1 can never revert to a loss. 0.35/0.15 is the
 # measured optimum here, not just an inherited crypto default — don't re-widen
 # without new evidence.
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.05"))
+# Pinned to the base value on purpose. This split reads max(base, STRONG) /
+# min(base, WEAK), so it has been INERT since the base dropped to 0.05 — the
+# whole "strong trails wide, weak trails tight" feature died silently in both
+# bots while the config kept advertising it. Measured on the crypto desk before
+# deciding: widening the strong branch LOSES in both windows there and plain
+# uniform beats every split on every measure. Kept inert deliberately now
+# rather than by accident. WEAK stays 0.15 and is inert too: min(0.02,0.15).
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.02"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
