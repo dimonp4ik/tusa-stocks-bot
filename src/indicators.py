@@ -632,6 +632,40 @@ def get_1h_trend(candles_1h: dict) -> dict:
     return {"trend": trend, "strong": strong}
 
 
+def htf_levels(candles_1h: dict, candles_4h: dict, price: float, atr: float) -> dict:
+    """Nearest confirmed swing level ABOVE and BELOW price, on 1h and 4h.
+
+    Ported from the crypto desk 2026-08-29. This bot only ever knew
+    recent_high/recent_low over 21 15m candles — about five hours — so a long
+    opened directly under a 4h swing high was indistinguishable from one opened
+    into open air. Distances are in ATR so they compare across tickers.
+
+    The FEATURE is ported, deliberately not the rule built on it there. Four
+    attempts this week to carry crypto VALUES over failed; the two desks keep
+    coming out mirrored. Whatever rule this supports here has to be found on
+    this desk's own data.
+    """
+    out = {"overhead_atr": None, "underfoot_atr": None}
+    if atr <= 0:
+        return out
+    levels_up, levels_dn = [], []
+    for c in (candles_1h, candles_4h):
+        if not c or not c.get("high"):
+            continue
+        sh, sl = find_swing_points(c["high"], c["low"])
+        for _, lvl in sh:
+            if lvl > price:
+                levels_up.append(lvl)
+        for _, lvl in sl:
+            if lvl < price:
+                levels_dn.append(lvl)
+    if levels_up:
+        out["overhead_atr"] = (min(levels_up) - price) / atr
+    if levels_dn:
+        out["underfoot_atr"] = (price - max(levels_dn)) / atr
+    return out
+
+
 # ── Combined SMC indicator dict ───────────────────────────────────────────────
 
 def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
@@ -691,6 +725,9 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
 
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
+    # ПОСЛЕ atr: htf_levels делит на него. Ровно та же ошибка уже была
+    # в крипте с absorption — вызов стоял выше определения atr.
+    _htf = htf_levels(candles_1h, candles_4h, closes[-1], atr)
 
     # Volatility regime (dead vs spike) — quality gate
     # BOS staleness/extension — ported from the crypto bot 2026-08-25, where
@@ -817,6 +854,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "macd_divergence":  macd_div,
         "choch":            choch,
         "engulfing":        engulfing,
+        "overhead_atr":     _htf["overhead_atr"],
+        "underfoot_atr":    _htf["underfoot_atr"],
         "in_discount":      prem_disc["in_discount"],
         "in_premium":       prem_disc["in_premium"],
         "midpoint":         prem_disc["midpoint"],
