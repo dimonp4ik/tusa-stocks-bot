@@ -729,6 +729,43 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # в крипте с absorption — вызов стоял выше определения atr.
     _htf = htf_levels(candles_1h, candles_4h, closes[-1], atr)
 
+    # Buy pressure — the "BIG GUY" idea as a number: where inside each bar the
+    # close sat, volume-weighted over 20 bars, in [-1, +1]. Closing at the high
+    # on heavy volume reads positive. Distinct from OBV (measured and empty on
+    # the crypto desk): OBV uses close-to-close direction only and ignores the
+    # intrabar location, so a bar that opens low, is bought all session and
+    # closes at its high reads flat there and strong here.
+    _prs_n = 20
+    buy_pressure = 0.0
+    if len(closes) > _prs_n:
+        _num = _den = 0.0
+        for _i in range(len(closes) - _prs_n, len(closes)):
+            _rng = highs[_i] - lows[_i]
+            if _rng <= 0:
+                continue
+            _loc = ((closes[_i] - lows[_i]) - (highs[_i] - closes[_i])) / _rng
+            _num += _loc * volumes[_i]
+            _den += volumes[_i]
+        if _den > 0:
+            buy_pressure = _num / _den
+
+    # Parabolic acceleration — ratio of the recent slope to the preceding one
+    # over the same span. >1 accelerating (arc-like), <1 decelerating. Only
+    # meaningful when both legs share a sign; a flat-into-move reads 3.0 and
+    # legs that disagree read 0.0 (not an arc at all).
+    _acc_n = 10
+    accel_ratio = 1.0
+    if len(closes) > 2 * _acc_n:
+        _recent = closes[-1] - closes[-1 - _acc_n]
+        _prior = closes[-1 - _acc_n] - closes[-1 - 2 * _acc_n]
+        if _prior != 0 and _recent != 0 and (_recent > 0) == (_prior > 0):
+            accel_ratio = abs(_recent) / abs(_prior)
+        elif _prior == 0 and _recent != 0:
+            accel_ratio = 3.0
+        else:
+            accel_ratio = 0.0
+        accel_ratio = min(accel_ratio, 10.0)
+
     # Volatility regime (dead vs spike) — quality gate
     # BOS staleness/extension — ported from the crypto bot 2026-08-25, where
     # bos_extension_atr turned out to be the one microstructure feature that
@@ -854,6 +891,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "macd_divergence":  macd_div,
         "choch":            choch,
         "engulfing":        engulfing,
+        "buy_pressure":     round(buy_pressure, 4),
+        "accel_ratio":      round(accel_ratio, 3),
         "overhead_atr":     _htf["overhead_atr"],
         "underfoot_atr":    _htf["underfoot_atr"],
         "in_discount":      prem_disc["in_discount"],
