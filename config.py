@@ -794,6 +794,25 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
 TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# ⚖️ SIGNIFICANCE 2026-08-28: cannot be tested paired on THIS desk, and the
+# unpaired answer is inconclusive:
+#   old exit +789.00R -> new exit +817.57R, delta +28.56R, R/trade +0.024
+#   p_gt_zero 0.633, 90% CI -114.27 to +164.30
+# The reason is structural and worth understanding before anyone retries it.
+# significance_check requires the pairing to be COMPLETE — every row in both
+# files must find a partner — and here the trade COUNTS differ (1321 vs 1316):
+# a different exit changes how long positions live, which changes slot
+# occupancy under MAX_SAME_DIRECTION_POSITIONS, which changes which trades get
+# taken at all. 1302 of them pair by entry, but the five that do not ARE part
+# of the effect, so pairing and discarding them would measure the wrong thing.
+# The tool falls back to unpaired, correctly, and unpaired has nowhere near the
+# power for a 3.6% effect. Passing --pair-key entry does NOT force it.
+#
+# The same change on the crypto desk DOES pair (1266 = 1266 = 1266 there) and
+# comes back p_gt_zero 1.0 with a 90% CI of +17.42 to +33.96 — every one of 5000
+# runs positive. That, plus the direction agreeing here, is what this setting
+# rests on. It is not independently proven on this desk and should not be
+# described as if it were.
 # 2026-08-28: 0.05 -> 0.02, ported from the crypto bot but measured here first.
 #   mult    to 30.06 profit  worst/ulcer     to 26.08 profit  worst/ulcer
 #   0.05      +493.51R        53.6/154.5       +742.90R        80.7/249.1

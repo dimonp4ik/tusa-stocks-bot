@@ -1,0 +1,34 @@
+{
+  "baseline": {
+    "count": 1321,
+    "net_r": 789.004488,
+    "rpt": 0.59727819
+  },
+  "baseline_csv": "s_base.csv",
+  "bootstrap": {
+    "p05_delta_net_r": -114.271294,
+    "p05_delta_rpt": -0.08439307,
+    "p50_delta_net_r": 29.210938,
+    "p50_delta_rpt": 0.02448483,
+    "p95_delta_net_r": 164.301505,
+    "p95_delta_rpt": 0.12696043,
+    "p_gt_zero_net": 0.6332,
+    "p_gt_zero_rpt": 0.6488,
+    "runs": 5000
+  },
+  "candidate": {
+    "count": 1316,
+    "net_r": 817.565493,
+    "rpt": 0.62125037
+  },
+  "candidate_csv": "s_cand.csv",
+  "entry_paired_count": 1302,
+  "full_paired_count": 1165,
+  "generated_utc": "2026-08-28T13:28:40+00:00",
+  "mode": "unpaired",
+  "observed_delta_net_r": 28.561005,
+  "observed_delta_rpt": 0.02397219,
+  "pair_key": "entry",
+  "paired_count": 1302,
+  "use_risk_mult": false
+}
