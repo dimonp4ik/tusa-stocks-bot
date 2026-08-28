@@ -900,7 +900,7 @@ def simulate_trade_direct(
     # right at the break, before anything confirms it, is this bot's worst
     # bucket (53.2% WR against a 63.6% book).
     try:
-        if float(setup.get("bos_extension_atr") or 99.0) <= EXTENSION_FRESH_THRESHOLD:
+        if _fld(setup, "bos_extension_atr", 99.0) <= EXTENSION_FRESH_THRESHOLD:
             _fm = float(EXTENSION_FRESH_SIZE_MULT)
             gross_r *= _fm; net_r *= _fm; cost_r *= _fm
     except (TypeError, ValueError):
@@ -914,7 +914,7 @@ def simulate_trade_direct(
         try:
             if (float(setup.get("eff_ratio") or 0.0) >= ORDERLY_EFF_MIN
                     and float(setup.get("vol_atr_pct") or 99.0) < ORDERLY_ATR_MAX
-                    and float(setup.get("bos_extension_atr") or 0.0) >= ORDERLY_EXT_MIN):
+                    and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
                 _sm = float(ORDERLY_SIZE_MULT)
                 gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm
         except (TypeError, ValueError):
@@ -966,8 +966,8 @@ def simulate_trade_direct(
         trend_1h=str(setup.get("trend_1h", "") or ""),
         trend_4h=str(setup.get("trend_4h", "") or ""),
         entry_source=str(setup.get("entry_source", "") or ""),
-        bos_extension_atr=round(float(setup.get("bos_extension_atr") or 0.0), 3),
-        bos_candles_ago=int(setup.get("bos_candles_ago") or -1),
+        bos_extension_atr=round(_fld(setup, "bos_extension_atr", -1.0), 3),
+        bos_candles_ago=int(_fld(setup, "bos_candles_ago", -1.0)),
         signals=" | ".join(setup.get("signals", [])),
         score_tags=" | ".join(setup.get("score_tags", [])),
         premium=int(bool(setup.get("premium"))),
@@ -1172,6 +1172,38 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
 
 
 _LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
+
+
+def _fld(setup: dict, key: str, missing: float) -> float:
+    """Read a numeric setup field, substituting ONLY when it is genuinely absent.
+
+    Ported from the crypto bot 2026-08-28 to kill a live bug. The pattern
+    `float(setup.get(k) or default)` also fires on a legitimate ZERO, and
+    bos_extension_atr is exactly the field where zero carries meaning: it is
+    None when no break level was found, and 0.0 when price sits right ON the
+    break — the freshest entry there is. With `or 99.0` a zero became 99, failed
+    the `<= EXTENSION_FRESH_THRESHOLD` test, and the fresh-break trim skipped
+    precisely the trades it exists to catch. The same file read the same field
+    with `or 0.0` ten lines later, which is how the inconsistency showed up.
+
+    MEASURED before claiming it mattered, and it does not: on the current book
+    bos_extension_atr is NEVER absent (0 of 1316 trades) and is exactly zero on
+    4 trades (0.3%). Fixing it moved profit by -0.51R, 0.06%. Kept because it is
+    correct and because a missing value becomes possible the moment the candle
+    source changes — not because it bought anything.
+
+    It also clears a suspicion worth recording: the fresh-break trim was fitted
+    on an export that wrote missing values as 0.0, so its <=0.71 bucket looked
+    like it could be padded with no-data trades. With zero absent values in the
+    data, it was not. That justification stands.
+    """
+    v = setup.get(key)
+    if v is None or v == "":
+        return missing
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return missing
 
 
 def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:

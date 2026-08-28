@@ -170,11 +170,14 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # other cross-desk port tried this session. Do not sync these two.
 #
 # ⚠️ 1.4 is a DIP here: worse than BOTH 1.5 and 1.3, in the nested windows and in
-# both disjoint slices. That is the signature of a second effect, and there is
-# one — the threshold also sets the score's +2 volume tier at
-# max(threshold*1.35, 2.0), which is 2.025 at 1.5 and 2.000 at both 1.4 and 1.3.
-# So the 1.5 -> 1.4 step moves the gate AND the tier; 1.4 -> 1.3 moves only the
-# gate. Neither this nor the crypto sweep is a clean gate test.
+# both disjoint slices. Diminishing returns cannot produce a dip, so something
+# else is at work — and the obvious candidate has now been RULED OUT. The
+# threshold also sets the score's +2 volume tier (max(threshold*1.35, 2.0) =
+# 2.025 at 1.5, 2.000 at 1.4 and 1.3), so the 1.5 -> 1.4 step moves both. On the
+# crypto desk that tier move was pinned and measured apart, and it changes
+# NOTHING — the band is 1.2% wide and holds no setup. The dip here remains
+# unexplained. Do not treat it as understood, and do not sync this parameter
+# across desks on the strength of either sweep.
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts

@@ -199,7 +199,13 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # on signals written before the 2026-08-25 migration, which falls through to
     # no trim rather than mis-sizing.
     try:
-        if float(sig.get("bos_extension_atr") or 99.0) <= EXTENSION_FRESH_THRESHOLD:
+        # `or 99.0` also swallowed a legitimate ZERO — price sitting right ON
+        # the break, the freshest entry there is, and exactly what this trim
+        # exists to catch. None still means "no break level found" and still
+        # falls through to no trim. Mirrors backtest._fld.
+        _ext = sig.get("bos_extension_atr")
+        _ext = 99.0 if _ext is None or _ext == "" else float(_ext)
+        if _ext <= EXTENSION_FRESH_THRESHOLD:
             _size_mult *= float(EXTENSION_FRESH_SIZE_MULT)
     except (TypeError, ValueError):
         pass
