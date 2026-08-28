@@ -637,6 +637,32 @@ OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
 # see while saving losses the model does NOT.
 OFF_SESSION_SIZE_MULT = float(os.getenv("OFF_SESSION_SIZE_MULT", "1.0"))
 
+# --- Volume-spike boost (2026-08-29) -----------------------------------------
+# FIRST rule on this desk found by SEARCH on its own data rather than ported
+# from crypto — the interaction scan had never been run here, which is why this
+# sizing book had three rules against crypto's ten.
+# Measured on three DISJOINT thirds (--candles 2800, ends 05.06/15.07/26.08),
+# R per trade at equal size against each third's own book:
+#   vol>=4.0   24tr 13% +0.714 (book +0.644)   +11%
+#              21tr 10% +0.910 (book +0.510)   +78%
+#              31tr 14% +1.120 (book +0.743)   +51%
+# Above book in all three, win rate 71-86% against a ~70% book in all three,
+# and the share sits at 10-14% — inside the 8-15% band a boost has to occupy.
+# 3.5 was also tested and is weaker (+1% in the first third); 3.0 is too wide
+# at 21-27% of the book.
+VOLUME_SPIKE_BOOST_MIN  = float(os.getenv("VOLUME_SPIKE_BOOST_MIN", "4.0"))
+# Shipped at 1.25. Measured as a live sizing rule on the same three disjoint
+# thirds, profit and both risk ratios up in EVERY one:
+#   mult   third1 profit  ratio   third2 profit  ratio   third3 profit  ratio
+#   1.00     +121.72R     60.3      +105.53R    40.4      +160.39R     76.3
+#   1.25     +126.00R     62.5      +110.31R    41.8      +168.38R     77.4
+#   1.50     +127.94R     63.1      +113.73R    42.7      +172.25R     76.9
+# 1.5 buys more profit but is already WORSE than 1.25 on the newest third's
+# ulcer ratio (76.9 vs 77.4), which is the third that matters most for what
+# happens next. Mild over maximal on a new finding, as with every other rule
+# shipped here.
+VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.25"))
+
 # --- Orderly trend rides bigger (2026-08-27) ---------------------------------
 # The PAIR "clean trend on a calm tape" was rejected above: at 29% of the book
 # it behaved as pure leverage. The triple search narrows the same idea to a

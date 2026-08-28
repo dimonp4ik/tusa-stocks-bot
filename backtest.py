@@ -48,6 +48,7 @@ from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,  # noqa: E402
     OFF_SESSION_SIZE_MULT,  # noqa: E402
+    VOLUME_SPIKE_BOOST_MIN, VOLUME_SPIKE_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
     SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
@@ -918,6 +919,14 @@ def simulate_trade_direct(
                     and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
                 _sm = float(ORDERLY_SIZE_MULT)
                 gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm
+        except (TypeError, ValueError):
+            pass
+    # Volume spike rides bigger — see VOLUME_SPIKE_BOOST_MIN in config.py.
+    if VOLUME_SPIKE_SIZE_MULT != 1.0:
+        try:
+            if _fld(setup, "volume_ratio", 0.0) >= VOLUME_SPIKE_BOOST_MIN:
+                _vm = float(VOLUME_SPIKE_SIZE_MULT)
+                gross_r *= _vm; net_r *= _vm; cost_r *= _vm; _stack *= _vm
         except (TypeError, ValueError):
             pass
     # OFF session rides smaller — see OFF_SESSION_SIZE_MULT in config.py.
