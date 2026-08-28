@@ -107,6 +107,14 @@ KLINES_1D_LIMIT = 5
 KLINES_1D_INTERVAL_SEC = 86400
 
 # --- Trading hours filter (UTC) ---
+# ⚠️ DEAD SETTINGS as of 2026-08-28. These three are imported at the top of
+# main.py and referenced NOWHERE else in the codebase — no hour gate, no weekend
+# gate, in either the live path or the backtest. The two agree, so there is no
+# live/backtest parity gap; both simply trade around the clock. Left in place
+# because the question they imply is a real and untested one (this desk holds
+# perps on STOCKS, whose underlying does close, and outside the US session the
+# book is thin), but do not read them as describing current behaviour. Session
+# awareness in this bot lives in SIZING only — see OPEN_SESSION_SIZE_MULT.
 TRADING_HOURS_START = 7    # 07:00 UTC = 10:00 Riga
 TRADING_HOURS_END   = 21   # 21:00 UTC = 00:00 Riga
 TRADE_WEEKENDS      = False
@@ -466,6 +474,31 @@ RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1
 # trades get trimmed, mean multiplier 0.851, tightest 0.667.
 # Downward only — a tight stop never gets sized UP, because that would raise
 # exposure on the trades whose stop sits closest to the noise.
+# --- 2026-08-28: measured how far the R accounting drifts from money here -----
+# Backtest sums outcomes in R, which assumes every trade risks the same money.
+# This block makes that true only ABOVE the reference — it scales wide stops
+# down and leaves tight ones alone. Both clamps bind hard: stop width spans
+# exactly RISK_MIN_PCT to RISK_MAX_PCT (0.40% to 1.50%), and 42.7% of the book
+# sits BELOW the 1.0% reference, risking as little as 0.40 of a reference unit.
+#   stop %      share   money   R/trade   win rate
+#   0-0.5      19.3%    0.416   +0.796     72.0%
+#   0.5-0.7    10.9%    0.593   +0.510     69.9%
+#   0.7-1.0    12.5%    0.848   +0.546     69.1%
+#   1.0-1.3    10.6%    1.000   +0.846     78.6%
+#   >1.3       46.7%    1.000   +0.544     68.2%
+# Return per unit of MONEY at risk is +0.6026 against the flat-R +0.6213 — the
+# accounting overstates by 3.0%. That is larger than the crypto desk's 1.2%
+# (its money range is only 0.80-1.05 against 0.40-1.00 here) but still modest,
+# and it stays modest for a reason worth noting: the tight-stop trades are
+# UNDER-weighted in money and OVER-perform in R, so the two errors cancel.
+#
+# 📌 FOR THE ACCOUNT OWNER, not shipped. Making the normalisation two-sided
+# (scaling tight stops UP to the reference instead of leaving them alone) is
+# worth +3.1% of return per unit of risk, because the trades it would size up
+# are the ones already beating the book. But as a standalone change it also
+# raises total exposure 21% (1084 -> 1316 reference units). Getting the +3.1%
+# without the extra exposure means lowering base risk per trade at the same
+# time, and that dial belongs to the owner. Do not ship one half of this.
 RISK_NORMALIZED_SIZING = os.getenv("RISK_NORMALIZED_SIZING", "1") != "0"
 RISK_REFERENCE_PCT     = float(os.getenv("RISK_REFERENCE_PCT", "0.010"))
 RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
