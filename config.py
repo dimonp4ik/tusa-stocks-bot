@@ -151,7 +151,31 @@ SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
-SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.5"))
+# 2026-08-28: 1.5 -> 1.3. Undocumented and never swept, and binding hard.
+# Full windows (nested — one window and a subset of it):
+#   min   to 30.06 tr/WR/profit  ratios       to 26.08 tr/WR/profit  ratios
+#   1.3   885 73.7% +547.62R  88.9/204.0      1316 74.0% +818.08R  116.8/311.5  <- shipped
+#   1.4   836 72.7% +501.51R  67.1/166.8      1256 73.2% +762.24R  102.0/268.9
+#   1.5   819 73.2% +513.46R  71.5/178.2      1218 73.2% +762.17R  106.2/280.9  <- was
+# Re-tested on genuinely DISJOINT slices (--candles 4000, ends 15.06 and 26.08),
+# because two --end-date values at full depth are a window and a subset:
+#   min   early tr/WR/profit  prof/ulcer     late tr/WR/profit  prof/ulcer
+#   1.3   290 74.8% +206.76R    113.9        325 77.2% +248.78R    122.7
+#   1.4   259 71.8% +164.06R     70.4        317 76.0% +236.17R    116.4
+#   1.5   263 73.4% +172.87R     92.5        301 75.4% +224.69R    125.0
+# 1.3 wins on trades, profit AND win rate in BOTH disjoint slices (+19.6% and
+# +10.7% profit), with risk better in the early slice and flat in the late one.
+#
+# 🔑 The crypto desk lands on 1.4, not 1.3 — a different optimum, like every
+# other cross-desk port tried this session. Do not sync these two.
+#
+# ⚠️ 1.4 is a DIP here: worse than BOTH 1.5 and 1.3, in the nested windows and in
+# both disjoint slices. That is the signature of a second effect, and there is
+# one — the threshold also sets the score's +2 volume tier at
+# max(threshold*1.35, 2.0), which is 2.025 at 1.5 and 2.000 at both 1.4 and 1.3.
+# So the 1.5 -> 1.4 step moves the gate AND the tier; 1.4 -> 1.3 moves only the
+# gate. Neither this nor the crypto sweep is a clean gate test.
+SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
