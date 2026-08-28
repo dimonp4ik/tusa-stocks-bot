@@ -1465,15 +1465,23 @@ def main(argv: list[str] | None = None) -> int:
             )
             _ordered = sorted(gated, key=lambda t: (t.entry_time or 0, t.symbol))
             _rp = risk_profile([t.net_r for t in _ordered])
-            print(
-                f"   устойчивый риск: "
-                f"худшие окна {_rp['worst_windows']:.2f}R "
-                f"(прибыль/риск "
-                f"{g_net / _rp['worst_windows'] if _rp['worst_windows'] else 0:.1f})   "
-                f"ulcer {_rp['ulcer']:.2f} "
-                f"(прибыль/ulcer "
-                f"{g_net / _rp['ulcer'] if _rp['ulcer'] else 0:.1f})"
-            )
+            # worst_windows is the mean of the 5 most negative 25-trade sums,
+            # negated. On a book where even the WORST 25-trade stretch made
+            # money it therefore comes out NEGATIVE, and the ratio then prints
+            # as a large negative number that reads like a catastrophe while
+            # meaning the opposite. Seen for real on 2026-08-28 (-0.32R giving
+            # a ratio of -703.8) on ~300-trade slices. Say so instead.
+            _ww = _rp['worst_windows']
+            _ulc = (f"ulcer {_rp['ulcer']:.2f} (прибыль/ulcer "
+                    f"{g_net / _rp['ulcer']:.1f})" if _rp['ulcer'] > 0
+                    else "ulcer 0 (не применим)")
+            if _ww > 0:
+                print(f"   устойчивый риск: худшие окна {_ww:.2f}R "
+                      f"(прибыль/риск {g_net / _ww:.1f})   {_ulc}")
+            else:
+                print(f"   устойчивый риск: худшие окна НЕ ПРИМЕНИМЫ "
+                      f"(ни один отрезок из 25 сделок не убыточен; сырое {_ww:.2f})"
+                      f"   {_ulc}")
     print(f"Elapsed:       {wall_sec:.2f}s wall-clock")
 
     # Rejection funnel. Only meaningful with --serial: the workers have their
