@@ -641,7 +641,26 @@ LIVE_PRICE_MAX_DRIFT_PCT = float(os.getenv("LIVE_PRICE_MAX_DRIFT_PCT", "0.015"))
 # NOTE: with TP1_CLOSE_FRAC=0 nothing closes at TP1 — this level only decides
 # when the runner switches to the ATR trail, and the trail floors at breakeven.
 TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk * 1.0
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "2.0"))      # TP2 = entry ± risk * 2.0 (was 3.0 — unreachable)
+# 2026-08-28: 2.0 -> 3.0, same reasoning as the crypto desk and measured here.
+# With TP1_CLOSE_FRAC=0 and a 0.02 ATR trail, TP2 is not the exit — it is only a
+# CAP, and a near cap truncates the best trades.
+#            to 30.06 profit  ratios       to 26.08 profit  ratios    worst-win
+#   1.5R      +489.92R  46.9/152.5          +722.76R  69.2/239.3       10.45
+#   2.0R      +497.98R  54.8/157.2          +749.66R  82.4/253.4        9.10  <- was
+#   2.5R      +504.45R  64.6/171.4          +754.07R  96.5/270.7        7.81
+#   3.0R      +513.46R  71.5/178.2          +762.17R 106.2/280.9        7.18  <- shipped
+#   4.0R      +522.41R  72.7/182.2          +771.36R 107.4/281.8        7.18
+#
+# Unlike crypto, where TP2 could not move drawdown at all, here it moves it a
+# lot: worst-windows falls 9.10 -> 7.18 (-21%) and ulcer 2.96 -> 2.71. Bigger
+# wins offset losses inside the same bad stretch, and this book has a fatter
+# win tail than the crypto one. 4.0R buys more profit but Max DD rebounds to
+# -13.44R while the ratios stop improving, so 3.0 is the cut.
+#
+# ⚠️ These two columns are ONE window and a subset of it — this desk's history
+# starts Feb-Mar 2026. The independent evidence is the crypto bot's three
+# windows; this only confirms sign and size here.
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
