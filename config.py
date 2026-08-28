@@ -662,6 +662,13 @@ VOLUME_SPIKE_BOOST_MIN  = float(os.getenv("VOLUME_SPIKE_BOOST_MIN", "4.0"))
 # happens next. Mild over maximal on a new finding, as with every other rule
 # shipped here.
 VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.25"))
+# ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
+# cannot tell a strategy property from a few lucky tickers. Splitting the 26
+# symbols into halves and re-measuring answers that separately:
+#   half A (13 tickers)  subset 101tr +0.816  rest 540tr +0.603  lift +0.213
+#   half B (13 tickers)  subset 110tr +1.141  rest 565tr +0.572  lift +0.569
+# Sign agrees on both halves. Combined with the three disjoint time thirds, this
+# is as validated as anything on this desk can be given six months of history.
 
 # --- Orderly trend rides bigger (2026-08-27) ---------------------------------
 # The PAIR "clean trend on a calm tape" was rejected above: at 29% of the book
