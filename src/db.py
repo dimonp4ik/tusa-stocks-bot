@@ -31,8 +31,32 @@ PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL"
 
 
 def _conn():
-    c = sqlite3.connect(DB_PATH)
+    """One connection per call, in WAL with a generous busy timeout.
+
+    Nine scheduled jobs share this file — scan, position monitor, zone watch,
+    shadow tracker, sweeps, digests — and none of them catch
+    sqlite3.OperationalError. In the default rollback journal a writer blocks
+    readers outright, and the 5-second default timeout then raises rather than
+    waits: reproduced by holding a transaction for 7 seconds, at which point an
+    unrelated set_bot_state() dies with "database is locked". The job it belongs
+    to dies with it, and if that job is the position monitor, an open trade goes
+    a cycle unwatched.
+
+    WAL lets readers run while a writer works, which removes most of the
+    contention outright; the timeout covers what is left. Both are set per
+    connection — journal_mode is a property of the FILE and persists, the
+    pragma is idempotent.
+    """
+    c = sqlite3.connect(DB_PATH, timeout=30.0)
     c.row_factory = sqlite3.Row
+    try:
+        c.execute("PRAGMA journal_mode=WAL")
+        c.execute("PRAGMA busy_timeout=30000")
+        c.execute("PRAGMA synchronous=NORMAL")
+    except sqlite3.Error:
+        # A filesystem that cannot do WAL is still usable in the old mode —
+        # slower under contention, but nothing here should fail to open.
+        pass
     return c
 
 
