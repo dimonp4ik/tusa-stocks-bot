@@ -31,6 +31,7 @@ from config import (
     STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS, STOP_EXCHANGE_BACKSTOP_R,
     MTF_MIN_SCORE, TP1_R_MULT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
+    CLAUDE_GATE_ENABLED,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS,
@@ -268,6 +269,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  TP1_R_MULT={TP1_R_MULT}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
+        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if CLAUDE_GATE_ENABLED else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}")
 
         report = "\n".join(L)
@@ -3532,17 +3534,31 @@ def run_scan():
                 direction  = analysis.get("direction")
                 confidence = analysis.get("confidence", "LOW").upper()
 
-                # Guard: Claude must confirm setup direction, not flip it
+                # SHADOW MODE (CLAUDE_GATE_ENABLED=0): Claude still runs, is
+                # still scored and logged, but does not withhold anything — the
+                # rules filter alone decides. His verdict can then be scored
+                # against REAL fills instead of against shadow-simulated ones,
+                # which is the only way to settle whether he adds or subtracts.
+                _gate = CLAUDE_GATE_ENABLED
+
+                # Guard: Claude must confirm setup direction, not flip it.
+                # Kept even in shadow mode: a flipped side is not a weaker
+                # opinion, it is a contradiction, and trading it would test
+                # nothing about the filter.
                 if decision in ("LONG", "SHORT") and decision != direction:
                     log.warning(f"  Skip {analysis['symbol']} — Claude flipped side blocked")
                     continue
 
-                # Skip LOW confidence signals
                 if confidence == "LOW":
-                    log.info(f"  Skip {analysis['symbol']} — LOW confidence")
-                    continue
+                    if _gate:
+                        log.info(f"  Skip {analysis['symbol']} — LOW confidence")
+                        continue
+                    log.info(f"  [shadow] {analysis['symbol']} — LOW confidence, trading anyway")
 
-                if decision != "NO TRADE":
+                if decision == "NO TRADE" and not _gate:
+                    log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, trading anyway")
+
+                if decision != "NO TRADE" or not _gate:
                     # Both caps withhold a setup Claude APPROVED. Tag why, so it
                     # is not later counted as one of Claude's rejections and can
                     # be judged on its own outcome (get_cap_impact_stats).
@@ -4091,6 +4107,20 @@ def start_bot():
 
 start_bot()  # runs at module load — works with gunicorn
 
+def _warn_claude_shadow() -> None:
+    """Say loudly which role Claude is in — the book differs by ~25% of trades."""
+    if CLAUDE_GATE_ENABLED:
+        return
+    log.warning("=" * 70)
+    log.warning("CLAUDE_GATE_ENABLED=0 — Claude is in SHADOW.")
+    log.warning("  He is still called, scored and logged, but the rules filter")
+    log.warning("  alone decides what trades. Approval here runs ~80%, so expect")
+    log.warning("  about a quarter more trades than with him gating.")
+    log.warning("  Purpose: score his verdict against REAL fills. Turn the gate")
+    log.warning("  back on once that comparison has enough closed trades.")
+    log.warning("=" * 70)
+
+
 def _warn_stop_rule_coupling() -> None:
     """Shout if STOP_CLOSE_CONFIRM is off, because it silently changes TWO things.
 
@@ -4119,6 +4149,7 @@ def _warn_stop_rule_coupling() -> None:
 
 
 _warn_stop_rule_coupling()
+_warn_claude_shadow()
 
 
 if __name__ == "__main__":

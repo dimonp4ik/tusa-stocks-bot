@@ -621,6 +621,27 @@ CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "9"))    # l
 CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "5")) # max HEAVY checks per scan
 CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # recent outcomes per coin (HEAVY)
 CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
+
+# Claude as a GATE, or as an observer. 1 = his verdict withholds setups (the
+# behaviour this bot has always had). 0 = SHADOW MODE: he is still called, still
+# scored, still logged, but the rules filter alone decides what trades.
+#
+# Why this switch exists. backtest.py never calls Claude, so its figures ARE the
+# rules-only book: 75.6% win rate on the current window once the live entry slip
+# is modelled honestly. Live, with Claude gating, the book wins 52.9%. The gap
+# is 23 points and Claude is the largest untested difference between the two.
+#
+# It could not be settled from the logs. Comparing his approvals against his
+# rejections needs the rejections' outcomes, and those come from the shadow
+# tracker — which until 2026-08-29 ran a different exit policy than the bot and
+# inflated unsent setups (TP2 share 51.4% against 6.9% for sent). Shadow mode
+# removes the need for that comparison entirely: every rule-passing setup is
+# really traded, so his verdict can be scored against real fills.
+#
+# Approval rate here is 80%, so trading rules-only adds about a quarter more
+# trades — a modest step. On the crypto desk it is 52%, which would nearly
+# double that book, so this stays OFF there until this one reports.
+CLAUDE_GATE_ENABLED = os.getenv("CLAUDE_GATE_ENABLED", "1") != "0"
 CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
 CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
