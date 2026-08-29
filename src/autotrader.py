@@ -33,6 +33,7 @@ from config import (
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
+    VOLUME_SPIKE_SIZE_MULT, VOLUME_SPIKE_BOOST_MIN, OFF_SESSION_SIZE_MULT,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     SIZE_MULT_MAX,
     TELEGRAM_TOKEN,
@@ -237,6 +238,22 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 _size_mult *= float(OPEN_SESSION_SIZE_MULT)
         except (TypeError, ValueError):
             pass
+    # Volume spike and OFF session — added 2026-08-29 to close a real gap: the
+    # backtest applied both and this function did not, so a size rule could be
+    # "shipped", measured, and never reach a live order. That is exactly what
+    # happened to the volume-spike boost on 2026-08-28. Both multipliers are 1.0
+    # today, so nothing changes now; the point is that the two paths can no
+    # longer drift apart silently. Missing fields fail toward NO boost, matching
+    # the backtest's _fld() substitutes.
+    if VOLUME_SPIKE_SIZE_MULT != 1.0:
+        try:
+            _vr = sig.get("volume_ratio")
+            if _vr is not None and float(_vr) >= VOLUME_SPIKE_BOOST_MIN:
+                _size_mult *= float(VOLUME_SPIKE_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
+    if OFF_SESSION_SIZE_MULT != 1.0 and str(sig.get("session") or "") == "OFF":
+        _size_mult *= float(OFF_SESSION_SIZE_MULT)
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.
     _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
