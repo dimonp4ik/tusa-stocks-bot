@@ -250,10 +250,24 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         "ordType":       "oco",
         "reduceOnly":    "true",
         "closeFraction": "1",
-        "slTriggerPx":   _fmt_px(sl_px),
-        "slOrdPx":       "-1",     # market on trigger
-        "tpTriggerPx":   _fmt_px(tp_px),
-        "tpOrdPx":       "-1",
+        "slTriggerPx":     _fmt_px(sl_px),
+        # Pin WHICH price triggers the stop. Left unset until 2026-08-29, so it
+        # was whatever OKX happened to default to — an unchosen parameter on a
+        # real-money path. "last" is the instrument's own traded price, which is
+        # exactly what the candles the backtest runs on are built from, so live
+        # and model now agree by construction.
+        #
+        # This may also be part of an open puzzle: the live stop rate runs far
+        # above the modelled one even after modelling touch-triggered stops. A
+        # mark-price trigger would explain the excess — mark is derived from the
+        # index, so it can reach a level the perp itself never traded, firing a
+        # stop that leaves no trace in the candles. Pinning "last" removes that
+        # possibility. If the rate stays high, the cause is elsewhere.
+        "slTriggerPxType": "last",
+        "slOrdPx":         "-1",     # market on trigger
+        "tpTriggerPx":     _fmt_px(tp_px),
+        "tpTriggerPxType": "last",
+        "tpOrdPx":         "-1",
     })
     if not ok:
         return False, data
