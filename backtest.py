@@ -748,8 +748,16 @@ def simulate_trade_direct(
         execution_delay_bars,
         adverse_entry_bps,
     )
+    # Levels are computed at SCAN time live and stored on the signal; the market
+    # order then fills wherever it fills. So an adverse fill must NOT drag the
+    # targets with it — doing that keeps R constant and pushes TP1 further away,
+    # which is not what the account experiences. BT_ADVERSE_KEEP_LEVELS=1 anchors
+    # tp/sl to the PLANNED entry and lets only the fill move, matching live.
+    # Default 0 preserves the old behaviour so existing figures still reproduce.
+    _lvl_src = (planned_entry
+                if os.getenv("BT_ADVERSE_KEEP_LEVELS", "0") == "1" else entry)
     tp1, tp2, sl = calculate_tp_sl_local(
-        entry,
+        _lvl_src,
         direction,
         atr=setup.get("atr", 0.0),
         recent_high=setup.get("recent_high", 0.0),
@@ -1178,6 +1186,40 @@ def backtest_symbol(
             max_history=int(_mh) if _mh else None,
         )
         setup["_knn_score"] = -1.0 if knn is None else knn
+
+        # Zone-wait entry, ported from the crypto desk 2026-08-29 to measure the
+        # single largest divergence on this book. This bot enters at MARKET the
+        # moment a setup fires, and the live fill lands a median 0.374% of price
+        # WORSE than the zone midpoint — a quarter of the way to the stop, given
+        # away before the trade starts. Fed back through --adverse-entry-bps that
+        # one number reproduces the live book (58.3% WR / 40.8% stops against
+        # live 52.9% / 43.9%), and it costs 88% of modelled profit.
+        #
+        # The crypto bot instead waits for price to come BACK to the zone and
+        # enters there. This models that: aim at a point in the zone
+        # (BT_ZONE_DEPTH 0.0 = near edge, 0.5 = midpoint), require price to
+        # actually trade there within BT_ZONE_WAIT_BARS, and DROP the setup
+        # otherwise — an unfilled limit is not a trade.
+        # Default -1 = off, so this changes nothing until measured.
+        _zdepth = float(os.getenv("BT_ZONE_DEPTH", "-1") or -1)
+        _zwait = int(os.getenv("BT_ZONE_WAIT_BARS", "6") or 0)
+        if _zdepth >= 0.0:
+            _lo_z = float(setup.get("entry_low") or 0)
+            _hi_z = float(setup.get("entry_high") or 0)
+            if not (_hi_z > _lo_z > 0):
+                continue
+            _target = (_hi_z - (_hi_z - _lo_z) * _zdepth
+                       if setup["direction"] == "LONG"
+                       else _lo_z + (_hi_z - _lo_z) * _zdepth)
+            _hit = None
+            for _j in range(i, min(i + max(1, _zwait), len(c15["low"]))):
+                if float(c15["low"][_j]) <= _target <= float(c15["high"][_j]):
+                    _hit = _j
+                    break
+            if _hit is None:
+                continue          # price never came back — no trade
+            setup = dict(setup, current_price=_target)
+            i = _hit
 
         trade = simulate_trade_direct(
             symbol,
