@@ -324,6 +324,28 @@ VOL_REGIME_LOOKBACK = int(os.getenv("VOL_REGIME_LOOKBACK", "50"))
 # DROPPED (default off): each lowered win rate (37.5% → 35.0%) and Expected R
 # (+0.12R → +0.03R). Strong-BOS pushed entries late (momentum spent → SL);
 # structural-only cut valid reversals. Flags kept for experimentation.
+# Re-tested 2026-08-29 on five windows, because the verdict above was reached on
+# a bot winning 37.5%. It holds — all three stay off, though for new reasons.
+#
+# REQUIRE_STRONG_BOS: total profit -2.7% and 51 fewer trades. It wins three
+# windows narrowly (+1.4/+1.3/+3.9%) and loses two badly, 07-15 worst at -13.2%
+# profit with the worst-windows ratio 59.3 -> 21.3.
+#   window   off                    on
+#   04-10   199tr +158.92R u53.6    193tr +161.10R u56.5
+#   05-07   213tr +151.80R u61.1    201tr +153.79R u67.4
+#   06-05   236tr +185.36R u125.1   221tr +170.20R u115.0
+#   07-15   237tr +141.99R u59.3    219tr +123.31R u38.0
+#   08-26   250tr +179.24R u72.7    250tr +186.15R u85.8
+#
+# REQUIRE_STRONG_CONFIRM: INERT. Turning it on reproduces the base book to the
+# last decimal in every window — not a knob that failed to reach, but a gate
+# that cannot fire. It demands one of FVG/OB/LiqSweep/ChoCH among confirmations,
+# and _select_entry_zone already requires an FVG or an OB to exist before a
+# setup can have an entry zone at all. Same shape as the crypto desk's dead
+# confirmations gate. Leaving it wired but noting it decides nothing.
+#
+# REQUIRE_STRICT_HTF: clearly bad, -21 to -26% profit across the three windows
+# measured, on 20-25% fewer trades. Cutting counter-trend still cuts winners.
 REQUIRE_STRONG_BOS = os.getenv("REQUIRE_STRONG_BOS", "0") != "0"
 STRONG_BOS_VOL_MULT = float(os.getenv("STRONG_BOS_VOL_MULT", "1.3"))  # x SMC_BOS_MIN_VOLUME
 REQUIRE_STRONG_CONFIRM  = os.getenv("REQUIRE_STRONG_CONFIRM", "0") != "0"
