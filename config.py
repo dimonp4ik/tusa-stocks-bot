@@ -717,6 +717,11 @@ OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volum
 # that IF the rule is right, more is better. A larger multiplier is a larger
 # bet on the same uncertain claim, which is exactly the reason 1.5 was chosen
 # in the first place.
+# Re-checked on five windows 2026-08-29 and this one EARNS its keep, unlike the
+# orderly boost above. Removing it costs profit in all five (-2.3 to -4.2%) AND
+# worsens the ulcer ratio in four of five, so the size is being paid for rather
+# than merely levered. The subset is small (3-10% of the book, the right band)
+# and above book in three of five windows.
 OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
 # Research handle, default 1.0 = no change. Live data 2026-08-28 showed the
 # whole live/backtest gap on this desk sits in OFF-session stops filling BEYOND
@@ -823,6 +828,26 @@ ORDERLY_EXT_MIN   = float(os.getenv("ORDERLY_EXT_MIN", "1.271"))
 # measured that way is the largest available bet on the weakest available
 # evidence. 1.5 also holds the smallest max drawdown, and drawdown is what
 # limits how large the book can be carried at all.
+# 2026-08-29 re-checked on FIVE windows at unit size, and the honest answer is
+# that this is a LEVERAGE dial, not an edge. The subset does not beat the book:
+#   window  subset            rest      gap
+#   04-10   43tr  +0.215     +0.730   -0.515   BELOW
+#   05-07   35tr  +1.032     +0.434   +0.597
+#   06-05   22tr  +0.630     +0.647   -0.017   BELOW
+#   07-15   28tr  +0.702     +0.470   +0.232
+#   08-26   41tr  +0.654     +0.696   -0.042   BELOW
+# Below book in three of five, and pooled that is 169 trades at +0.625 against
+# +0.593 — a gap of +0.032 with a standard error near 0.10. Indistinguishable
+# from zero. An earlier three-window read looked uniformly positive, but the
+# gaps there were +0.03 and the two windows added since break the pattern.
+#
+# KEPT AT 1.5 ANYWAY. Removing it costs profit in all five windows (-4.1/-14.6/
+# -4.9/-7.9/-7.2%) while the ratios split two better, three worse, and absolute
+# ulcer barely moves. So it is not free size — it is size on a slice with book-
+# average edge, which is what leverage is. Raising or lowering it is the account
+# owner's call, the same class as SIZE_MULT_MAX and TP1_R_MULT; 1.25 sits
+# monotonically between 1.0 and 1.5 on every measure, so there is no peak to
+# find. Recorded here so the decision is made on the true picture.
 ORDERLY_SIZE_MULT = float(os.getenv("ORDERLY_SIZE_MULT", "1.5"))
 
 # --- Ceiling on the stacked product (2026-08-27) -----------------------------
