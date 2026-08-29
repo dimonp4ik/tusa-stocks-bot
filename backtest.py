@@ -929,8 +929,14 @@ def simulate_trade_direct(
     # Orderly trend rides bigger — see ORDERLY_SIZE_MULT in config.py.
     if ORDERLY_SIZE_MULT != 1.0:
         try:
-            if (float(setup.get("eff_ratio") or 0.0) >= ORDERLY_EFF_MIN
-                    and float(setup.get("vol_atr_pct") or 99.0) < ORDERLY_ATR_MAX
+            # All three read through _fld: `x or default` swallows a legitimate
+            # zero, and eff_ratio genuinely CAN be zero (price ending exactly
+            # where it started is perfect chop). Behaviour is unchanged on real
+            # data — a zero vol_atr_pct needs three consecutive bars of zero
+            # range — but the mixed styles in one condition are how this bug
+            # class gets copied to a place where zeros do occur.
+            if (_fld(setup, "eff_ratio", 0.0) >= ORDERLY_EFF_MIN
+                    and _fld(setup, "vol_atr_pct", 99.0) < ORDERLY_ATR_MAX
                     and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
                 _sm = float(ORDERLY_SIZE_MULT)
                 gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm; _size_mult *= _sm
