@@ -47,3 +47,9 @@ sweep_*.log
 seed_regen.log
 seed_tp10.log
 src_compare.log
+
+# Backtest trade exports — regenerate with --export-trades, never commit
+raw_*.csv
+unit_*.csv
+uh_*.csv
+pk_*.csv

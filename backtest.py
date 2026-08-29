@@ -661,6 +661,9 @@ class TradeRecord:
     adaptive_pack: str = ""
     adaptive_reason: str = ""
     risk_mult: float = 1.0
+    # Total applied size multiplier. net_r is already multiplied by this, so any
+    # subset comparison must divide it back out first — see tools_sizing.py.
+    size_mult: float = 1.0
     quality_score: float = 0.0
     trend_score: int = 0
     volatility_score: int = 0
@@ -905,10 +908,17 @@ def simulate_trade_direct(
     # Fresh-break trim — see EXTENSION_FRESH_THRESHOLD in config.py. Entering
     # right at the break, before anything confirms it, is this bot's worst
     # bucket (53.2% WR against a 63.6% book).
+    # _size_mult is the TOTAL applied size, recorded so the export can carry it.
+    # Without it net_r cannot be divided back to unit R, and every subset
+    # analysis silently credits a rule with whatever boosts it overlaps — which
+    # is exactly how the volume-spike boost passed two validations it should
+    # have failed. _stack below stays as it was because the ceiling has always
+    # been applied to the BOOSTS only.
+    _size_mult = 1.0
     try:
         if _fld(setup, "bos_extension_atr", 99.0) <= EXTENSION_FRESH_THRESHOLD:
             _fm = float(EXTENSION_FRESH_SIZE_MULT)
-            gross_r *= _fm; net_r *= _fm; cost_r *= _fm
+            gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _size_mult *= _fm
     except (TypeError, ValueError):
         pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Applied
@@ -922,7 +932,7 @@ def simulate_trade_direct(
                     and float(setup.get("vol_atr_pct") or 99.0) < ORDERLY_ATR_MAX
                     and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
                 _sm = float(ORDERLY_SIZE_MULT)
-                gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm
+                gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm; _size_mult *= _sm
         except (TypeError, ValueError):
             pass
     # Volume spike rides bigger — see VOLUME_SPIKE_BOOST_MIN in config.py.
@@ -930,13 +940,13 @@ def simulate_trade_direct(
         try:
             if _fld(setup, "volume_ratio", 0.0) >= VOLUME_SPIKE_BOOST_MIN:
                 _vm = float(VOLUME_SPIKE_SIZE_MULT)
-                gross_r *= _vm; net_r *= _vm; cost_r *= _vm; _stack *= _vm
+                gross_r *= _vm; net_r *= _vm; cost_r *= _vm; _stack *= _vm; _size_mult *= _vm
         except (TypeError, ValueError):
             pass
     # OFF session rides smaller — see OFF_SESSION_SIZE_MULT in config.py.
     if OFF_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OFF":
         _fm = float(OFF_SESSION_SIZE_MULT)
-        gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _stack *= _fm
+        gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _stack *= _fm; _size_mult *= _fm
     # Opening bell rides bigger — see OPEN_SESSION_SIZE_MULT in config.py.
     if OPEN_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OPEN":
         try:
@@ -945,11 +955,11 @@ def simulate_trade_direct(
             _vok = False
         if _vok:
             _om = float(OPEN_SESSION_SIZE_MULT)
-            gross_r *= _om; net_r *= _om; cost_r *= _om; _stack *= _om
+            gross_r *= _om; net_r *= _om; cost_r *= _om; _stack *= _om; _size_mult *= _om
 
     if _stack > SIZE_MULT_MAX:
         _fix = SIZE_MULT_MAX / _stack
-        gross_r *= _fix; net_r *= _fix; cost_r *= _fix
+        gross_r *= _fix; net_r *= _fix; cost_r *= _fix; _size_mult *= _fix
 
     return TradeRecord(
         symbol=symbol,
@@ -975,6 +985,7 @@ def simulate_trade_direct(
         adaptive_pack=str(setup.get("adaptive_pack", "") or ""),
         adaptive_reason=str(setup.get("adaptive_reason", "") or ""),
         risk_mult=float(setup.get("risk_mult", 1.0) or 1.0),
+        size_mult=_size_mult,
         quality_score=float(setup.get("quality_score", 0.0) or 0.0),
         trend_score=int(setup.get("trend_score", 0) or 0),
         volatility_score=int(setup.get("volatility_score", 0) or 0),
@@ -1380,7 +1391,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "direction", "outcome", "entry", "tp1", "tp2", "sl",
         "gross_r", "net_r", "cost_r", "mtf_score", "volume_ratio",
         "rsi", "eff_ratio", "vol_atr_pct", "vol_ratio_regime",
-        "adaptive_pack", "adaptive_reason", "risk_mult",
+        "adaptive_pack", "adaptive_reason", "risk_mult", "size_mult",
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",

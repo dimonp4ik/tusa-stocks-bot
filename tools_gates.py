@@ -159,6 +159,8 @@ def main() -> int:
     ap.add_argument("--kill", type=int, default=3)
     ap.add_argument("--lookahead", action="store_true")
     ap.add_argument("--grid", action="store_true", help="Sweep every capacity gate.")
+    ap.add_argument("--out", default=None,
+                    help="Write the honestly-gated book to CSV, for the analysis tools.")
     a = ap.parse_args()
 
     with open(a.csv, newline="", encoding="utf-8") as fh:
@@ -167,6 +169,17 @@ def main() -> int:
         print("АВАРИЯ: выгрузка пуста")
         return 1
     print(f"сырых сделок: {len(rows)}")
+
+    if a.out:
+        kept = apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
+                           per_dir=a.per_dir, kill=a.kill, lookahead=a.lookahead)
+        with open(a.out, "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            w.writerows(kept)
+        report("записано", kept)
+        print(f"-> {a.out}")
+        return 0
 
     if not a.grid:
         report("подглядка",

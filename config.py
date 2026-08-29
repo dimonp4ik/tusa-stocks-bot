@@ -550,7 +550,29 @@ RISK_SIZE_MULT_MIN     = float(os.getenv("RISK_SIZE_MULT_MIN", "0.45"))
 # Equal-risk, both halves, six of eight tested cells pass: 0.71/x0.75 = +13.5%,
 # 0.71/x0.5 = +29%. Mild chosen over maximal, as in the crypto bot.
 EXTENSION_FRESH_THRESHOLD = float(os.getenv("EXTENSION_FRESH_THRESHOLD", "0.7"))
-EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "0.75"))
+# 0.75 -> 1.0 on 2026-08-29. This trim was a fossil: it was fitted on a book
+# that no longer exists, and on the current one it was cutting size on BETTER
+# trades than average.
+#
+# The justification above claims the fresh-break bucket wins 53.2% against a
+# 63.6% book. Re-measured at unit size on honestly-gated books, neither number
+# reproduces — and note the BOOK is 73.2%, not 63.6%, which dates the fitting to
+# before the entry-cost and execution-model fixes:
+#   third   subset            rest              unit R gap
+#   06-05   48tr  WR 72.9%    144tr  WR 74.3%   +0.300
+#   07-15   57tr  WR 77.2%    168tr  WR 72.0%   +0.145
+#   08-26   55tr  WR 76.4%    170tr  WR 73.5%   -0.033
+#   pooled  160tr WR 75.6%    482tr  WR 73.2%
+# Removing it improves profit AND both risk ratios in all three thirds, which is
+# the opposite of the leverage signature:
+#   third   net R             worst ratio      ulcer ratio
+#   06-05   +124.17 -> +134.15      -           62.3 -> 63.0
+#   07-15   +109.44 -> +117.66  13.4 -> 14.3    34.8 -> 36.0
+#   08-26   +155.38 -> +163.97  50.4 -> 65.6    52.0 -> 54.6
+# The other two multipliers were re-checked the same way and both KEEP: removing
+# orderly costs 5.8-9.5% of profit and removing open_session 3.5-5.8%, with
+# ratios mixed rather than better.
+EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "1.0"))
 
 # --- Opening-bell session rides bigger (2026-08-26) --------------------------
 # This bot had no session multiplier at all. Split by session:
@@ -661,7 +683,31 @@ VOLUME_SPIKE_BOOST_MIN  = float(os.getenv("VOLUME_SPIKE_BOOST_MIN", "4.0"))
 # ulcer ratio (76.9 vs 77.4), which is the third that matters most for what
 # happens next. Mild over maximal on a new finding, as with every other rule
 # shipped here.
-VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.25"))
+# 1.25 -> 1.0 on 2026-08-29. ROLLED BACK the day after shipping, and the reason
+# is worth more than the rule was.
+#
+# Both validations that passed it were reading net_r straight out of the export,
+# and this export carries NO size_mult column — every multiplier is already
+# folded into net_r with no way to divide it back out. The spike subset overlaps
+# the orderly and open-session boosts, so it was being credited with their 1.5x.
+# Re-exported with every size multiplier forced to 1.0 and gated honestly, the
+# subset stops looking special:
+#   third   subset          rest            gap
+#   06-05   25tr  +0.424    167tr  +0.670   -0.246   BELOW book
+#   07-15   24tr  +0.809    201tr  +0.425   +0.384
+#   08-26   36tr  +0.739    189tr  +0.610   +0.130
+# Pooled that is 85 trades at +0.666 against +0.561, a gap of +0.105 with a
+# standard error near 0.15 — indistinguishable from zero, and carried by one
+# third. The symbol hold-out, the test that could settle it, comes back
+# UNDERPOWERED at this book size (55 and 53 subset trades against the 60 it
+# needs), which is not a negative answer but is not a positive one either.
+#
+# The book-level figures do improve in all three thirds (+3.0/+4.5/+5.2% profit)
+# and that is what kept it alive for a day. But boosting ANY profitable slice
+# adds profit mechanically; the ratios moved 1-4%, inside noise for a 200-trade
+# third. Edge has to show up as the slice beating the book, and it does not.
+# Removing an unjustified boost is the safe direction — see the sizing rules.
+VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.0"))
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
 # cannot tell a strategy property from a few lucky tickers. Splitting the 26
 # symbols into halves and re-measuring answers that separately:
