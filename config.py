@@ -354,6 +354,21 @@ DAILY_TREND_SHORT_FILTER = os.getenv("DAILY_TREND_SHORT_FILTER", "1") != "0"
 #    cutting 32% junk trades. First filter to beat baseline on every axis.
 EFF_RATIO_FILTER   = os.getenv("EFF_RATIO_FILTER", "1") != "0"
 EFF_RATIO_LOOKBACK = int(os.getenv("EFF_RATIO_LOOKBACK", "20"))
+# Re-swept 2026-08-29 on five windows because the justification above is a
+# fossil (430 trades at 36.7% win rate, against today's ~74%) and because the
+# crypto desk moved this same parameter 0.15 -> 0.12 the same night. Here it
+# does NOT move — 0.15 is already the optimum:
+#   thr    04-10     05-07     06-05     07-15     08-26     total
+#   0.15  +150.33   +144.84   +163.16   +140.26   +172.55   +771.14  <- kept
+#   0.12  +157.89   +144.65   +157.59   +135.91   +167.07   +763.11
+#   0.10  +146.09   +154.10   +161.14   +135.72   +172.20   +769.25
+# Each threshold wins a window or two and loses the rest; the totals sit within
+# 1% of each other. Turning it OFF is different and clearly bad: the earliest
+# window goes from no losing 25-trade stretch at all to 12.80R of worst-windows,
+# with profit down 17%. The chop protection is doing real work on this book even
+# though its original numbers describe a different bot.
+#
+# Sixth parameter this session where the two desks disagree. Crypto wants 0.12.
 EFF_RATIO_MIN      = float(os.getenv("EFF_RATIO_MIN", "0.15"))
 # Premium/Discount structure gate — "discount" only counts as a buy signal inside
 # a bullish/neutral dealing range, "premium" only inside a bearish/neutral one. In
@@ -388,6 +403,12 @@ BEAR_TREND_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("BEAR_TREND_SKIP
 # A/B backtest, on top of bear-trend guard, same 20 symbols × 8640×15m:
 #   guard:    2344tr  39.6% WR  +0.150R/tr  DD -47.36R
 #   +RSI mid: 2117tr  40.1% WR  +0.175R/tr  DD -37.38R  (+17% R/tr, -21% DD)
+# Re-tested 2026-08-29 (its justification is a fossil too — 2646 trades at 38.1%
+# win rate). It is now close to inert: switching it OFF moves profit +1.3/+1.3/
+# +1.2% across 04-10/06-05/08-26 and adds 4/14/-1 trades, with the ulcer ratio
+# better in one window and worse in two. Inside the band that does not earn a
+# change either way, so it stays on — but it is no longer earning its place and
+# should be re-checked if the book changes again.
 DIRECTIONAL_RSI_MIDLINE_FILTER = os.getenv("DIRECTIONAL_RSI_MIDLINE_FILTER", "1") != "0"
 RSI_LONG_MIN_MIDLINE           = float(os.getenv("RSI_LONG_MIN_MIDLINE", "42"))  # lowered 50→42: catches zone entry earlier, same WR/R (+3 trades, +4R on 8640-bar test)
 RSI_SHORT_MAX_MIDLINE          = float(os.getenv("RSI_SHORT_MAX_MIDLINE", "40"))
