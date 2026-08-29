@@ -392,7 +392,29 @@ REQUIRE_STRICT_HTF = os.getenv("REQUIRE_STRICT_HTF", "0") != "0"
 #   guard: 2344tr  39.6% WR  +0.150R/tr  DD -47.36R  (+27% R/tr, -31% DD)
 # Volume-part of the guard transfers (crowded shorts get squeezed in stocks
 # too); the LONDON-session skip was crypto-clock specific → no session skip.
-BEAR_TREND_HOT_VOL_GUARD     = os.getenv("BEAR_TREND_HOT_VOL_GUARD", "1") != "0"
+# ON -> OFF on 2026-08-29. Two independent reasons, and they agree.
+#
+# The mechanism above is stated in crypto terms: market-makers squeezing crowded
+# late shorts, with a LONDON-session clause. US equities do not have that
+# microstructure, and this session has now watched six parameters refuse to port
+# between the two desks. Its numbers are a fossil besides — 2646 trades at 38.1%
+# win rate, against this book's ~74%.
+#
+# Measured on all five windows:
+#   window   guard ON               guard OFF
+#   04-10   189tr +150.33R  u62.7   199tr +158.92R  u53.6
+#   05-07   202tr +144.84R  u60.8   213tr +151.80R  u61.1
+#   06-05   217tr +163.16R  u102.7  236tr +185.36R  u125.1
+#   07-15   232tr +140.26R  u61.6   237tr +141.99R  u59.3
+#   08-26   243tr +172.55R  u63.5   250tr +179.24R  u72.7
+# Profit and trade count rise in EVERY window (+6.0% and +52 trades in total),
+# with the ulcer ratio better in three of five. The two windows where it slips
+# are the two smallest moves in the table; 04-10 also goes from having no losing
+# 25-trade stretch to a 1.92R one, which is real but tiny against 158.92R.
+#
+# This is a setup filter built on a story, not a risk rail — removing it does not
+# widen any position. BEAR_TREND_SKIP_SESSIONS was already empty and inert.
+BEAR_TREND_HOT_VOL_GUARD     = os.getenv("BEAR_TREND_HOT_VOL_GUARD", "0") != "0"
 BEAR_TREND_HOT_VOL_MIN_RATIO = float(os.getenv("BEAR_TREND_HOT_VOL_MIN_RATIO", "2.5"))
 BEAR_TREND_SKIP_SESSIONS     = set(_parse_symbol_list(os.getenv("BEAR_TREND_SKIP_SESSIONS", "")))
 
