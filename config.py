@@ -155,7 +155,23 @@ TRADE_WEEKENDS      = False
 # because "the bot is blind" assumes little about the market. That is wrong.
 # What counts as a meaningful gap is a property of the instrument, and stock
 # perps gap differently from alt perps. Measure every port.
-SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
+# 5 -> 4 on 2026-08-29. The test above ran on two slices, on a book selected by
+# a kill-switch replay that peeked at future outcomes, and it came back
+# ambiguous ("the two disagree"). Re-run on all FIVE windows of available
+# history against the honest book:
+#   swing    04-10     05-07     06-05     07-15     08-26    total
+#     5    +112.85   +123.28   +140.26   +124.84   +185.13   +686.36
+#     4    +131.90   +127.24   +152.99   +138.09   +170.78   +721.00
+#     3    +130.56   +127.55   +165.63   +193.26   +127.20   +744.20
+# Per window the story is monotone and clean: four windows want it SHORTER, one
+# wants it longer — and that one is the most recent. 3 earns the most in total
+# but gives up 31% in that latest window; 4 beats the old 5 on profit AND win
+# rate in four of five with a worst case of -7.7%. Taking the value that never
+# loses much rather than the one with the highest sum.
+#
+# Note the crypto desk sits at 3. Two desks, same parameter, different answers —
+# the fifth time a VALUE has refused to port while features and tools port fine.
+SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "4"))
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 # Minimum 3-candle impulse that qualifies an order block, as a fraction of
