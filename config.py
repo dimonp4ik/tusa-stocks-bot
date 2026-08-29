@@ -291,7 +291,22 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.006"))  # within
 # --- Multi-timeframe score gate (max ~15) ---
 # 2026-06-11 A/B (20 sym, 2880+5760×15m, trail): scores 12-13 = WR ~20%, -6.3R.
 # Raising 10→14 cut those: WR 48.9→50.7%, R/tr +17%, DD -25% on both windows.
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "14"))
+# 14 -> 13 on 2026-08-29. The justification above is a fossil: it was measured
+# 2026-06-11 on a bot whose win rate was 48.9%, against today's ~74%, so the
+# "scores 12-13 = WR ~20%" bucket it was protecting against no longer exists.
+# Re-swept on all five windows:
+#   min    04-10     05-07     06-05     07-15     08-26    total  trades
+#    14  +131.90   +127.24   +152.99   +138.09   +170.78  +721.00   1031
+#    13  +150.33   +144.84   +163.16   +140.26   +172.55  +771.14   1083
+#    12  +152.55   +145.13   +169.53   +144.49   +173.42  +785.12   1101
+# 13 raises profit, trade count AND the ulcer ratio in EVERY window; win rate
+# rises in three and slips 0.7-0.9pp in two. 12 earns a little more again but
+# halves the worst-windows ratio in 07-15 (62.7 -> 33.9), so the gain there is
+# bought with drawdown rather than earned.
+#
+# The crypto desk also sits at 13 — the first parameter this session where the
+# two desks agree, and worth noting precisely because four others did not.
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "13"))
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # №1 Volatility regime — DEFAULT ON after re-test 2026-06-05 on full context
