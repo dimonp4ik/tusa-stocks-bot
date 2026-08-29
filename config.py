@@ -179,6 +179,34 @@ SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 # loses wins — and it is the smaller move away from a number this desk never
 # chose in the first place.
 SMC_OB_MIN_IMPULSE = float(os.getenv("SMC_OB_MIN_IMPULSE", "0.004"))
+
+# Zone-acceptance tolerances, as fractions of price. Readable from the
+# environment since 2026-08-29; they were plain literals inherited from the
+# crypto fork, and they are the parameters that decide whether price counts as
+# "at" a zone at all. NEAR is how far PAST the zone still counts, APPROACH is
+# how far SHORT of it counts. The approach tolerance on gaps was 1% of price —
+# about 2.5 ATR on a 15m equity bar, so a gap was being accepted while price
+# was still a long way from it. Same numbers make sense on crypto, where an ATR
+# is several times wider.
+SMC_FVG_NEAR_TOL     = float(os.getenv("SMC_FVG_NEAR_TOL", "0.001"))
+SMC_FVG_APPROACH_TOL = float(os.getenv("SMC_FVG_APPROACH_TOL", "0.01"))
+SMC_OB_NEAR_TOL      = float(os.getenv("SMC_OB_NEAR_TOL", "0.002"))
+# 0.005 -> 0.008 on 2026-08-29, measured on five windows. The ulcer ratio
+# improves in ALL FIVE while profit holds — risk falling at constant profit is
+# the opposite of the leverage signature, and it is the change the account
+# actually wanted.
+#   window   0.005 net / ulcer-ratio      0.008 net / ulcer-ratio
+#   04-10     +97.94  32.9                +112.85  34.6
+#   05-07    +117.72  39.5                +123.28  53.9   (no losing 25-stretch)
+#   06-05    +140.90  67.2                +140.26  78.3
+#   07-15    +129.72  40.5                +124.84  53.3   (worst ratio 20.2->38.7)
+#   08-26    +166.99  50.7                +185.13  61.8   (worst ratio 38.0->125.2)
+# Swept past it too: beyond 0.008 the trade count falls away (238/229/216/197 in
+# the last window) and profit goes with it, so this is a peak and not a slope.
+# Tightening loses on every measure. The FVG approach tolerance was swept the
+# same way in both directions and KEEPS 0.01 — tightening it to 0.004 costs a
+# third of the profit, so the wide tolerance there is doing real work.
+SMC_OB_APPROACH_TOL  = float(os.getenv("SMC_OB_APPROACH_TOL", "0.008"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # 2026-08-28: 1.5 -> 1.3. Undocumented and never swept, and binding hard.
 # Full windows (nested — one window and a subset of it):
