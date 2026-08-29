@@ -1231,6 +1231,36 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 # Validated on the GATED book in both halves: +46% and +10%, win rate up in
 # both (54.7->58.1, 54.1->59.5). The ungated export disagreed on the first
 # half; it describes 2414 trades production never takes.
+# ⚠️ 2026-08-29: this flag describes the position MONITOR, and for an
+# AUTOTRADING account the monitor is not what closes the trade. src/okx_trader.py
+# places a reduce-only OCO algo on the exchange with slTriggerPx at the stop and
+# slOrdPx "-1" (market on trigger), so the exchange flattens the position the
+# moment price TOUCHES the level — no closed candle required. The monitor only
+# handles "whatever the exchange algo hasn't closed yet", as that module's own
+# docstring says.
+#
+# So the backtest, at STOP_CLOSE_CONFIRM=1, is modelling a bot that exists only
+# for signal-only users. The honest figures for an autotrading account are the
+# touch ones, and they are worse:
+#   window   close-confirmed        touch (exchange)
+#   04-10   199tr +158.92R WR75.9   200tr +155.93R WR73.5
+#   05-07   213tr +151.80R WR71.4   216tr +134.80R WR64.4
+#   06-05   236tr +185.36R WR75.4   237tr +161.67R WR70.0
+#   07-15   237tr +141.99R WR73.0   237tr +143.85R WR70.5
+#   08-26   250tr +179.24R WR75.2   246tr +159.27R WR69.9
+# -7.6% profit in total and 2.4-7.0pp of win rate, with the modelled stop rate
+# going 24.4% -> 29.7%.
+#
+# NOT flipped, deliberately: this same flag drives the live monitor, where
+# close-confirmation is the real and correct behaviour for anyone trading the
+# signals by hand. Flipping it would make their exits worse to make one report
+# honest. The account owner should decide which population the default serves.
+#
+# Note this does NOT close the live gap on its own: live is 60% stops (24 of 40
+# closed, week of 2026-08-21) and touch semantics only reach 29.7%. Something
+# beyond the stop rule is still unaccounted for. Related: slTriggerPxType is not
+# set on the algo order, so which price triggers it is whatever OKX defaults to
+# — an unpinned parameter on a live money path.
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 # Exchange-side stop stays in place as a disaster backstop, widened to this
 # multiple of R so it cannot fire before the close confirmation. It is what
