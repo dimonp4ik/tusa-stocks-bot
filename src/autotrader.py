@@ -481,7 +481,22 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 # sit orphaned on the exchange after the position is flat.
                 okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
                 if pos.get("tp1_algo_id"):
-                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
+                    # This one is checked while the OCO above is not, and the asymmetry is
+                    # deliberate. The OCO is placed with closeFraction, so the exchange
+                    # retires it when the position goes flat. The TP1 partial is a FIXED
+                    # size reduce-only order: nothing retires it, and a leftover would sit
+                    # armed until the next position in the same instrument, then close part
+                    # of it at a price chosen for a trade that ended days ago.
+                    _c_ok, _c_err = okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
+                    if not _c_ok:
+                        log.error(f"autotrade STALE TP1 ORDER {pos['user_id']} {pos['inst_id']}: "
+                                  f"cancel failed ({_c_err}) — it can fire on a later position")
+                        _dm(pos["user_id"], "\n".join([
+                            f"⚠️ *{disp}*: не смог снять ордер частичного закрытия TP1.",
+                            "Он может сработать по следующей сделке этого же тикера.",
+                            "Проверь открытые алго-ордера на бирже.",
+                            f"`{_c_err}`",
+                        ]))
                 ok, err = okx.close_position_market(creds, pos["inst_id"])
                 at_close_position(pos["id"], new_status,
                                   error=None if ok else str(err))
