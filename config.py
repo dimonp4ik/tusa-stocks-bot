@@ -472,6 +472,19 @@ LONG_RELATIVE_WEAKNESS_MAX_PCT        = float(os.getenv("LONG_RELATIVE_WEAKNESS_
 BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER  = os.getenv("BULL_NEUTRAL_LONG_NARROW_ZONE_FILTER", "0") != "0"
 BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT  = float(os.getenv("BULL_NEUTRAL_LONG_MAX_ZONE_WIDTH_PCT", "0.00173509"))
 
+# These two carried no justification at all — inherited from the fork and never
+# measured here. Tested 2026-08-29 by switching BOTH off across five windows,
+# and they EARN their place: total profit is flat (+817.31R against +818.08R)
+# but risk degrades badly in three of five windows. The earliest window is the
+# clearest — worst-windows goes 1.92R -> 8.31R and the ulcer ratio 53.6 -> 36.0.
+# They add ~130 trades when removed, and those trades cost more than they bring.
+#   window   both ON                both OFF
+#   04-10   199tr +158.92R  u53.6   232tr +157.29R  u36.0
+#   05-07   213tr +151.80R  u61.1   227tr +133.87R  u43.1
+#   06-05   236tr +185.36R  u125.1  273tr +183.53R  u83.7
+#   07-15   237tr +141.99R  u59.3   266tr +152.93R  u63.5
+#   08-26   250tr +179.24R  u72.7   266tr +190.46R  u78.3
+# Not every unjustified inherited flag is a fossil. Measured, kept.
 LONG_NY_COIN_MOMENTUM_FILTER          = os.getenv("LONG_NY_COIN_MOMENTUM_FILTER", "1") != "0"
 LONG_NY_MIN_COIN_CHANGE_1H            = float(os.getenv("LONG_NY_MIN_COIN_CHANGE_1H", "0.0"))
 
