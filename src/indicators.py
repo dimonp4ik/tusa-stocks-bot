@@ -725,6 +725,24 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
 
     # ATR for stops/takes
     atr = calculate_atr(highs, lows, closes)
+
+    # Wyckoff absorption — volume relative to how little the bar actually moved,
+    # in ATR units. High volume inside a narrow bar is effort without result:
+    # someone is filling size into the move rather than chasing it. Ported from
+    # the crypto desk 2026-08-29, where it measured EMPTY (fewer than 30 trades
+    # per window ever exceeded 3, and the buckets read +0.003 / +0.019 / -0.057).
+    # Worth re-measuring here rather than inheriting that verdict: equities are
+    # where institutional accumulation actually happens, and the two desks have
+    # disagreed on seven parameters running.
+    #
+    # Must stay BELOW the atr assignment above — computing it earlier raises
+    # UnboundLocalError, which is exactly how this port broke the first time on
+    # the other feature.
+    absorption = 0.0
+    if len(closes) > 21 and atr > 0:
+        _rng_atr = (highs[-1] - lows[-1]) / atr
+        if _rng_atr > 0.05:          # guard: a doji would divide by ~nothing
+            absorption = min(vol_ratio / _rng_atr, 20.0)
     # ПОСЛЕ atr: htf_levels делит на него. Ровно та же ошибка уже была
     # в крипте с absorption — вызов стоял выше определения atr.
     _htf = htf_levels(candles_1h, candles_4h, closes[-1], atr)
@@ -904,6 +922,7 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         "vol_ratio_regime": vol_reg["ratio"],
         "eff_ratio":        eff_ratio,
         "volume_ratio":     round(vol_ratio, 2),
+        "absorption":       round(absorption, 3),
         "current_close":    closes[-1],
         "current_open":     opens[-1],
         "recent_high":      recent_high,

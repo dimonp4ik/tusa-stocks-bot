@@ -677,6 +677,7 @@ class TradeRecord:
     bos_extension_atr: float = 0.0
     buy_pressure: float = 0.0
     accel_ratio: float = 1.0
+    absorption: float = 0.0
     overhead_atr: float = -1.0
     underfoot_atr: float = -1.0
     bos_candles_ago: int = -1
@@ -998,6 +999,7 @@ def simulate_trade_direct(
         bos_extension_atr=round(_fld(setup, "bos_extension_atr", -1.0), 3),
         buy_pressure=round(_fld(setup, "buy_pressure", 0.0), 4),
         accel_ratio=round(_fld(setup, "accel_ratio", 1.0), 3),
+        absorption=round(_fld(setup, "absorption", 0.0), 3),
         overhead_atr=round(_fld(setup, "overhead_atr", -1.0), 3),
         underfoot_atr=round(_fld(setup, "underfoot_atr", -1.0), 3),
         bos_candles_ago=int(_fld(setup, "bos_candles_ago", -1.0)),
@@ -1395,7 +1397,7 @@ def write_trades_csv(path: str, trades: list[TradeRecord]) -> None:
         "quality_score", "trend_score", "volatility_score",
         "entry_quality_score", "portfolio_risk_score",
         "session", "trend_1h", "trend_4h", "entry_source",
-        "bos_extension_atr", "bos_candles_ago", "overhead_atr", "underfoot_atr", "buy_pressure", "accel_ratio",
+        "bos_extension_atr", "bos_candles_ago", "overhead_atr", "underfoot_atr", "buy_pressure", "accel_ratio", "absorption",
         "signals", "score_tags", "premium", "knn_score", "swing_trend",
     ]
     with open(path, "w", newline="", encoding="utf-8") as f:
