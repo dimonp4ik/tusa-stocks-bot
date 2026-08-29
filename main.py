@@ -269,7 +269,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  TP1_R_MULT={TP1_R_MULT}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
-        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if CLAUDE_GATE_ENABLED else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
+        A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}")
 
         report = "\n".join(L)
@@ -494,10 +494,27 @@ def _session_windows_text() -> str:
 
 
 
+def _claude_gate_enabled() -> bool:
+    """Is Claude a GATE, or an observer? DB state wins, config is the default.
+
+    Runtime-switchable on purpose: this is a live experiment, and its whole
+    value is being able to stop it the moment it looks wrong, without a
+    redeploy. backtest.py never calls Claude, so with the gate OFF the live bot
+    trades the same population the model measures — the only way to score his
+    verdict against real fills instead of simulated ones.
+    """
+    state = get_bot_state("claude_gate_enabled")
+    if state is not None:
+        return state == "1"
+    return CLAUDE_GATE_ENABLED
+
+
 def _kb_settings():
     """Settings keyboard — built per-render so the off-session toggle shows
     its live state."""
     night = "🌙 Вне сессии: ВКЛ ✅" if _off_session_enabled() else "🌙 Вне сессии: ВЫКЛ"
+    gate = ("🤖 Клод: ФИЛЬТР ✅" if _claude_gate_enabled()
+            else "🤖 Клод: ТЕНЬ 👁")
     return {"inline_keyboard": [[
         {"text": "📊 Фильтры",       "callback_data": "adm_filters"},
         {"text": "🔒 Блок тикеров",  "callback_data": "adm_manblock"},
@@ -506,6 +523,8 @@ def _kb_settings():
         {"text": "💰 Бюджет Claude", "callback_data": "adm_budget"},
     ], [
         {"text": night,              "callback_data": "adm_night_toggle"},
+    ], [
+        {"text": gate,               "callback_data": "adm_claude_toggle"},
     ], [_BACK_ROW[0]]]}
 
 _KB_ANALYTICS = {"inline_keyboard": [[
@@ -926,6 +945,30 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _hdr = "🔧 *Настройки*\n\n*Когда бот ищет сетапы:*\n"
         _edit_admin_text(chat_id, message_id,
                          _hdr + _session_windows_text() + "\n\nВыбери раздел:",
+                         _kb_settings())
+
+    elif data == "adm_claude_toggle":
+        new_val = "0" if _claude_gate_enabled() else "1"
+        set_bot_state("claude_gate_enabled", new_val)
+        _on = [
+            "🤖 Клод: *ФИЛЬТР*",
+            "Его вердикт решает — отклонённые сетапы не торгуются.",
+            "Так бот работал всегда.",
+        ]
+        _off = [
+            "🤖 Клод: *ТЕНЬ*",
+            "Торгуют только правила. Клод по-прежнему считает и пишет вердикт,",
+            "но ничего не задерживает.",
+            "",
+            "Он одобряет ~80%, так что сделок станет примерно на четверть больше.",
+            "Смысл: бэктест Клода не вызывает, поэтому в тени живой бот торгует",
+            "ту же совокупность, что меряет модель — и вердикт можно оценить по",
+            "РЕАЛЬНЫМ сделкам, а не по симулированным.",
+            "",
+            "Судить не раньше чем через 2 недели.",
+        ]
+        note = "\n".join(_on if new_val == "1" else _off)
+        _edit_admin_text(chat_id, message_id, "🔧 *Настройки*\n\n" + note,
                          _kb_settings())
 
     elif data == "adm_night_toggle":
@@ -3539,7 +3582,7 @@ def run_scan():
                 # rules filter alone decides. His verdict can then be scored
                 # against REAL fills instead of against shadow-simulated ones,
                 # which is the only way to settle whether he adds or subtracts.
-                _gate = CLAUDE_GATE_ENABLED
+                _gate = _claude_gate_enabled()
 
                 # Guard: Claude must confirm setup direction, not flip it.
                 # Kept even in shadow mode: a flipped side is not a weaker
