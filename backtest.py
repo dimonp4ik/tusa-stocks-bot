@@ -546,9 +546,25 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
     return base
 
 
-# Close-confirmed stop — mirrors the live setting so backtest and live cannot
-# drift apart (config already applies the STOP_CLOSE_CONFIRM env override).
+# Close-confirmed stop — mirrors the live MONITOR setting (config already applies
+# the STOP_CLOSE_CONFIRM env override).
 from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
+
+# ...but the monitor is not what closes an AUTOTRADED position. src/okx_trader
+# places a reduce-only OCO algo with slTriggerPx at the stop and slOrdPx "-1",
+# so the exchange flattens on a TOUCH of the level and the monitor only handles
+# what the algo left behind. Modelling close-confirmation therefore describes a
+# bot that exists only for signal-only users.
+#
+# Default ON because this account autotrades: the headline figures must describe
+# the stop the account actually gets. BT_EXCHANGE_STOP=0 restores monitor
+# semantics for anyone reading these numbers as a manual trader.
+#
+# This is deliberately a BACKTEST-only switch. Flipping STOP_CLOSE_CONFIRM
+# instead would also change the live monitor and make manual exits worse in
+# order to fix a report.
+_BT_EXCHANGE_STOP = os.getenv("BT_EXCHANGE_STOP", "1") != "0"
+_STOP_ON_CLOSE = _STOP_CLOSE_CONFIRM and not _BT_EXCHANGE_STOP
 
 # Anchor the runner trail to PRIOR bars only, so a trail exit can never be
 # filled off the same bar that printed the peak. Ported from the crypto bot
@@ -791,9 +807,9 @@ def simulate_trade_direct(
         l = lows[j]
         if not tp1_reached:
             if direction == "LONG":
-                if (closes[j] <= sl) if _STOP_CLOSE_CONFIRM else (l <= sl):
+                if (closes[j] <= sl) if _STOP_ON_CLOSE else (l <= sl):
                     outcome = "SL"
-                    if _STOP_CLOSE_CONFIRM:
+                    if _STOP_ON_CLOSE:
                         stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True
@@ -810,9 +826,9 @@ def simulate_trade_direct(
                     trail_mult_eff = _post_tp1_trail_mult_bt(direction, entry, tp1, tp2, h, l, closes[j])
                     continue
             else:
-                if (closes[j] >= sl) if _STOP_CLOSE_CONFIRM else (h >= sl):
+                if (closes[j] >= sl) if _STOP_ON_CLOSE else (h >= sl):
                     outcome = "SL"
-                    if _STOP_CLOSE_CONFIRM:
+                    if _STOP_ON_CLOSE:
                         stop_exit_price = closes[j]
                     exit_bar = j
                     closed = True

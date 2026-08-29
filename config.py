@@ -171,7 +171,18 @@ TRADE_WEEKENDS      = False
 #
 # Note the crypto desk sits at 3. Two desks, same parameter, different answers —
 # the fifth time a VALUE has refused to port while features and tools port fine.
-SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "4"))
+# 🔴 REVERTED to 5 on 2026-08-29, hours after shipping 4. The sweep that chose 4
+# ran on the MONITOR stop model; this account autotrades, so the exchange model
+# (BT_EXCHANGE_STOP, touch) is the one that describes it. Re-run on that:
+#   swing   04-10    05-07    06-05    07-15    08-26    total
+#     4    155.93   134.80   161.67   143.85   159.27   755.52
+#     5    157.31   117.52   166.06   146.10   178.39   765.38
+# 5 wins four windows of five and +1.3% overall — the opposite of what the
+# monitor model said. A structural parameter is exactly where the stop rule
+# should change the answer: a shorter swing puts stops closer, and stops that
+# only need to be TOUCHED punish closeness far more than stops that need a
+# close beyond them.
+SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 # Minimum 3-candle impulse that qualifies an order block, as a fraction of
