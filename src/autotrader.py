@@ -304,10 +304,31 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     tp_px = okx.round_to_tick(float(sig["tp2"]), tick)
     ok, algo_id = okx.place_protection_oco(creds, inst_id, sig["direction"], sl_px, tp_px)
     if not ok:
-        # Never leave a naked position: close it right back.
-        okx.close_position_market(creds, inst_id)
-        log.warning(f"autotrade OCO failed for {uid} {inst_id}: {algo_id} — position closed")
-        _dm(uid, f"❌ Автотрейдинг: не смог поставить стоп по {disp} — позиция закрыта для безопасности.\n`{algo_id}`")
+        # Never leave a naked position: close it right back — and CHECK that the
+        # close actually happened. The result used to be discarded, so a failed
+        # close still told the owner "closed for safety" while a leveraged
+        # position sat open with no stop on it. Retry once, then say plainly that
+        # it is still open, because that needs a human immediately.
+        _closed, _cerr = okx.close_position_market(creds, inst_id)
+        if not _closed:
+            _closed, _cerr = okx.close_position_market(creds, inst_id)
+        if _closed:
+            log.warning(f"autotrade OCO failed for {uid} {inst_id}: {algo_id} — position closed")
+            _dm(uid, f"❌ Автотрейдинг: не смог поставить стоп по {disp} — "
+                     f"позиция закрыта для безопасности.\n`{algo_id}`")
+        else:
+            log.error(f"autotrade NAKED POSITION {uid} {inst_id}: OCO failed ({algo_id}) "
+                      f"AND close failed ({_cerr}) — position is open WITHOUT a stop")
+            _msg = "\n".join([
+                f"🚨 *СРОЧНО: {disp} открыта БЕЗ СТОПА*",
+                "",
+                "Не удалось ни поставить защиту, ни закрыть позицию.",
+                "Зайди на биржу и закрой её вручную.",
+                "",
+                f"стоп: `{algo_id}`",
+                f"закрытие: `{_cerr}`",
+            ])
+            _dm(uid, _msg)
         return
 
     # Optional: pre-place the user's chosen TP1 partial-close as its OWN real
