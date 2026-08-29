@@ -3067,7 +3067,8 @@ def _check_open_signals():
 # ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
 def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
                             sl: float, highs: list, lows: list,
-                            closes: list = None) -> tuple:
+                            closes: list = None, require_fill: bool = True,
+                            wait_bars: int = 4) -> tuple:
     """Replay a setup's bracket over forward candles (same order as the validated
     backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
     reached_tp2). outcome is None while still live (no TP1/SL hit yet).
@@ -3088,7 +3089,39 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
     risk = abs(entry - sl)
     if risk <= 0:
         return None, 0, 0
+    # The bracket used to start at `entry` on bar 0 whether or not price ever
+    # traded there — the same fantasy fill removed from backtest.py, and never
+    # ported here. It inflates every shadow number: unsent setups resolved TP2
+    # at 51.4% against 6.9% for the ones actually sent.
+    start = 0
+    if require_fill:
+        if min(len(highs), len(lows)) < int(wait_bars) + 1:
+            return None, 0, 0
+        start = -1
+        for i in range(min(int(wait_bars) + 1, len(highs), len(lows))):
+            touched = (lows[i] <= entry) if direction == "LONG" else (highs[i] >= entry)
+            if touched:
+                start = i
+                break
+        if start < 0:
+            return "NO_FILL", 0, 0
+        highs, lows = highs[start:], lows[start:]
+        if closes is not None:
+            closes = closes[start:]
+
     use_close = STOP_CLOSE_CONFIRM and closes is not None
+
+    # ATR for the post-TP1 trail, from the same candles.
+    _rng = []
+    for i in range(min(len(highs), len(lows))):
+        r = highs[i] - lows[i]
+        if closes is not None and i > 0 and i < len(closes):
+            r = max(r, abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
+        _rng.append(r)
+    _atr = (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0
+    _tmult = max(0.0, float(TRAIL_ATR_MULT))
+    _peak = entry
+
     for idx, (h, l) in enumerate(zip(highs, lows)):
         if not tp1_reached:
             if direction == "LONG":
@@ -3102,12 +3135,20 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
                 if l <= tp2:  return "TP2", 1, 1
                 if l <= tp1:  tp1_reached = True
         else:
+            # Post-TP1 the live runner is TRAILED, not carried to TP2 or
+            # breakeven; TP1_CLOSE_FRAC has been 0 since this exit profile
+            # shipped. The trail is anchored to PRIOR bars only, mirroring
+            # backtest.py's BT_TRAIL_LAG.
+            _trail = (max(entry, _peak - _atr * _tmult) if direction == "LONG"
+                      else min(entry, _peak + _atr * _tmult))
             if direction == "LONG":
-                if h >= tp2:  return "TP2", 1, 1
-                if l <= entry: return "TP1", 1, 0   # breakeven exit after TP1
+                if h >= tp2:    return "TP2", 1, 1
+                if l <= _trail: return "TP1", 1, 0
+                _peak = max(_peak, h)
             else:
-                if l <= tp2:  return "TP2", 1, 1
-                if h >= entry: return "TP1", 1, 0
+                if l <= tp2:    return "TP2", 1, 1
+                if h >= _trail: return "TP1", 1, 0
+                _peak = min(_peak, l)
     # No terminal hit within the candles seen so far.
     return (None, 1, 0) if tp1_reached else (None, 0, 0)
 

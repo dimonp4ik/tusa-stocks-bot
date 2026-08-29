@@ -1068,7 +1068,8 @@ def get_cap_impact_stats(since_ts: float) -> dict:
         for reason in ("dir_cap", "scan_cap", "send_failed"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
-                   WHERE resolved=1 AND ts >= ? AND block_reason=?
+                   WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
+                     AND ts >= ? AND block_reason=?
                      AND COALESCE(source,'live')='live'""",
                 (since_ts, reason),
             ).fetchall()
@@ -1299,7 +1300,8 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 # setups Claude actually liked. Judged separately by
                 # get_cap_impact_stats().
                 """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
-                   WHERE resolved=1 AND ts >= ? AND sent=?
+                   WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
+                     AND ts >= ? AND sent=?
                      AND COALESCE(source,'live')='live'
                      AND COALESCE(block_reason,'')=''""",
                 (since_ts, sent_val),
@@ -1366,7 +1368,8 @@ def get_similar_resolved_setups(symbol: str, direction: str, mtf_score,
                       entry_price, tp1, tp2, sl, net_r,
                       COALESCE(source,'live') AS source
                FROM setup_log
-               WHERE resolved=1 AND ts >= ? AND direction=?
+               WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
+                 AND ts >= ? AND direction=?
                  AND COALESCE(source,'live')='live'
                  AND COALESCE(block_reason,'')=''
                  AND (symbol=? OR ABS(COALESCE(mtf_score,0) - ?) <= 2)
