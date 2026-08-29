@@ -550,20 +550,22 @@ def _post_tp1_trail_mult_bt(direction: str, entry: float, tp1: float, tp2: float
 # the STOP_CLOSE_CONFIRM env override).
 from config import STOP_CLOSE_CONFIRM as _STOP_CLOSE_CONFIRM
 
-# ...but the monitor is not what closes an AUTOTRADED position. src/okx_trader
-# places a reduce-only OCO algo with slTriggerPx at the stop and slOrdPx "-1",
-# so the exchange flattens on a TOUCH of the level and the monitor only handles
-# what the algo left behind. Modelling close-confirmation therefore describes a
-# bot that exists only for signal-only users.
+# 🔴 CORRECTED 2026-08-29, hours after being added with the wrong default.
 #
-# Default ON because this account autotrades: the headline figures must describe
-# the stop the account actually gets. BT_EXCHANGE_STOP=0 restores monitor
-# semantics for anyone reading these numbers as a manual trader.
+# The claim was: an autotraded position is closed by the exchange OCO on a TOUCH
+# of the stop, so modelling close-confirmation describes a bot the account does
+# not run. That is WRONG. src/autotrader.py deliberately moves the exchange stop
+# OUT to STOP_EXCHANGE_BACKSTOP_R (1.5R crypto / 2.5R stocks) measured from the
+# real fill, precisely so it cannot fire on the wicks the close-confirmed rule
+# exists to ignore. Its own comment says so: the exchange leg is a disaster
+# backstop for when the bot is down, not the working stop. The working stop is
+# the monitor's, and it IS close-confirmed.
 #
-# This is deliberately a BACKTEST-only switch. Flipping STOP_CLOSE_CONFIRM
-# instead would also change the live monitor and make manual exits worse in
-# order to fix a report.
-_BT_EXCHANGE_STOP = os.getenv("BT_EXCHANGE_STOP", "1") != "0"
+# So STOP_CLOSE_CONFIRM=1 is right for an autotrading account and the default
+# here goes back to OFF. Kept as a research handle: BT_EXCHANGE_STOP=1 models
+# touch-triggered stops, which is what the book would look like if the backstop
+# were ever moved onto the signal level.
+_BT_EXCHANGE_STOP = os.getenv("BT_EXCHANGE_STOP", "0") != "0"
 _STOP_ON_CLOSE = _STOP_CLOSE_CONFIRM and not _BT_EXCHANGE_STOP
 
 # Anchor the runner trail to PRIOR bars only, so a trail exit can never be

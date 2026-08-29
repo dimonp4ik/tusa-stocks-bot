@@ -171,18 +171,22 @@ TRADE_WEEKENDS      = False
 #
 # Note the crypto desk sits at 3. Two desks, same parameter, different answers —
 # the fifth time a VALUE has refused to port while features and tools port fine.
-# 🔴 REVERTED to 5 on 2026-08-29, hours after shipping 4. The sweep that chose 4
-# ran on the MONITOR stop model; this account autotrades, so the exchange model
-# (BT_EXCHANGE_STOP, touch) is the one that describes it. Re-run on that:
-#   swing   04-10    05-07    06-05    07-15    08-26    total
-#     4    155.93   134.80   161.67   143.85   159.27   755.52
-#     5    157.31   117.52   166.06   146.10   178.39   765.38
-# 5 wins four windows of five and +1.3% overall — the opposite of what the
-# monitor model said. A structural parameter is exactly where the stop rule
-# should change the answer: a shorter swing puts stops closer, and stops that
-# only need to be TOUCHED punish closeness far more than stops that need a
-# close beyond them.
-SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
+# 5 -> 4 on 2026-08-29. Measured across all five windows of available history:
+#   swing    04-10     05-07     06-05     07-15     08-26    total
+#     5    +112.85   +123.28   +140.26   +124.84   +185.13   +686.36
+#     4    +131.90   +127.24   +152.99   +138.09   +170.78   +721.00
+#     3    +130.56   +127.55   +165.63   +193.26   +127.20   +744.20
+# Four windows want it shorter, one wants it longer, and that one is the most
+# recent. 3 earns the most in total but gives up 31% in that latest window; 4
+# beats 5 on profit AND win rate in four of five with a worst case of -7.7%.
+#
+# Briefly reverted to 5 the same day on a touch-stop model, then restored: that
+# model was built on a wrong reading of the autotrader, which moves the exchange
+# stop OUT to a backstop rather than placing it on the signal level. The
+# close-confirmed comparison above is the right one.
+#
+# The crypto desk sits at 3. Two desks, same parameter, different answers.
+SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "4"))
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
 # Minimum 3-candle impulse that qualifies an order block, as a fraction of
@@ -1242,36 +1246,19 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 # Validated on the GATED book in both halves: +46% and +10%, win rate up in
 # both (54.7->58.1, 54.1->59.5). The ungated export disagreed on the first
 # half; it describes 2414 trades production never takes.
-# ⚠️ 2026-08-29: this flag describes the position MONITOR, and for an
-# AUTOTRADING account the monitor is not what closes the trade. src/okx_trader.py
-# places a reduce-only OCO algo on the exchange with slTriggerPx at the stop and
-# slOrdPx "-1" (market on trigger), so the exchange flattens the position the
-# moment price TOUCHES the level — no closed candle required. The monitor only
-# handles "whatever the exchange algo hasn't closed yet", as that module's own
-# docstring says.
+# 🔴 A note added here earlier today claimed that an autotrading account gets a
+# touch-triggered stop from the exchange OCO, and that this flag therefore
+# described the wrong bot. That was WRONG and is retracted. src/autotrader.py
+# moves the exchange stop OUT to STOP_EXCHANGE_BACKSTOP_R from the real fill
+# exactly so it cannot fire on the wicks this rule exists to ignore; the
+# exchange leg is a disaster backstop for when the bot is down. The working stop
+# is the monitor's, and it is close-confirmed. =1 is correct here.
 #
-# So the backtest, at STOP_CLOSE_CONFIRM=1, is modelling a bot that exists only
-# for signal-only users. The honest figures for an autotrading account are the
-# touch ones, and they are worse:
-#   window   close-confirmed        touch (exchange)
-#   04-10   199tr +158.92R WR75.9   200tr +155.93R WR73.5
-#   05-07   213tr +151.80R WR71.4   216tr +134.80R WR64.4
-#   06-05   236tr +185.36R WR75.4   237tr +161.67R WR70.0
-#   07-15   237tr +141.99R WR73.0   237tr +143.85R WR70.5
-#   08-26   250tr +179.24R WR75.2   246tr +159.27R WR69.9
-# -7.6% profit in total and 2.4-7.0pp of win rate, with the modelled stop rate
-# going 24.4% -> 29.7%.
-#
-# NOT flipped, deliberately: this same flag drives the live monitor, where
-# close-confirmation is the real and correct behaviour for anyone trading the
-# signals by hand. Flipping it would make their exits worse to make one report
-# honest. The account owner should decide which population the default serves.
-#
-# Note this does NOT close the live gap on its own: live is 60% stops (24 of 40
-# closed, week of 2026-08-21) and touch semantics only reach 29.7%. Something
-# beyond the stop rule is still unaccounted for. Related: slTriggerPxType is not
-# set on the algo order, so which price triggers it is whatever OKX defaults to
-# — an unpinned parameter on a live money path.
+# What survives from that detour: BT_EXCHANGE_STOP in backtest.py models
+# touch-triggered stops as a research handle (default OFF), and it measures what
+# moving the backstop onto the signal level would cost — on the stocks book that
+# is about -7.6% of profit and 2.4-7.0pp of win rate, on the hostile crypto
+# window -32%. That is the price of the close-confirmed rule, and it is large.
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 # Exchange-side stop stays in place as a disaster backstop, widened to this
 # multiple of R so it cannot fire before the close confirmation. It is what
