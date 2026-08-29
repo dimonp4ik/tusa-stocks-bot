@@ -3,6 +3,7 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
+    SMC_FVG_MAX_FILL,
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
     SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE,
@@ -188,7 +189,7 @@ def _zone_payload(zone, source: str, current: float, age=None):
     }
 
 
-_FVG_MAX_FILL = 0.80   # skip FVG if price already through > 80% of the zone
+_FVG_MAX_FILL = SMC_FVG_MAX_FILL   # skip FVG if price is already this far through the zone
 
 
 def _fvg_fresh(zone, current: float, direction: str) -> bool:

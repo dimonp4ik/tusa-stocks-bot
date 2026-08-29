@@ -188,6 +188,25 @@ SMC_OB_MIN_IMPULSE = float(os.getenv("SMC_OB_MIN_IMPULSE", "0.004"))
 # about 2.5 ATR on a 15m equity bar, so a gap was being accepted while price
 # was still a long way from it. Same numbers make sense on crypto, where an ATR
 # is several times wider.
+# How far through a gap price may already be and still count as a usable zone.
+# Was a module constant in src/signal_filter.py. It matters far more here than
+# on the crypto desk, where the note says it only bites when a setup has no
+# order block: 73% of this book's entries come from FVG (173 of 238 in the last
+# window), so this gate is on the main path rather than the fallback.
+# Swept 2026-08-29, its first ever, and 0.80 stands:
+#   fill    06-05      07-15      08-26
+#   0.50   +141.83   +128.56   +184.68
+#   0.65   +140.26   +128.69   +185.74
+#   0.80   +140.26   +124.84   +185.13   <- kept
+#   0.90   +140.26   +124.84   +181.63
+#   0.95   +140.26   +124.84   +181.63
+# Tightening to 0.65 is mildly positive (+3.1% in one window, nothing in the
+# other two) and loosening costs the last window. The 0.1-3% band does not earn
+# a change. Note the first window reads identical across 0.65-0.95 to the last
+# decimal: not the "knob never reached" failure — the env anchor was verified
+# and the other windows do move — there is simply no setup there with fill in
+# that range.
+SMC_FVG_MAX_FILL     = float(os.getenv("SMC_FVG_MAX_FILL", "0.80"))
 SMC_FVG_NEAR_TOL     = float(os.getenv("SMC_FVG_NEAR_TOL", "0.001"))
 SMC_FVG_APPROACH_TOL = float(os.getenv("SMC_FVG_APPROACH_TOL", "0.01"))
 SMC_OB_NEAR_TOL      = float(os.getenv("SMC_OB_NEAR_TOL", "0.002"))
