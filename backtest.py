@@ -748,12 +748,28 @@ def simulate_trade_direct(
         execution_delay_bars,
         adverse_entry_bps,
     )
-    # Levels are computed at SCAN time live and stored on the signal; the market
-    # order then fills wherever it fills. So an adverse fill must NOT drag the
-    # targets with it — doing that keeps R constant and pushes TP1 further away,
-    # which is not what the account experiences. BT_ADVERSE_KEEP_LEVELS=1 anchors
-    # tp/sl to the PLANNED entry and lets only the fill move, matching live.
-    # Default 0 preserves the old behaviour so existing figures still reproduce.
+    # 🔴 The measurement that motivated this switch was WRONG, and the switch is
+    # kept only as a research handle. The claim was that live fills land ~0.37%
+    # (stocks) / ~0.22% (crypto) worse than the model's, costing 80% / 42% of
+    # profit. What was actually measured is the fill against the ZONE MIDPOINT —
+    # and the model does not fill at the zone either. planned_entry is
+    # setup["current_price"], the price at signal time, which is what the live
+    # bot records as its fill too. The offset from the zone is a property of the
+    # strategy that BOTH sides already carry, so feeding it back through
+    # --adverse-entry-bps counted it twice.
+    #
+    # What IS true and was verified: execution slip is 0.000% on both desks —
+    # the recorded fill equals the recorded market price to the digit. There is
+    # nothing for a limit order to recover.
+    #
+    # The residual gap that cannot be measured from the exports is the drift
+    # between the bar CLOSE the model fills at and the market price ~2 minutes
+    # later when the order lands. Bounding that needs the bar close stored on
+    # the signal, which is not logged today.
+    #
+    # BT_ADVERSE_KEEP_LEVELS remains correct in itself: if an adverse fill is
+    # ever modelled, the levels must NOT move with it, because live computes
+    # them at scan time and stores them.
     _lvl_src = (planned_entry
                 if os.getenv("BT_ADVERSE_KEEP_LEVELS", "0") == "1" else entry)
     tp1, tp2, sl = calculate_tp_sl_local(
