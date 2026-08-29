@@ -1194,6 +1194,9 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
 
 
 _LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
+# Research handle, default 0 = honest. 1 restores the old kill-switch replay
+# that read a trade's eventual outcome while walking entries, for A/B only.
+_BT_KILL_LOOKAHEAD = os.getenv("BT_KILL_LOOKAHEAD", "0") == "1"
 
 
 def _fld(setup: dict, key: str, missing: float) -> float:
@@ -1247,17 +1250,40 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
     per_bar: dict = {}
     open_by_dir: dict = {}
     kept: list[TradeRecord] = []
+    closed: list[tuple[float, str]] = []   # (exit_ts, outcome) of kept trades
     streak = 0
     cur_day = None
     blocked_day = None
+
+    def _sl_streak_at(now: float, dy: int) -> int:
+        """Consecutive SLs among trades that had already CLOSED by `now`, today.
+
+        This is what the live kill-switch can actually see. The original replay
+        walked trades in ENTRY order and read t.outcome, which is only known at
+        exit — so it paused the day at the entry of the third trade that would
+        LATER stop out. Losses cluster, so peeking at that timing removed the
+        rest of a bad patch and flattered every figure downstream of the gate.
+        """
+        done = sorted((e, o) for e, o in closed if e <= now and int(e // 86400) == dy)
+        n = 0
+        for _, outcome in reversed(done):
+            if outcome != "SL":
+                break
+            n += 1
+        return n
+
     for t in ordered:
         raw = t.entry_time or 0
         ts = raw / 1000 if raw > 1e11 else raw
         day = int(ts // 86400)
         if day != cur_day:
-            cur_day, streak, blocked_day = day, 0, None
-        if KILL_SWITCH_SL_STREAK > 0 and blocked_day == day:
-            continue
+            cur_day, streak, blocked_day, closed = day, 0, None, []
+        if KILL_SWITCH_SL_STREAK > 0:
+            if blocked_day == day:
+                continue
+            if not _BT_KILL_LOOKAHEAD and _sl_streak_at(ts, day) >= KILL_SWITCH_SL_STREAK:
+                blocked_day = day
+                continue
         key = (t.symbol, t.direction)
         if SIGNAL_COOLDOWN_HOURS > 0 and key in last_sig and (ts - last_sig[key]) / 3600 < SIGNAL_COOLDOWN_HOURS:
             continue
@@ -1275,9 +1301,14 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
         per_bar[bar] = per_bar.get(bar, 0) + 1
         kept.append(t)
         if KILL_SWITCH_SL_STREAK > 0:
-            streak = streak + 1 if t.outcome == "SL" else 0
-            if streak >= KILL_SWITCH_SL_STREAK:
-                blocked_day = day
+            ex = t.exit_time or 0
+            ex = ex / 1000 if ex > 1e11 else ex
+            if ex > 0:
+                closed.append((ex, t.outcome))
+            if _BT_KILL_LOOKAHEAD:
+                streak = streak + 1 if t.outcome == "SL" else 0
+                if streak >= KILL_SWITCH_SL_STREAK:
+                    blocked_day = day
     return kept
 
 
