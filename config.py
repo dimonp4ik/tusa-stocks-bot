@@ -158,6 +158,27 @@ TRADE_WEEKENDS      = False
 SMC_SWING_LOOKBACK    = int(os.getenv("SMC_SWING_LOOKBACK", "5"))
 SMC_FVG_MIN_PCT       = float(os.getenv("SMC_FVG_MIN_PCT", "0.0005"))
 SMC_OB_LOOKBACK       = int(os.getenv("SMC_OB_LOOKBACK", "30"))
+# Minimum 3-candle impulse that qualifies an order block, as a fraction of
+# price. Readable from the environment since 2026-08-29; it was a plain literal
+# carried over from the crypto desk, where 0.5% in three 15m candles is an
+# ordinary move. On US equities a 15m ATR runs about 0.4% of price, so the same
+# number demands roughly a 1.2-ATR impulse here — a far stricter bar than it
+# was ever meant to be. This parameter decides whether an order block EXISTS at
+# all, so a threshold set too high does not select worse trades, it hides
+# structure. Same failure mode as swing 5->3, eff-lookback 20->10 and the FVG
+# threshold on the crypto side: all three were too strict.
+# 0.005 -> 0.004 on 2026-08-29, measured on FIVE roughly disjoint 29-day
+# windows (--candles 2800, end 04-10 / 05-07 / 06-05 / 07-15 / 08-26):
+#   thr      04-10     05-07     06-05     07-15     08-26    trades
+#   0.005    +86.11    +95.20   +134.15   +117.66   +163.97     995
+#   0.0040   +97.94   +117.72   +140.90   +129.72   +166.99    1027
+#   0.0035   +99.13   +119.58   +149.84   +131.07   +163.21    1041
+# 0.004 raises profit in EVERY window, trade count in every window, and win rate
+# in four of five; the ulcer ratio improves in four of five. 0.0035 earns more
+# in total but gives some back in the last window, so the value that never
+# loses wins — and it is the smaller move away from a number this desk never
+# chose in the first place.
+SMC_OB_MIN_IMPULSE = float(os.getenv("SMC_OB_MIN_IMPULSE", "0.004"))
 SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # 2026-08-28: 1.5 -> 1.3. Undocumented and never swept, and binding hard.
 # Full windows (nested — one window and a subset of it):

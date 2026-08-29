@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, SMC_OB_MIN_IMPULSE
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -379,7 +379,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
             next3_bull = all(closes[j] > opens[j] for j in range(i + 1, min(i + 4, n)))
             if next3_bull:
                 move = (closes[min(i + 3, n - 1)] - closes[i]) / (closes[i] + 1e-10)
-                if move > 0.005:
+                if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.998 <= current <= ob_top * 1.005:
@@ -390,7 +390,7 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
             next3_bear = all(closes[j] < opens[j] for j in range(i + 1, min(i + 4, n)))
             if next3_bear:
                 move = (closes[i] - closes[min(i + 3, n - 1)]) / (closes[i] + 1e-10)
-                if move > 0.005:
+                if move > SMC_OB_MIN_IMPULSE:
                     ob_top = max(opens[i], closes[i])
                     ob_bot = min(opens[i], closes[i])
                     if ob_bot * 0.995 <= current <= ob_top * 1.002:
