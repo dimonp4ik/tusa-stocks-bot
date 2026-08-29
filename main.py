@@ -4050,6 +4050,36 @@ def start_bot():
 
 start_bot()  # runs at module load — works with gunicorn
 
+def _warn_stop_rule_coupling() -> None:
+    """Shout if STOP_CLOSE_CONFIRM is off, because it silently changes TWO things.
+
+    The obvious one is the monitor's stop rule. The one that costs money is in
+    src/autotrader.py: moving the exchange stop out to STOP_EXCHANGE_BACKSTOP_R
+    is gated on this same flag, so switching it off ALSO plants the exchange OCO
+    directly on the signal's stop, where it fires on the first wick — exactly
+    what the close-confirmed rule exists to prevent.
+
+    Added 2026-08-29 after live data showed ten of twenty-four stops booked at
+    the level rather than beyond it, and an average stop of -1.209R against the
+    backtest's -1.534R. Both are signatures of touch-triggered exits. Whether
+    the flag really is off in this deployment is the account owner's to check —
+    this makes the answer visible in the logs instead of inferable from fills.
+    """
+    if STOP_CLOSE_CONFIRM:
+        return
+    log.warning("=" * 70)
+    log.warning("STOP_CLOSE_CONFIRM=0 — stops fire on a WICK TOUCH, not a close.")
+    log.warning("  This also stops the exchange SL being moved out to the %.1fR",
+                float(STOP_EXCHANGE_BACKSTOP_R))
+    log.warning("  backstop, so the exchange OCO sits ON the signal stop and")
+    log.warning("  triggers first on any spike. The backtest models the OTHER")
+    log.warning("  rule, so its figures will not describe this deployment.")
+    log.warning("=" * 70)
+
+
+_warn_stop_rule_coupling()
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
