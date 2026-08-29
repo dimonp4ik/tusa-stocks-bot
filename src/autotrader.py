@@ -271,7 +271,21 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _dm(uid, f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
         return
 
-    okx.ensure_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
+    # The order size above was computed FOR this leverage. The result used to
+    # be discarded, so a failed call meant the exchange kept whatever leverage
+    # the instrument already had and filled a size priced for a different one —
+    # silently more or less risk than the strategy asked for. Refusing the trade
+    # is the safe failure here: a skipped setup costs nothing, a mis-levered
+    # position costs whatever the market does next.
+    _lev_ok, _lev_err = okx.ensure_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
+    if not _lev_ok:
+        log.warning(f"autotrade leverage set failed {uid} {inst_id}: {_lev_err}")
+        _dm(uid, "\n".join([
+            f"⚠️ Автотрейдинг: не смог выставить плечо {AUTOTRADE_LEVERAGE}x по {disp}.",
+            "Сделка пропущена — иначе размер позиции не соответствовал бы риску.",
+            f"`{_lev_err}`",
+        ]))
+        return
 
     ok, ord_id = okx.place_market_entry(creds, inst_id, sig["direction"], sz)
     if not ok:
