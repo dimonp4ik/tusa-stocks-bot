@@ -200,6 +200,11 @@ def init_db():
                 sent        INTEGER NOT NULL DEFAULT 0,
                 session     TEXT,
                 entry_source TEXT,
+                -- ATR the strategy measured at signal time. The live monitor and
+                -- backtest both trail on THIS value; without it the shadow
+                -- tracker had to estimate one from forward candles, and the two
+                -- disagreed on 13% of outcomes.
+                atr         REAL,
                 outcome     TEXT,
                 reached_tp1 INTEGER NOT NULL DEFAULT 0,
                 reached_tp2 INTEGER NOT NULL DEFAULT 0,
@@ -210,6 +215,7 @@ def init_db():
         """)
         # Migrate older setup_log DBs: outcome-tracking columns (shadow tracker).
         for col, ddl in {
+            "atr":          "REAL",
             "sl":           "REAL",
             "session":      "TEXT",
             "entry_source": "TEXT",
@@ -1027,9 +1033,9 @@ def log_setup_candidate(analysis: dict) -> int:
             INSERT INTO setup_log
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
-                 session, entry_source, trend,
+                 session, entry_source, atr, trend,
                  oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1045,6 +1051,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("reason", ""),
             analysis.get("session", ""),
             analysis.get("entry_source", ""),
+            analysis.get("atr"),
             analysis.get("swing_trend", ""),
             analysis.get("oi_delta_pct"),
             analysis.get("oi_regime"),

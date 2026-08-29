@@ -3113,7 +3113,7 @@ def _check_open_signals():
 def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float,
                             sl: float, highs: list, lows: list,
                             closes: list = None, require_fill: bool = True,
-                            wait_bars: int = 4) -> tuple:
+                            wait_bars: int = 4, atr: float = 0.0) -> tuple:
     """Replay a setup's bracket over forward candles (same order as the validated
     backtest: SL → TP2 → TP1 each bar). Returns (outcome|None, reached_tp1,
     reached_tp2). outcome is None while still live (no TP1/SL hit yet).
@@ -3163,7 +3163,14 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
         if closes is not None and i > 0 and i < len(closes):
             r = max(r, abs(highs[i] - closes[i - 1]), abs(lows[i] - closes[i - 1]))
         _rng.append(r)
-    _atr = (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0
+    # The live monitor and backtest both trail on the ATR the strategy measured
+    # at signal time. Estimating one from FORWARD candles instead put this
+    # tracker 13% out of step with the model on synthetic series — always in the
+    # same direction, TP2 in the model against TP1 here. Use the stored value
+    # whenever setup_log has it; the estimate is only a fallback for rows
+    # written before that column existed.
+    _atr = float(atr) if atr and atr > 0 else (
+        (sum(_rng[:14]) / len(_rng[:14])) if _rng else 0.0)
     _tmult = max(0.0, float(TRAIL_ATR_MULT))
     _peak = entry
 
@@ -3230,6 +3237,7 @@ def _track_setup_outcomes():
                     s["direction"], float(s["entry_price"]),
                     float(s["tp1"]), float(s["tp2"]), float(s["sl"]),
                     highs, lows, closes,
+                    atr=float(s["atr"] or 0.0) if "atr" in s.keys() else 0.0,
                 )
                 age_h = (time.time() - float(s["ts"])) / 3600
                 if outcome is None:
