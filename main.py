@@ -275,6 +275,30 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A(f"  КЛОД: {'ФИЛЬТР (его вердикт решает)' if _claude_gate_enabled() else 'ТЕНЬ (торгуют правила, вердикт только пишется)'}")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}")
 
+        # Publish latency is what drags the fill away from the entry zone, and
+        # entry drift is the largest single cost in this book. The per-scan
+        # breakdown is logged, but the log is not reachable from where this is
+        # analysed, so it is surfaced here as well.
+        A("## ЗАДЕРЖКА ПУБЛИКАЦИИ (последние сканы)")
+        try:
+            _phs = json.loads(get_bot_state("scan_phase_ms") or "[]")
+            _phs = [r for r in _phs if r.get("sent")]
+            if _phs:
+                def _med(k):
+                    v = sorted(float(r.get(k) or 0) for r in _phs)
+                    return v[len(v) // 2]
+                A(f"  сканов с сигналами: {len(_phs)}")
+                A(f"  медиана: разбор {_med('smc'):.1f}с, Клод {_med('light'):.1f}с, "
+                  f"отправка {_med('send'):.1f}с, ВСЕГО {_med('total'):.1f}с")
+                _w = max(_phs, key=lambda r: float(r.get("total") or 0))
+                A(f"  худший скан: {_w.get('total')}с "
+                  f"(разбор {_w.get('smc')}с, Клод {_w.get('light')}с, отправка {_w.get('send')}с)")
+            else:
+                A("  данных нет (нужен хотя бы один скан с сигналом)")
+        except Exception as _phe:
+            A(f"  ошибка чтения: {_phe}")
+        A("")
+
         report = "\n".join(L)
         if message_id:
             _edit_admin_text(chat_id, message_id,
@@ -3823,6 +3847,21 @@ def run_scan():
         _last_scan_stats["sent"] = sent_count
         log.info(f"Scan phases: smc+rank {_ph_smc:.1f}s, light {_ph_light:.1f}s, "
                  f"send {time.time()-_ph_t_send:.1f}s, total {time.time()-_ph_t0:.1f}s")
+        # Persist the breakdown too. The log lives on the host and is not
+        # reachable from where this gets analysed, so without this the timing
+        # could be collected but never read. Last 50 scans, rendered in the
+        # admin report next to the config.
+        try:
+            _ph_hist = json.loads(get_bot_state("scan_phase_ms") or "[]")
+            _ph_hist.append({"t": round(time.time()),
+                             "smc": round(_ph_smc, 1),
+                             "light": round(_ph_light, 1),
+                             "send": round(time.time() - _ph_t_send, 1),
+                             "total": round(time.time() - _ph_t0, 1),
+                             "sent": sent_count})
+            set_bot_state("scan_phase_ms", json.dumps(_ph_hist[-50:]))
+        except Exception as _pe:
+            log.debug(f"scan phase persist failed: {_pe}")
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
 
     except Exception as e:
