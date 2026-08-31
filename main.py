@@ -3662,8 +3662,13 @@ def run_scan():
                         log.info(f"  Skip {analysis['symbol']} — scan cap {MAX_SIGNALS_PER_SCAN} reached")
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "scan_cap")
-                        except Exception:
-                            pass
+                        except Exception as _mbe:
+                            # Losing this tag is not cosmetic: an untagged sent=0 row
+                            # reads as a Claude rejection, and that history is fed
+                            # back to Claude as his own track record. Seen live on
+                            # 2026-07-30 before the tagging existed at all.
+                            log.warning(f"mark_setup_blocked failed, setup will look "
+                                        f"like a Claude rejection: {_mbe}")
                         continue
 
                     if (MAX_SAME_DIRECTION_POSITIONS > 0
@@ -3674,8 +3679,13 @@ def run_scan():
                         )
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "dir_cap")
-                        except Exception:
-                            pass
+                        except Exception as _mbe:
+                            # Losing this tag is not cosmetic: an untagged sent=0 row
+                            # reads as a Claude rejection, and that history is fed
+                            # back to Claude as his own track record. Seen live on
+                            # 2026-07-30 before the tagging existed at all.
+                            log.warning(f"mark_setup_blocked failed, setup will look "
+                                        f"like a Claude rejection: {_mbe}")
                         continue
 
                     # Snapshot the live X-Perp price (the instrument the user
@@ -3839,8 +3849,13 @@ def run_scan():
                         # block_reason, silently counted as a Claude rejection.
                         try:
                             mark_setup_blocked(analysis.get("_setup_log_id"), "send_failed")
-                        except Exception:
-                            pass
+                        except Exception as _mbe:
+                            # Losing this tag is not cosmetic: an untagged sent=0 row
+                            # reads as a Claude rejection, and that history is fed
+                            # back to Claude as his own track record. Seen live on
+                            # 2026-07-30 before the tagging existed at all.
+                            log.warning(f"mark_setup_blocked failed, setup will look "
+                                        f"like a Claude rejection: {_mbe}")
             except Exception as e:
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
