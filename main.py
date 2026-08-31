@@ -279,6 +279,24 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         # entry drift is the largest single cost in this book. The per-scan
         # breakdown is logged, but the log is not reachable from where this is
         # analysed, so it is surfaced here as well.
+        # The model keeps the FULL position past TP1 (TP1_CLOSE_FRAC=0). A trader
+        # whose own tp1_close_pct is non-zero banks part of it instead, so their
+        # live results are not the ones any backtest figure describes. Surface it
+        # rather than let the two quietly disagree.
+        A("## ФИКСАЦИЯ НА TP1 (модель держит ВСЮ позицию)")
+        try:
+            from src.db import at_get_active_traders as _agt
+            _tr = _agt() or []
+            _bad = [t for t in _tr if float(t.get("tp1_close_pct") or 0) != 0]
+            A(f"  автотрейдеров {len(_tr)}, с ненулевой фиксацией {len(_bad)}")
+            if _bad:
+                _vals = sorted({float(t.get("tp1_close_pct") or 0) for t in _bad})
+                A(f"  ⚠️ РАСХОЖДЕНИЕ С МОДЕЛЬЮ: фиксируют на TP1 {_vals}%")
+                A("     модель держит всю позицию до трейлинга — цифры бэктеста им не подходят")
+        except Exception as _te:
+            A(f"  ошибка чтения: {_te}")
+        A("")
+
         A("## ЗАДЕРЖКА ПУБЛИКАЦИИ (последние сканы)")
         try:
             _phs = json.loads(get_bot_state("scan_phase_ms") or "[]")
