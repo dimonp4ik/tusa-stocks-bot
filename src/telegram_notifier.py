@@ -256,11 +256,24 @@ def send_signal(analysis: dict) -> bool:
 
     if _send_message(message):
         # Log to DB
+        # The message is already out, so True is still the honest answer.
+        # But a signal with no DB row is never monitored and never traded,
+        # and the caller cannot tell the difference. The realistic cause is
+        # a transient write lock (reproduced 2026-08-31 before WAL landed),
+        # so retry once before giving up, and report through the logger --
+        # print bypassed the log level and formatting entirely.
         try:
             from src.db import log_signal
             analysis["_signal_id"] = log_signal(analysis, tp1, tp2, sl)
         except Exception as e:
-            print(f"[DB] log_signal failed: {e}")
+            try:
+                from src.db import log_signal
+                analysis["_signal_id"] = log_signal(analysis, tp1, tp2, sl)
+                _log.warning(f"log_signal succeeded on retry after: {e}")
+            except Exception as e2:
+                _log.error(
+                    f"log_signal FAILED twice - signal was announced but has "
+                    f"no DB row, so it will not be monitored or traded: {e2}")
         return True
     return False
 
