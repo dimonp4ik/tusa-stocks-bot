@@ -32,6 +32,7 @@ from config import (
     MTF_MIN_SCORE, TP1_R_MULT,
     TP1_CLOSE_FRAC, EXIT_PROFILE,
     CLAUDE_GATE_ENABLED,
+    LEVELS_FROM_STRUCTURE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS,
@@ -3721,7 +3722,18 @@ def run_scan():
                     # entry — i.e. the move already happened before we could
                     # publish. Recompute the same levels send_signal() will use.
                     try:
+                        # Anchor point for the bracket. current_price has by
+                        # now been overwritten with the live quote, so levels
+                        # computed from it follow the fill wherever it drifted —
+                        # dragging the stop toward the noise the setup was meant
+                        # to sit outside of. LEVELS_FROM_STRUCTURE=1 keeps them
+                        # on the pre-drift price instead. See config for the
+                        # measured trade-off; default is unchanged.
                         _price = analysis["current_price"]
+                        if LEVELS_FROM_STRUCTURE:
+                            _zp = analysis.get("zone_entry_price")
+                            if _zp:
+                                _price = float(_zp)
                         _atr   = analysis.get("atr", 0.0)
                         _rhi   = analysis.get("recent_high", _price * 1.03)
                         _rlo   = analysis.get("recent_low",  _price * 0.97)

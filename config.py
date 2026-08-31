@@ -1281,6 +1281,32 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 # is about -7.6% of profit and 2.4-7.0pp of win rate, on the hostile crypto
 # window -32%. That is the price of the close-confirmed rule, and it is large.
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
+
+# Where TP1/TP2/SL are anchored when the fill drifts away from the signal price.
+#
+# 0 (current): levels are recomputed FROM the live fill. The setup fires on a
+#   break, the order lands ~2 minutes later with price extended a median 0.22%
+#   (crypto) / 0.37% (stocks), and the stop is then placed relative to THAT —
+#   so for a long it sits higher in absolute terms than the structure justifies,
+#   and an ordinary pullback takes it out. This is why a fresh trade so often
+#   shows red immediately, and why a long and a short can both stop out in the
+#   same chop: each side's stop has been dragged toward the noise.
+#
+# 1: levels stay anchored to the pre-drift price — the structure the setup was
+#   actually read from. Only the fill moves.
+#
+# Measured on five windows at the observed 37.4 bps drift:
+#            win rate      profit      stops
+#   from fill  58-66%     +196.44R    34-41%
+#   structure  72-76%     +144.45R    24-28%
+# Win rate +13pp and a third fewer stops, but 26% less profit — the anchored
+# stop sits closer, so each trade both risks and earns less. Risk-adjusted it is
+# mixed across windows: 05-07 strongly favours the current behaviour (ulcer
+# ratio 7.8 against 1.0), 08-26 strongly favours anchoring (6.1 against 2.5).
+#
+# Default unchanged. This is the same profit-for-drawdown axis as SIZE_MULT_MAX
+# and TP1_R_MULT, and it belongs to the account owner.
+LEVELS_FROM_STRUCTURE = os.getenv("LEVELS_FROM_STRUCTURE", "0") != "0"
 # Exchange-side stop stays in place as a disaster backstop, widened to this
 # multiple of R so it cannot fire before the close confirmation. It is what
 # protects the position while the bot itself is down (deploy/restart/network).
