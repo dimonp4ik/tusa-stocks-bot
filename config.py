@@ -1304,9 +1304,11 @@ STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 # mixed across windows: 05-07 strongly favours the current behaviour (ulcer
 # ratio 7.8 against 1.0), 08-26 strongly favours anchoring (6.1 against 2.5).
 #
-# Default unchanged. This is the same profit-for-drawdown axis as SIZE_MULT_MAX
-# and TP1_R_MULT, and it belongs to the account owner.
-LEVELS_FROM_STRUCTURE = os.getenv("LEVELS_FROM_STRUCTURE", "0") != "0"
+# ON since 2026-08-31 by the account owner's decision: he repeatedly reported
+# trades opening red and stopping out in both directions, which is exactly
+# what a fill-anchored stop produces. Fewer stops chosen over headline
+# profit. Same profit-for-drawdown axis as SIZE_MULT_MAX and TP1_R_MULT.
+LEVELS_FROM_STRUCTURE = os.getenv("LEVELS_FROM_STRUCTURE", "1") != "0"
 # Exchange-side stop stays in place as a disaster backstop, widened to this
 # multiple of R so it cannot fire before the close confirmation. It is what
 # protects the position while the bot itself is down (deploy/restart/network).
