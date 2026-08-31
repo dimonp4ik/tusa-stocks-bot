@@ -1213,9 +1213,19 @@ KNN_HORIZON        = int(os.getenv("KNN_HORIZON", "16"))          # forward bars
 KNN_K              = int(os.getenv("KNN_K", "40"))                # neighbours
 KNN_MIN_HISTORY    = int(os.getenv("KNN_MIN_HISTORY", "120"))     # min bars to score
 KNN_HIGH_SCORE     = float(os.getenv("KNN_HIGH_SCORE", "0.55"))   # size-up threshold
-KNN_HIGH_MULT      = float(os.getenv("KNN_HIGH_MULT", "1.20"))    # size-up multiplier
+# kNN sizing was LIVE-ONLY: main.py applied these multipliers to risk_mult,
+# backtest.py computes knn_score and exports it but never sizes on it. So
+# every validated number assumed no kNN sizing while the live book carried
+# +-20% from it. Measured on six windows across both bots, the score does
+# not separate: crypto top vs bottom quartile +0.129/+0.225/+0.246 against
+# +0.127/+0.223/+0.256 (bottom equal or better), and in stocks the boosted
+# top quartile is BELOW book in all three windows (+0.590/+0.214/+0.576
+# against +0.593/+0.529/+0.632) - the rule sized up the worst quartile.
+# Neutralised rather than deleted: the score is still computed and exported,
+# so it stays available if someone models it properly first.
+KNN_HIGH_MULT      = float(os.getenv("KNN_HIGH_MULT", "1.0"))     # neutralised 2026-08-31
 KNN_LOW_SCORE      = float(os.getenv("KNN_LOW_SCORE", "0.50"))    # size-down threshold
-KNN_LOW_MULT       = float(os.getenv("KNN_LOW_MULT", "0.80"))     # size-down multiplier
+KNN_LOW_MULT       = float(os.getenv("KNN_LOW_MULT", "1.0"))      # neutralised 2026-08-31
 KNN_RISK_MAX_MULT  = float(os.getenv("KNN_RISK_MAX_MULT", "1.50"))  # cap after overlays
 KNN_RISK_MIN_MULT  = float(os.getenv("KNN_RISK_MIN_MULT", "0.50"))  # floor after overlays
 
