@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 
 from flask import Flask, request as flask_request
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
+                                EVENT_JOB_ERROR)
 
 import requests as _requests
 
@@ -4114,7 +4116,29 @@ def start_bot():
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")
 
-    scheduler = BackgroundScheduler(daemon=True)
+    # APScheduler's default misfire_grace_time is ONE SECOND: a job whose
+    # run time slips by more than that is dropped outright, not run late.
+    # For this process that meant the 1-min position monitor could simply
+    # not run - leaving an open trade with a stale exchange stop and no
+    # trail update - and a dropped zone-watch tick meant entering later and
+    # worse. Running late beats not running at all here. max_instances=1
+    # still prevents two copies of the same job overlapping, and coalesce
+    # collapses a backlog into a single run rather than a burst.
+    scheduler = BackgroundScheduler(
+        daemon=True,
+        job_defaults={"max_instances": 1, "coalesce": True,
+                      "misfire_grace_time": 60},
+    )
+
+    def _job_problem(event):
+        kind = {EVENT_JOB_MISSED: "MISSED (ran too late, dropped)",
+                EVENT_JOB_MAX_INSTANCES: "SKIPPED (previous run still going)",
+                EVENT_JOB_ERROR: "ERROR"}.get(event.code, str(event.code))
+        log.warning(f"Scheduler job {event.job_id}: {kind}")
+
+    scheduler.add_listener(_job_problem,
+                           EVENT_JOB_MISSED | EVENT_JOB_MAX_INSTANCES |
+                           EVENT_JOB_ERROR)
 
     # Signal scan — every 5 min aligned to candle closes.
     # 15m candles close at :00/:15/:30/:45 → scan at :01/:16/:31/:46 (+1 min buffer).
