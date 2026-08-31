@@ -602,7 +602,25 @@ def poll_exchange_closes() -> None:
             # right away; the signal's own status message follows separately.
             okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
             if pos.get("tp1_algo_id"):
-                okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
+                # Same hazard as the close path above, which checks this and
+                # this path did not. The OCO is closeFraction, so the exchange
+                # retires it once the position is flat; the TP1 partial is a
+                # FIXED size reduce-only order that nothing retires. A leftover
+                # sits armed until the next position in this instrument, then
+                # closes part of it at a price chosen for a trade already over.
+                _c_ok, _c_err = okx.cancel_protection(
+                    creds, pos["inst_id"], pos["tp1_algo_id"])
+                if not _c_ok:
+                    _d = pos["inst_id"].split("-")[0]
+                    log.error(f"autotrade STALE TP1 ORDER {pos['user_id']} "
+                              f"{pos['inst_id']}: cancel failed ({_c_err}) "
+                              f"on the exchange-flat path - it can fire later")
+                    _dm(pos["user_id"], "\n".join([
+                        f"⚠️ *{_d}*: не смог снять ордер частичного закрытия TP1.",
+                        "Он может сработать по следующей сделке этого же тикера.",
+                        "Проверь открытые алго-ордера на бирже.",
+                        f"`{_c_err}`",
+                    ]))
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
             _dm(pos["user_id"],
