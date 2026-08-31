@@ -405,7 +405,13 @@ def get_btc_change_1d() -> float:
         if len(closes) < 2:
             return 0.0
         return (closes[-1] - closes[-2]) / closes[-2] * 100.0
-    except Exception:
+    except Exception as e:
+        # 0.0 reads as "BTC flat", which is not neutral: the correlation
+        # and trend guards that consume it go inert, so a feed outage
+        # quietly lets through trades those guards exist to block.
+        # The value stays 0.0 (every caller assumes a float), but the
+        # failure is no longer invisible.
+        _logger.warning(f"BTC change feed failed, filters see flat: {e}")
         return 0.0
 
 
@@ -417,7 +423,13 @@ def get_btc_change_1h() -> float:
         if len(closes) < 2:
             return 0.0
         return (closes[-1] - closes[-2]) / closes[-2] * 100.0
-    except Exception:
+    except Exception as e:
+        # 0.0 reads as "BTC flat", which is not neutral: the correlation
+        # and trend guards that consume it go inert, so a feed outage
+        # quietly lets through trades those guards exist to block.
+        # The value stays 0.0 (every caller assumes a float), but the
+        # failure is no longer invisible.
+        _logger.warning(f"BTC change feed failed, filters see flat: {e}")
         return 0.0
 
 
