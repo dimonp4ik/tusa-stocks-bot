@@ -343,6 +343,37 @@ def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
     return ok, data
 
 
+def get_last_fill_px(creds: dict, inst_id: str) -> float | None:
+    """Average price of the most recent fill on this instrument, or None.
+
+    The signal engine and the exchange do not exit at the same moment: the
+    engine waits for a 15m candle to CLOSE beyond the stop, while the exchange
+    backstop is a trigger and fires at once. So the engine's own message quotes
+    a candle close the position never traded at. Ported from the crypto bot,
+    which found this live on 2026-08-22 (-6.73% reported against a fill minutes
+    earlier and far above it); this bot reported nothing at all instead.
+
+    Reads the fills endpoint rather than orders-history: it gives the real
+    average execution, including the slippage a market-on-trigger stop eats.
+    """
+    ok, data = _request(creds, "GET", "/api/v5/trade/fills",
+                        params={"instId": inst_id, "limit": "10"})
+    if not ok or not data:
+        return None
+    try:
+        best_ts, best_px = None, None
+        for f in data:
+            px = float(f.get("fillPx") or 0)
+            ts = int(f.get("ts") or 0)
+            if px <= 0:
+                continue
+            if best_ts is None or ts > best_ts:
+                best_ts, best_px = ts, px
+        return best_px
+    except (TypeError, ValueError):
+        return None
+
+
 def close_position_market(creds: dict, inst_id: str) -> tuple:
     """Market-close the whole isolated position. 'no position' → already flat, ok."""
     ok, data = _request(creds, "POST", "/api/v5/trade/close-position", body={
