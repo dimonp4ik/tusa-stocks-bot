@@ -1340,10 +1340,20 @@ def get_setup_accuracy(since_ts: float) -> dict:
                 # get_cap_impact_stats().
                 """SELECT outcome, reached_tp1, reached_tp2 FROM setup_log
                    WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
-                     AND ts >= ? AND sent=?
+                     AND ts >= ?
                      AND COALESCE(source,'live')='live'
-                     AND COALESCE(block_reason,'')=''""",
-                (since_ts, sent_val),
+                     AND (CASE WHEN UPPER(COALESCE(decision,'')) IN ('LONG','SHORT')
+                               THEN 1 ELSE 0 END) = ?
+                     AND (? = 0 OR sent = 1)""",
+                # Split on the VERDICT, not on sent/block_reason: a setup Claude
+                # APPROVED is re-logged on every scan while it waits for price to
+                # return to the zone, only one copy is ever sent, and the rest sat
+                # at sent=0 with nothing to tag them -- so they counted as
+                # rejections. Measured on live crypto data 2026-09-01: five such
+                # rows at 80% TP1 moved the rejected bucket from 53.8% to 61.1%
+                # and flipped the reported gap negative. That number decides
+                # whether the gate stays on.
+                (since_ts, sent_val, sent_val),
             ).fetchall()
             n = len(rows)
             tp1 = sum(1 for r in rows if r["reached_tp1"])
