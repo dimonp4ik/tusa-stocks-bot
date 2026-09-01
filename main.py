@@ -2902,12 +2902,30 @@ def _apply_knn_overlay(setup: dict, symbol: str) -> None:
 
 
 def _setup_rank(setup: dict) -> tuple:
-    """Rank setups before Claude so only the strongest spend LLM tokens."""
-    mtf_score    = int(setup.get("mtf_score", 0) or 0)
-    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
-    volume_score  = float(setup.get("volume_ratio", 0.0))
+    """Rank setups before Claude so only the strongest spend LLM tokens.
+
+    mtf_score was the PRIMARY key here while volume was the last tiebreak, so
+    selection ran on the weaker feature. Measured on this book, top third
+    against bottom third by unit R and win rate:
+
+      volume_ratio  +0.157 / +0.569 / +0.189   WR 74.6 vs 66.2, 75.9 vs 62.0,
+                                               74.7 vs 69.9  -- higher in all
+      mtf_score     +0.006 / +0.109 / +0.313   WR 67.6 vs 76.1, 67.1 vs 68.4,
+                                               72.3 vs 63.9  -- LOWER in two
+
+    Same conclusion the crypto bot reached on its own data and acted on; this
+    one kept the old order. Measured here rather than ported blind, because
+    volume does not mean the same thing in the two books.
+
+    Says nothing about the MTF_MIN_SCORE gate, which is separately validated --
+    only that above the gate a higher score does not rank better. Bounded: the
+    ranking binds only when a scan yields more than MAX_SETUPS_TO_CLAUDE.
+    """
+    volume_score  = float(setup.get("volume_ratio", 0.0) or 0.0)
     zone_bonus    = 1 if setup.get("entry_source") in ("OB", "FVG") else 0
-    return (mtf_score, zone_bonus, confirmations, volume_score)
+    confirmations = sum(1 for k in ("fvg", "order_block", "liq_sweep") if setup.get(k))
+    mtf_score     = int(setup.get("mtf_score", 0) or 0)
+    return (volume_score, zone_bonus, confirmations, mtf_score)
 
 
 # ── Open-signal monitor (updates TP/SL hits in DB) ────────────────────────────
