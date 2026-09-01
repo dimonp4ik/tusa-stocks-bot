@@ -118,6 +118,18 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
 
 
 def _format_price(price: float) -> str:
+    """Price for a human, in fixed point, never in scientific notation.
+
+    The type guard is the point: this is called while building the signal
+    message, so a None or a string here raises TypeError and the signal is
+    never sent at all. Ported from the crypto bot, which guards. Its
+    significant-digit branch for sub-0.001 prices is deliberately NOT
+    ported -- nothing on this book trades below a dollar.
+    """
+    try:
+        price = float(price)
+    except (TypeError, ValueError):
+        return str(price)
     if price >= 1000:  return f"{price:,.2f}"
     if price >= 1:     return f"{price:.4f}"
     return f"{price:.6f}"
