@@ -167,7 +167,12 @@ def recommend_leverage(price: float, sl: float, tp1: float, tp2: float,
 def send_signal(analysis: dict) -> bool:
     """Format and send a trading signal. Returns True on success."""
     decision = analysis["decision"]
-    if decision == "NO TRADE":
+    # Refusing a NO TRADE is the right default, but shadow mode deliberately
+    # trades the rules' verdict instead of Claude's, and this guard blocked
+    # exactly those setups - they were recorded as send failures, so the
+    # toggle looked enabled while changing nothing. main.py sets the flag
+    # only on that path.
+    if decision == "NO TRADE" and not analysis.get("_force_send"):
         return False
 
     price     = analysis["current_price"]

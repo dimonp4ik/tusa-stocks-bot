@@ -3696,6 +3696,10 @@ def run_scan():
 
                 if decision == "NO TRADE" and not _gate:
                     log.info(f"  [shadow] {analysis['symbol']} — Claude said NO TRADE, trading anyway")
+                    # send_signal refuses any NO TRADE outright, so without this the
+                    # shadow toggle silently did nothing for exactly the setups it
+                    # exists to let through: they came back as "send failed".
+                    analysis["_force_send"] = True
 
                 if decision != "NO TRADE" or not _gate:
                     # Both caps withhold a setup Claude APPROVED. Tag why, so it
