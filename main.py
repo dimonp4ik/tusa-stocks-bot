@@ -3198,11 +3198,9 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
 
     STOP_CLOSE_CONFIRM must mirror the live position monitor and backtest.py
     here too — this is a THIRD independent place the stop rule is implemented
-    (setup_log / "Точность ИИ" / the mirror experiment). Currently harmless
-    since STOP_CLOSE_CONFIRM defaults 0 on this bot (unmeasured — see
-    portfolio_sim findings), but if it is ever enabled without this fix, a
-    setup that is both sent (real position) and logged gets two different
-    outcomes for the same trade.
+    (setup_log / "Точность ИИ" / the mirror experiment). STOP_CLOSE_CONFIRM is ENABLED on this bot, so a setup that is both sent
+    (real position) and logged gets two different outcomes for the same
+    trade unless this mirrors the monitor exactly.
     """
     tp1_reached = False
     risk = abs(entry - sl)
@@ -3228,7 +3226,16 @@ def _simulate_setup_outcome(direction: str, entry: float, tp1: float, tp2: float
         if closes is not None:
             closes = closes[start:]
 
-    use_close = STOP_CLOSE_CONFIRM and closes is not None
+    # closes[idx] is indexed off the highs/lows loop below, so a shorter
+    # closes list walks off the end. Fall back to the wick rule and say so
+    # rather than raise. The docstring above used to argue this was
+    # harmless because STOP_CLOSE_CONFIRM was 0 on this bot -- it is now 1
+    # (see the admin report's config block), so the path is live.
+    use_close = (STOP_CLOSE_CONFIRM and closes is not None
+                 and len(closes) >= min(len(highs), len(lows)))
+    if STOP_CLOSE_CONFIRM and closes is not None and not use_close:
+        log.warning(f"  shadow: closes shorter than highs/lows "
+                    f"({len(closes)} < {min(len(highs), len(lows))}) — wick stop used")
 
     # ATR for the post-TP1 trail, from the same candles.
     _rng = []
