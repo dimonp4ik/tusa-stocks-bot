@@ -306,7 +306,8 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
                     v = sorted(float(r.get(k) or 0) for r in _phs)
                     return v[len(v) // 2]
                 A(f"  сканов с сигналами: {len(_phs)}")
-                A(f"  медиана: разбор {_med('smc'):.1f}с, Клод {_med('light'):.1f}с, "
+                A(f"  медиана: свечи {_med('fetch'):.1f}с, разбор {_med('smc'):.1f}с, "
+          f"Клод {_med('light'):.1f}с, "
                   f"отправка {_med('send'):.1f}с, ВСЕГО {_med('total'):.1f}с")
                 _w = max(_phs, key=lambda r: float(r.get("total") or 0))
                 A(f"  худший скан: {_w.get('total')}с "
@@ -3341,7 +3342,7 @@ def run_scan():
     # zone, and entry drift is the single largest cost in the book, so the
     # breakdown is logged every scan rather than guessed at.
     _ph_t0 = time.time()
-    _ph_smc = _ph_light = 0.0
+    _ph_smc = _ph_light = _ph_fetch = 0.0
     now_utc = datetime.now(timezone.utc)
 
     # TP/SL monitoring moved to dedicated 1-min job (_monitor_open_signals)
@@ -3452,13 +3453,38 @@ def run_scan():
         smc_diag = {}  # funnel diagnostics: how many coins reached scoring + best score
 
         # Step 2: SMC filter — BOS + confirmation + 1h/4h trend + BTC correlation
+        # Candles are fetched CONCURRENTLY. This loop used to pull four
+        # timeframes serially per ticker and sleep 0.2s between tickers, which
+        # measured 46.4s of a 58.5s publish on 2026-09-01 - 79% of the delay
+        # that drags the fill away from the entry zone, and entry drift is the
+        # largest single cost in this book. The crypto bot was given this months
+        # ago and stocks never was. Only the network wait overlaps; analysis
+        # stays on this thread so setup order and the diag counters are unchanged.
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        _SCAN_FETCH_WORKERS = 6      # well under OKX public rate limits
+
+        def _fetch_all(sym):
+            return sym, (get_klines(sym), get_klines_1h(sym),
+                         get_klines_4h(sym), get_klines_1d(sym))
+
+        _t0 = time.time()
+        _fetched = {}
+        with ThreadPoolExecutor(max_workers=_SCAN_FETCH_WORKERS) as _ex:
+            for _fut in as_completed([_ex.submit(_fetch_all, s) for s in coins]):
+                try:
+                    _sym, _dfs = _fut.result()
+                    _fetched[_sym] = _dfs
+                except Exception as e:
+                    log.warning(f"  Fetch failed: {e}")
+        _ph_fetch = time.time() - _t0
+        log.info(f"Candles: {len(_fetched)}/{len(coins)} symbols in {_ph_fetch:.1f}s")
+
         _ph_t_smc = time.time()
         for symbol in coins:
+            if symbol not in _fetched:
+                continue
             try:
-                df_15m = get_klines(symbol)
-                df_1h  = get_klines_1h(symbol)
-                df_4h  = get_klines_4h(symbol)
-                df_1d  = get_klines_1d(symbol)
+                df_15m, df_1h, df_4h, df_1d = _fetched[symbol]
                 setup  = analyze_coin_smc(df_15m, df_1h, symbol, df_4h, btc_change, df_1d, diag=smc_diag)
                 if setup:
                     _apply_knn_overlay(setup, symbol)
@@ -3468,7 +3494,6 @@ def run_scan():
                         f"signals={setup['signals']}"
                     )
                     setups.append(setup)
-                time.sleep(0.2)  # 2 API calls per coin — small delay
             except Exception as e:
                 log.warning(f"  Skip {symbol}: {e}")
 
@@ -3878,7 +3903,8 @@ def run_scan():
                 log.error(f"  Error sending {analysis.get('symbol','?')}: {e}")
 
         _last_scan_stats["sent"] = sent_count
-        log.info(f"Scan phases: smc+rank {_ph_smc:.1f}s, light {_ph_light:.1f}s, "
+        log.info(f"Scan phases: fetch {_ph_fetch:.1f}s, smc+rank {_ph_smc:.1f}s, "
+                 f"light {_ph_light:.1f}s, "
                  f"send {time.time()-_ph_t_send:.1f}s, total {time.time()-_ph_t0:.1f}s")
         # Persist the breakdown too. The log lives on the host and is not
         # reachable from where this gets analysed, so without this the timing
@@ -3887,6 +3913,7 @@ def run_scan():
         try:
             _ph_hist = json.loads(get_bot_state("scan_phase_ms") or "[]")
             _ph_hist.append({"t": round(time.time()),
+                             "fetch": round(_ph_fetch, 1),
                              "smc": round(_ph_smc, 1),
                              "light": round(_ph_light, 1),
                              "send": round(time.time() - _ph_t_send, 1),
