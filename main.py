@@ -201,8 +201,15 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
             A("  всё, что есть в базе")
         A("")
 
-        for label, cut in ([(window_label, since_ts)] +
-                           ([("последние 7 дней", since7)] if since_ts < since7 else [])):
+        # Same-named windows print the same block twice: when the report's own
+        # window IS the 7-day one, since_ts and since7 differ by a hair and the
+        # condition below still adds it. Dedupe on the label the reader sees.
+        _wins = [(window_label, since_ts)]
+        if since_ts < since7:
+            _wins.append(("последние 7 дней", since7))
+        _seen = set()
+        _wins = [w for w in _wins if not (w[0] in _seen or _seen.add(w[0]))]
+        for label, cut in _wins:
             s = get_stats(since_ts=cut) if cut > 0 else get_stats(days=36500)
             A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
             A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
@@ -237,7 +244,10 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("")
 
         A("## ПРИРОДА СТОПОВ (X-Perp фитиль vs реальный разворот)")
-        for label, cut in (("последние 7 дней", since7), (window_label, since_ts)):
+        _sl_wins = [("последние 7 дней", since7), (window_label, since_ts)]
+        _seen2 = set()
+        _sl_wins = [w for w in _sl_wins if not (w[0] in _seen2 or _seen2.add(w[0]))]
+        for label, cut in _sl_wins:
             w = get_sl_wick_stats(cut)
             if w["n"]:
                 A(f"  {label}: стопов {w['n']}  "
