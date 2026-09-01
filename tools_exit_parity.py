@@ -57,8 +57,13 @@ def _series(n: int, start: float, vol: float):
     return o, h, l, c
 
 
-def main_() -> int:
-    runs = int(sys.argv[1]) if len(sys.argv) > 1 else 400
+def compare(runs: int = 400):
+    """Compare the model's exit against the shadow's on synthetic series.
+
+    Split out of main_ so parity_check.py can assert on it. The drift this
+    catches went unnoticed for months precisely because running it was
+    something a person had to remember.
+    """
     random.seed(7)
     agree = dis = skipped = 0
     kinds: dict[str, int] = {}
@@ -109,6 +114,12 @@ def main_() -> int:
             kinds[f"model={model} shadow={shad}"] = kinds.get(
                 f"model={model} shadow={shad}", 0) + 1
 
+    return agree, dis, skipped, kinds
+
+
+def main_() -> int:
+    runs = int(sys.argv[1]) if len(sys.argv) > 1 else 400
+    agree, dis, skipped, kinds = compare(runs)
     total = agree + dis
     if total == 0:
         print("АВАРИЯ: ни одной сравнимой пары — проверь генератор серий")

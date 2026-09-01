@@ -116,14 +116,42 @@ def check_r_model() -> list[str]:
     return failures
 
 
+EXIT_PARITY_MAX = 0.03   # known residual is ~1%; a real break is much larger
+
+
+def check_exit_parity() -> list[str]:
+    """The exit rule exists three times; assert two of them still agree.
+
+    This check covers backtest.simulate_trade_direct against the shadow
+    tracker's _simulate_setup_outcome, which is what unsent setups are
+    resolved with and therefore what Claude is shown as his own record. The
+    comparison already existed as tools_exit_parity.py, but running it was
+    something a person had to remember -- and the divergence that mattered
+    most sat there for months. A residual around 1% is expected and
+    documented; anything past EXIT_PARITY_MAX means the two have drifted.
+    """
+    try:
+        from tools_exit_parity import compare
+    except Exception as e:
+        return [f"exit parity unavailable: {e}"]
+    agree, dis, _skipped, kinds = compare(200)
+    total = agree + dis
+    if total == 0:
+        return ["exit parity: no comparable pairs — the series generator is broken"]
+    rate = dis / total
+    if rate > EXIT_PARITY_MAX:
+        return [f"exit rule drift: {dis}/{total} ({rate*100:.1f}%) disagree, max {EXIT_PARITY_MAX*100:.0f}% — {kinds}"]
+    return []
+
+
 def main() -> int:
-    failures = check_tp_sl_parity() + check_r_model()
+    failures = check_tp_sl_parity() + check_r_model() + check_exit_parity()
     if failures:
         print("FAIL")
         for item in failures:
             print(f"- {item}")
         return 1
-    print("PASS: live/backtest TP-SL parity and R model checks are OK.")
+    print("PASS: TP/SL parity, R model and exit-rule parity are OK.")
     return 0
 
 
