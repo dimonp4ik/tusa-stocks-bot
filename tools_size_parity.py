@@ -123,5 +123,23 @@ def main_() -> int:
     return 0
 
 
+def main_all() -> int:
+    """Two passes: as configured, then with the fresh-break trim FORCED ON.
+
+    A rule sitting at 1.0 is invisible to this comparison -- the ceiling was
+    applied to the whole product live and to the boosts only in the model,
+    and those agree exactly while the trim is disabled. 400/400 meant
+    nothing for that rule. Forcing it on is what makes the check honest.
+    """
+    rc = main_()
+    import src.autotrader as _at
+    if float(C.EXTENSION_FRESH_SIZE_MULT) == 1.0:
+        print("\n--- второй проход: подрезка свежего слома принудительно 0.9 ---")
+        _at.EXTENSION_FRESH_SIZE_MULT = 0.9
+        bt.EXTENSION_FRESH_SIZE_MULT = 0.9
+        rc = main_() or rc
+    return rc
+
+
 if __name__ == "__main__":
-    raise SystemExit(main_())
+    raise SystemExit(main_all())

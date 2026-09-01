@@ -193,6 +193,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # width, which is the assumption every R figure in this project rests on,
     # so it has to have the last word.
     _norm = 1.0
+    _stack = 1.0   # BOOSTS only: the ceiling never applied to the trim
     if RISK_NORMALIZED_SIZING:
         try:
             _e, _sl = float(sig["entry_price"]), float(sig["sl"])
@@ -232,6 +233,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                     and float(_ap) < ORDERLY_ATR_MAX
                     and float(_ex) >= ORDERLY_EXT_MIN):
                 _size_mult *= float(ORDERLY_SIZE_MULT)
+                _stack *= float(ORDERLY_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Opening bell WITH volume rides bigger — see OPEN_SESSION_SIZE_MULT in
@@ -245,6 +247,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _vr = sig.get("volume_ratio")
             if _vr is not None and float(_vr) >= OPEN_VOL_MIN:
                 _size_mult *= float(OPEN_SESSION_SIZE_MULT)
+                _stack *= float(OPEN_SESSION_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     # Volume spike and OFF session — added 2026-08-29 to close a real gap: the
@@ -259,13 +262,25 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             _vr = sig.get("volume_ratio")
             if _vr is not None and float(_vr) >= VOLUME_SPIKE_BOOST_MIN:
                 _size_mult *= float(VOLUME_SPIKE_SIZE_MULT)
+                _stack *= float(VOLUME_SPIKE_SIZE_MULT)
         except (TypeError, ValueError):
             pass
     if OFF_SESSION_SIZE_MULT != 1.0 and str(sig.get("session") or "") == "OFF":
         _size_mult *= float(OFF_SESSION_SIZE_MULT)
+        _stack *= float(OFF_SESSION_SIZE_MULT)
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.
-    _size_mult = min(_size_mult, float(SIZE_MULT_MAX)) * _norm
+    # The ceiling applies to the BOOSTS, not to the whole product, matching
+    # backtest._size_mult_for. This changes NOTHING reachable today and is not
+    # presented as a fix: capping the total differs only where the trim and the
+    # boosts co-occur, and they cannot -- the trim needs bos_extension_atr
+    # <= 0.7 while ORDERLY needs >= 1.271, which leaves a maximum stack of 1.5
+    # against a 2.0 ceiling. Aligned anyway so the two paths agree by
+    # construction rather than by a coincidence of two thresholds that nothing
+    # stops anyone from moving.
+    if _stack > float(SIZE_MULT_MAX):
+        _size_mult *= float(SIZE_MULT_MAX) / _stack
+    _size_mult *= _norm
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return
