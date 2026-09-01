@@ -184,12 +184,21 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # stop distance here spans 0.40%-1.50%, so without this the widest trades
     # risk 3.8x the tightest ones under an identical "size".
     _size_mult = 1.0
+    # Normalisation is held aside and applied AFTER the ceiling, matching the
+    # crypto bot. Folding it in here and capping the product afterwards lets
+    # the ceiling undo it: with boosts 3.0 and a 0.7 normalisation the old
+    # order sent min(2.1, 2.0) = 2.0 where the intended size is 0.7 * 2.0 =
+    # 1.4 -- 43% more money at risk than the wide stop was supposed to get.
+    # Normalisation exists precisely so 1R costs the same money at any stop
+    # width, which is the assumption every R figure in this project rests on,
+    # so it has to have the last word.
+    _norm = 1.0
     if RISK_NORMALIZED_SIZING:
         try:
             _e, _sl = float(sig["entry_price"]), float(sig["sl"])
             _risk_pct = abs(_e - _sl) / _e if _e > 0 else 0.0
             if _risk_pct > RISK_REFERENCE_PCT:
-                _size_mult *= max(RISK_SIZE_MULT_MIN, RISK_REFERENCE_PCT / _risk_pct)
+                _norm = max(RISK_SIZE_MULT_MIN, RISK_REFERENCE_PCT / _risk_pct)
         except (TypeError, ValueError, ZeroDivisionError, KeyError) as _e:
             # Fails OPEN: without this the multiplier stays 1.0 and a wide-stop
             # trade goes out at FULL size, which is the case this whole block
@@ -256,7 +265,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _size_mult *= float(OFF_SESSION_SIZE_MULT)
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.
-    _size_mult = min(_size_mult, float(SIZE_MULT_MAX))
+    _size_mult = min(_size_mult, float(SIZE_MULT_MAX)) * _norm
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:
         return

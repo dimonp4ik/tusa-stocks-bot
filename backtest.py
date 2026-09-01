@@ -725,6 +725,57 @@ class SymbolResult:
     trade_records: list[TradeRecord] = field(default_factory=list)
 
 
+def _size_mult_for(setup: dict) -> float:
+    """Total size multiplier for one setup - the model's mirror of the live
+    rules in src/autotrader.py.
+
+    Extracted from simulate_trade_direct without changing a condition, so the
+    live path can be compared against it (tools_size_parity.py). Multiplying
+    gross/net/cost by each factor in turn is identical to multiplying once by
+    the product, which is what makes the extraction exact.
+
+    The ceiling applies to the BOOSTS only: _stack deliberately excludes the
+    fresh-break trim above it, as it always has.
+    """
+    m = 1.0
+    try:
+        if _fld(setup, "bos_extension_atr", 99.0) <= EXTENSION_FRESH_THRESHOLD:
+            m *= float(EXTENSION_FRESH_SIZE_MULT)
+    except (TypeError, ValueError):
+        pass
+    stack = 1.0
+    if ORDERLY_SIZE_MULT != 1.0:
+        try:
+            if (_fld(setup, "eff_ratio", 0.0) >= ORDERLY_EFF_MIN
+                    and _fld(setup, "vol_atr_pct", 99.0) < ORDERLY_ATR_MAX
+                    and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
+                _sm = float(ORDERLY_SIZE_MULT)
+                stack *= _sm; m *= _sm
+        except (TypeError, ValueError):
+            pass
+    if VOLUME_SPIKE_SIZE_MULT != 1.0:
+        try:
+            if _fld(setup, "volume_ratio", 0.0) >= VOLUME_SPIKE_BOOST_MIN:
+                _vm = float(VOLUME_SPIKE_SIZE_MULT)
+                stack *= _vm; m *= _vm
+        except (TypeError, ValueError):
+            pass
+    if OFF_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OFF":
+        _fm = float(OFF_SESSION_SIZE_MULT)
+        stack *= _fm; m *= _fm
+    if OPEN_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OPEN":
+        try:
+            _vok = float(setup.get("volume_ratio") or 0.0) >= OPEN_VOL_MIN
+        except (TypeError, ValueError):
+            _vok = False
+        if _vok:
+            _om = float(OPEN_SESSION_SIZE_MULT)
+            stack *= _om; m *= _om
+    if stack > SIZE_MULT_MAX:
+        m *= SIZE_MULT_MAX / stack
+    return m
+
+
 def simulate_trade_direct(
     symbol: str,
     setup: dict,
@@ -957,58 +1008,11 @@ def simulate_trade_direct(
     # is exactly how the volume-spike boost passed two validations it should
     # have failed. _stack below stays as it was because the ceiling has always
     # been applied to the BOOSTS only.
-    _size_mult = 1.0
-    try:
-        if _fld(setup, "bos_extension_atr", 99.0) <= EXTENSION_FRESH_THRESHOLD:
-            _fm = float(EXTENSION_FRESH_SIZE_MULT)
-            gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _size_mult *= _fm
-    except (TypeError, ValueError):
-        pass
-    # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Applied
-    # as a correction after the boosts, since the multipliers here are folded
-    # straight into gross/net/cost rather than accumulated in one variable.
-    _stack = 1.0
-    # Orderly trend rides bigger — see ORDERLY_SIZE_MULT in config.py.
-    if ORDERLY_SIZE_MULT != 1.0:
-        try:
-            # All three read through _fld: `x or default` swallows a legitimate
-            # zero, and eff_ratio genuinely CAN be zero (price ending exactly
-            # where it started is perfect chop). Behaviour is unchanged on real
-            # data — a zero vol_atr_pct needs three consecutive bars of zero
-            # range — but the mixed styles in one condition are how this bug
-            # class gets copied to a place where zeros do occur.
-            if (_fld(setup, "eff_ratio", 0.0) >= ORDERLY_EFF_MIN
-                    and _fld(setup, "vol_atr_pct", 99.0) < ORDERLY_ATR_MAX
-                    and _fld(setup, "bos_extension_atr", 0.0) >= ORDERLY_EXT_MIN):
-                _sm = float(ORDERLY_SIZE_MULT)
-                gross_r *= _sm; net_r *= _sm; cost_r *= _sm; _stack *= _sm; _size_mult *= _sm
-        except (TypeError, ValueError):
-            pass
-    # Volume spike rides bigger — see VOLUME_SPIKE_BOOST_MIN in config.py.
-    if VOLUME_SPIKE_SIZE_MULT != 1.0:
-        try:
-            if _fld(setup, "volume_ratio", 0.0) >= VOLUME_SPIKE_BOOST_MIN:
-                _vm = float(VOLUME_SPIKE_SIZE_MULT)
-                gross_r *= _vm; net_r *= _vm; cost_r *= _vm; _stack *= _vm; _size_mult *= _vm
-        except (TypeError, ValueError):
-            pass
-    # OFF session rides smaller — see OFF_SESSION_SIZE_MULT in config.py.
-    if OFF_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OFF":
-        _fm = float(OFF_SESSION_SIZE_MULT)
-        gross_r *= _fm; net_r *= _fm; cost_r *= _fm; _stack *= _fm; _size_mult *= _fm
-    # Opening bell rides bigger — see OPEN_SESSION_SIZE_MULT in config.py.
-    if OPEN_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OPEN":
-        try:
-            _vok = float(setup.get("volume_ratio") or 0.0) >= OPEN_VOL_MIN
-        except (TypeError, ValueError):
-            _vok = False
-        if _vok:
-            _om = float(OPEN_SESSION_SIZE_MULT)
-            gross_r *= _om; net_r *= _om; cost_r *= _om; _stack *= _om; _size_mult *= _om
-
-    if _stack > SIZE_MULT_MAX:
-        _fix = SIZE_MULT_MAX / _stack
-        gross_r *= _fix; net_r *= _fix; cost_r *= _fix; _size_mult *= _fix
+    # Size rules live in _size_mult_for so the live autotrader can be compared
+    # against them directly; applying the product once is identical to folding
+    # each factor in turn, which is what this used to do inline.
+    _size_mult = _size_mult_for(setup)
+    gross_r *= _size_mult; net_r *= _size_mult; cost_r *= _size_mult
 
     return TradeRecord(
         symbol=symbol,
