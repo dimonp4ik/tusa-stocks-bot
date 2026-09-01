@@ -249,6 +249,11 @@ def init_db():
             "resolved":     "INTEGER NOT NULL DEFAULT 0",
             "resolved_ts":  "REAL",
             "trend":        "TEXT",
+            # Funding is fetched every scan and used as a HARD gate (skip LONG
+            # above +0.05%, SHORT below -0.05%) and then thrown away, so the
+            # gate has never been measured against outcomes. Ported from the
+            # crypto bot, which had the same blind spot.
+            "funding_rate": "REAL",
             # Open Interest shadow feature (logged, not yet acted on).
             "oi_delta_pct": "REAL",
             "oi_regime":    "TEXT",
@@ -1063,8 +1068,9 @@ def log_setup_candidate(analysis: dict) -> int:
                 (ts, symbol, direction, entry_price, tp1, tp2, sl,
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, atr, trend,
-                 oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir,
+                 funding_rate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1087,6 +1093,7 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("oi_confirms"),
             analysis.get("counter", ""),
             analysis.get("open_same_dir"),
+            analysis.get("funding_rate"),
         ))
         return cur.lastrowid
 
