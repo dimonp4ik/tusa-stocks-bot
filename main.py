@@ -310,12 +310,21 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("## ЗАДЕРЖКА ПУБЛИКАЦИИ (последние сканы)")
         try:
             _phs = json.loads(get_bot_state("scan_phase_ms") or "[]")
-            _phs = [r for r in _phs if r.get("sent")]
+            # Every scan is timed, whether or not it published: the phases are
+            # the same either way, and dropping the quiet ones threw away all
+            # the data on the bot that signals least often.
             if _phs:
                 def _med(k):
-                    v = sorted(float(r.get(k) or 0) for r in _phs)
-                    return v[len(v) // 2]
-                A(f"  сканов с сигналами: {len(_phs)}")
+                    # Only rows that CARRY the key. Records written before a
+                    # phase existed read as 0.0 through `or 0` and drag the
+                    # median toward zero -- which is how 'свечи 0.0с' appeared
+                    # next to an unchanged 45.6s parse and looked like the
+                    # fetch was free.
+                    v = sorted(float(r[k]) for r in _phs
+                               if r.get(k) is not None)
+                    return v[len(v) // 2] if v else 0.0
+                _sent = sum(1 for r in _phs if r.get("sent"))
+                A(f"  сканов записано: {len(_phs)} (с сигналами {_sent})")
                 _fs = sum(int(r.get('fund_skip') or 0) for r in _phs)
                 if _fs:
                     A(f"  гейт фандинга отказал: {_fs} сетапов за {len(_phs)} сканов")
@@ -3971,7 +3980,11 @@ def run_scan():
                              "total": round(time.time() - _ph_t0, 1),
                              "fund_skip": _funding_skips,
                              "sent": sent_count})
-            set_bot_state("scan_phase_ms", json.dumps(_ph_hist[-50:]))
+            # 50 records is about four hours. A scan publishes a signal maybe
+            # once in fifty, so filtering to "scans that sent something" left
+            # the crypto report with nothing at all to show. A day of history
+            # costs a few KB.
+            set_bot_state("scan_phase_ms", json.dumps(_ph_hist[-300:]))
         except Exception as _pe:
             log.debug(f"scan phase persist failed: {_pe}")
         log.info(f"=== Scan complete — {sent_count} signal(s) sent ===\n")
