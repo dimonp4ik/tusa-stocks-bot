@@ -527,13 +527,18 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
-            f"SELECT status FROM signals WHERE symbol = ? AND status IN ({placeholders})"
-            f" ORDER BY opened_at DESC LIMIT ?",
+            f"SELECT status, realized_r FROM signals WHERE symbol = ? "
+            f"AND status IN ({placeholders}) ORDER BY opened_at DESC LIMIT ?",
             [symbol, *FINAL_STATUSES, lookback],
         ).fetchall()
 
-    statuses = [r["status"] for r in rows]
-    rs = [_status_to_r(s) for s in statuses]
+    # Use the R actually recorded on the trade, not a nominal value derived
+    # from its status. This feeds auto_block_bad_symbols, which stops the
+    # bot trading a symbol, and the status map scores every win as the same
+    # +R regardless of what the runner really made -- on live rows here
+    # those range from +0.29R to +3.27R. The crypto bot reads realized_r
+    # and falls back to the map only when it is missing; this one never did.
+    rs = [_row_r(r) for r in rows]
     gross_profit = sum(r for r in rs if r > 0)
     gross_loss   = abs(sum(r for r in rs if r < 0))
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else (999.0 if gross_profit > 0 else 0.0)
