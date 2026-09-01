@@ -2977,6 +2977,32 @@ def _post_tp1_trail_mult(direction: str, entry: float, tp1: float, tp2: float,
     return base
 
 
+def _deep_feed_breached(symbol: str, sl: float, direction: str,
+                        monitor_from: float, candle_lim: int):
+    """Did the DEEP global feed also breach this stop? None = unknown.
+
+    One implementation for two callers: the sl_xperp_only diagnostic and
+    the optional STOP_REQUIRE_GLOBAL_CONFIRM gate. The stop rule already
+    exists in three places here; it does not need a fourth.
+
+    Compares like with like: under a close-confirmed stop the X-Perp side
+    triggered on a CLOSE, so asking the deep feed only for a wick touch
+    would answer a different, near-always-yes question.
+    """
+    try:
+        g = get_klines(symbol, limit=candle_lim)
+        gd = _slice_candles_from_open(g, monitor_from)
+        if STOP_CLOSE_CONFIRM:
+            return any((float(x) <= sl) if direction == "LONG" else (float(x) >= sl)
+                       for x in gd.get("close", []))
+        if direction == "LONG":
+            return any(float(x) <= sl for x in gd.get("low", []))
+        return any(float(x) >= sl for x in gd.get("high", []))
+    except Exception as _we:
+        log.debug(f"  deep-feed stop check failed {symbol}: {_we}")
+        return None
+
+
 def _check_open_signals():
     """For each OPEN signal in DB, fetch current price and update status."""
     active_signals = get_open_signals()
@@ -3157,22 +3183,26 @@ def _check_open_signals():
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
                 realized_r = round(tp1_close_frac * tp1_r, 4) if status == "TP1_PARTIAL" else 0.0
 
+            # Optional second opinion before closing: the position trades on the
+            # X-Perp, but the levels come from the deep feed and so does every
+            # figure the model reports. With this on, a stop needs both to agree.
+            # Default off -- see STOP_REQUIRE_GLOBAL_CONFIRM in config.py.
+            _deep_ok = None
+            if new_status == "SL_HIT":
+                from config import STOP_REQUIRE_GLOBAL_CONFIRM as _REQ_DEEP
+                _deep_ok = _deep_feed_breached(sig["symbol"], sl, direction,
+                                               monitor_from, candle_lim)
+                if _REQ_DEEP and _deep_ok is False:
+                    log.info(f"  #{sig['id']} {sig['symbol']} — стоп только на X-Perp, "
+                             f"глубокий фид не подтверждает, держим")
+                    new_status = None
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult)
                 # SL-wick diagnostic: real reversal (deep global feed also breached
                 # SL) or thin-X-Perp execution noise (only X-Perp wicked to it)?
-                if new_status == "SL_HIT":
-                    try:
-                        g = get_klines(sig["symbol"], limit=candle_lim)  # global feed
-                        gd = _slice_candles_from_open(g, monitor_from)
-                        if direction == "LONG":
-                            g_breached = any(float(x) <= sl for x in gd.get("low", []))
-                        else:
-                            g_breached = any(float(x) >= sl for x in gd.get("high", []))
-                        set_sl_xperp_only(sig["id"], 0 if g_breached else 1)
-                    except Exception as _we:
-                        log.debug(f"  SL-wick check failed #{sig['id']}: {_we}")
+                if new_status == "SL_HIT" and _deep_ok is not None:
+                    set_sl_xperp_only(sig["id"], 0 if _deep_ok else 1)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
                 try:
                     send_signal_update(sig, new_status, exit_px)

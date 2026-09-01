@@ -1292,6 +1292,31 @@ BTC_BLOCK_THRESHOLD_PCT = 1.0  # SPY ±1% intraday = genuine market-wide event
 # window -32%. That is the price of the close-confirmed rule, and it is large.
 STOP_CLOSE_CONFIRM = os.getenv("STOP_CLOSE_CONFIRM", "1") != "0"
 
+# Require the DEEP feed to confirm a stop before closing, not just the X-Perp
+# the position trades on. The monitor already computes this -- it is the
+# sl_xperp_only diagnostic -- and then closes anyway, so the information is
+# there and unused.
+#
+# Measured on the live week of 2026-09-02: 3 of 15 crypto stops (20%) and 6 of
+# 22 stocks stops (27%) were breached on the X-Perp alone. Those are not thin
+# symbols -- GOOGL, META, TSLA, ETH -- and in stocks they cost MORE than real
+# stops (-1.697R against -1.321R), because a spike closes far past the level
+# and a close-confirmed exit follows it down. Skipping them would move the
+# live stop rate from 38.5% to 30.8% (crypto) and 44.9% to 32.7% (stocks),
+# which is most of the remaining gap against the model.
+#
+# The catch, stated plainly: nobody knows what those trades would have done
+# next. Held instead of closed, they run until the deep feed agrees or the
+# exchange backstop fires at STOP_EXCHANGE_BACKSTOP_R -- so a -1.1R stop can
+# become -1.5R (crypto) or -2.5R (stocks). The counterfactual is not in the
+# data and cannot be backtested: the model only ever sees the deep feed, so it
+# already behaves as if this were on. That is also the argument FOR it -- with
+# it on, live and model use the same evidence for the same decision.
+#
+# Default OFF. This is the account owner's call, same class as
+# LEVELS_FROM_STRUCTURE.
+STOP_REQUIRE_GLOBAL_CONFIRM = os.getenv("STOP_REQUIRE_GLOBAL_CONFIRM", "0") != "0"
+
 # Where TP1/TP2/SL are anchored when the fill drifts away from the signal price.
 #
 # 0 (current): levels are recomputed FROM the live fill. The setup fires on a
