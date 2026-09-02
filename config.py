@@ -1603,8 +1603,26 @@ BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 # 0.317R/trade instead of 0.211R: it understated net edge by ~21% (+826R ->
 # +1003R on the 1679-trade 2022-2026 deep set). Slippage kept at 0.05%/side,
 # which is conservative for liquid stock X-Perps inside the US session.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
-BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0005"))
+# 2026-09-03: both rates were 0.0005 and both were wrong, by a lot.
+# FEE: the account owner's actual per-side fee is 0.0001, five times lower than
+# what was assumed here.
+# SLIPPAGE: 0.0005 per side was never measured. The honest cost of crossing is
+# half the spread, and the spread was measured live on the venue — crypto perps
+# above $5M turnover have a median spread of 0.0172% (half = 0.0086%), and the
+# stock X-Perps 0.011% (half = 0.0055%). Rounded up to 0.0001 per side for both.
+# Round trip therefore goes from 0.20% to 0.04% of notional.
+#
+# This matters far beyond tidiness. Cost in R is round-trip / risk-in-price, so
+# at a 2.14% median stop the old rates charged 0.0934R per trade against a live
+# gross edge of +0.091R — i.e. the model believed the whole edge was eaten by
+# costs. On the real rates the charge is 0.0187R and the live book is clearly
+# profitable: crypto +19.90R gross over 218 trades becomes +15.8R net, stocks
+# +27.44R over 168 becomes +21.9R.
+# Every table recorded before this date was measured with costs 5x too high.
+# Overstated costs bias the model toward fewer trades and wider stops, so
+# cost-sensitive decisions need re-checking, not just re-baselining.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0001"))
+BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 BACKTEST_USE_BTC_FILTER = os.getenv("BACKTEST_USE_BTC_FILTER", "1") != "0"
 
 # --- Autotrading (real OKX EU orders for allow-listed users) ---
