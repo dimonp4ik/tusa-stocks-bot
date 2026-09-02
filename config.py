@@ -1529,4 +1529,14 @@ AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # N consecutive SL among today's closed signals → pause new signals until the
 # next Riga day. 0 = off.
+# Swept 2026-09-02 over 5 windows (04-10/05-07/06-05/07-15/08-26, 2800 candles)
+# AFTER the kill-switch lookahead fix — the old value predated it and was never
+# re-derived. profit / profit-per-ulcer, best of each column marked:
+#   kill=2   146.5 138.3 175.1 146.8 143.4  |  46.3 63.3 106.9 60.1 48.1   worse on both, everywhere
+#   kill=3   161.3 158.7 192.3 150.7 185.3  |  53.6 64.3 126.5 61.4 75.3   ← best risk-adjusted in 4/5
+#   kill=4   160.8 154.8 190.3 156.4 190.1  |  48.2 58.4 121.1 64.7 74.4
+#   kill=5   165.6 161.4 190.3 156.4 187.0  |  48.5 62.6 121.1 64.7 70.0
+#   kill=0   165.6 172.1 190.3 156.4 187.0  |  48.5 72.1 121.1 64.7 70.0
+# Loosening buys gross profit by admitting more trades while every risk ratio
+# falls — the leverage signature, so 3 stays. Tightening to 2 loses both.
 KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "3"))
