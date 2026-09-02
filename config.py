@@ -501,6 +501,18 @@ LOW_EDGE_SHORT_SYMBOLS = _parse_symbol_list(os.getenv("LOW_EDGE_SHORT_SYMBOLS", 
 # All four proven together on 8640×15m across all monthly slices.
 RELATIVE_STRENGTH_LOOKBACK_HOURS      = int(os.getenv("RELATIVE_STRENGTH_LOOKBACK_HOURS", "1"))
 LONG_RELATIVE_WEAKNESS_FILTER         = os.getenv("LONG_RELATIVE_WEAKNESS_FILTER", "1") != "0"
+# Swept 2026-09-02 because -1.6 is inherited from the crypto bot, where it
+# measures an altcoin against BTC; against SPY a 1.6-point hourly divergence
+# is enormous, so the gate looked likely to be inert here. It is NOT inert
+# (the rows differ), but no threshold wins consistently — each is better in
+# two or three windows and worse in the rest, and the five-window totals sit
+# within 0.2% of each other:
+#   -1.6  162.08 159.38 193.21 151.36 186.28   total 852.3   (kept)
+#   -0.8  164.02 159.38 196.84 148.54 184.39   total 853.2
+#   -0.5  161.25 160.75 198.22 146.93 184.47   total 851.6
+#   -0.3  155.13 168.63 184.30 155.27 188.01   total 851.3
+# No signal, so the inherited value stays rather than being re-fitted to
+# whichever window happens to favour a number.
 LONG_RELATIVE_WEAKNESS_MAX_PCT        = float(os.getenv("LONG_RELATIVE_WEAKNESS_MAX_PCT", "-1.60"))
 
 # Zone-width constant below was curve-fit on crypto vol — for stocks a 0.17%
