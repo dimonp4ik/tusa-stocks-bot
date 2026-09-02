@@ -1124,6 +1124,18 @@ SIZE_MULT_MAX = float(os.getenv("SIZE_MULT_MAX", "2.0"))
 # already be past TP1/TP2 by the time this check ran and still pass. Cap
 # drift at RISK_MAX_PCT itself: if the ticker moved further than the widest
 # stop we'd ever set, the structural zone is stale, don't anchor to it.
+# 2026-09-02: tightening this was considered and REJECTED. The live entry lands
+# a median 0.343% worse than the price the model fills at, so at 1.5% this gate
+# rejects almost nothing and looked like an easy win. But the drift does not
+# predict a bad trade — it predicts a GOOD one. Split at the median on the live
+# export: low-drift signals return +0.161 unit R, high-drift ones +0.386, and the
+# crypto bot shows the same sign (+0.067 vs +0.173). Drift marks momentum: price
+# leaves the zone fast exactly when the move is real, so a tighter gate would cut
+# the best trades.
+# Note this does NOT contradict the model being optimistic: a worse fill against
+# fixed structural levels costs money mechanically, while the SIZE of the drift
+# still correlates with setup quality. "Hurts mechanically" and "predicts a bad
+# outcome" are different claims and both need testing.
 LIVE_PRICE_MAX_DRIFT_PCT = float(os.getenv("LIVE_PRICE_MAX_DRIFT_PCT", "0.015"))
 # 2026-07-22 stock sweep (16 sym, 2022-2026 Dukascopy), measured AFTER the
 # session-aware expiry fix. Full resolution (stride=1):
