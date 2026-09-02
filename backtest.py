@@ -818,6 +818,33 @@ def simulate_trade_direct(
     # the recorded fill equals the recorded market price to the digit. There is
     # nothing for a limit order to recover.
     #
+    # ✅ 2026-09-02: that residual IS measurable now, and it is large. The
+    # signal row carries BOTH prices: zone_entry_price is the analyzer price the
+    # model fills at (planned_entry = setup["current_price"]), and market_price
+    # is the live price at order time, which main.py writes over current_price
+    # just before sending. The column was added after the note above was written.
+    # Measured on the live export (23 signals carrying both):
+    #   stocks  median +0.343%   LONG +0.328% adverse in 100%, SHORT +0.381% in 93%
+    #   crypto  median +0.081%   LONG +0.104%, SHORT +0.051%, both 100%
+    # This is NOT the zone-midpoint double count: that compared the live fill to
+    # a zone both sides already carry, this compares the live fill to the MODEL'S
+    # fill. It is not an X-Perp basis either: a basis offset helps one side and
+    # hurts the other, while this is adverse in BOTH directions (the raw unsigned
+    # price offset is two-sided, median -0.140%, only 39% positive).
+    # Feeding it back through --adverse-entry-bps is therefore correct, and it
+    # lands on the live results:
+    #                     per-trade R
+    #   model as-is          +0.745
+    #   model at 34 bps      +0.147
+    #   LIVE                 +0.107
+    # Across the five windows 34 bps takes profit 852.31R -> 241.56R and win rate
+    # 71-76% -> 59-68%, against a live 55.1%. The crypto bot shows the same effect
+    # four times smaller (8 bps: -18% profit, WR 73.9 -> 71.4), which fits: it
+    # waits for the zone while this bot enters at market.
+    # Default stays 0 so the recorded tables remain comparable; the honest base
+    # for NEW absolute claims is 34 bps here and 8 in crypto. Sample is 23 rows,
+    # so re-measure as exports accumulate.
+    #
     # The residual gap that cannot be measured from the exports is the drift
     # between the bar CLOSE the model fills at and the market price ~2 minutes
     # later when the order lands. Bounding that needs the bar close stored on
