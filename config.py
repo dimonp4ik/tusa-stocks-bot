@@ -1112,7 +1112,26 @@ TP1_R_MULT    = float(os.getenv("TP1_R_MULT", "1.0"))      # TP1 = entry ± risk
 # ⚠️ These two columns are ONE window and a subset of it — this desk's history
 # starts Feb-Mar 2026. The independent evidence is the crypto bot's three
 # windows; this only confirms sign and size here.
-TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "3.0"))
+# SWEPT 2026-09-02 (first time). TP2 looks inert -- under the trail exit almost
+# nothing reaches it -- but the few that do pay several R each, so the cap
+# decides the whole tail. It matters more here than on the crypto desk because
+# TP1 sits at 1.0R rather than 0.6R, leaving the runner more room to matter.
+#
+#   TP2   04-10     05-07     06-05     07-15     08-26     ulcer ratio by window
+#   3.0  +158.92  +151.80  +185.36  +141.99  +179.24   53.6/61.1/125.1/59.3/72.7
+#   4.0  +158.92  +151.97  +189.32  +148.91  +182.00   52.8/61.4/124.5/60.6/74.5
+#   5.0  +161.33  +158.71  +192.32  +150.70  +185.29   53.6/64.3/126.5/61.4/75.3
+#
+# 5.0 beats 3.0 on profit in all five windows and on the ulcer ratio in four,
+# equal in the fifth; worst-window ratios improve where they are defined (two
+# windows have no losing 25-trade stretch at all). Win rate, drawdown and trade
+# count do not move: no position is larger, the cap was cutting runners short.
+#
+# Stopped at 5.0 deliberately. Past 6.0 the 08-26 window plateaus at +185.90 --
+# nothing reaches TP2 any more and the trail decides everything -- while 05-07
+# drops to +155.13 at 6.0 before wobbling back up. That is individual trades
+# crossing the boundary, not a trend, and chasing it would be fitting noise.
+TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "5.0"))
 
 # Runner exit after TP1: trail the remaining 50% by ATR instead of fixed TP2.
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
