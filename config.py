@@ -321,7 +321,27 @@ RETEST_MAX_DIST_PCT = float(os.getenv("RETEST_MAX_DIST_PCT", "0.006"))  # within
 #
 # The crypto desk also sits at 13 — the first parameter this session where the
 # two desks agree, and worth noting precisely because four others did not.
-MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "13"))
+#
+# RE-SWEPT 2026-09-03 on honest costs, and the reason 13 beat 12 above is GONE.
+# That objection was 'halves the worst-windows ratio in 07-15 (62.7 → 33.9)'.
+# At the real fee/slippage there is no losing 25-trade stretch in 07-15 at ALL,
+# at any threshold — the measure the objection rested on was manufactured by
+# charging five times the true cost per trade.
+#   min    04-10    05-07    06-05    07-15    08-26     total   profit/ulcer
+#    13   206.27   213.41   246.81   199.01   240.86   1106.36   91.5 112.7 204.4 112.4 132.0
+#    12   212.06   214.08   254.24   205.44   241.92   1127.74   98.9 113.6 210.4 114.7 125.6
+#    11   211.68   225.65   254.24   205.44   242.18   1139.19   99.1 124.3 210.4 114.7 124.1
+#    10   211.68   225.65   254.24   205.36   242.18   1139.11   (identical to 11)
+#     9   211.68   225.65   254.24   205.36   242.18   1139.11   (identical to 11)
+# Max drawdown is IDENTICAL at every threshold in every window (-8.31 / -7.68 /
+# -4.95 / -5.83 / -6.91), and the trade count barely moves: lowering the bar does
+# not buy exposure, it changes WHICH setups fill the same quota, which is why the
+# refused count climbs while trades taken does not.
+# 10 and 9 return exactly 11's numbers, so 11 is where the score's own floor
+# binds — this is a saturation point, not a slide toward having no filter.
+# Costs 08-26 about 6% of its ulcer ratio (132.0 → 124.1); every other window
+# improves on both profit and ulcer.
+MTF_MIN_SCORE = int(os.getenv("MTF_MIN_SCORE", "11"))
 
 # --- Signal-quality filters (backtested on a PINNED 20-coin / ~21-day set) ---
 # №1 Volatility regime — DEFAULT ON after re-test 2026-06-05 on full context
@@ -687,6 +707,15 @@ ATR_PERIOD    = 14
 # profit in 4 of 5 windows but the worst-windows ratio collapses (19 vs 89,
 # 36 vs 83, 99 vs 269): the stops start arriving in clusters, and clusters are
 # what make the drawdown. 0.50 stays.
+# RE-CHECKED 2026-09-03 on honest costs and narrowing is REJECTED again, for a
+# different reason than before. Profit does rise (1106 → 1159R at 0.25, 1177R
+# at 0.15), but max drawdown worsens in ALL FIVE windows and 04-10 grows a
+# losing 25-trade stretch that does not exist at 0.5. Profit-per-drawdown falls
+# (34.3 → 33.6 → 33.4).
+# The mechanism is the trap worth remembering: position size is normalised by
+# risk, so a TIGHTER STOP SILENTLY BUYS A BIGGER POSITION. The extra profit is
+# exposure, not selection. Any change that moves stop distance has to be checked
+# for this before its profit line is believed.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
 # --- 2026-08-28: swept, and REJECTED despite looking like the biggest find yet -
