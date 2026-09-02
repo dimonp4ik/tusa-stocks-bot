@@ -866,6 +866,37 @@ EXTENSION_FRESH_SIZE_MULT = float(os.getenv("EXTENSION_FRESH_SIZE_MULT", "1.0"))
 # supported than 1.5 — it is a larger bet on the same uncertain claim. Revisit
 # once there is a second regime to test against.
 OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volume requirement
+# A neutral 1h trend rides bigger. Ported from the crypto bot 2026-09-02,
+# where it is the strongest single sizing rule found (profit AND both risk
+# ratios up in all three windows — the test that separates a real subset
+# from leverage). This bot had no equivalent knob at all.
+# The export says the same subset leads here: trend_1h=neutral is 30 trades
+# at 83.3% WR and +1.010 unit R against a +0.658 book average. Thirty trades
+# is too few to ship on, so this stays 1.0 (inert) until measured
+# end-to-end across the five windows.
+# NOTE the 4h version does NOT port: trend_4h=neutral is WORSE here (+0.424)
+# while it is better in crypto — the two bots mirror on this, as they do on
+# volume semantics and on late-entry handling.
+# MEASURED end-to-end 2026-09-02, five windows, and NOT shipped. Profit wins
+# in all five and rises monotonically (+2.9% at 1.25, +4.8% at 1.5, +6.4% at
+# 1.75), but profit is not what decides a sizing rule.
+#   mult    total R    profit-per-ulcer better than base
+#   1.0     852.31     (base)
+#   1.25    876.78     3 of 5 windows
+#   1.5     893.62     2 of 5
+#   1.75    906.64     2 of 5
+# The worst-windows measure cannot arbitrate here: in this bot no 25-trade
+# stretch is negative in most windows, so the harness reports it as not
+# applicable and ulcer is the only scale-normalised risk measure left. That
+# ratio moves BOTH ways rather than up, which is what leverage looks like --
+# pure leverage leaves a scale-normalised ratio flat. The arithmetic agrees:
+# the boost adds about 3% exposure and about 2.9% profit, i.e. in aggregate
+# the subset earns like the book, not better than it.
+# In the crypto bot the same rule passes cleanly (both ratios up in 3 of 3),
+# which is why it ships at 1.75 there. Here it does not, and the subset is
+# only 30 trades. Left inert; re-run this sweep once the book is larger.
+HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.0"))
+
 # Swept again on a PINNED window (the first sweep ran on a sliding one — see
 # the note at the candle stamp in backtest.py). No turn appears through 2.0:
 #   mult   profit      worst   ulcer   MaxDD

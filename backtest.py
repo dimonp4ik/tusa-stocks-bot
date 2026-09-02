@@ -46,7 +46,8 @@ if importlib.util.find_spec("dotenv") is None:
 
 from config import (
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,  # noqa: E402
-    OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,  # noqa: E402
+    OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
+    HTF_NEUTRAL_1H_SIZE_MULT,  # noqa: E402
     OFF_SESSION_SIZE_MULT,  # noqa: E402
     VOLUME_SPIKE_BOOST_MIN, VOLUME_SPIKE_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
@@ -771,6 +772,10 @@ def _size_mult_for(setup: dict) -> float:
         if _vok:
             _om = float(OPEN_SESSION_SIZE_MULT)
             stack *= _om; m *= _om
+    if (HTF_NEUTRAL_1H_SIZE_MULT != 1.0
+            and str(setup.get("trend_1h") or "").lower() == "neutral"):
+        _hm = float(HTF_NEUTRAL_1H_SIZE_MULT)
+        stack *= _hm; m *= _hm
     if stack > SIZE_MULT_MAX:
         m *= SIZE_MULT_MAX / stack
     return m

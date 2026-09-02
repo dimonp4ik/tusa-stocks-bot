@@ -33,6 +33,7 @@ from config import (
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
+    HTF_NEUTRAL_1H_SIZE_MULT,
     VOLUME_SPIKE_SIZE_MULT, VOLUME_SPIKE_BOOST_MIN, OFF_SESSION_SIZE_MULT,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     SIZE_MULT_MAX,
@@ -278,6 +279,14 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # against a 2.0 ceiling. Aligned anyway so the two paths agree by
     # construction rather than by a coincidence of two thresholds that nothing
     # stops anyone from moving.
+    # A neutral 1h trend rides bigger — see HTF_NEUTRAL_1H_SIZE_MULT in
+    # config.py. Absent on rows written before this knob existed, which sizes
+    # at 1.0 rather than guessing, matching what the backtest does.
+    if (float(HTF_NEUTRAL_1H_SIZE_MULT) != 1.0
+            and str(sig.get("trend_1h") or "").lower() == "neutral"):
+        _hm = float(HTF_NEUTRAL_1H_SIZE_MULT)
+        _size_mult *= _hm
+        _stack *= _hm
     if _stack > float(SIZE_MULT_MAX):
         _size_mult *= float(SIZE_MULT_MAX) / _stack
     _size_mult *= _norm
