@@ -1236,6 +1236,15 @@ EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
 # call, and the 0.02 rows above reproduce the recorded anchors exactly,
 # which confirms the branch was already doing nothing.
 POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.0"))
+# Measured 2026-09-02 and DECLINED. Activating this branch (0.002, below the
+# base, so weak-context runners trail tighter) is better in all five windows
+# — but by 0.04-0.07%: 162.15/159.46/193.34/151.48/186.40 against
+# 162.08/159.38/193.21/151.36/186.28, with the ulcer ratios unmoved. The
+# crypto bot showed the same sign at +0.13% on one window, so the effect is
+# real rather than noise, just negligible — and it is the same "tighter is
+# better" gradient the base already exposes, applied to a subset. Not worth
+# re-enabling a branch whose inert-by-equality trap was just closed. Left
+# above the base so min(base, WEAK) keeps returning the base.
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
