@@ -1149,7 +1149,19 @@ TP2_R_MULT    = float(os.getenv("TP2_R_MULT", "5.0"))
 # Backtest (10 sym, 2880x15m): +21% net R, -27% max drawdown, same win rate vs
 # fixed TP2. Trailing stop = peak ∓ TRAIL_ATR_MULT×ATR, floored at breakeven.
 TRAIL_RUNNER_ENABLED = os.getenv("TRAIL_RUNNER_ENABLED", "1") != "0"
-TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.02"))  # base trail; post_tp1_v2 overrides per-context
+# SWEPT 2026-09-02 with the strong branch pinned off, all five windows.
+# Same monotone response as the crypto bot: tighter is better on profit,
+# worst-windows AND ulcer in every window, while win rate and trade count
+# do not move at all — the trail only acts inside trades that are already
+# winning, so this is a pure exit change.
+#          04-10    05-07    06-05    07-15    08-26
+#   0.02   161.33   158.71   192.32   150.70   185.29   (was)
+#   0.01   161.87   159.19   192.96   151.07   186.00
+#   0.006  162.08   159.38   193.21   151.36   186.28   ← shipped
+#   0.003  162.24   159.52   193.40   151.58   186.49
+# Stopping short of the floor for the same reason as crypto: it would put
+# the stop flush against price, and live wicks are harsher than the model.
+TRAIL_ATR_MULT       = float(os.getenv("TRAIL_ATR_MULT", "0.006"))  # base trail; post_tp1_v2 overrides per-context
 # ⚖️ SIGNIFICANCE 2026-08-28: cannot be tested paired on THIS desk, and the
 # unpaired answer is inconclusive:
 #   old exit +789.00R -> new exit +817.57R, delta +28.56R, R/trade +0.024
@@ -1218,7 +1230,12 @@ EXIT_PROFILE   = os.getenv("EXIT_PROFILE", "post_tp1_v2").strip().lower()
 # deciding: widening the strong branch LOSES in both windows there and plain
 # uniform beats every split on every measure. Kept inert deliberately now
 # rather than by accident. WEAK stays 0.15 and is inert too: min(0.02,0.15).
-POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.02"))
+# 2026-09-02: pinned to 0.0 rather than to the base value, mirroring the
+# crypto bot. max(base, STRONG) held inert by equality only works until the
+# base is tuned; 0.0 keeps it inert for any base. Verified inert here by
+# call, and the 0.02 rows above reproduce the recorded anchors exactly,
+# which confirms the branch was already doing nothing.
+POST_TP1_STRONG_TRAIL_ATR_MULT = float(os.getenv("POST_TP1_STRONG_TRAIL_ATR_MULT", "0.0"))
 POST_TP1_WEAK_TRAIL_ATR_MULT   = float(os.getenv("POST_TP1_WEAK_TRAIL_ATR_MULT", "0.15"))
 POST_TP1_STRONG_CLOSE_PROGRESS = float(os.getenv("POST_TP1_STRONG_CLOSE_PROGRESS", "0.25"))
 POST_TP1_STRONG_WICK_PROGRESS  = float(os.getenv("POST_TP1_STRONG_WICK_PROGRESS", "0.55"))
