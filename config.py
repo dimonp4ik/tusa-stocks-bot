@@ -663,6 +663,18 @@ LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
 #   risk%  ~0.4–1.5% of price → on 10x = 4–15% margin at risk per stop
 #   liquidation ~9% away at 10x → 1.5% max SL keeps 6x safety headroom
 ATR_PERIOD    = 14
+# Swept 2026-09-02 over the 5 standard windows (2800 candles). net R / worst-
+# windows ratio / ulcer ratio, current value marked:
+#   0.30   155.5 164.4 197.2 165.8 197.2 | 19.1  —   —  35.9  98.8 | 35.9 65.7 123.0 60.9 80.7
+#   0.50   161.3 158.7 192.3 150.7 185.3 | 88.6  —   —  82.7 268.8 | 53.6 64.3 126.5 61.4 75.3  ←
+#   0.70   151.8 146.9 182.1 144.1 175.1 | 82.7  —   — 145.2 180.5 | 50.1 64.7 125.4 58.6 70.7
+#   1.00   139.9 139.5 169.3 136.3 154.9 |163.1  —   — 328.3  61.4 | 49.9 65.2 114.8 59.2 58.8
+#   1.30   137.8 121.2 148.8 122.8 147.0 | 68.8  —   —  27.1   —  | 46.0 44.6  88.5 41.7 59.5
+# Widening is monotonically worse here, so the crypto value (1.0, swept on that
+# bot) does NOT port — stocks want the tighter stop. Tightening to 0.30 buys
+# profit in 4 of 5 windows but the worst-windows ratio collapses (19 vs 89,
+# 36 vs 83, 99 vs 269): the stops start arriving in clusters, and clusters are
+# what make the drawdown. 0.50 stays.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
 # --- 2026-08-28: swept, and REJECTED despite looking like the biggest find yet -
