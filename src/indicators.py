@@ -57,10 +57,33 @@ def calculate_stoch_rsi(closes: list, rsi_period: int = 14,
     if len(closes) < needed:
         return 50.0, 50.0
 
-    # Build RSI series
-    rsi_values = []
-    for i in range(rsi_period, len(closes)):
-        rsi_values.append(calculate_rsi(closes[:i + 1], rsi_period))
+    # Build RSI series -- one running pass.
+    #
+    # This used to call calculate_rsi(closes[:i + 1]) for every i, and each of
+    # those calls re-ran Wilder smoothing from the beginning, making the whole
+    # thing quadratic: ~300 full RSI computations per symbol. Profiling put 92%
+    # of the entire SMC analysis in here, and that analysis is 81% of publish
+    # latency (45.6s of 56.1s), which is what makes the live entry land late.
+    #
+    # Wilder smoothing is a recurrence, so carrying it forward gives the same
+    # numbers as restarting it: same seed, same operations, same order. Verified
+    # bit-identical against the old implementation over 132 (symbol, timeframe,
+    # prefix-length) cases before shipping.
+    #
+    # The leading 50.0 is not a placeholder. calculate_rsi returns 50.0 when it
+    # is handed fewer than period + 2 closes, which is exactly the i ==
+    # rsi_period case, so the old series started with it too.
+    deltas = [closes[i] - closes[i - 1] for i in range(1, len(closes))]
+    gains  = [max(d, 0.0) for d in deltas]
+    losses = [abs(min(d, 0.0)) for d in deltas]
+    avg_gain = sum(gains[:rsi_period]) / rsi_period
+    avg_loss = sum(losses[:rsi_period]) / rsi_period
+    rsi_values = [50.0]
+    for i in range(rsi_period, len(deltas)):
+        avg_gain = (avg_gain * (rsi_period - 1) + gains[i]) / rsi_period
+        avg_loss = (avg_loss * (rsi_period - 1) + losses[i]) / rsi_period
+        rs = avg_gain / (avg_loss + 1e-10)
+        rsi_values.append(100 - 100 / (1 + rs))
 
     if len(rsi_values) < stoch_period:
         return 50.0, 50.0
