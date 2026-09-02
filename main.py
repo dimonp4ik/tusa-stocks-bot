@@ -217,7 +217,11 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
             A(f"  винрейт: {s['win_rate']}%")
             A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
               f"SL: {s['sl_hit']}  истекло: {s['expired']}")
-            A(f"  итог: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
+            A(f"  валовой: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
+            A(f"  издержки: -{s.get('cost_r', 0)}R  "
+              f"(комиссия+спред, посчитаны по {s.get('cost_n', 0)} сделкам)")
+            A(f"  ЧИСТЫМИ: {s.get('net_r', 0)}R  "
+              f"({s.get('net_per_trade', 0)}R/сделка)  ← это и есть прибыль")
             _l, _sh = s.get("long") or {}, s.get("short") or {}
             A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")

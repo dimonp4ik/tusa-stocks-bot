@@ -22,6 +22,7 @@ from config import (
     DB_PATH, AUTO_BLOCK_ENABLED, AUTO_BLOCK_LOOKBACK_TRADES, AUTO_BLOCK_MIN_TRADES,
     AUTO_BLOCK_MAX_PROFIT_FACTOR, AUTO_BLOCK_MAX_WIN_RATE, AUTO_BLOCK_DAYS,
     TP1_R_MULT, TP2_R_MULT, TP1_CLOSE_FRAC, LIVE_HIST_EPOCH_TS,
+    BACKTEST_FEE_RATE, BACKTEST_SLIPPAGE_RATE,
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
@@ -928,7 +929,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     cutoff = since_ts if since_ts is not None else time_mod.time() - days * 86400
     with _conn() as c:
         rows = c.execute(
-            "SELECT status, direction, opened_at, premium, realized_r FROM signals WHERE opened_at >= ?",
+            "SELECT status, direction, opened_at, premium, realized_r, "
+            "entry_price, sl FROM signals WHERE opened_at >= ?",
             (cutoff,)
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
@@ -960,6 +962,35 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     # ── Total R ───────────────────────────────────────────────────────────────
     total_r = sum(_row_r(r) for r in rows if r["status"] in FINAL_STATUSES)
     r_per_trade = (total_r / closed) if closed else 0.0
+
+    # realized_r is GROSS: the monitor derives it from entry/TP/SL prices alone,
+    # so it carries no fees and no funding. The backtest reports NET. Comparing
+    # the two, or reading "total" as profit, silently overstates the book -- at
+    # the old (wrong) rates the whole live edge was inside the cost line.
+    #
+    # Cost in R is round-trip cost over the stop distance in price, which is why
+    # it is computed per trade rather than as one average: a trade with a 1%
+    # stop pays twice the R of one with a 2% stop.
+    _rt = 2.0 * (float(BACKTEST_FEE_RATE) + float(BACKTEST_SLIPPAGE_RATE))
+    _cost_r = 0.0
+    _cost_n = 0
+    for r in rows:
+        if r["status"] not in FINAL_STATUSES:
+            continue
+        try:
+            e = float(r.get("entry_price") or 0.0)
+            sl_ = float(r.get("sl") or 0.0)
+        except (TypeError, ValueError):
+            continue
+        if e <= 0 or sl_ <= 0:
+            continue
+        risk_pct = abs(e - sl_) / e
+        if risk_pct <= 0:
+            continue
+        _cost_r += _rt / risk_pct
+        _cost_n += 1
+    net_r = total_r - _cost_r
+    net_per_trade = (net_r / closed) if closed else 0.0
 
     # ── Direction breakdown ───────────────────────────────────────────────────
     dir_stats = {}
@@ -1029,6 +1060,10 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         "win_rate":         round(win_rate, 1),
         "total_r":          round(total_r, 2),
         "r_per_trade":      round(r_per_trade, 3),
+        "cost_r":           round(_cost_r, 2),
+        "cost_n":           _cost_n,
+        "net_r":            round(net_r, 2),
+        "net_per_trade":    round(net_per_trade, 3),
         "long":             dir_stats.get("LONG",  {}),
         "short":            dir_stats.get("SHORT", {}),
         "premium":          premium,
