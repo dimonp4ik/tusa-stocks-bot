@@ -47,6 +47,7 @@ from src.db import (
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     at_has_open_position,
+    get_signal_by_id,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -689,7 +690,48 @@ def poll_exchange_closes() -> None:
             if not ok:
                 continue   # transient API error — retry next cycle
             if size > 0:
-                continue   # still open on the exchange, nothing to do
+                # The engine marks a signal closed BEFORE mirroring that close
+                # to the exchange, and mirror_transition wraps each position in
+                # its own except. A failure there leaves the signal finished,
+                # this record open, and the position still running — with
+                # nobody to retry it, because mirror_transition only fires on
+                # the transition itself and that has already passed. The OCO
+                # still guards it, so this is not a naked position, but the
+                # trail is dead and the trade has stopped being the one the
+                # engine believes it closed. Catch it here, where we are
+                # already asking the exchange what is really open.
+                _sig = get_signal_by_id(pos["signal_id"])
+                if not _sig or _sig.get("status") not in _CLOSE_STATUSES:
+                    continue   # still open on the exchange, nothing to do
+                log.warning(f"autotrade reconcile pos#{pos['id']} "
+                            f"{pos['inst_id']}: signal already {_sig['status']} "
+                            f"but position still open on the exchange")
+                okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+                if pos.get("tp1_algo_id"):
+                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
+                _rok, _rerr = okx.close_position_market(creds, pos["inst_id"])
+                if not _rok:
+                    _rok, _rerr = okx.close_position_market(creds, pos["inst_id"])
+                _rbase = pos["inst_id"].split("-")[0]
+                if not _rok:
+                    log.error(f"autotrade NAKED POSITION {pos['user_id']} "
+                              f"{pos['inst_id']}: reconcile close failed twice "
+                              f"({_rerr}) — position open WITHOUT a stop")
+                    _dm(pos["user_id"], "\n".join([
+                        f"🚨 *СРОЧНО: {_rbase} осталась БЕЗ СТОПА*",
+                        "",
+                        "Сделка по сигналу уже закрыта, а позицию на бирже "
+                        "закрыть не удалось (2 попытки).",
+                        "Зайди на биржу и закрой её вручную.",
+                        "",
+                        f"причина: `{_rerr}`",
+                    ]))
+                    continue
+                at_close_position(pos["id"], _sig["status"])
+                _dm(pos["user_id"],
+                    f"🤖 *{_rbase}*: позиция осталась висеть на бирже после "
+                    f"закрытия сигнала — закрыл её сейчас.")
+                continue
 
             # A zero read is acted on IRREVERSIBLY below (protection cancelled,
             # record closed), so it must not be believed on a single sample.
