@@ -389,6 +389,23 @@ def _fmt_sz(sz: float) -> str:
     """Contracts as clean string: 3.0 → '3', 0.5 → '0.5'."""
     s = f"{sz:.8f}".rstrip("0").rstrip(".")
     return s or "0"
+def fmt_px_display(px: float, tick: float = 0) -> str:
+    """Price for a human to read, not for the API.
+
+    _fmt_px is exact by design — it must not drop a digit the exchange needs.
+    That makes it wrong for a message: an averaged fill on PEPE renders as
+    0.0000026552307693, while the tick-rounded stop next to it renders as
+    2.775e-06 (plain str), so the same DM showed one price in 17 digits and
+    another in scientific notation. Round to the instrument's own tick — the
+    finest distinction the market actually makes — then force fixed point.
+    """
+    try:
+        v = round_to_tick(float(px), tick) if tick else float(px)
+        return format(Decimal(repr(float(v))).normalize(), "f")
+    except Exception:
+        return _fmt_px(px)
+
+
 def _fmt_px(px: float) -> str:
     """Price as a plain decimal string OKX will accept.
 
