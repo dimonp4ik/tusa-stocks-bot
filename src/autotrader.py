@@ -583,9 +583,31 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                             "Проверь открытые алго-ордера на бирже.",
                             f"`{_c_err}`",
                         ]))
+                # The protection was cancelled a few lines up, so if this
+                # close does not go through the position is sitting on the
+                # exchange with NOTHING under it. Marking the record closed
+                # here would also stop us tracking it and tell the owner it
+                # is over. Retry once, exactly like the naked-position guard
+                # on the open path, and if it still will not close, keep the
+                # record OPEN and say so: poll_exchange_closes will retire it
+                # properly once the position really is flat.
                 ok, err = okx.close_position_market(creds, pos["inst_id"])
-                at_close_position(pos["id"], new_status,
-                                  error=None if ok else str(err))
+                if not ok:
+                    ok, err = okx.close_position_market(creds, pos["inst_id"])
+                if not ok:
+                    log.error(f"autotrade NAKED POSITION {pos['user_id']} "
+                              f"{pos['inst_id']}: protection cancelled but close "
+                              f"failed twice ({err}) — position open WITHOUT a stop")
+                    _dm(pos["user_id"], "\n".join([
+                        f"🚨 *СРОЧНО: {disp} осталась БЕЗ СТОПА*",
+                        "",
+                        "Защита снята, а закрыть позицию не удалось (2 попытки).",
+                        "Зайди на биржу и закрой её вручную.",
+                        "",
+                        f"причина: `{err}`",
+                    ]))
+                    continue
+                at_close_position(pos["id"], new_status, error=None)
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
                 # Move the exchange stop to breakeven RIGHT NOW — don't wait
