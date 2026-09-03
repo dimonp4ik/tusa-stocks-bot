@@ -750,6 +750,21 @@ RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0
 # history this desk cannot produce independent full windows at all — disjoint
 # thirds are the only honest test here, and they must be run BEFORE believing a
 # result, not after.
+# RE-TESTED 2026-09-03 on honest costs, after finding that this cap rewrites the
+# stop on 65% of LIVE trades against 39% in the model. The live entry lands
+# ~0.34% worse while the structural stop does not move, so live risk is larger
+# and hits the cap far more often; the cap then pulls the stop INSIDE structure
+# (risk = min(max(risk, min), max); sl = price - risk). That looked like it must
+# be undoing LEVELS_FROM_STRUCTURE for two thirds of the book.
+# It is not a leak — it is protection, and raising it is worse on BOTH axes:
+#   cap     04-10    05-07    06-05    07-15    08-26     total    worst maxDD
+#   0.015  211.68   225.65   254.24   205.44   242.18   1139.19    -8.31
+#   0.018  199.17   225.53   247.66   161.57   233.92   1067.85   -14.53
+#   0.022  180.62   229.30   227.19   148.09   212.32    997.52   -17.54
+# 07-15 triples its drawdown and grows a losing 25-trade stretch that does not
+# exist at 0.015. The reading to keep: when the structural stop sits further
+# than 1.5% away the SETUP is worse, so capping the risk caps the damage too.
+# 'Structure always beats an arbitrary line' is false here.
 RISK_MAX_PCT  = float(os.getenv("RISK_MAX_PCT", "0.015"))  # max SL distance = 1.5%
 # Raising this was tested 2026-08-25 and REJECTED, though the diagnosis that
 # suggested it was sound: 35% of trades sit pinned at the cap and do worse
