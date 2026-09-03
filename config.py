@@ -317,6 +317,14 @@ SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip over
 # (it gates direction): this one only adds a point. Was hardcoded in
 # signal_filter.py as 38..68 / 32..62 with no recorded reason; lifted
 # 2026-09-03 at exactly those values, behaviour unchanged.
+# SWEPT 2026-09-03 immediately after lifting it, five windows, three settings:
+# current (38-68 / 32-62), wider (35-71 / 29-65), narrower (41-65 / 35-59).
+# FOUR of five windows come back byte-identical under all three. Widening moves
+# one trade in 07-15 (234 → 235, -0.08R); narrowing moves one in 05-07
+# (218 → 217, -2.08R). Everything else is unchanged, drawdown included.
+# The band barely binds, which is what a +1 point out of ~20 should do: the
+# score only rarely stops exactly on the boundary where that point decides.
+# Left as it is — now measured rather than assumed.
 RSI_SCORE_LONG_MIN  = float(os.getenv("RSI_SCORE_LONG_MIN",  "38"))
 RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
 RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
