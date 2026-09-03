@@ -7,6 +7,8 @@ from config import (
     RSI_OVERSOLD, RSI_OVERBOUGHT, VOLUME_SPIKE_MULTIPLIER, MIN_SIGNALS_TO_PASS,
     SMC_MIN_CONFIRMATIONS, SMC_BOS_MIN_VOLUME, BTC_BLOCK_THRESHOLD_PCT,
     SMC_RSI_LONG_MAX, SMC_RSI_SHORT_MIN, MTF_MIN_SCORE,
+    RSI_SCORE_LONG_MIN, RSI_SCORE_LONG_MAX,
+    RSI_SCORE_SHORT_MIN, RSI_SCORE_SHORT_MAX,
     REQUIRE_ENTRY_ZONE, ENTRY_ZONE_SL_BUFFER_ATR,
     REQUIRE_HTF_TREND, REQUIRE_RETEST, RETEST_MAX_DIST_PCT,
     VOL_REGIME_FILTER, VOL_MIN_ATR_PCT, VOL_MIN_RATIO, VOL_MAX_RATIO,
@@ -288,9 +290,9 @@ def _calc_mtf_score(ind: dict, bos: str, direction: str, confirmations: list,
         score += 1; tags.append("Vol+1")
 
     rsi = float(ind.get("rsi", 50.0))
-    if direction == "LONG" and 38 <= rsi <= 68:
+    if direction == "LONG" and RSI_SCORE_LONG_MIN <= rsi <= RSI_SCORE_LONG_MAX:
         score += 1; tags.append("RSI+1")
-    elif direction == "SHORT" and 32 <= rsi <= 62:
+    elif direction == "SHORT" and RSI_SCORE_SHORT_MIN <= rsi <= RSI_SCORE_SHORT_MAX:
         score += 1; tags.append("RSI+1")
 
     if direction == "LONG" and btc_change_pct >= 0:

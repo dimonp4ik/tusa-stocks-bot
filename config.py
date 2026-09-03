@@ -312,6 +312,16 @@ TP_LEVEL_MIN_DISTANCE_PCT = float(os.getenv("TP_LEVEL_MIN_DISTANCE_PCT", "0.005"
 
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
+# The RSI band that earns a setup its +1 SCORE point. Distinct from the
+# overextension caps above (they REJECT) and from the midline filter below
+# (it gates direction): this one only adds a point. Was hardcoded in
+# signal_filter.py as 38..68 / 32..62 with no recorded reason; lifted
+# 2026-09-03 at exactly those values, behaviour unchanged.
+RSI_SCORE_LONG_MIN  = float(os.getenv("RSI_SCORE_LONG_MIN",  "38"))
+RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
+RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
+RSI_SCORE_SHORT_MAX = float(os.getenv("RSI_SCORE_SHORT_MAX", "62"))
+
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
 
 # --- Entry zone (FVG / Order Block) ---
