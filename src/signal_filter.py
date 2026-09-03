@@ -50,6 +50,23 @@ from config import (
 from src.indicators import get_indicators, get_smc_indicators
 
 
+def _regime(ind: dict) -> float:
+    """Volatility-regime ratio, defaulting only when it is genuinely absent.
+
+    `ind.get("vol_ratio_regime", 1.0) or 1.0` read a ratio of exactly 0.0 as
+    1.0 — "normal volatility". Zero is reachable and it is not normal: it means
+    the last three bars were perfectly flat against a median that moved, i.e.
+    the market has stopped. That is precisely the reading the dead-market rules
+    exist to catch, and `or` handed back its opposite. Written out in four
+    places, so it is a function now rather than a fifth copy.
+    """
+    v = ind.get("vol_ratio_regime")
+    try:
+        return float(v) if v is not None else 1.0
+    except (TypeError, ValueError):
+        return 1.0
+
+
 def _norm_symbol(symbol: str) -> str:
     return str(symbol or "").upper().replace("-", "").replace("/", "").replace("_", "")
 
@@ -357,7 +374,7 @@ def _adaptive_filter_pack(ind: dict, bos: str, direction: str,
     trend_4h = ind.get("trend_4h", "neutral")
     eff       = float(ind.get("eff_ratio", 1.0) or 0.0)
     vol_ratio = float(ind.get("volume_ratio", 0.0) or 0.0)
-    vol_regime = float(ind.get("vol_ratio_regime", 1.0) or 1.0)
+    vol_regime = _regime(ind)
     atr_pct   = float(ind.get("vol_atr_pct", 0.0) or 0.0)
     structural = _has_structural_confirmation(confirmations)
     strong_bos = bool(ind.get("bos_body_strong", False))
@@ -439,7 +456,7 @@ def _quality_breakdown(ind: dict, bos: str, entry_zone, adaptive_pack: str) -> d
     trend_score = min(100, trend_score)
 
     eff = float(ind.get("eff_ratio", 0.0) or 0.0)
-    vol_ratio = float(ind.get("vol_ratio_regime", 1.0) or 1.0)
+    vol_ratio = _regime(ind)
     volatility_score = 40 + min(40, eff * 120)
     if 0.8 <= vol_ratio <= 1.8:
         volatility_score += 20
@@ -602,7 +619,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
     # 2c. Volatility regime — skip dead markets (→ EXPIRED) and spikes (→ SL)
     if VOL_REGIME_FILTER:
         atr_pct = ind.get("vol_atr_pct", 0.0)
-        v_ratio = ind.get("vol_ratio_regime", 1.0)
+        v_ratio = _regime(ind)
         if atr_pct < VOL_MIN_ATR_PCT:
             return _rej("atr_pct_vol_min_atr_pct")
         if v_ratio < VOL_MIN_RATIO or v_ratio > VOL_MAX_RATIO:
@@ -615,7 +632,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         and bos == "bearish"
         and trend_1h == "bearish"
         and trend_4h == "bearish"
-        and float(ind.get("vol_ratio_regime", 1.0) or 1.0) >= BEAR_TREND_HOT_VOL_MIN_RATIO
+        and _regime(ind) >= BEAR_TREND_HOT_VOL_MIN_RATIO
     ):
         return _rej("unnamed")
     if (
@@ -858,7 +875,7 @@ def analyze_coin_smc(candles_15m: dict, candles_1h: dict, symbol: str,
         risk_mult,
         symbol=symbol,
         entry_source=entry_zone["entry_source"] if entry_zone else "MARKET",
-        vol_ratio_regime=float(ind.get("vol_ratio_regime", 1.0) or 1.0),
+        vol_ratio_regime=_regime(ind),
         rsi=float(rsi),
     )
     risk_mult, trend_pair_risk_tag = _apply_trend_pair_risk_overlay(
