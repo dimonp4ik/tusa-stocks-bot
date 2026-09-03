@@ -292,6 +292,22 @@ SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
 # old value so behaviour is unchanged. Swept on the crypto desk, where the
 # response is flat across 0.003-0.008 (identical drawdown) and only breaks at
 # 0.012. Not yet swept here.
+# SWEPT 2026-09-03 on all five windows, and 0.005 stays.
+#          04-10    05-07    06-05    07-15    08-26     total   mean p/DD
+#   0.003  215.24   223.09   239.85   207.36   246.26   1131.80    32.6
+#   0.005  211.68   225.65   254.24   205.44   242.18   1139.19    35.3
+#   0.008  211.19   194.80   258.65   208.40   253.76   1126.80    32.7
+#   0.012  203.37   189.77   260.39   206.45   256.00   1115.98    36.8
+# 0.012 is tempting: better drawdown and ulcer ratio in FOUR of five windows
+# (08-26 goes -6.91 to -5.21 with the ulcer ratio 124.1 to 163.6). But 05-07
+# collapses 16% and takes the total with it, and total profit is best where it
+# already sits. Four windows out of five is not enough to move a live bot.
+#
+# The contrast with crypto is the part worth keeping. There the response is
+# FLAT — drawdown is identical across 0.003-0.008 and only breaks at 0.012.
+# Here it is window-sensitive, and 05-07 in particular reacts hard. Same knob,
+# same units, different behaviour, which is now the fourth parameter where the
+# two desks disagree (after the score floor, the stop buffer and the scan cap).
 TP_LEVEL_MIN_DISTANCE_PCT = float(os.getenv("TP_LEVEL_MIN_DISTANCE_PCT", "0.005"))
 
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
