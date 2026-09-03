@@ -3745,6 +3745,17 @@ def run_scan():
             log.warning(f"Calendar check failed: {e}")
 
         # Step 5: Send signals to Telegram (hard cap: max 3 per scan)
+        #
+        # SWEPT 2026-09-03 via the model's BT_LIVE_MAX_PER_SCAN and left alone:
+        # this cap almost never binds. Raising it 3 → 5 adds exactly ONE trade
+        # across 1144, and 8 is identical to 5.
+        #   3   1144 trades   1139.19R
+        #   5   1145 trades   1146.78R   (+0.67%, drawdown identical)
+        #   8   1145 trades   1146.78R
+        # The +0.67% is uneven (06-05 +2.09R, 08-26 +7.00R, 05-07 -1.50R) and
+        # most of it is reordering rather than extra trades, since the
+        # same-direction cap binds first. Not worth editing live code for.
+        # Kept as a local on purpose: it is not a tuning surface.
         MAX_SIGNALS_PER_SCAN = 3
         _ph_t_send = time.time()
         sent_count = 0
