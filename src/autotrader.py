@@ -513,6 +513,21 @@ def update_trailing(sig: dict, stop_px: float) -> None:
             new = okx.round_to_tick(float(stop_px), tick)
             if old and abs(new - old) < (tick or 1e-9):
                 continue
+            # A trailing stop only ever moves TOWARDS price. The engine
+            # recomputes the post-TP1 peak from scratch every cycle out of the
+            # candles that came back, so a short window — or the fallback to
+            # the deep feed when the X-Perp call fails, whose highs are lower
+            # than the thin X-Perp's — understates the peak and hands us a
+            # LOOSER stop. Amending to it would push the exchange stop back
+            # away from price and give up profit already locked in, purely
+            # because one data fetch came back thin. Ratchet against the last
+            # stop actually set, which is what sl_px records.
+            if old:
+                _long = str(pos.get("direction", "")).upper() == "LONG"
+                if (new < old) if _long else (new > old):
+                    log.info(f"autotrade trail held pos#{pos['id']}: "
+                             f"engine asked {new}, keeping {old}")
+                    continue
             u = at_get(pos["user_id"])
             creds = _creds_of(u) if u else None
             if not creds:
