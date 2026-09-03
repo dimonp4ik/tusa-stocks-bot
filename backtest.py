@@ -50,6 +50,7 @@ from config import (
     HTF_NEUTRAL_1H_SIZE_MULT,  # noqa: E402
     OFF_SESSION_SIZE_MULT,  # noqa: E402
     VOLUME_SPIKE_BOOST_MIN, VOLUME_SPIKE_SIZE_MULT,  # noqa: E402
+    VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
     SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
@@ -759,6 +760,16 @@ def _size_mult_for(setup: dict) -> float:
             if _fld(setup, "volume_ratio", 0.0) >= VOLUME_SPIKE_BOOST_MIN:
                 _vm = float(VOLUME_SPIKE_SIZE_MULT)
                 stack *= _vm; m *= _vm
+        except (TypeError, ValueError):
+            pass
+    # Trades that only just clear the volume gate — see VOLUME_THIN_TRIM_MAX in
+    # config.py. A missing volume_ratio defaults ABOVE the threshold, so an
+    # absent field means no trim rather than one applied on no evidence.
+    if VOLUME_THIN_SIZE_MULT != 1.0:
+        try:
+            if _fld(setup, "volume_ratio", 99.0) < VOLUME_THIN_TRIM_MAX:
+                _tm = float(VOLUME_THIN_SIZE_MULT)
+                stack *= _tm; m *= _tm
         except (TypeError, ValueError):
             pass
     if OFF_SESSION_SIZE_MULT != 1.0 and str(setup.get("session") or "") == "OFF":

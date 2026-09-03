@@ -35,6 +35,7 @@ from config import (
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
     HTF_NEUTRAL_1H_SIZE_MULT,
     VOLUME_SPIKE_SIZE_MULT, VOLUME_SPIKE_BOOST_MIN, OFF_SESSION_SIZE_MULT,
+    VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     SIZE_MULT_MAX,
     TELEGRAM_TOKEN,
@@ -271,6 +272,16 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     if OFF_SESSION_SIZE_MULT != 1.0 and str(sig.get("session") or "") == "OFF":
         _size_mult *= float(OFF_SESSION_SIZE_MULT)
         _stack *= float(OFF_SESSION_SIZE_MULT)
+    # Thin volume rides smaller — see VOLUME_THIN_TRIM_MAX in config.py. Absent
+    # volume_ratio means no trim, matching the backtest.
+    if VOLUME_THIN_SIZE_MULT != 1.0:
+        try:
+            _tv = sig.get("volume_ratio")
+            if _tv is not None and float(_tv) < VOLUME_THIN_TRIM_MAX:
+                _size_mult *= float(VOLUME_THIN_SIZE_MULT)
+                _stack *= float(VOLUME_THIN_SIZE_MULT)
+        except (TypeError, ValueError):
+            pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.
     # The ceiling applies to the BOOSTS, not to the whole product, matching

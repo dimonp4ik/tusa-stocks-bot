@@ -1084,6 +1084,51 @@ VOLUME_SPIKE_BOOST_MIN  = float(os.getenv("VOLUME_SPIKE_BOOST_MIN", "4.0"))
 # third. Edge has to show up as the slice beating the book, and it does not.
 # Removing an unjustified boost is the safe direction — see the sizing rules.
 VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.0"))
+
+# --- Thin-volume trim (2026-09-03) -------------------------------------------
+# The mirror of the boost above: the volume gate has a hard floor at 1.30, and
+# the trades that only just clear it are the weakest the filter admits. Measured
+# on the model over FIVE non-overlapping windows (04-10, 05-07, 06-05, 07-15,
+# 08-26; the 09-02 export is excluded because it shares 22 of its 29 days with
+# 08-26 and cannot count as separate evidence):
+#
+#   volume 1.30-1.50  n= 180  +0.663R      <- this band
+#          1.50-2.00  n= 299  +0.820R
+#          2.00-3.00  n= 318  +0.926R
+#          3.00-5.00  n= 192  +1.218R
+#          5.00+      n= 153  +1.210R
+#
+# Monotone across the whole range, which is what separates a quality axis from
+# a band picked after looking. Pooled, the bottom band runs +0.663R against
+# +0.994R for the rest: -0.344R at 2.46 sigma on 15.7% of the book.
+#
+# It is NOT a session effect. Adding "and session == OFF" WEAKENS it (2.23
+# sigma on n=143), and the non-OFF part of the band points the same way
+# (+0.750R, 0.98 sigma on n=37). Session was the first framing tried and the
+# data rejected it.
+#
+# MEASURED end to end on the same five windows. Trade count and win rate do not
+# move at any setting -- size cannot change selection -- so the whole effect is
+# in the money. profit/ulcer by window:
+#
+#   mult   04-10   05-07   06-05   07-15   08-26   total profit
+#   1.0     99.1   124.3   210.4   114.7   124.1   1139.19R
+#   0.85    98.3   125.1   212.6   119.7   126.7   1121.12R  (-1.6%)
+#   0.75    97.7   125.5   213.7   122.6   128.3   1109.07R  (-2.6%)
+#   0.5     95.6   126.3   214.3   125.9   131.0   1078.97R  (-5.3%)
+#
+# Ulcer itself falls in ALL FIVE windows at every setting. The response is
+# monotone in the multiplier everywhere: four windows keep improving as the
+# trim deepens and 04-10 keeps degrading, so there is no optimum to find --
+# this is a dial trading profit for risk, not a peak.
+#
+# 0.75 is set: it takes most of the ulcer gain for half the profit of 0.5, and
+# matches the crypto desk's equivalent trim so the two stay comparable. Moving
+# it is a preference, not a correction -- 0.5 is defensible if drawdown matters
+# more, 0.85 if profit does. 04-10 is the one window that dislikes it at every
+# setting; it is also the oldest.
+VOLUME_THIN_TRIM_MAX  = float(os.getenv("VOLUME_THIN_TRIM_MAX", "1.5"))
+VOLUME_THIN_SIZE_MULT = float(os.getenv("VOLUME_THIN_SIZE_MULT", "0.75"))
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
 # cannot tell a strategy property from a few lucky tickers. Splitting the 26
 # symbols into halves and re-measuring answers that separately:
