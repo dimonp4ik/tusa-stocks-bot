@@ -144,14 +144,63 @@ def check_exit_parity() -> list[str]:
     return []
 
 
+def check_live_r_matches_model() -> list[str]:
+    """The monitor's R against the backtest's, on the same trade.
+
+    check_r_model above proves the BACKTEST's function agrees with config. It
+    said nothing about the live monitor, which computed its own blended R
+    inline — eleven copies of the same arithmetic in the loop that decides what
+    goes into realized_r. Nothing compared the two, so the model could have
+    been re-derived and the live books would have gone on using the old shape.
+
+    The copies are now one function (src/r_model.blended_r) and this is the
+    guard that keeps it honest.
+    """
+    from config import TP1_CLOSE_FRAC
+    from src.r_model import blended_r
+
+    failures = []
+    frac = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
+    runner = 1.0 - frac
+    for entry, tp1, tp2, sl in ((100.0, 101.0, 102.0, 99.0),
+                                (100.0, 100.6, 105.0, 99.0),
+                                (50.0, 50.9, 53.5, 48.2),
+                                (100.0, 99.4, 95.0, 101.0),   # short
+                                (7.5, 7.44, 7.10, 7.62)):     # short, small px
+        risk = abs(entry - sl)
+        tp1_r = abs(tp1 - entry) / risk
+        tp2_r = abs(tp2 - entry) / risk
+
+        live_tp2 = blended_r(frac, tp1_r, runner, tp2_r)
+        model_tp2 = gross_r_for_outcome("TP2", entry, tp1, tp2, sl)
+        if not _almost_equal(live_tp2, model_tp2, eps=5e-5):
+            failures.append(
+                f"live/model R mismatch TP2 at entry={entry}: "
+                f"monitor {live_tp2}, backtest {model_tp2}"
+            )
+
+        # TP1 reached, runner gave nothing back — the monitor's BREAKEVEN and
+        # TP1_EXPIRED closes, and the backtest's "TP1" outcome.
+        live_tp1 = blended_r(frac, tp1_r, 0.0, 0.0)
+        model_tp1 = gross_r_for_outcome("TP1", entry, tp1, tp2, sl)
+        if not _almost_equal(live_tp1, model_tp1, eps=5e-5):
+            failures.append(
+                f"live/model R mismatch TP1 at entry={entry}: "
+                f"monitor {live_tp1}, backtest {model_tp1}"
+            )
+    return failures
+
+
 def main() -> int:
-    failures = check_tp_sl_parity() + check_r_model() + check_exit_parity()
+    failures = (check_tp_sl_parity() + check_r_model()
+                + check_live_r_matches_model() + check_exit_parity())
     if failures:
         print("FAIL")
         for item in failures:
             print(f"- {item}")
         return 1
-    print("PASS: TP/SL parity, R model and exit-rule parity are OK.")
+    print("PASS: TP/SL parity, R model, live-vs-model R and "
+          "exit-rule parity are OK.")
     return 0
 
 

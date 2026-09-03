@@ -61,6 +61,7 @@ from config import EVENT_WARN_HOURS
 from config import LIVE_PRICE_MAX_DRIFT_PCT
 from config import EXTENDED_SESSION_WINDOWS
 from src.market_hours import session_hours_between
+from src.r_model import blended_r
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats,
     set_sl_xperp_only, get_sl_wick_stats,
@@ -3115,7 +3116,7 @@ def _check_open_signals():
                     if direction == "LONG":
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if high >= tp2:
-                            realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                            realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if high >= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
@@ -3123,7 +3124,7 @@ def _check_open_signals():
                     else:
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if low <= tp2:
-                            realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                            realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if low <= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
@@ -3140,10 +3141,10 @@ def _check_open_signals():
                             live_trail_stop = trail_stop
                             if low <= trail_stop:
                                 runner_r   = max(0.0, (trail_stop - entry) / risk)
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, runner_r)
                                 new_status, exit_px = "TP1_TRAIL", trail_stop; break
                             if high >= tp2:
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                         else:
                             best_price = min(best_price, low)
@@ -3151,26 +3152,26 @@ def _check_open_signals():
                             live_trail_stop = trail_stop
                             if high >= trail_stop:
                                 runner_r   = max(0.0, (entry - trail_stop) / risk)
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * runner_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, runner_r)
                                 new_status, exit_px = "TP1_TRAIL", trail_stop; break
                             if low <= tp2:
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                     else:
                         # Legacy: SL moved to breakeven, fixed TP2 (no stored ATR).
                         if direction == "LONG":
                             if low <= entry:
-                                realized_r = round(tp1_close_frac * tp1_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
                                 new_status, exit_px = "BREAKEVEN", entry; break
                             if high >= tp2:
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                         else:
                             if high >= entry:
-                                realized_r = round(tp1_close_frac * tp1_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
                                 new_status, exit_px = "BREAKEVEN", entry; break
                             if low <= tp2:
-                                realized_r = round(tp1_close_frac * tp1_r + runner_frac * tp2_r, 4)
+                                realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
 
             # Expire on MARKET-OPEN hours, not wall-clock: a weekend must not
@@ -3185,7 +3186,7 @@ def _check_open_signals():
                 or (SIGNAL_EXPIRY_MAX_DAYS > 0 and age_hours > SIGNAL_EXPIRY_MAX_DAYS * 24)
             ):
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                realized_r = round(tp1_close_frac * tp1_r, 4) if status == "TP1_PARTIAL" else 0.0
+                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0) if status == "TP1_PARTIAL" else 0.0
 
             # Optional second opinion before closing: the position trades on the
             # X-Perp, but the levels come from the deep feed and so does every
