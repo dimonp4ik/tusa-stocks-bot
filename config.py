@@ -3,6 +3,30 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ─── How to read the measurement tables in this file ─────────────────────────
+#
+# Most settings below carry a table of numbers from the sweep that chose them.
+# Two things about those tables, learned the hard way on 2026-09-03:
+#
+# 1. The ABSOLUTE totals age. Every table was measured under the config of its
+#    own date, so a later change to fees, targets or sizing shifts them all.
+#    That is expected and harmless: what a table proves is the COMPARISON
+#    INSIDE it — the rows were measured against each other under one config,
+#    and their ranking is what chose the value. Do not compare a number from an
+#    old table against a fresh run and call the difference a regression.
+#
+# 2. A CONCLUSION can outlive its own retraction, and that is the dangerous
+#    one. Three notes in these two bots were found still asserting findings
+#    that had already been withdrawn — a size rule reverted the same hour it
+#    shipped, a live/backtest gap re-measured away, and a win rate from before
+#    the execution model was fixed. Each would have sent the next sweep down a
+#    hole. When a table's CLAIM is what you are about to act on, check it
+#    against the current data before trusting it; when only its numbers look
+#    stale, that is just age.
+#
+# Anchors for the current config live in the session notes, not here, precisely
+# because they move with every change.
+
 # --- Required secrets (set in Render environment variables) ---
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
