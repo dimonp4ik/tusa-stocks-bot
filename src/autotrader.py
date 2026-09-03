@@ -338,6 +338,18 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # fills on the X-Perp seconds later, off by the basis plus slippage —
     # always in the same direction.
     _avg_px  = okx.get_position_avg_px(creds, inst_id)
+    # The TP1 partial further down is a FIXED-size reduce-only order, so it has
+    # to be sized off what the entry ACTUALLY filled rather than what was asked
+    # for. A market order that fills short leaves a position smaller than sz;
+    # reduceOnly then caps the TP1 order at the position, so "close half at TP1"
+    # silently becomes "close all of it" and the runner the strategy is built
+    # around never exists. Nothing reverses or over-closes — it just quietly
+    # stops being the trade that was measured.
+    # Falls back to sz when the read fails, which is the old behaviour.
+    _sz_ok, _filled_sz = okx.get_position_size(creds, inst_id)
+    _pos_sz = _filled_sz if (_sz_ok and _filled_sz and _filled_sz > 0) else sz
+    if _pos_sz != sz:
+        log.warning(f"autotrade partial fill {uid} {inst_id}: asked {sz}, got {_pos_sz}")
     _fill_px = _avg_px or float(sig["entry_price"])
     _sl_level = float(sig["sl"])
     if STOP_CLOSE_CONFIRM:
@@ -391,7 +403,8 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     tp1_line = "TP1 и трейлинг ведёт бот автоматически."
     if close_pct > 0:
         lot = (spec or {}).get("lotSz") or 1.0
-        raw_tp1_sz = sz if close_pct >= 100 else int((sz * close_pct / 100.0) / lot) * lot
+        raw_tp1_sz = (_pos_sz if close_pct >= 100
+                      else int((_pos_sz * close_pct / 100.0) / lot) * lot)
         if raw_tp1_sz > 0:
             tp1_px = okx.round_to_tick(float(sig["tp1"]), tick)
             ok, tp1_result = okx.place_tp1_partial(creds, inst_id, sig["direction"], tp1_px, raw_tp1_sz)
@@ -400,7 +413,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 # Report the share that will REALLY close, not the setting.
                 # raw_tp1_sz is floored to lotSz, so "50%" of an odd contract
                 # count is never exactly 50% — 50% of 99 lots is 49, i.e. 49.5%.
-                _act_pct = raw_tp1_sz / sz * 100.0 if sz else close_pct
+                _act_pct = raw_tp1_sz / _pos_sz * 100.0 if _pos_sz else close_pct
                 _pct_s = (f"{_act_pct:.0f}%" if abs(_act_pct - close_pct) < 0.5
                           else f"{_act_pct:.1f}% (просил {close_pct:.0f}%, "
                                f"ровно не делится на контракты)")
