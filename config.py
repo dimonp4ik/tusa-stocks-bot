@@ -1009,13 +1009,30 @@ HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.0"))
 # than merely levered. The subset is small (3-10% of the book, the right band)
 # and above book in three of five windows.
 OPEN_SESSION_SIZE_MULT = float(os.getenv("OPEN_SESSION_SIZE_MULT", "1.5"))
-# Research handle, default 1.0 = no change. Live data 2026-08-28 showed the
-# whole live/backtest gap on this desk sits in OFF-session stops filling BEYOND
-# the stop level (average -1.209R instead of -1.00R, -4.88R of unmodelled excess
-# over 23 stops). The backtest cannot see that — it resolves stops on 15m bars
-# and books -1R — so this knob exists to price the trade-off the owner has to
-# make: OFF is ~79% of the book, and trimming it costs profit the model DOES
-# see while saving losses the model does NOT.
+# Research handle, default 1.0 = no change.
+#
+# 🔴 The reason this knob was created is GONE. It used to say the live/backtest
+# gap sat in OFF-session stops filling beyond the level (-1.209R over 23 stops,
+# 2026-08-28), and invited trimming ~79% of the book to buy back losses the
+# model supposedly could not see. Re-measured 2026-09-03 on 74 live stops, the
+# premise does not survive:
+#
+#   opened before 2026-08-26   47 stops   -1.000R exactly,  0% worse than -1R
+#   opened from   2026-08-26   27 stops   -1.396R        , 100% worse than -1R
+#
+# The break is a DATE, not a session. Close-confirmed stops exit on the close of
+# the candle that breached, which lies beyond the level by construction, so
+# every stop after that change books worse than -1R and every stop before it
+# books exactly -1R. The `session` column started being filled at the same time,
+# which is the only reason the excess appeared to belong to OFF.
+#
+# And the excess is not unmodelled: the backtest books -1.365R on a stop against
+# the -1.396R now measured live, a gap of 0.03R. Within the post-change window
+# OFF sits at -1.466R against roughly -1.26R elsewhere, on 18 stops against 9 —
+# far too thin to call a session effect.
+#
+# Left at 1.0. Turning it down now would be paying for a defect that was already
+# corrected, on 79% of the book.
 OFF_SESSION_SIZE_MULT = float(os.getenv("OFF_SESSION_SIZE_MULT", "1.0"))
 
 # --- Volume-spike boost (2026-08-29) -----------------------------------------
