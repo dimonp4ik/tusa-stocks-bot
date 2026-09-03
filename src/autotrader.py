@@ -418,7 +418,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                           else f"{_act_pct:.1f}% (просил {close_pct:.0f}%, "
                                f"ровно не делится на контракты)")
                 tp1_line = (f"На TP1 ({tp1_px}) закроется {_pct_s} "
-                            f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(sz)} контр.), "
+                            f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(_pos_sz)} контр.), "
                             f"остаток — под трейлинг.")
             else:
                 log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
@@ -426,8 +426,33 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
 
     # Record the REAL fill, not the pre-entry quote used for sizing — this is
     # what "breakeven" is later measured against.
-    at_log_position(sig["id"], uid, inst_id, sig["direction"], sz, _fill_px, margin,
-                    algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
+    # Store the size we ACTUALLY hold. The monitor subtracts this from the live
+    # position size to report how much TP1 closed, so a requested size that never
+    # filled would overstate that share to the owner.
+    #
+    # This write is the LAST step, after the entry and its protection are already
+    # live on the exchange, and the caller only logs a warning on exception. So a
+    # failure here leaves a real position that this bot does not know about: the
+    # monitor never sees it, the trail never moves, and the owner is told nothing
+    # while the log says "open failed". The OCO still protects it, but nobody is
+    # managing it. Say so loudly instead, with what is needed to find it by hand.
+    try:
+        at_log_position(sig["id"], uid, inst_id, sig["direction"], _pos_sz, _fill_px, margin,
+                        algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
+    except Exception as _db_err:
+        log.error(f"autotrade UNTRACKED POSITION {uid} {inst_id}: entry and OCO are LIVE "
+                  f"but at_log_position failed ({_db_err}) — bot will not manage it")
+        _dm(uid, "\n".join([
+            f"🚨 *{disp}*: позиция открыта, но бот её НЕ ВЕДЁТ.",
+            "",
+            "Стоп и цель на бирже стоят, но трейлинг работать не будет.",
+            "Закрой её вручную или следи сам.",
+            "",
+            f"инструмент: `{inst_id}`",
+            f"защита: `{algo_id}`",
+            f"ошибка: `{_db_err}`",
+        ]))
+        raise
     lev = AUTOTRADE_LEVERAGE
     # Report what was actually BOUGHT, not what was requested. Size is in
     # contracts and OKX floors to lotSz, so the real notional is
@@ -435,12 +460,12 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # pre-entry quote, so both numbers were right by construction and could
     # never show a real fill or a rounding gap.
     _ctval = float((spec or {}).get("ctVal") or 0) or 0.0
-    _real_notional = sz * _ctval * _fill_px if _ctval else margin * lev
+    _real_notional = _pos_sz * _ctval * _fill_px if _ctval else margin * lev
     _real_margin   = _real_notional / lev if lev else margin
     _px_line = (f"Вход: {okx._fmt_px(_fill_px)}" if _avg_px
                 else f"Вход: ~{px} _(биржа не отдала цену заливки)_")
     _dm(uid, (f"🤖 *Сделка открыта: {disp} {sig['direction']}*\n"
-              f"Объём: {okx._fmt_sz(sz)} контр. (${_real_notional:.2f} позиция, "
+              f"Объём: {okx._fmt_sz(_pos_sz)} контр. (${_real_notional:.2f} позиция, "
               f"${_real_margin:.2f} маржа, {lev}x)\n"
               f"{_px_line}\nSL: {sl_px}\nTP2: {tp_px}\n"
               f"{tp1_line}"))
