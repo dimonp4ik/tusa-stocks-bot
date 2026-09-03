@@ -1530,6 +1530,21 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.5"))
 # It ships because it never hurts, not because it is a large edge. The original
 # warning stands — crypto's 8 is not transferable, stock correlation runs
 # through SPY, not BTC.
+# SWEPT 2026-09-03 on honest costs. Raising it is a real dial, not an
+# improvement: profit climbs but so does correlated exposure, and the
+# risk-adjusted result stands still.
+#   cap  trades    total R   maxDD by window                 mean profit/DD
+#    5    1144    1139.19   -8.31 -7.68 -4.95 -5.83 -6.91        35.3
+#    7    1254    1264.27   -8.15 -7.71 -5.71 -6.58 -10.30       34.0
+#    9    1307    1337.07   -8.15 -7.71 -5.71 -7.77 -10.30       34.7
+# On the most recent window profit rises 18% while max drawdown deepens 49%
+# (-6.91 to -10.30). Profit-per-trade barely moves (0.996 / 1.008 / 1.023), so
+# the extra money comes from holding more same-side positions at once — and
+# those lose together when the tape turns, which is exactly what max drawdown
+# is measuring here.
+# Kept at 5. Unlike most rejected candidates this one is an HONEST trade: an
+# owner who wants more absolute profit and can sit through a ~50% deeper
+# drawdown can raise it knowingly. It is not free profit.
 MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "5"))
 
 # --- US market session gate (see src/market_hours.py) ---
