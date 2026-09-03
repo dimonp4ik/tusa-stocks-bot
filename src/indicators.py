@@ -6,7 +6,7 @@ No pandas, no numpy — works on any Python version.
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, SMC_OB_MIN_IMPULSE, SMC_FVG_NEAR_TOL, SMC_FVG_APPROACH_TOL, SMC_OB_NEAR_TOL, SMC_OB_APPROACH_TOL
+from config import SMC_SWING_LOOKBACK, SMC_FVG_MIN_PCT, SMC_OB_LOOKBACK, ATR_PERIOD, EFF_RATIO_LOOKBACK, PD_TREND_GATE, SMC_OB_MIN_IMPULSE, SMC_FVG_NEAR_TOL, SMC_FVG_APPROACH_TOL, SMC_OB_NEAR_TOL, SMC_OB_APPROACH_TOL, TP_LEVEL_MIN_DISTANCE_PCT
 
 
 # ── Basic indicators ──────────────────────────────────────────────────────────
@@ -868,11 +868,11 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
     # TP2 = second 15m swing level OR nearest 1h swing level
     current_px = closes[-1]
     _bull_tps = sorted(
-        [p for _, p in swing_highs if p > current_px * 1.005],
+        [p for _, p in swing_highs if p > current_px * (1.0 + TP_LEVEL_MIN_DISTANCE_PCT)],
         key=lambda x: x
     )
     _bear_tps = sorted(
-        [p for _, p in swing_lows if p < current_px * 0.995],
+        [p for _, p in swing_lows if p < current_px * (1.0 - TP_LEVEL_MIN_DISTANCE_PCT)],
         key=lambda x: x, reverse=True
     )
     bull_tp1 = _bull_tps[0] if _bull_tps else None
@@ -895,8 +895,8 @@ def get_smc_indicators(candles_15m: dict, candles_1h: dict = None,
         sh_1h, sl_1h = find_swing_points(
             candles_1h["high"], candles_1h["low"], lookback=3
         )
-        _bull_1h = sorted([p for _, p in sh_1h if p > current_px * 1.005], key=lambda x: x)
-        _bear_1h = sorted([p for _, p in sl_1h if p < current_px * 0.995], key=lambda x: x, reverse=True)
+        _bull_1h = sorted([p for _, p in sh_1h if p > current_px * (1.0 + TP_LEVEL_MIN_DISTANCE_PCT)], key=lambda x: x)
+        _bear_1h = sorted([p for _, p in sl_1h if p < current_px * (1.0 - TP_LEVEL_MIN_DISTANCE_PCT)], key=lambda x: x, reverse=True)
         if bull_tp2 is None and _bull_1h:
             bull_tp2 = _bull_1h[0]
         if bear_tp2 is None and _bear_1h:

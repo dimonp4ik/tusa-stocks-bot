@@ -286,6 +286,14 @@ SMC_MIN_CONFIRMATIONS = int(os.getenv("SMC_MIN_CONFIRMATIONS", "2"))
 # unexplained. Do not treat it as understood, and do not sync this parameter
 # across desks on the strength of either sweep.
 SMC_BOS_MIN_VOLUME    = float(os.getenv("SMC_BOS_MIN_VOLUME", "1.3"))
+# A swing level only qualifies as TP1/TP2 if it sits at least this far beyond
+# the current price. Was hardcoded as 1.005/0.995 in indicators.py in FOUR
+# places (15m and 1h levels) with no recorded reason; lifted 2026-09-03 at its
+# old value so behaviour is unchanged. Swept on the crypto desk, where the
+# response is flat across 0.003-0.008 (identical drawdown) and only breaks at
+# 0.012. Not yet swept here.
+TP_LEVEL_MIN_DISTANCE_PCT = float(os.getenv("TP_LEVEL_MIN_DISTANCE_PCT", "0.005"))
+
 SMC_RSI_LONG_MAX      = float(os.getenv("SMC_RSI_LONG_MAX", "72"))   # skip overextended longs
 SMC_RSI_SHORT_MIN     = float(os.getenv("SMC_RSI_SHORT_MIN", "28"))  # skip overextended shorts
 MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
