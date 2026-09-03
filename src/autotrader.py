@@ -48,6 +48,7 @@ from src.db import (
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     at_has_open_position,
     get_signal_by_id,
+    set_signal_size_mult,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -290,6 +291,17 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _stack *= _hm
     if _stack > float(SIZE_MULT_MAX):
         _size_mult *= float(SIZE_MULT_MAX) / _stack
+    # Record what this signal actually traded at, HERE — above the _norm
+    # step below, which resizes so that 1R costs the same money at any stop
+    # width and therefore does not scale R. The rule multipliers above DO
+    # scale it, and are what the backtest multiplies gross_r/net_r by.
+    # Best-effort: the trade matters more than the bookkeeping, so a failure
+    # here is logged and the open continues.
+    try:
+        set_signal_size_mult(sig["id"], _size_mult)
+    except Exception as _sm_err:
+        log.warning(f"could not record size_mult for signal {sig.get('id')}: "
+                    f"{_sm_err}")
     _size_mult *= _norm
     margin = _margin_for(u, balance) * _size_mult
     if margin <= 0:

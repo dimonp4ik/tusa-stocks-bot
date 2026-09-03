@@ -143,6 +143,14 @@ def init_db():
             # in the backtest and do nothing in production.
             "eff_ratio":     "REAL",
             "vol_atr_pct":   "REAL",
+            # 2026-09-03: the size multiplier ACTUALLY used when this signal
+            # was opened. Every input above was already stored, but the
+            # product was not, so the only way to weight a past trade by its
+            # size was to re-derive it — with TODAY's rules, against a trade
+            # opened before half of them existed. Store the answer, not just
+            # the ingredients. NULL on rows written before this migration,
+            # which the reader treats as 1.0.
+            "size_mult":     "REAL",
         }.items():
             _ensure_column(c, "signals", col, ddl)
 
@@ -489,6 +497,23 @@ def update_signal_status(signal_id: int, status: str, exit_price=None, realized_
             """, (status, now, exit_price, realized_r, signal_id))
 
 
+def set_signal_size_mult(signal_id: int, mult: float) -> None:
+    """Record the position-size multiplier this signal actually traded at.
+
+    Written once, when the first autotrader opens the signal. The value is
+    signal-level (it reads only the signal's own fields), so every user gets
+    the same number and a repeat write is a no-op rather than a conflict.
+
+    Kept OUT of the risk-normalisation step that follows it in the autotrader:
+    that step exists to make 1R cost the same money whatever the stop width, so
+    it does not scale R. The rule multipliers above it do, which is exactly
+    what backtest._size_mult_for applies to gross_r and net_r.
+    """
+    with _conn() as c:
+        c.execute("UPDATE signals SET size_mult = ? WHERE id = ?",
+                  (float(mult), signal_id))
+
+
 def set_sl_xperp_only(signal_id: int, xperp_only: int) -> None:
     """Record the SL-wick diagnostic on a stopped-out signal (see schema note)."""
     with _conn() as c:
@@ -533,7 +558,7 @@ def get_symbol_performance(symbol: str, lookback: int = None) -> dict:
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     with _conn() as c:
         rows = c.execute(
-            f"SELECT status, realized_r FROM signals WHERE symbol = ? "
+            f"SELECT status, realized_r, size_mult FROM signals WHERE symbol = ? "
             f"AND status IN ({placeholders}) ORDER BY opened_at DESC LIMIT ?",
             [symbol, *FINAL_STATUSES, lookback],
         ).fetchall()
@@ -912,12 +937,41 @@ def _status_r(status: str) -> float:
     return 0.0
 
 
+def _size_of(row) -> float:
+    """The size multiplier this signal traded at; 1.0 when unknown.
+
+    NULL on every row written before the 2026-09-03 migration, and on any
+    signal no autotrader ever opened. Both mean "one unit", which is what the
+    number already meant before the column existed — so widening a query to
+    include size_mult never restates history, it only starts weighting the
+    rows that carry a real value.
+    """
+    try:
+        m = row["size_mult"] if "size_mult" in row.keys() else None
+    except (TypeError, AttributeError):
+        m = None
+    try:
+        m = float(m)
+    except (TypeError, ValueError):
+        return 1.0
+    return m if m > 0 else 1.0
+
+
 def _row_r(row) -> float:
-    """Realized R for a row — prefers the stored realized_r, falls back to status R."""
+    """Realized R for a row, scaled by the size it actually traded at.
+
+    realized_r is measured per UNIT of risk: the monitor derives it from the
+    trade's own prices and knows nothing about position size. The account does
+    not experience unit R — a half-size BTC trade that stops out costs half as
+    much money, and a 1.5x counter-structure winner earns half again as much.
+    backtest.py multiplies gross_r and net_r by exactly this factor, so leaving
+    it out here made the report and the model answer different questions, with
+    the report answering the one nobody asked.
+    """
     rr = row["realized_r"] if "realized_r" in row.keys() else None
     if rr is not None:
-        return float(rr)
-    return _status_r(row["status"])
+        return float(rr) * _size_of(row)
+    return _status_r(row["status"]) * _size_of(row)
 
 
 def get_stats(days: int = 7, since_ts: float = None) -> dict:
@@ -930,7 +984,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     with _conn() as c:
         rows = c.execute(
             "SELECT status, direction, opened_at, premium, realized_r, "
-            "entry_price, sl FROM signals WHERE opened_at >= ?",
+            "entry_price, sl, size_mult FROM signals WHERE opened_at >= ?",
             (cutoff,)
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
@@ -987,7 +1041,10 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         risk_pct = abs(e - sl_) / e
         if risk_pct <= 0:
             continue
-        _cost_r += _rt / risk_pct
+        # Costs scale with size for the same reason the returns do — half a
+        # position pays half the round trip. backtest.py multiplies cost_r by
+        # the same factor.
+        _cost_r += (_rt / risk_pct) * _size_of(r)
         _cost_n += 1
     net_r = total_r - _cost_r
     net_per_trade = (net_r / closed) if closed else 0.0
