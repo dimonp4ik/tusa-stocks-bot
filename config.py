@@ -1673,7 +1673,32 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.5"))
 # Kept at 5. Unlike most rejected candidates this one is an HONEST trade: an
 # owner who wants more absolute profit and can sit through a ~50% deeper
 # drawdown can raise it knowingly. It is not free profit.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "5"))
+#
+# 🔴 5 -> 4 on 2026-09-05, from the live book rather than a sweep. Two clusters
+# made the whole week's loss: seven LONGS opened inside 150 minutes on 09-03,
+# six of them stopped, -7.84R; four SHORTS inside 165 minutes on 08-31, three
+# stopped, -4.61R. That is -12.45R against a gross week of -4.47R — the
+# scattered trades were fine, the pile-ons were not.
+#
+# Note what the cap does NOT stop: seven longs got through a cap of five,
+# because it counts positions open AT THAT MOMENT and earlier ones close while
+# later ones are still being opened. Tightening the count is the part that can
+# be measured here; the RATE of accumulation is a separate rail and is not
+# built yet.
+#
+#   окно    лимит 5                        лимит 4                        лимит 3
+#   04-10   +205.95R DD 8.48 ulc 2.11(97.7)  +206.29R DD 4.70 ulc 1.12(184.2)  +158.24R DD 10.15 ❌
+#   05-07   +222.48R DD 7.42 ulc 1.77(125.5) +197.37R DD 6.46 ulc 1.35(146.2)   -
+#   06-05   +245.52R DD 4.60 ulc 1.15(213.7) +240.56R DD 4.50 ulc 1.07(224.3)  +202.38R хуже
+#   07-15   +198.91R DD 5.64 ulc 1.62(122.6) +176.28R DD 5.64 ulc 1.47(119.9)   -
+#   08-26   +236.21R DD 6.91 ulc 1.84(128.3) +218.29R DD 5.83 ulc 1.59(137.1)  +196.09R хуже
+#
+# Ulcer falls in all five windows and max drawdown in four (equal in the fifth);
+# the ratio improves in four of five, 07-15 being 2% worse. Total profit -6.3%.
+# 3 is WRONG on this desk — it takes 04-10 from 8.48 to 10.15, worse than doing
+# nothing. The crypto desk measured its own optimum at 3; they are different
+# books and each is set from its own sweep.
+MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "4"))
 
 # --- US market session gate (see src/market_hours.py) ---
 # Signals only while NYSE/Nasdaq is open — off-session X-Perp candles are thin
