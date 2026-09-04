@@ -63,7 +63,8 @@ def risk_profile(rs: list[float], k: int = 5, n: int = 25) -> dict:
 
 def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
                 per_dir: int, kill: int, bar_sec: int = 900,
-                lookahead: bool = False) -> list[dict]:
+                lookahead: bool = False,
+                dir_rate: int = 0, dir_rate_min: float = 0.0) -> list[dict]:
     """Replay cooldown / per-scan / per-direction / kill-switch in entry order.
 
     The kill-switch is the one gate that cannot be replayed naively. Live it
@@ -81,6 +82,7 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
     kept: list[dict] = []
     closed: list[tuple[float, str]] = []
     streak = 0
+    dir_entries: dict = {}
     cur_day = None
     blocked_day = None
 
@@ -114,6 +116,12 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
         bar = int(ts // (bar_sec or 900))
         if per_scan > 0 and per_bar.get(bar, 0) >= per_scan:
             continue
+        if dir_rate > 0 and dir_rate_min > 0:
+            d = t.get("direction", "")
+            recent = [x for x in dir_entries.get(d, []) if ts - x <= dir_rate_min * 60]
+            dir_entries[d] = recent
+            if len(recent) >= dir_rate:
+                continue
         if per_dir > 0:
             live = [o for o in open_by_dir.get(t.get("direction", ""), [])
                     if _num(o, "exit_time") > raw]
@@ -123,6 +131,8 @@ def apply_gates(rows: list[dict], *, cooldown_h: float, per_scan: int,
             open_by_dir[t.get("direction", "")] = live
         last_sig[key] = ts
         per_bar[bar] = per_bar.get(bar, 0) + 1
+        if dir_rate > 0:
+            dir_entries.setdefault(t.get("direction", ""), []).append(ts)
         kept.append(t)
         if kill > 0:
             ex = _ts(_num(t, "exit_time"))
@@ -157,6 +167,8 @@ def main() -> int:
     ap.add_argument("--per-scan", type=int, default=3)
     ap.add_argument("--per-dir", type=int, default=5)
     ap.add_argument("--kill", type=int, default=3)
+    ap.add_argument("--dir-rate", type=int, default=0)
+    ap.add_argument("--dir-rate-min", type=float, default=0.0)
     ap.add_argument("--lookahead", action="store_true")
     ap.add_argument("--grid", action="store_true", help="Sweep every capacity gate.")
     ap.add_argument("--out", default=None,
@@ -172,7 +184,8 @@ def main() -> int:
 
     if a.out:
         kept = apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=a.lookahead)
+                           per_dir=a.per_dir, kill=a.kill,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=a.lookahead)
         with open(a.out, "w", newline="", encoding="utf-8") as fh:
             w = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
             w.writeheader()
@@ -184,15 +197,18 @@ def main() -> int:
     if not a.grid:
         report("подглядка",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=True))
+                           per_dir=a.per_dir, kill=a.kill,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=True))
         report("честно",
                apply_gates(rows, cooldown_h=a.cooldown, per_scan=a.per_scan,
-                           per_dir=a.per_dir, kill=a.kill, lookahead=False))
+                           per_dir=a.per_dir, kill=a.kill,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=False))
         return 0
 
     def run(**kw):
         base = dict(cooldown_h=a.cooldown, per_scan=a.per_scan,
-                    per_dir=a.per_dir, kill=a.kill, lookahead=False)
+                    per_dir=a.per_dir, kill=a.kill,
+                           dir_rate=a.dir_rate, dir_rate_min=a.dir_rate_min, lookahead=False)
         base.update(kw)
         return apply_gates(rows, **base)
 

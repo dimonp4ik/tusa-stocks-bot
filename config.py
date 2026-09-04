@@ -27,7 +27,10 @@ load_dotenv()
 # Anchors for the current config live in the session notes, not here, precisely
 # because they move with every change.
 
-# --- Required secrets (set in Render environment variables) ---
+# --- Required secrets (set in RAILWAY environment variables) ---
+# Railway, not Render. This line said Render for months and cost a
+# debugging session on 2026-09-05: a flag was traced to the wrong
+# dashboard because the comment was believed over the deploy.
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
