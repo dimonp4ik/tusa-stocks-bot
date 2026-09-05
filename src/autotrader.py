@@ -36,6 +36,7 @@ from config import (
     HTF_NEUTRAL_1H_SIZE_MULT,
     VOLUME_SPIKE_SIZE_MULT, VOLUME_SPIKE_BOOST_MIN, OFF_SESSION_SIZE_MULT,
     VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,
+    TIGHT_STOP_MAX_ATR, TIGHT_STOP_SIZE_MULT,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     SIZE_MULT_MAX,
     TELEGRAM_TOKEN,
@@ -281,6 +282,19 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 _size_mult *= float(VOLUME_THIN_SIZE_MULT)
                 _stack *= float(VOLUME_THIN_SIZE_MULT)
         except (TypeError, ValueError):
+            pass
+    # A tight structural stop means the level sits right at the entry — see
+    # TIGHT_STOP_SIZE_MULT in config.py. The distance is computed by the SAME
+    # helper the model uses, imported rather than re-derived, because a second
+    # copy of this arithmetic is exactly how the two sides drift apart.
+    if TIGHT_STOP_SIZE_MULT != 1.0:
+        try:
+            from backtest import _stop_atr_of as _sa_of
+            _sa = _sa_of(sig)
+            if _sa is not None and _sa < TIGHT_STOP_MAX_ATR:
+                _size_mult *= float(TIGHT_STOP_SIZE_MULT)
+                _stack *= float(TIGHT_STOP_SIZE_MULT)
+        except (TypeError, ValueError, ImportError):
             pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.

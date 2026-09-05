@@ -51,6 +51,7 @@ from config import (
     OFF_SESSION_SIZE_MULT,  # noqa: E402
     VOLUME_SPIKE_BOOST_MIN, VOLUME_SPIKE_SIZE_MULT,  # noqa: E402
     VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,  # noqa: E402
+    TIGHT_STOP_MAX_ATR, TIGHT_STOP_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
     SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
@@ -727,6 +728,26 @@ class SymbolResult:
     trade_records: list[TradeRecord] = field(default_factory=list)
 
 
+def _stop_atr_of(row: dict) -> float | None:
+    """Stop distance in ATR, read from whichever field names the caller has.
+
+    The backtest holds "entry"/"sl"; the live signal row holds
+    "entry_price"/"sl". One definition serving both is the point — the model
+    and the autotrader drifting apart on a shared quantity is a failure this
+    project has hit more than once.
+    """
+    try:
+        e = row.get("entry")
+        if e in (None, ""): e = row.get("entry_price")
+        if e in (None, ""): e = row.get("current_price")
+        e = float(e); sl = float(row.get("sl")); ap = float(row.get("vol_atr_pct"))
+    except (TypeError, ValueError):
+        return None
+    if e <= 0 or ap <= 0:
+        return None
+    return (abs(e - sl) / e) / ap
+
+
 def _size_mult_for(setup: dict) -> float:
     """Total size multiplier for one setup - the model's mirror of the live
     rules in src/autotrader.py.
@@ -787,6 +808,13 @@ def _size_mult_for(setup: dict) -> float:
             and str(setup.get("trend_1h") or "").lower() == "neutral"):
         _hm = float(HTF_NEUTRAL_1H_SIZE_MULT)
         stack *= _hm; m *= _hm
+    # A tight structural stop means the level is right at the entry — see
+    # TIGHT_STOP_SIZE_MULT in config.py.
+    if TIGHT_STOP_SIZE_MULT != 1.0:
+        _sa = _stop_atr_of(setup)
+        if _sa is not None and _sa < TIGHT_STOP_MAX_ATR:
+            _tsm = float(TIGHT_STOP_SIZE_MULT)
+            stack *= _tsm; m *= _tsm
     if stack > SIZE_MULT_MAX:
         m *= SIZE_MULT_MAX / stack
     return m
@@ -1054,7 +1082,13 @@ def simulate_trade_direct(
     # Size rules live in _size_mult_for so the live autotrader can be compared
     # against them directly; applying the product once is identical to folding
     # each factor in turn, which is what this used to do inline.
-    _size_mult = _size_mult_for(setup)
+    # entry and sl are locals here and are NOT in `setup` — the stop is computed
+    # long after the setup dict is built. Passing them explicitly is what makes
+    # the tight-stop rule reachable at all: without this it read a missing field,
+    # returned None and never fired, while tools_size_parity still passed 300/300
+    # because its generated rows DO carry those fields. A rule that is inert in
+    # the real path and live in the harness is the worst of both.
+    _size_mult = _size_mult_for({**setup, "entry": entry, "sl": sl})
     gross_r *= _size_mult; net_r *= _size_mult; cost_r *= _size_mult
 
     return TradeRecord(

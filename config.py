@@ -1169,6 +1169,50 @@ VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.0"))
 # setting; it is also the oldest.
 VOLUME_THIN_TRIM_MAX  = float(os.getenv("VOLUME_THIN_TRIM_MAX", "1.5"))
 VOLUME_THIN_SIZE_MULT = float(os.getenv("VOLUME_THIN_SIZE_MULT", "0.75"))
+
+# --- Tight structural stop = a precise setup (2026-09-05) ---------------------
+# When the stop sits close to entry in ATR terms, the level the trade is built
+# on is right there; a distant stop means we entered "somewhere in the area".
+# The bot does not distinguish the two at all, and the difference is large and
+# one-directional across every stocks window measured (unit R, so this is not
+# a size artefact):
+#
+#   окно     доля книги   тесные            прочие           разница
+#   04-10      11.5%      95.8% / +1.667    69.2% / +0.649   +1.017
+#   06-05      20.7%      75.0% / +1.120    73.2% / +0.794   +0.327
+#   07-15      26.1%      70.5% / +0.926    68.8% / +0.718   +0.208
+#   08-26      22.0%      72.9% / +1.116    70.7% / +0.852   +0.264
+#   09-02      24.9%      76.9% / +1.296    66.3% / +0.633   +0.663
+#
+# CRYPTO ONLY GETS 2% of its book into this bucket and its windows disagree, so
+# this stays on the stocks desk.
+#
+# FULL RUNS at x1.25, all five windows:
+#
+#   окно     прибыль            просадка          прибыль/просадка
+#   04-10   +206.29 -> +217.62  -4.70 -> -4.70     43.9 -> 46.3
+#   05-07   +197.37 -> +206.14  -6.46 -> -6.46     30.6 -> 31.9
+#   06-05   +240.56 -> +262.76  -4.50 -> -5.00     53.5 -> 52.5
+#   07-15   +176.28 -> +191.58  -5.64 -> -5.89     31.3 -> 32.5
+#   08-26   +218.29 -> +237.36  -5.83 -> -6.28     37.4 -> 37.8
+#
+# Profit up 4-9% in all five; drawdown unmoved in two and rising by less than
+# profit in the other three; profit per unit of drawdown better in four of five.
+# That is not the signature of plain leverage, where both move together.
+#
+# ⚠️ It is still a BOOST, and the discipline recorded in this project is that
+# boosts need the subset to hold up in a HOSTILE window. The stocks desk has no
+# hostile window — every export is 2026 — so this ships OFF and is the owner's
+# call. TIGHT_STOP_SIZE_MULT=1.25 on Railway turns it on.
+#
+# ⚠️ It was DEAD on first measurement: `_size_mult_for(setup)` is called with a
+# setup built before the levels exist, so `sl` was missing, the helper returned
+# None and the rule never fired — while tools_size_parity passed 300/300,
+# because its generated rows DO carry sl. Fixed by passing the locals through.
+# The check that catches this is comparing a run against the baseline, not a
+# green harness.
+TIGHT_STOP_MAX_ATR   = float(os.getenv("TIGHT_STOP_MAX_ATR", "1.5"))
+TIGHT_STOP_SIZE_MULT = float(os.getenv("TIGHT_STOP_SIZE_MULT", "1.0"))
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
 # cannot tell a strategy property from a few lucky tickers. Splitting the 26
 # symbols into halves and re-measuring answers that separately:
