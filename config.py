@@ -1275,6 +1275,22 @@ TIGHT_STOP_SIZE_MULT = float(os.getenv("TIGHT_STOP_SIZE_MULT", "1.0"))
 # raising profit.
 #
 # Ships OFF. RSI_STRETCH_SIZE_MULT=0.75 on Railway turns it on.
+#
+# MEASURED TOGETHER with HTF_NEUTRAL_1H_SIZE_MULT=1.5, because those are the two
+# this desk would switch on at once and knobs that touch the same trades can
+# cancel. They do not — the trim keys on stretched LONGS, the boost on a neutral
+# 1h trend, and the two sets barely overlap:
+#
+#   окно    база                 только трим          только буст          ОБЕ
+#   04-10  +206.29 -4.70 43.9   +201.39 -4.29 46.9   +212.58 -4.52 47.0   +207.50 -4.52 45.9
+#   05-07  +197.37 -6.46 30.6   +188.84 -6.46 29.2   +209.45 -6.46 32.4   +201.12 -6.46 31.1
+#   06-05  +240.56 -4.50 53.5   +232.39 -4.26 54.6   +253.04 -4.50 56.2   +244.08 -4.26 57.3
+#   07-15  +176.28 -5.64 31.3   +173.80 -4.86 35.8   +184.54 -6.72 27.5   +181.91 -5.94 30.6
+#   08-26  +218.29 -5.83 37.4   +209.65 -4.99 42.0   +235.98 -5.83 40.5   +226.82 -4.99 45.5
+#
+# Together, profit is up in ALL FIVE windows and drawdown is lower in three,
+# flat in one, higher in one. Each alone has a weakness the other covers: the
+# trim costs profit, the boost adds drawdown, and the pair cancels both.
 RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
 RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "1.0"))
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
