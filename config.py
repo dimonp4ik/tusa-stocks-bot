@@ -996,10 +996,33 @@ OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volum
 # where it is the strongest single sizing rule found (profit AND both risk
 # ratios up in all three windows — the test that separates a real subset
 # from leverage). This bot had no equivalent knob at all.
-# The export says the same subset leads here: trend_1h=neutral is 30 trades
-# at 83.3% WR and +1.010 unit R against a +0.658 book average. Thirty trades
-# is too few to ship on, so this stays 1.0 (inert) until measured
-# end-to-end across the five windows.
+# The export said the same subset leads here: trend_1h=neutral was 30 trades
+# at 83.3% WR and +1.010 unit R against a +0.658 book average — too few to ship
+# on, so it stayed inert "until measured end-to-end across the five windows".
+#
+# MEASURED 2026-09-05, five full runs. The subset is now visible on 1,506 raw
+# trades: among the best decile by unit R, trend_1h=neutral is 23% against 11%
+# of the rest, and their trend_score averages 79.0 against 81.9.
+#
+#   окно    база              x1.5              x1.75
+#   04-10  +206.29 -4.70 43.9  +212.58 -4.52 47.0  +215.29 -4.67 46.1
+#   05-07  +197.37 -6.46 30.6  +209.45 -6.46 32.4  +214.53 -6.46 33.2
+#   06-05  +240.56 -4.50 53.5  +253.04 -4.50 56.2  +255.95 -4.50 56.9
+#   07-15  +176.28 -5.64 31.3  +184.54 -6.72 27.5  +187.84 -6.93 27.1
+#   08-26  +218.29 -5.83 37.4  +235.98 -5.83 40.5  +241.48 -5.83 41.4
+#
+# Profit rises 3-8% in all five at either setting; drawdown is unmoved in three
+# windows, better in one, worse in one (07-15, which degrades at both). Profit
+# per unit of drawdown beats base in four of five.
+#
+# 1.5 RATHER THAN 1.75, though 1.75 edges it on three windows: this desk still
+# has no second market regime, so the whole finding rests on one year. That is
+# the same reasoning that put OPEN_SESSION_SIZE_MULT at 1.5 above — a bigger
+# multiplier is a bigger bet on the same single-regime claim, not better
+# evidence for it.
+#
+# Ships OFF (1.0) regardless: it is a boost, and boosts are the owner's call.
+# HTF_NEUTRAL_1H_SIZE_MULT=1.5 on Railway turns it on.
 # NOTE the 4h version does NOT port: trend_4h=neutral is WORSE here (+0.424)
 # while it is better in crypto — the two bots mirror on this, as they do on
 # volume semantics and on late-entry handling.
