@@ -138,6 +138,13 @@ def init_db():
             # have fired, which is worse than a wrong value because turning
             # it on would have changed nothing and looked like a null result.
             "trend_1h":      "TEXT",
+            # 2026-09-05: trend_4h and rsi were never stored either, and both
+            # are live inputs — TREND_PAIR_RISK_UP sizes on the 1h/4h PAIR, so
+            # with only half the pair on the row the boost cannot be audited
+            # against outcomes at all, and the corridor rules key on rsi. The
+            # filter has returned both all along; only the insert was short.
+            "trend_4h":      "TEXT",
+            "rsi":           "REAL",
             # 2026-08-27, same reason: OPEN_SESSION_SIZE_MULT keys on session
             # AND volume_ratio, and neither was on the row. Without them the
             # opening boost would size correctly in the backtest and do nothing
@@ -439,9 +446,10 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 symbol, direction, entry_price, tp1, tp2, sl, opened_at, status,
                 confidence, reason, entry_low, entry_high, entry_source, market_price, zone_entry_price,
                 mtf_score, mtf_score_max, premium, atr, bos_extension_atr,
-                session, volume_ratio, eff_ratio, vol_atr_pct, trend_1h
+                session, volume_ratio, eff_ratio, vol_atr_pct, trend_1h,
+                trend_4h, rsi
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -458,6 +466,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("eff_ratio"),
             analysis.get("vol_atr_pct"),
             analysis.get("trend_1h"),
+            analysis.get("trend_4h"),
+            analysis.get("rsi"),
         ))
         return cur.lastrowid
 
