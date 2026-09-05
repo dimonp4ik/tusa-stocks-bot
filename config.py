@@ -125,6 +125,19 @@ TIMEFRAME_4H_KUCOIN = "4hour"
 # Matched to backtest WINDOW_4H, NOT raised past 51: trend_4h_strong stays
 # False on both sides (confirmed dead in the crypto data), and raising only the
 # live side would recreate the very mismatch this fixes.
+# ⚠ 2026-09-05: this budget is ONE SHORT of what the strong-trend flag needs.
+# get_1h_trend() sets strong=True only when len(closes) >= 51, so with 50 the
+# 4h EMA-stack flag has NEVER been True — not once, in the live bot or in the
+# backtest (which hardcodes its own WINDOW_4H = 50). Evidence: trend_score is a
+# sum of fixed bonuses and the value 100 (both aligned + BOTH strong) does not
+# occur in a single one of 5,845 exported setups across three windows.
+#
+# DO NOT "fix" this to 51 as tidy-up. Raising it REVIVES a dead scoring input:
+# HTF_STRONG_SCORE would start firing for 4h, pushing mtf_score up by 1 on
+# exactly the fully-aligned setups that measure WORST (67.3/65.9/59.1% WR
+# against 76.8/82.9/70.8% for the neutral-1h group), so more of the weakest
+# group would clear MTF_MIN_SCORE. It is a behaviour change and needs its own
+# three-window measurement, not a one-character edit.
 KLINES_4H_LIMIT = 50
 KLINES_4H_INTERVAL_SEC = 4 * 3600
 
