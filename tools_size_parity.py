@@ -81,6 +81,11 @@ def main_() -> int:
             "volume_ratio": round(random.uniform(0.8, 6.0), 2),
             "bos_extension_atr": round(random.uniform(0.0, 4.0), 2),
             "vol_atr_pct": round(random.uniform(0.002, 0.020), 4),
+            # RSI_STRETCH_SIZE_MULT keys on this. Without it the generated
+            # rows never reach the branch and parity passes while proving
+            # nothing about it — the exact failure this harness exists to
+            # prevent. Range straddles the 68 threshold on purpose.
+            "rsi": round(random.uniform(30.0, 80.0), 2),
             "eff_ratio": round(random.uniform(0.0, 0.9), 3),
         }
         live = _live_mult(sig, user)

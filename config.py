@@ -1236,6 +1236,47 @@ VOLUME_THIN_SIZE_MULT = float(os.getenv("VOLUME_THIN_SIZE_MULT", "0.75"))
 # green harness.
 TIGHT_STOP_MAX_ATR   = float(os.getenv("TIGHT_STOP_MAX_ATR", "1.5"))
 TIGHT_STOP_SIZE_MULT = float(os.getenv("TIGHT_STOP_SIZE_MULT", "1.0"))
+
+# --- Stretched-long size trim, ported from crypto 2026-09-06 -----------------
+# A long bought while RSI already sits at the top of its corridor is buying a
+# move that has run. The crypto desk trims those to 0.75 and the same subset
+# points the same way here — unit R against the rest of the book, per window:
+#
+#   08-26  139 сд  +0.880 против +0.919   (-0.039)
+#   04-10   71 сд  +0.526 против +0.815   (-0.289)
+#   06-05   93 сд  +0.813 против +0.873   (-0.060)
+#
+# Weaker in all three, on 15-25% of the book. Note the magnitudes are uneven:
+# one window carries most of it, so this is a consistent SIGN on a thin effect,
+# not a large one. It is a TRIM, which is the safe direction — no leverage is
+# added, a weak subset simply weighs less.
+#
+# Two other crypto-only rules were checked the same way and do NOT port:
+# the volatility BOOST (vol_atr_pct >= 0.0104) runs -0.066 and -0.279 here, i.e.
+# the subset is worse where crypto finds it better; and the parabolic trim
+# (accel_ratio >= 6) disagrees between windows (-0.035 / -0.234 / +0.195).
+#
+# rsi only started reaching this bot's database on 2026-09-05, so before that
+# the rule could not have fired live even if it had existed.
+#
+# FULL RUNS at 0.75, all five windows — trade COUNT is unchanged, only weight:
+#
+#   окно    база                  с тримом
+#   04-10  +206.29 -4.70 43.9    +201.39 -4.29 46.9
+#   05-07  +197.37 -6.46 30.6    +188.84 -6.46 29.2
+#   06-05  +240.56 -4.50 53.5    +232.39 -4.26 54.6
+#   07-15  +176.28 -5.64 31.3    +173.80 -4.86 35.8
+#   08-26  +218.29 -5.83 37.4    +209.65 -4.99 42.0
+#
+# Drawdown improves in four windows and worsens in none; profit costs 1.4-4.3%;
+# profit per unit of drawdown is better in four of five. That is the trade a
+# trim is supposed to make — a little return for a lot less risk — and it is
+# the only rule measured in this session that lowers drawdown rather than
+# raising profit.
+#
+# Ships OFF. RSI_STRETCH_SIZE_MULT=0.75 on Railway turns it on.
+RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
+RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "1.0"))
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
 # cannot tell a strategy property from a few lucky tickers. Splitting the 26
 # symbols into halves and re-measuring answers that separately:

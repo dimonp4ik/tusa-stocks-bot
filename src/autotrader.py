@@ -37,6 +37,7 @@ from config import (
     VOLUME_SPIKE_SIZE_MULT, VOLUME_SPIKE_BOOST_MIN, OFF_SESSION_SIZE_MULT,
     VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,
     TIGHT_STOP_MAX_ATR, TIGHT_STOP_SIZE_MULT,
+    RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,
     SIZE_MULT_MAX,
     TELEGRAM_TOKEN,
@@ -295,6 +296,17 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 _size_mult *= float(TIGHT_STOP_SIZE_MULT)
                 _stack *= float(TIGHT_STOP_SIZE_MULT)
         except (TypeError, ValueError, ImportError):
+            pass
+    # Stretched longs ride smaller — see RSI_STRETCH_LONG_MIN in config.py.
+    # Absent rsi means no trim, matching the backtest.
+    if (RSI_STRETCH_SIZE_MULT != 1.0
+            and str(sig.get("direction") or "").upper() == "LONG"):
+        try:
+            _rs = sig.get("rsi")
+            if _rs is not None and float(_rs) >= RSI_STRETCH_LONG_MIN:
+                _size_mult *= float(RSI_STRETCH_SIZE_MULT)
+                _stack *= float(RSI_STRETCH_SIZE_MULT)
+        except (TypeError, ValueError):
             pass
     # Ceiling on the stacked product — see SIZE_MULT_MAX in config.py. Mirrors
     # backtest.py, which applies the same cap to the folded multipliers.

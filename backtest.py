@@ -52,6 +52,7 @@ from config import (
     VOLUME_SPIKE_BOOST_MIN, VOLUME_SPIKE_SIZE_MULT,  # noqa: E402
     VOLUME_THIN_TRIM_MAX, VOLUME_THIN_SIZE_MULT,  # noqa: E402
     TIGHT_STOP_MAX_ATR, TIGHT_STOP_SIZE_MULT,  # noqa: E402
+    RSI_STRETCH_LONG_MIN, RSI_STRETCH_SIZE_MULT,  # noqa: E402
     ORDERLY_EFF_MIN, ORDERLY_ATR_MAX, ORDERLY_EXT_MIN, ORDERLY_SIZE_MULT,  # noqa: E402
     SIZE_MULT_MAX,  # noqa: E402
     BACKTEST_CANDLES,
@@ -815,6 +816,17 @@ def _size_mult_for(setup: dict) -> float:
         if _sa is not None and _sa < TIGHT_STOP_MAX_ATR:
             _tsm = float(TIGHT_STOP_SIZE_MULT)
             stack *= _tsm; m *= _tsm
+    # A long bought into a stretched RSI rides smaller — see config.py. A missing
+    # rsi defaults BELOW the threshold, so an absent field means no trim rather
+    # than one applied on no evidence.
+    if (RSI_STRETCH_SIZE_MULT != 1.0
+            and str(setup.get("direction") or "").upper() == "LONG"):
+        try:
+            if _fld(setup, "rsi", 0.0) >= RSI_STRETCH_LONG_MIN:
+                _rm = float(RSI_STRETCH_SIZE_MULT)
+                stack *= _rm; m *= _rm
+        except (TypeError, ValueError):
+            pass
     if stack > SIZE_MULT_MAX:
         m *= SIZE_MULT_MAX / stack
     return m
