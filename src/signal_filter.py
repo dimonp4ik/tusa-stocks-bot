@@ -116,6 +116,16 @@ def _change_pct_from_1h(candles_1h: dict, lookback_hours: int = 1) -> float:
     return (cur - prev) / prev * 100.0
 
 
+# ⚠ 2026-09-05: the three overlays below all write to `risk_mult` — and NOTHING
+# SIZES FROM IT on this desk either. src/autotrader.py does not mention the
+# field at all, and backtest.py records it as a column while sizing from
+# _size_mult_for(). Same finding as the crypto desk, verified there by running
+# with TREND_PAIR_RISK_UP=0 and reproducing the baseline byte for byte.
+#
+# So these knobs describe an intention, not a behaviour: changing one moves
+# nothing, and analysis run with --use-risk-mult weights past results by a
+# multiplier no position ever carried. Wire them into _size_mult_for on both
+# sides before trusting any of them, or delete them.
 def _apply_quality_risk_overlay(
     risk_mult: float,
     *,
