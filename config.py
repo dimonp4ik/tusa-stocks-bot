@@ -755,6 +755,28 @@ CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # c
 # Approval rate here is 80%, so trading rules-only adds about a quarter more
 # trades — a modest step. On the crypto desk it is 52%, which would nearly
 # double that book, so this stays OFF there until this one reports.
+#
+# ✅ IT REPORTS, 2026-09-06. Scored against real fills, which is what shadow
+# mode was built to make possible:
+#
+#   одобрено Клодом   161 сд   +0.161R на сделку   итого +25.88R
+#   отклонено Клодом   27 сд   -0.247R на сделку   итого  -6.66R
+#
+# Difference 0.408R per trade, 1.38 sigma — modest significance on 27 rejections,
+# but the sign is the one the experiment was set up to find, and the rejected
+# arm is outright negative rather than merely weaker. Gating would have returned
+# +6.66R for 14% fewer trades.
+#
+# Corroborating detail from the same read: the worst live trades carry Claude's
+# own warning in their reason text ("severely negative expectancy", "disaster")
+# and traded anyway because he is in shadow. Scoring that text as a signal, on a
+# holdout excluding the trades it was derived from, gives -0.323R against
+# +0.252R here (1.39 sigma) and -0.341R against +0.178R on the crypto desk
+# (1.61 sigma) — the same effect from a second direction.
+#
+# Recommendation: switch this back ON here. The crypto desk stays OFF for now —
+# its approval rate is 52%, so gating halves that book, which is a much larger
+# step than this one and deserves its own decision.
 CLAUDE_GATE_ENABLED = os.getenv("CLAUDE_GATE_ENABLED", "1") != "0"
 CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
 CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
