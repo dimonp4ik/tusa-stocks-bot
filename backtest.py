@@ -120,6 +120,13 @@ def _in_extended_window_bt(dt_utc) -> bool:
 
 PROJECT_DIR = Path(__file__).resolve().parent
 CACHE_DIR = PROJECT_DIR / "backtest_cache"
+# NOTE for anyone comparing runs (config.py points here as "the note at the
+# candle stamp"): a backtest with no --end-date is anchored to NOW, and this TTL
+# means it refetches every two hours and SLIDES the window forward — old candles
+# fall off the back, new ones arrive at the front. Two runs of the SAME config
+# either side of a refresh will not agree. The dated windows are immune, because
+# their range is pinned, so any comparison that has to be exact passes
+# --end-date. A sweep run on a sliding window has to be redone on a pinned one.
 CACHE_TTL_SEC = 2 * 3600
 
 # OKX API — SAME source the live bot analyses (stock/ETF/commodity USDT swaps).
