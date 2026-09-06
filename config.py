@@ -1066,6 +1066,17 @@ OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volum
 # In the crypto bot the same rule passes cleanly (both ratios up in 3 of 3),
 # which is why it ships at 1.75 there. Here it does not, and the subset is
 # only 30 trades. Left inert; re-run this sweep once the book is larger.
+# 2026-09-06, split test on the FRESH window (2000 candles to 2026-09-05), each
+# half measured alone against base 155 trades / +144.78R / DD -5.76 / pd 25.1:
+#   trim only  (RSI_STRETCH 0.75)   +139.09R  DD -5.30  pd 26.3
+#   boost only (this knob at 1.5)   +152.67R  DD -5.76  pd 26.5
+#   both together                   +146.98R  DD -5.30  pd 27.7
+# The two halves work through different ends: the trim buys -8% drawdown for
+# -3.9% profit, the boost adds +5.4% profit with the drawdown UNCHANGED to the
+# digit. That last part is not proof the boost is free -- a drawdown that does
+# not move at all means this window's worst stretch simply contains no
+# neutral-1h trades, which is luck, not evidence. The 30-trade caution above
+# stands; what this adds is that the pair is not merely the trim in disguise.
 HTF_NEUTRAL_1H_SIZE_MULT = float(os.getenv("HTF_NEUTRAL_1H_SIZE_MULT", "1.0"))
 
 # Swept again on a PINNED window (the first sweep ran on a sliding one — see
