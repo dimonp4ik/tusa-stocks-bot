@@ -1382,6 +1382,12 @@ def merge_results(results: Iterable[SymbolResult]) -> SymbolResult:
 
 
 _LIVE_MAX_PER_SCAN = int(os.getenv("BT_LIVE_MAX_PER_SCAN", "3"))
+from dataclasses import replace as _dc_replace
+_BT_CONC_TRIM = os.getenv("BT_CONCURRENCY_TRIM", "").strip()
+_BT_CONC_MIN, _BT_CONC_MULT = (
+    (int(_BT_CONC_TRIM.split(":")[0]), float(_BT_CONC_TRIM.split(":")[1]))
+    if _BT_CONC_TRIM else (0, 1.0)
+)
 # Research handle, default 0 = honest. 1 restores the old kill-switch replay
 # that read a trade's eventual outcome while walking entries, for A/B only.
 _BT_KILL_LOOKAHEAD = os.getenv("BT_KILL_LOOKAHEAD", "0") == "1"
@@ -1484,6 +1490,29 @@ def apply_live_gates(trades: list[TradeRecord]) -> list[TradeRecord]:
             if len(live) >= MAX_SAME_DIRECTION_POSITIONS:
                 continue
             live.append(t)
+            # ❌ MEASURED 2026-09-06 AND NOT TAKEN, at 1:0.75. Against base
+            # (43.9 / 30.6 / 53.5 / 31.3 / 37.4 profit/DD on the five windows):
+            #     04-10  +159.49R  DD -3.53  45.2
+            #     05-07  +158.01R  DD -4.84  32.6
+            #     06-05  +198.12R  DD -4.00  49.6   <- worse
+            #     07-15  +143.06R  DD -4.84  29.6   <- worse
+            #     08-26  +174.80R  DD -4.37  40.0
+            # Better in three windows, worse in two: the same split the crypto
+            # bot gave. Correlated exposure is real but pricing it costs about
+            # what it saves, in BOTH books.
+            # Graded alternative to the hard cap: keep the trade but take it
+            # smaller once N same-direction positions are already open.
+            # BT_CONCURRENCY_TRIM is "N:mult"; empty (default) leaves the run
+            # untouched. Ported from the crypto bot, where it was measured and
+            # NOT taken (better in two calm windows, worse in the hostile one).
+            if _BT_CONC_TRIM:
+                _n_open = len(live) - 1          # excludes the trade just added
+                if _n_open >= _BT_CONC_MIN:
+                    t = _dc_replace(t, gross_r=t.gross_r * _BT_CONC_MULT,
+                                    net_r=t.net_r * _BT_CONC_MULT,
+                                    cost_r=t.cost_r * _BT_CONC_MULT,
+                                    size_mult=t.size_mult * _BT_CONC_MULT)
+                    live[-1] = t
             open_by_dir[t.direction] = live
         last_sig[key] = ts
         per_bar[bar] = per_bar.get(bar, 0) + 1
