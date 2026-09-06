@@ -1231,6 +1231,20 @@ VOLUME_SPIKE_SIZE_MULT  = float(os.getenv("VOLUME_SPIKE_SIZE_MULT", "1.0"))
 # more, 0.85 if profit does. 04-10 is the one window that dislikes it at every
 # setting; it is also the oldest.
 VOLUME_THIN_TRIM_MAX  = float(os.getenv("VOLUME_THIN_TRIM_MAX", "1.5"))
+# ⚖️ HONEST-FILL AUDIT 2026-09-06, removed and re-run at 34 bps against base
+# 6.2 / 6.0 / 5.5 profit/DD (2026-04-10 / 07-15 / 08-26):
+#   without it   6.5  /  5.9  /  5.5   (profit +3.5R / +2.9R / +1.9R, drawdown
+#                                       -15.04 / -11.00 / -15.53 vs -15.36 /
+#                                       -10.24 / -15.13)
+# A wash: better once, worse once, equal once. It neither earns nor costs
+# anything measurable at honest fills, so it stays as the safer default.
+#
+# 🔚 THAT CLOSES THE AUDIT OF EVERY LIVE SIZE RULE IN BOTH BOTS (nine of them:
+# six in crypto at 8 bps, three here at 34). Not one is removable. The tables
+# that justified them were all measured at zero fill cost, and the fear was that
+# some were artefacts of a fill nobody gets — but the only thing the fill cost
+# actually demoted was the RSI_STRETCH + HTF_NEUTRAL_1H pair recommended to the
+# owner, which is recorded at RSI_STRETCH_SIZE_MULT above.
 VOLUME_THIN_SIZE_MULT = float(os.getenv("VOLUME_THIN_SIZE_MULT", "0.75"))
 
 # --- Tight structural stop = a precise setup (2026-09-05) ---------------------
