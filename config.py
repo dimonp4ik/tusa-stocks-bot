@@ -1338,6 +1338,22 @@ RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
 # a real dict, and autotrader reads them. trend_1h takes exactly the three
 # values "bullish"/"bearish"/"neutral" (neutral is 15% of the book), and live
 # and model compare it identically -- str(...).lower() == "neutral" in both.
+# 🔴 2026-09-06 — THE CASE FOR THIS PAIR IS MUCH WEAKER UNDER HONEST FILLS.
+# Every table above (this knob and HTF_NEUTRAL_1H_SIZE_MULT) was measured at
+# --adverse-entry-bps 0. The note at backtest.py says the honest base for this
+# desk is 34 bps, because it enters at market. Re-run at 34, base against the
+# pair, profit/DD:
+#   04-10  base 6.2  ->  pair 6.2   (+1.8R profit, drawdown 15.36 -> 15.66)
+#   07-15  base 6.0  ->  pair 4.9   WORSE
+#   08-26  base 5.5  ->  pair 6.1   better
+# At 0 bps the pair beat base in four of five windows; at 34 it is a wash, a
+# loss and a win. The edge does not survive the fill cost intact.
+# Note also what the fill cost does to the book itself: drawdown goes from
+# -4.70/-5.64/-5.83 to -15.36/-10.24/-15.13, so the risk in every table above
+# is understated roughly threefold. Trade count and win rate fall too.
+# This is not a reason to revert anything -- nothing here is shipped ON -- but
+# any future claim about these knobs has to be made at 34 bps, and the
+# recommendation to the owner was downgraded accordingly.
 RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "1.0"))
 
 # ---------------------------------------------------------------------------
