@@ -1315,6 +1315,53 @@ TIGHT_STOP_SIZE_MULT = float(os.getenv("TIGHT_STOP_SIZE_MULT", "1.0"))
 # trim costs profit, the boost adds drawdown, and the pair cancels both.
 RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
 RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "1.0"))
+
+# ---------------------------------------------------------------------------
+# overhead_atr — measured 2026-09-06, NOT shipped. Read this before spending a
+# night on it again.
+#
+# overhead_atr is the distance from price up to the nearest HTF level, in ATR
+# (src/indicators.py). It is recorded in the export and NOTHING reads it.
+#
+# WHAT IS REAL: a LONG taken with overhead_atr < 0.3 -- resistance sitting
+# right on top of the entry -- earns less, in every window measured, raw and
+# gated alike (unit R, i.e. net_r / size_mult, so size rules cannot flatter it):
+#     raw 2026-04-10  +0.544 vs +0.810      gated 2026-04-10  +0.596 vs +0.943
+#     raw 2026-06-05  +0.532 vs +0.872      gated 2026-05-07  +0.884 vs +1.082
+#     raw 2026-08-26  +0.740 vs +1.068      gated 2026-06-05  +0.405 vs +1.020
+#                                           gated 2026-07-15  +0.583 vs +0.911
+# Seven independent sets, same sign, gap 0.20-0.62R. SHORTs are unaffected and
+# barely occur in the group (2-6 per window): overhead is measured above price,
+# so it is an obstacle only for a long. The mechanism is plain -- no room to
+# the target.
+#
+# WHY IT IS NOT SHIPPED: the group is still PROFITABLE (+0.4..0.9R), so trimming
+# it buys nothing. Exact arithmetic on the four gated windows, LONG and
+# overhead_atr < 0.3 scaled by M, profit/DD:
+#     M=1.00  17.1  24.5  38.7  31.8
+#     M=0.75  16.8  23.7  40.1  36.0
+#     M=0.50  16.4  22.8  41.7  33.8
+#     M=0.00  15.7  20.6  45.6  29.8
+# Better in two windows, worse in two, and in the first window the drawdown does
+# not move AT ALL (-12.38 at every M) -- these trades are not what makes it.
+# Same lesson as the crypto weak fifth: a consistent quality gap is not a
+# licence to cut, because cutting profitable trades costs profit.
+#
+# ALSO MEASURED AND DEAD: reordering the per-scan cap by quality. Same-bar
+# candidates are ranked by SYMBOL NAME (backtest.py, `key=lambda t: (t.entry_time
+# or 0, t.symbol, ...)`) which is arbitrary, so a better key looked free -- but
+# the cap barely binds: across 418/484/604 pre-gate setups only 12/8/32 are
+# excess over the 3-per-scan limit, i.e. 2-5%, and fewer after gating. Not worth
+# the risk of touching the ordering.
+#
+# ALSO DEAD: fitting a quality score for stocks the way the crypto one was fitted
+# (see SETUP_QUALITY_MIN there). On the three raw windows combined (1506 trades)
+# the best pair was (volume_ratio, overhead_atr), held-out spread +0.573/+0.694/
+# +0.497 -- but the weights do not hold still (overhead +0.026/+0.023/+0.179 across
+# the folds, volume_ratio ~0.01 i.e. nothing), the fifths are not monotone in any
+# window, and all of the signal is the single overhead_atr effect above. Crypto
+# has three features that stay put; here there is one, and it is not tradable.
+# ---------------------------------------------------------------------------
 # ✅ SYMBOL HOLD-OUT PASSED 2026-08-29. Time thirds share a market, so they
 # cannot tell a strategy property from a few lucky tickers. Splitting the 26
 # symbols into halves and re-measuring answers that separately:
