@@ -1314,6 +1314,12 @@ TIGHT_STOP_SIZE_MULT = float(os.getenv("TIGHT_STOP_SIZE_MULT", "1.0"))
 # flat in one, higher in one. Each alone has a weakness the other covers: the
 # trim costs profit, the boost adds drawdown, and the pair cancels both.
 RSI_STRETCH_LONG_MIN  = float(os.getenv("RSI_STRETCH_LONG_MIN", "68"))
+# ✅ LIVE CHAIN VERIFIED 2026-09-06 for both knobs recommended together
+# (this one and HTF_NEUTRAL_1H_SIZE_MULT): signal_filter returns rsi and
+# trend_1h as top-level keys, log_signal inserts both, get_signal_by_id returns
+# a real dict, and autotrader reads them. trend_1h takes exactly the three
+# values "bullish"/"bearish"/"neutral" (neutral is 15% of the book), and live
+# and model compare it identically -- str(...).lower() == "neutral" in both.
 RSI_STRETCH_SIZE_MULT = float(os.getenv("RSI_STRETCH_SIZE_MULT", "1.0"))
 
 # ---------------------------------------------------------------------------
