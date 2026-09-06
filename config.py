@@ -1469,6 +1469,21 @@ ORDERLY_EXT_MIN   = float(os.getenv("ORDERLY_EXT_MIN", "1.271"))
 # owner's call, the same class as SIZE_MULT_MAX and TP1_R_MULT; 1.25 sits
 # monotonically between 1.0 and 1.5 on every measure, so there is no peak to
 # find. Recorded here so the decision is made on the true picture.
+# ⚖️ HONEST-FILL AUDIT 2026-09-06, removed and re-run at --adverse-entry-bps 34
+# across all five windows (base profit/DD and drawdown against removed):
+#   04-10   6.2 -> 7.3    DD -15.36 -> -12.47
+#   05-07  11.7 -> 11.5   DD  -8.30 ->  -7.60
+#   06-05  10.2 ->  9.7   DD  -9.42 ->  -9.42
+#   07-15   6.0 ->  6.0   DD -10.24 ->  -9.83
+#   08-26   5.5 ->  5.0   DD -15.13 -> -14.73
+# Drawdown falls in four windows and never rises -- but the mean is -6.8%
+# drawdown for -6.9% profit, i.e. almost exactly proportional. Removing this
+# boost is not an edge, it is a smaller bet: the same flat exchange this file
+# keeps finding. Kept ON. If the owner ever wants less risk per se, this is the
+# cleanest single lever, and it should be described as reduced leverage rather
+# than as an improvement.
+# For contrast, OPEN_SESSION_SIZE_MULT under the same test gives 5.8 / - / 4.9 /
+# 6.1 against 6.2 / - / 6.0 / 5.5, i.e. worse in two of three: it earns its keep.
 ORDERLY_SIZE_MULT = float(os.getenv("ORDERLY_SIZE_MULT", "1.5"))
 
 # --- Ceiling on the stacked product (2026-08-27) -----------------------------
