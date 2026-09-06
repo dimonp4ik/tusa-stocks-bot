@@ -1048,6 +1048,13 @@ OPEN_VOL_MIN           = float(os.getenv("OPEN_VOL_MIN", "2.5"))  # 0 = no volum
 # NOTE the 4h version does NOT port: trend_4h=neutral is WORSE here (+0.424)
 # while it is better in crypto — the two bots mirror on this, as they do on
 # volume semantics and on late-entry handling.
+# ⚠️ READ THE TWO BLOCKS IN ORDER. What follows is the EARLIER (2026-09-02)
+# measurement, kept for the record; it concluded "left inert, the subset earns
+# like the book". The 2026-09-05 five-window table ABOVE supersedes it: on full
+# end-to-end runs profit rises 3-8% in all five windows and profit-per-drawdown
+# beats base in four of five. Quoting the older block alone understates the
+# case for 1.5 -- which is exactly what happened when it was re-read on
+# 2026-09-06.
 # MEASURED end-to-end 2026-09-02, five windows, and NOT shipped. Profit wins
 # in all five and rises monotonically (+2.9% at 1.25, +4.8% at 1.5, +6.4% at
 # 1.75), but profit is not what decides a sizing rule.
