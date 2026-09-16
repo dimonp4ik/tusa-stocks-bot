@@ -53,3 +53,13 @@ raw_*.csv
 unit_*.csv
 uh_*.csv
 pk_*.csv
+
+# Research data stays on disk: the audit folder alone is 1.5 GB and single CSVs
+# there exceed GitHub's 100 MB file limit. Scripts and write-ups are tracked,
+# the tables they produce are not - they are reproducible by re-running.
+*.pkl
+*.joblib
+*cache*/
+reports/**/*.csv
+reports/**/*.json
+reports/**/*.log
