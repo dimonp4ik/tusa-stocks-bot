@@ -20,6 +20,7 @@ import hashlib
 import hmac
 import json
 import logging
+import math
 import os
 import time
 from datetime import datetime, timezone
@@ -72,7 +73,11 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
             resp = requests.post(url, headers=headers, data=body_str, timeout=timeout)
         j = resp.json()
         if str(j.get("code")) == "0":
-            return True, j.get("data", [])
+            data = j.get("data", [])
+            for item in data if isinstance(data, list) else []:
+                if isinstance(item, dict) and str(item.get("sCode", "0")) != "0":
+                    return False, f"{item.get('sMsg') or 'order rejected'} (sCode {item['sCode']})"
+            return True, data
         # Per-order errors sit inside data[0].sMsg with outer code 1/2
         detail = ""
         try:
@@ -185,16 +190,25 @@ def ensure_leverage(creds: dict, inst_id: str, lever: int = 10) -> tuple:
 
 
 def get_position_size(creds: dict, inst_id: str) -> tuple:
-    """(ok, size_float). 0.0 means flat (position closed, by SL/TP/trail/manually)."""
     ok, data = _request(creds, "GET", "/api/v5/account/positions", params={"instId": inst_id})
     if not ok:
         return False, data
     try:
-        if not data:
-            return True, 0.0
-        return True, abs(float(data[0].get("pos") or 0))
-    except Exception as e:
-        return False, f"position parse failed: {e}"
+        if not isinstance(data, list):
+            raise ValueError('positions response must be a list')
+        size = 0.0
+        for row in data:
+            if row.get('instId', inst_id) != inst_id:
+                continue
+            if 'pos' not in row or row['pos'] in ('', None):
+                raise ValueError('position size missing')
+            value = abs(float(row['pos']))
+            if not math.isfinite(value):
+                raise ValueError('position size non-finite')
+            size += value
+        return True, size
+    except (TypeError, ValueError, KeyError, AttributeError) as exc:
+        return False, f'position parse failed: {exc}'
 
 
 def get_position_avg_px(creds: dict, inst_id: str) -> float | None:
@@ -279,7 +293,10 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
     if not ok:
         return False, data
     try:
-        return True, data[0]["algoId"]
+        algo_id = data[0].get("algoId")
+        if not algo_id:
+            raise ValueError("missing algoId")
+        return True, algo_id
     except Exception as e:
         # The exchange call itself SUCCEEDED (outer code 0) - only pulling
         # the id out of the response failed. Keeping True is right: the
@@ -288,7 +305,7 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         # its trail silently freezes for the life of the trade. Should not
         # be reachable; say so loudly if it ever is.
         _log.error(f"OKX response parsed empty, order id lost: {e}")
-        return True, ""
+        return False, "protection acknowledgement missing algoId"
 
 
 def place_tp1_partial(creds: dict, inst_id: str, direction: str,
@@ -312,7 +329,10 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
     if not ok:
         return False, data
     try:
-        return True, data[0]["algoId"]
+        algo_id = data[0].get("algoId")
+        if not algo_id:
+            raise ValueError("missing algoId")
+        return True, algo_id
     except Exception as e:
         # The exchange call itself SUCCEEDED (outer code 0) - only pulling
         # the id out of the response failed. Keeping True is right: the
@@ -343,46 +363,48 @@ def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
     return ok, data
 
 
-def get_last_fill_px(creds: dict, inst_id: str) -> float | None:
-    """Average price of the most recent fill on this instrument, or None.
+def get_last_fill_px(creds: dict, inst_id: str, *, since_ts=None,
+                     side: str = None) -> float | None:
+    """VWAP of latest matching order in a complete recent fill page.
 
-    The signal engine and the exchange do not exit at the same moment: the
-    engine waits for a 15m candle to CLOSE beyond the stop, while the exchange
-    backstop is a trigger and fires at once. So the engine's own message quotes
-    a candle close the position never traded at. Ported from the crypto bot,
-    which found this live on 2026-08-22 (-6.73% reported against a fill minutes
-    earlier and far above it); this bot reported nothing at all instead.
-
-    Reads the fills endpoint rather than orders-history: it gives the real
-    average execution, including the slippage a market-on-trigger stop eats.
+    Not whole-position PnL. Decline truncated pages, missing identifiers and
+    ambiguous rows rather than report an unrelated entry fill as the exit.
     """
-    ok, data = _request(creds, "GET", "/api/v5/trade/fills",
-                        params={"instId": inst_id, "limit": "10"})
-    if not ok or not data:
+    ok,data=_request(creds,"GET","/api/v5/trade/fills",
+                     params={"instId":inst_id,"limit":"100"})
+    if not ok or not data or len(data)>=100:
         return None
     try:
-        best_ts, best_px = None, None
+        import math
+        rows=[]
         for f in data:
-            px = float(f.get("fillPx") or 0)
-            ts = int(f.get("ts") or 0)
-            if px <= 0:
-                continue
-            if best_ts is None or ts > best_ts:
-                best_ts, best_px = ts, px
-        return best_px
-    except (TypeError, ValueError):
+            if f.get("instId")!=inst_id or (side and f.get("side")!=side):continue
+            ts=int(f.get("ts") or 0)
+            if since_ts is not None and ts<float(since_ts)*1000:continue
+            px=float(f.get("fillPx") or 0);sz=float(f.get("fillSz") or 0)
+            if not f.get("ordId") or not all(math.isfinite(x) and x>0 for x in (px,sz)):
+                return None
+            rows.append((ts,str(f['ordId']),px,sz))
+        if not rows:return None
+        order=max(rows,key=lambda r:r[0])[1]
+        selected=[r for r in rows if r[1]==order]
+        return sum(r[2]*r[3] for r in selected)/sum(r[3] for r in selected)
+    except (TypeError,ValueError,OverflowError):
         return None
 
 
 def close_position_market(creds: dict, inst_id: str) -> tuple:
-    """Market-close the whole isolated position. 'no position' → already flat, ok."""
-    ok, data = _request(creds, "POST", "/api/v5/trade/close-position", body={
-        "instId": inst_id, "mgnMode": "isolated",
-    })
-    if not ok and any(s in str(data).lower() for s in ("position", "51023", "51169")):
-        # 51023 position not exist / 51169 no position to close — algo got there first
-        return True, "already flat"
-    return ok, data
+    """Keep protection until the exchange confirms the position is flat.
+
+    An accepted close request is not a fill. Errors containing 'position' must
+    never be interpreted as success without reading the actual position.
+    """
+    ok, data = _request(creds, "POST", "/api/v5/trade/close-position",
+                        body={"instId": inst_id, "mgnMode": "isolated"})
+    read_ok, size = get_position_size(creds, inst_id)
+    if read_ok and size == 0:
+        return True, data if ok else "confirmed flat"
+    return False, data if not ok else f"close pending: position confirmation {size}"
 
 
 def _fmt_sz(sz: float) -> str:
@@ -436,3 +458,18 @@ def calc_contracts(margin_usd: float, leverage: float, price: float, spec: dict)
     if sz < spec["minSz"]:
         return 0.0
     return sz
+
+
+def get_order_book(inst_id: str) -> dict | None:
+    """Uncached executable depth; sizes for X-Perp are in contracts."""
+    try:
+        response = requests.get(_base_url() + "/api/v5/market/books",
+                                params={"instId": inst_id, "sz": "50"}, timeout=5)
+        response.raise_for_status()
+        body = response.json()
+        if body.get("code") != "0" or not body.get("data"):
+            return None
+        return body["data"][0]
+    except Exception as exc:
+        _log.warning("order book unavailable %s: %s", inst_id, exc)
+        return None

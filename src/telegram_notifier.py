@@ -117,6 +117,28 @@ def calculate_tp_sl(price: float, direction: str, atr: float = 0.0,
     return round(tp1, 8), round(tp2, 8), round(sl, 8)
 
 
+def bracket_for_analysis(analysis: dict, price: float):
+    """Use an explicit fixed-R bracket for independently tested entry families."""
+    target_r = analysis.get("fixed_target_r")
+    stop_atr = analysis.get("fixed_stop_atr")
+    if target_r is not None and stop_atr is not None:
+        target_r = float(target_r)
+        risk = float(analysis.get("atr") or 0) * float(stop_atr)
+        if price <= 0 or target_r <= 0 or risk <= 0 or risk >= price:
+            raise ValueError("invalid fixed-R bracket")
+        sign = 1 if analysis.get("direction") == "LONG" else -1
+        target = price + sign * risk * target_r
+        stop = price - sign * risk
+        return round(target, 8), round(target, 8), round(stop, 8)
+    return calculate_tp_sl(
+        price, analysis.get("direction", ""),
+        float(analysis.get("atr", 0.0) or 0.0),
+        float(analysis.get("recent_high", 0.0) or 0.0),
+        float(analysis.get("recent_low", 0.0) or 0.0),
+        tp1_level=analysis.get("tp1_level"), tp2_level=analysis.get("tp2_level"),
+    )
+
+
 def _format_price(price: float) -> str:
     """Price for a human, in fixed point, never in scientific notation.
 
@@ -187,17 +209,44 @@ def send_signal(analysis: dict) -> bool:
     if decision == "NO TRADE" and not analysis.get("_force_send"):
         return False
 
-    price     = analysis["current_price"]
+    from config import LEVELS_FROM_STRUCTURE
+    price = analysis["current_price"]
+    if LEVELS_FROM_STRUCTURE and analysis.get("zone_entry_price"):
+        price = float(analysis["zone_entry_price"])
     direction = analysis["direction"]
     atr       = analysis.get("atr", 0.0)
     rec_high  = analysis.get("recent_high", price * 1.03)
     rec_low   = analysis.get("recent_low",  price * 0.97)
 
-    tp1, tp2, sl = calculate_tp_sl(
-        price, direction, atr, rec_high, rec_low,
-        tp1_level=analysis.get("tp1_level"),
-        tp2_level=analysis.get("tp2_level"),
-    )
+    tp1, tp2, sl = bracket_for_analysis(analysis, price)
+
+    if analysis.get("_shadow_only"):
+        arrow = "🟢 LONG" if decision == "LONG" else "🔴 SHORT"
+        module = next((str(item).replace("Venue module ", "")
+                       for item in analysis.get("signals", [])
+                       if str(item).startswith("Venue module ")), "frozen_filter")
+        timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
+        message = (
+            "🧪 *ТЕНЕВОЙ СИГНАЛ — ОРДЕР НЕ ОТКРЫТ*\n"
+            f"{arrow} — *{_disp_sym(analysis['symbol'])}*\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            f"💰 Вход по рынку: `{_format_price(price)}`\n"
+            f"🎯 Цель: `{_format_price(tp2)}` "
+            f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+            f"🛑 Стоп: `{_format_price(sl)}`\n"
+            f"🧩 Фильтр: `{_esc(module)}`\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "ℹ️ Сделка записана только для forward-проверки.\n"
+            f"⏰ {timestamp}"
+        )
+        if not _send_message(message):
+            return False
+        try:
+            from src.db import log_signal
+            analysis["_signal_id"] = log_signal(analysis, tp1, tp2, sl)
+        except Exception as exc:
+            _log.error("Paper signal announced but DB write failed: %s", exc)
+        return True
 
     mtf_score = int(analysis.get("mtf_score", 9) or 9)
     lev_info  = recommend_leverage(price, sl, tp1, tp2, direction, mtf_score)
@@ -375,8 +424,9 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     else:
         return False
 
+    paper = "🧪 PAPER · " if not sig.get("autotrade_eligible", 1) else ""
     message = (
-        f"{icon} *{title}* — {arrow} *{_disp_sym(symbol)}*\n"
+        f"{icon} *{paper}{title}* — {arrow} *{_disp_sym(symbol)}*\n"
         f"━━━━━━━━━━━━━━━━━━━\n"
         f"Вход: `{_format_price(entry)}`\n"
         f"{body}\n"

@@ -21,6 +21,7 @@ import requests
 import sys
 import os
 import logging as _log
+import threading
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -252,6 +253,36 @@ def get_top_coins():
     return [sym for sym, _ in rows[:TOP_COINS_COUNT]]
 
 
+_kl_cache: dict = {}
+_KL_CACHE_MAX = 100
+_KL_BOUNDARY_GRACE = 3
+_MIN_REFETCH_SEC = 10
+_kl_lock = threading.Lock()
+
+
+def _kl_cache_get(key, interval_sec: int):
+    with _kl_lock:
+        entry = _kl_cache.get(key)
+        if not entry:
+            return None
+        now = time.time()
+        if now - entry["fetched_at"] < _MIN_REFETCH_SEC:
+            return entry["data"]
+        if now < entry["t_newest"] + 2 * interval_sec + _KL_BOUNDARY_GRACE:
+            return entry["data"]
+        return None
+
+
+def _kl_cache_put(key, data: dict) -> None:
+    times = data.get("time") or [0]
+    entry = {"data": data, "t_newest": int(times[-1]), "fetched_at": time.time()}
+    with _kl_lock:
+        if len(_kl_cache) >= _KL_CACHE_MAX:
+            oldest = min(_kl_cache, key=lambda item: _kl_cache[item]["fetched_at"])
+            _kl_cache.pop(oldest, None)
+        _kl_cache[key] = entry
+
+
 def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
                interval_sec=KLINES_INTERVAL_SEC, closed_only: bool = True):
     """
@@ -324,13 +355,37 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
     for logic that specifically wants a settled/closed candle's close price.
     """
     try:
+        cache_key = ("xperp", symbol, limit)
+        if not include_forming:
+            cached = _kl_cache_get(cache_key, 15 * 60)
+            if cached is not None:
+                return cached
         inst_id = get_xperp_instruments().get(_base_of(symbol))
         if not inst_id:
             return None
-        raw = _okx_get("/api/v5/market/candles",
-                       {"instId": inst_id, "bar": "15m",
-                        "limit": min(limit + 2, 300)}).get("data", [])
-        raw_newest_first = raw  # OKX order: newest-first
+        want = limit + 2
+        raw_newest_first = []
+        after = None
+        while len(raw_newest_first) < want:
+            params = {"instId": inst_id, "bar": "15m",
+                      "limit": min(want - len(raw_newest_first), 300)}
+            if after is not None:
+                params["after"] = after
+            endpoint = ("/api/v5/market/candles" if after is None
+                        else "/api/v5/market/history-candles")
+            page = _okx_get(endpoint, params).get("data", [])
+            if not page:
+                break
+            raw_newest_first.extend(page)
+            if len(page) < 300 and len(raw_newest_first) < want:
+                break
+            after = page[-1][0]
+        unique = {}
+        for candle in raw_newest_first:
+            unique.setdefault(candle[0], candle)
+        raw_newest_first = sorted(
+            unique.values(), key=lambda value: int(value[0]), reverse=True
+        )
         closed = [c for c in reversed(raw_newest_first) if len(c) > 8 and c[8] == "1"]
         closed = closed[-limit:]
         candles = list(closed)
@@ -340,7 +395,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
                 candles = candles + [forming]
         if not candles:
             return None
-        return {
+        result = {
             "time":   [int(float(c[0])) // 1000 for c in candles],
             "open":   [float(c[1]) for c in candles],
             "high":   [float(c[2]) for c in candles],
@@ -353,6 +408,9 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
             # the intrabar touch close-confirmation exists to ignore.
             "confirmed": [1 if (len(c) > 8 and c[8] == "1") else 0 for c in candles],
         }
+        if not include_forming:
+            _kl_cache_put(cache_key, result)
+        return result
     except Exception as e:
         _logger.debug(f"get_klines_xperp failed for {symbol}: {e}")
         return None

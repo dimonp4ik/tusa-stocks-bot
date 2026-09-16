@@ -1,3 +1,4 @@
+import math
 """
 SQLite database for tracking signal performance.
 
@@ -16,6 +17,7 @@ import time as time_mod
 import json
 import sys
 import os
+from contextlib import contextmanager
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -31,6 +33,7 @@ TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HI
 PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
 
 
+@contextmanager
 def _conn():
     """One connection per call, in WAL with a generous busy timeout.
 
@@ -58,7 +61,11 @@ def _conn():
         # A filesystem that cannot do WAL is still usable in the old mode —
         # slower under contention, but nothing here should fail to open.
         pass
-    return c
+    try:
+        with c:
+            yield c
+    finally:
+        c.close()
 
 
 def _ensure_column(conn, table: str, column: str, ddl: str) -> None:
@@ -121,6 +128,9 @@ def init_db():
             "atr":           "REAL",
             "realized_r":    "REAL",
             "runner_trail_atr_mult": "REAL",
+            # Signals forced through only to measure a disabled Claude gate stay
+            # visible and resolvable, but must never reach a real-money opener.
+            "autotrade_eligible": "INTEGER NOT NULL DEFAULT 1",
             # SL-wick diagnostic (ported 2026-07-22): on an SL_HIT, 1 = the deep
             # global feed ALSO breached the stop (real reversal), 0 = only the
             # thin X-Perp wicked to it (execution noise). NULL = not an SL /
@@ -284,6 +294,7 @@ def init_db():
             # 'live' = judged by Claude in production; 'backtest' = seeded
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
+            "signal_bar_ts": "REAL",
             # Realised R of the trade (backtest: real net_r incl. trailed
             # runner; live: left NULL, derived from bracket at read time).
             # Powers expectancy (avg R) in Claude's self-feedback block.
@@ -469,6 +480,8 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("trend_4h"),
             analysis.get("rsi"),
         ))
+        if analysis.get("_shadow_only"):
+            c.execute("UPDATE signals SET autotrade_eligible=0 WHERE id=?", (cur.lastrowid,))
         return cur.lastrowid
 
 
@@ -992,6 +1005,19 @@ def _row_r(row) -> float:
     return _status_r(row["status"]) * _size_of(row)
 
 
+def _row_net_r(row):
+    """Estimated net signal R; unknown execution geometry is not a winning trade."""
+    try:
+        entry, sl = float(row['entry_price']), float(row['sl'])
+        risk = abs(entry-sl)
+        if not math.isfinite(entry) or not math.isfinite(risk) or entry <= 0 or risk <= 0:
+            return None
+        cost = 2 * (float(BACKTEST_FEE_RATE)+float(BACKTEST_SLIPPAGE_RATE))*entry/risk
+        return _row_r(row)-cost*_size_of(row)
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
 def get_stats(days: int = 7, since_ts: float = None) -> dict:
     """Aggregate stats with R-value, direction breakdown and recent streak.
 
@@ -1026,7 +1052,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     sl_hit      = sum(1 for r in rows if r["status"] == "SL_HIT")
     expired     = sum(1 for r in rows if r["status"] == "EXPIRED")
     tp1_expired = sum(1 for r in rows if r["status"] == "TP1_EXPIRED")
-    profitable  = sum(1 for r in rows if r["status"] in PROFIT_STATUSES)
+    profitable  = sum(1 for r in rows if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
 
     win_rate = (profitable / closed * 100) if closed else 0.0
     tp1_rate = (tp1_hit    / total  * 100) if total  else 0.0
@@ -1072,7 +1098,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     for direction in ("LONG", "SHORT"):
         dr = [r for r in rows if r.get("direction") == direction]
         dr_closed = [r for r in dr if r["status"] in FINAL_STATUSES]
-        dr_wins   = sum(1 for r in dr_closed if r["status"] in PROFIT_STATUSES)
+        dr_wins   = sum(1 for r in dr_closed if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
         dr_r      = sum(_row_r(r) for r in dr_closed)
         dir_stats[direction] = {
             "total":    len(dr),
@@ -1085,7 +1111,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     # ── Premium breakdown (💎 OB+FVG overlap + sweep setups) ──────────────────
     prem_rows   = [r for r in rows if r.get("premium")]
     prem_closed = [r for r in prem_rows if r["status"] in FINAL_STATUSES]
-    prem_wins   = sum(1 for r in prem_closed if r["status"] in PROFIT_STATUSES)
+    prem_wins   = sum(1 for r in prem_closed if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
     prem_r      = sum(_row_r(r) for r in prem_closed)
     premium = {
         "total":    len(prem_rows),
@@ -1147,6 +1173,7 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     }
 
 
+
 # ── Setup log ─────────────────────────────────────────────────────────────────
 
 def log_setup_candidate(analysis: dict) -> int:
@@ -1161,15 +1188,8 @@ def log_setup_candidate(analysis: dict) -> int:
     tp2 = analysis.get("tp2_level")
     sl  = None
     try:
-        from src.telegram_notifier import calculate_tp_sl  # local: avoid circular import
-        tp1, tp2, sl = calculate_tp_sl(
-            float(price), analysis.get("direction", ""),
-            atr=float(analysis.get("atr", 0.0) or 0.0),
-            recent_high=float(analysis.get("recent_high", 0.0) or 0.0),
-            recent_low=float(analysis.get("recent_low", 0.0) or 0.0),
-            tp1_level=analysis.get("tp1_level"),
-            tp2_level=analysis.get("tp2_level"),
-        )
+        from src.telegram_notifier import bracket_for_analysis  # local: avoid circular import
+        tp1, tp2, sl = bracket_for_analysis(analysis, float(price))
     except Exception:
         pass
     with _conn() as c:
@@ -1179,8 +1199,8 @@ def log_setup_candidate(analysis: dict) -> int:
                  mtf_score, decision, confidence, risk_score, reason, sent,
                  session, entry_source, atr, trend,
                  oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir,
-                 funding_rate)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 funding_rate, source, signal_bar_ts)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             time_mod.time(),
             analysis.get("symbol", ""),
@@ -1204,8 +1224,25 @@ def log_setup_candidate(analysis: dict) -> int:
             analysis.get("counter", ""),
             analysis.get("open_same_dir"),
             analysis.get("funding_rate"),
+            analysis.get("source") or "live",
+            analysis.get("signal_bar_ts"),
         ))
         return cur.lastrowid
+
+
+def log_setup_candidate_once(analysis: dict) -> int | None:
+    """Log one regime setup per closed signal bar, including across restarts."""
+    signal_bar_ts = analysis.get("signal_bar_ts")
+    if signal_bar_ts is None:
+        return log_setup_candidate(analysis)
+    with _conn() as c:
+        row = c.execute(
+            "SELECT id FROM setup_log WHERE source=? AND symbol=? AND direction=? "
+            "AND signal_bar_ts=? LIMIT 1",
+            (analysis.get("source") or "live", analysis.get("symbol", ""),
+             analysis.get("direction", ""), float(signal_bar_ts)),
+        ).fetchone()
+    return None if row else log_setup_candidate(analysis)
 
 
 def mark_setup_blocked(setup_log_id: int, reason: str) -> None:

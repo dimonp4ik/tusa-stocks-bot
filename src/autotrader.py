@@ -24,12 +24,18 @@ Fail-safe rules:
   - closes treat "already flat" (exchange algo fired first) as success.
 """
 import logging
+import json
+from datetime import datetime, timezone
 import threading
+from collections import defaultdict
 import time
 
 import requests
 
+from src.risk_limits import bounded_margin, position_risk, equity_guard
 from config import (
+    AUTOTRADE_RISK_PER_TRADE, AUTOTRADE_MAX_OPEN_RISK, AUTOTRADE_COST_RESERVE,
+    AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
     RISK_NORMALIZED_SIZING, RISK_REFERENCE_PCT, RISK_SIZE_MULT_MIN,
     EXTENSION_FRESH_THRESHOLD, EXTENSION_FRESH_SIZE_MULT,
     OPEN_SESSION_SIZE_MULT, OPEN_VOL_MIN,
@@ -46,6 +52,7 @@ from config import (
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
+    get_bot_state, set_bot_state,
     at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
@@ -160,7 +167,16 @@ def _check_threshold_cross(u: dict, balance: float) -> None:
             log.warning(f"threshold prompt to {u['user_id']} failed: {e}")
 
 
+_entry_locks = defaultdict(threading.Lock)
+
+
 def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
+    # Keep balance, deduplication, risk budgeting and entry atomic per local user.
+    with _entry_locks[u['user_id']]:
+        _open_for_user_locked(u, sig, inst_id, disp)
+
+
+def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     uid = u["user_id"]
     creds = _creds_of(u)
     if not creds:
@@ -184,6 +200,28 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
     at_set_balance(uid, balance)
     _check_threshold_cross(u, balance)
+    try:
+        state_key = f"risk_guard:{uid}"
+        state = json.loads(get_bot_state(state_key) or '{}')
+        previous_block = state.get('last_block')
+        previous_balance = float(u.get('last_balance') or 0)
+        peak_floor = max(previous_balance, AUTOTRADE_EQUITY_PEAK_FLOOR)
+        state, blocked = equity_guard(state, equity=balance,
+            day=datetime.now(timezone.utc).date().isoformat(),
+            max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS, max_drawdown=AUTOTRADE_MAX_DRAWDOWN,
+            peak_floor=peak_floor)
+        state["last_block"] = blocked
+        set_bot_state(state_key, json.dumps(state))
+        if blocked:
+            if blocked != previous_block:
+                _dm(uid, "Автотрейдинг: новые входы приостановлены по лимиту потерь. "
+                         "Открытые позиции продолжают сопровождаться. "
+                         "Причина: " + blocked)
+            log.warning("autotrade risk guard %s: %s", uid, blocked)
+            return
+    except Exception as exc:
+        log.error("autotrade risk state unavailable; entry refused: %s", exc)
+        return
 
     # Risk-normalised sizing: a wide stop gets less size so that 1R costs the
     # same money regardless of where structure put the stop. See config.py —
@@ -339,8 +377,15 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     except Exception as _sm_err:
         log.warning(f"could not record size_mult for signal {sig.get('id')}: "
                     f"{_sm_err}")
-    _size_mult *= _norm
-    margin = _margin_for(u, balance) * _size_mult
+    # The client owns position sizing. Strategy/regime fields may decide
+    # whether a setup is traded, but they must not change the requested money.
+    _size_mult = 1.0
+    try:
+        set_signal_size_mult(sig["id"], _size_mult)
+    except Exception as _sm_err:
+        log.warning("could not record client size for signal %s: %s",
+                    sig.get("id"), _sm_err)
+    margin = _margin_for(u, balance)
     if margin <= 0:
         return
     if margin > balance:
@@ -348,8 +393,23 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     spec = okx.get_xperp_spec(inst_id)
-    px   = okx.get_last_price(inst_id) or float(sig["entry_price"])
-    sz   = okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, px, spec or {})
+    px = okx.get_last_price(inst_id)
+    try:
+        if not px or not spec:
+            raise ValueError("current exchange price or contract specification unavailable")
+        pos_ok, exchange_size = okx.get_position_size(creds, inst_id)
+        if not pos_ok or exchange_size != 0:
+            raise ValueError("exchange instrument is not confirmed flat")
+        planned, original_sl = float(sig['entry_price']), float(sig['sl'])
+        direction = sig['direction']
+        if (direction == 'LONG' and not original_sl < px < float(sig['tp1'])) or (
+                direction == 'SHORT' and not float(sig['tp1']) < px < original_sl):
+            raise ValueError("entry has crossed the original stop or first target")
+        distance = abs(planned-original_sl)*max(1.,STOP_EXCHANGE_BACKSTOP_R)
+    except (TypeError, ValueError, KeyError) as exc:
+        log.warning("autotrade risk validation refused %s: %s", inst_id, exc)
+        return
+    sz = okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, px, spec or {})
     if sz <= 0:
         _dm(uid, f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
         return
@@ -368,6 +428,22 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             "Сделка пропущена — иначе размер позиции не соответствовал бы риску.",
             f"`{_lev_err}`",
         ]))
+        return
+
+    # Refresh executable depth after leverage setup; last-trade prices may be stale.
+    from src.execution_guard import execution_quote
+    try:
+        book = okx.get_order_book(inst_id)
+        if not book:
+            raise ValueError("order book unavailable")
+        quote = execution_quote(book, direction, sz, time.time()*1000)
+        executable = quote.worst
+        if not (original_sl < executable < float(sig['tp1']) if direction == 'LONG'
+                else float(sig['tp1']) < executable < original_sl):
+            raise ValueError("executable price outside signal bracket")
+        px = quote.average
+    except (TypeError, ValueError, KeyError, IndexError) as exc:
+        log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
         return
 
     ok, ord_id = okx.place_market_entry(creds, inst_id, sig["direction"], sz)
@@ -400,7 +476,7 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _pos_sz = _filled_sz if (_sz_ok and _filled_sz and _filled_sz > 0) else sz
     if _pos_sz != sz:
         log.warning(f"autotrade partial fill {uid} {inst_id}: asked {sz}, got {_pos_sz}")
-    _fill_px = _avg_px or float(sig["entry_price"])
+    _fill_px = _avg_px or px
     _sl_level = float(sig["sl"])
     if STOP_CLOSE_CONFIRM:
         # Risk distance stays the signal's (that is the strategy's 1R); only the
@@ -428,6 +504,13 @@ def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         else:
             log.error(f"autotrade NAKED POSITION {uid} {inst_id}: OCO failed ({algo_id}) "
                       f"AND close failed ({_cerr}) — position is open WITHOUT a stop")
+            # Keep failed emergency closes discoverable by reconciliation.
+            try:
+                at_log_position(sig["id"], uid, inst_id, sig["direction"],
+                                _pos_sz, _fill_px, margin, "", sl_px)
+            except Exception as tracking_error:
+                log.critical("unprotected position could not be persisted %s %s: %s",
+                             uid, inst_id, tracking_error)
             _msg = "\n".join([
                 f"🚨 *СРОЧНО: {disp} открыта БЕЗ СТОПА*",
                 "",
@@ -525,6 +608,9 @@ def open_positions_for_signal(sig: dict) -> None:
     """Fire-and-forget: open this signal for every active autotrader."""
     if not AUTOTRADE_ENABLED or not sig:
         return
+    if int(sig.get("autotrade_eligible", 1) or 0) != 1:
+        log.info("autotrade: shadow-only signal %s refused", sig.get("id"))
+        return
     traders = at_get_active_traders()
     if not traders:
         return
@@ -606,7 +692,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
             u = at_get(pos["user_id"])
             creds = _creds_of(u) if u else None
             if not creds:
-                at_close_position(pos["id"], new_status, error="no creds")
+                log.error("Cannot manage position %s: credentials unavailable; keeping tracked", pos["id"])
                 continue
 
             if new_status in _CLOSE_STATUSES:
@@ -615,7 +701,24 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 # cancel any still-resting TP1 partial-close order — if TP1
                 # was never reached (e.g. straight SL_HIT) it would otherwise
                 # sit orphaned on the exchange after the position is flat.
-                okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+                ok, err = okx.close_position_market(creds, pos["inst_id"])
+                if not ok:
+                    ok, err = okx.close_position_market(creds, pos["inst_id"])
+                if not ok:
+                    log.error(f"autotrade CLOSE PENDING {pos['user_id']} "
+                              f"{pos['inst_id']}: close not confirmed; protection retained "
+                              f"({err}) — position remains tracked for retry")
+                    _dm(pos["user_id"], "\n".join([
+                        f"🚨 *СРОЧНО: {disp} пока не закрыта*",
+                        "",
+                        "Закрытие пока не подтверждено. Существующая защита не отменялась.",
+                        "Зайди на биржу и закрой её вручную.",
+                        "",
+                        f"причина: `{err}`",
+                    ]))
+                    continue
+                if pos.get("sl_algo_id"):
+                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
                 if pos.get("tp1_algo_id"):
                     # This one is checked while the OCO above is not, and the asymmetry is
                     # deliberate. The OCO is placed with closeFraction, so the exchange
@@ -641,22 +744,6 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 # on the open path, and if it still will not close, keep the
                 # record OPEN and say so: poll_exchange_closes will retire it
                 # properly once the position really is flat.
-                ok, err = okx.close_position_market(creds, pos["inst_id"])
-                if not ok:
-                    ok, err = okx.close_position_market(creds, pos["inst_id"])
-                if not ok:
-                    log.error(f"autotrade NAKED POSITION {pos['user_id']} "
-                              f"{pos['inst_id']}: protection cancelled but close "
-                              f"failed twice ({err}) — position open WITHOUT a stop")
-                    _dm(pos["user_id"], "\n".join([
-                        f"🚨 *СРОЧНО: {disp} осталась БЕЗ СТОПА*",
-                        "",
-                        "Защита снята, а закрыть позицию не удалось (2 попытки).",
-                        "Зайди на биржу и закрой её вручную.",
-                        "",
-                        f"причина: `{err}`",
-                    ]))
-                    continue
                 at_close_position(pos["id"], new_status, error=None)
                 _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
@@ -749,25 +836,23 @@ def poll_exchange_closes() -> None:
                 # trail is dead and the trade has stopped being the one the
                 # engine believes it closed. Catch it here, where we are
                 # already asking the exchange what is really open.
-                _sig = get_signal_by_id(pos["signal_id"])
-                if not _sig or _sig.get("status") not in _CLOSE_STATUSES:
+                unprotected = not pos.get("sl_algo_id")
+                _sig = {"status": "UNPROTECTED_CLOSED"} if unprotected else get_signal_by_id(pos["signal_id"])
+                if not unprotected and (not _sig or _sig.get("status") not in _CLOSE_STATUSES):
                     continue   # still open on the exchange, nothing to do
                 log.warning(f"autotrade reconcile pos#{pos['id']} "
                             f"{pos['inst_id']}: signal already {_sig['status']} "
                             f"but position still open on the exchange")
-                okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
-                if pos.get("tp1_algo_id"):
-                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
                 _rok, _rerr = okx.close_position_market(creds, pos["inst_id"])
                 if not _rok:
                     _rok, _rerr = okx.close_position_market(creds, pos["inst_id"])
                 _rbase = pos["inst_id"].split("-")[0]
                 if not _rok:
-                    log.error(f"autotrade NAKED POSITION {pos['user_id']} "
-                              f"{pos['inst_id']}: reconcile close failed twice "
-                              f"({_rerr}) — position open WITHOUT a stop")
+                    log.error(f"autotrade CLOSE PENDING {pos['user_id']} "
+                              f"{pos['inst_id']}: reconcile close not confirmed; protection retained "
+                              f"({_rerr}) — position remains tracked for retry")
                     _dm(pos["user_id"], "\n".join([
-                        f"🚨 *СРОЧНО: {_rbase} осталась БЕЗ СТОПА*",
+                        f"🚨 *СРОЧНО: {_rbase} пока не закрыта*",
                         "",
                         "Сделка по сигналу уже закрыта, а позицию на бирже "
                         "закрыть не удалось (2 попытки).",
@@ -776,6 +861,10 @@ def poll_exchange_closes() -> None:
                         f"причина: `{_rerr}`",
                     ]))
                     continue
+                if pos.get("sl_algo_id"):
+                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
+                if pos.get("tp1_algo_id"):
+                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
                 at_close_position(pos["id"], _sig["status"])
                 _dm(pos["user_id"],
                     f"🤖 *{_rbase}*: позиция осталась висеть на бирже после "
@@ -827,16 +916,17 @@ def poll_exchange_closes() -> None:
             # and quotes that candle close, a price this position never
             # traded at. Ported from the crypto bot, which hit this live.
             _tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
-            _fill = okx.get_last_fill_px(creds, pos["inst_id"])
+            _fill = okx.get_last_fill_px(creds, pos["inst_id"],
+                since_ts=pos.get("opened_at"),
+                side="sell" if str(pos.get("direction", "")).upper()=="LONG" else "buy")
             _entry = float(pos.get("entry_px") or 0)
             if _fill and _entry > 0:
                 _mv = ((_fill - _entry) / _entry * 100.0
                        if str(pos.get("direction", "")).upper() == "LONG"
                        else (_entry - _fill) / _entry * 100.0)
-                _px_line = (f"Закрыто по `{okx.fmt_px_display(_fill, _tick)}` "
+                _px_line = (f"Средняя цена последнего ордера закрытия: `{okx.fmt_px_display(_fill, _tick)}` "
                             f"(вход `{okx.fmt_px_display(_entry, _tick)}`, "
-                            f"{_mv:+.2f}%, x{AUTOTRADE_LEVERAGE}: "
-                            f"{_mv * AUTOTRADE_LEVERAGE:+.0f}%)")
+                            f"движение цены {_mv:+.2f}%). Без комиссий и funding; не чистый PnL счёта.")
             else:
                 _px_line = "Цену заливки биржа не отдала."
             _dm(pos["user_id"],

@@ -293,47 +293,24 @@ def find_swing_points(highs: list, lows: list, lookback: int = SMC_SWING_LOOKBAC
 # ── SMC: Break of Structure ───────────────────────────────────────────────────
 
 def detect_bos(closes: list, swing_highs: list, swing_lows: list,
-               recent_candles: int = 10) -> tuple:
-    """
-    Detect Break of Structure in the last `recent_candles` candles.
-    Returns (direction, break_index, break_level) — direction is
-    'bullish'/'bearish'/None; break_index/break_level are None when no BOS.
+               recent_candles: int = 10,
+               swing_lookback: int = SMC_SWING_LOOKBACK) -> tuple:
+    """Inputs are closed candles. Use levels confirmed before each break bar.
 
-    Bullish BOS: recent close breaks above a confirmed swing high.
-    Bearish BOS: recent close breaks below a confirmed swing low.
-
-    break_index is the candle where the break FIRST occurred within the
-    scan window — not necessarily the current candle, since the window
-    looks back `recent_candles` bars. Callers that care how stale/extended
-    the break already is (vs. chasing an exhausted move) should use it —
-    see bos_candles_ago / bos_extension_atr in get_smc_indicators.
+    Pivot p is known after p + swing_lookback closes. Return the first
+    qualifying close in the recent window, including the latest closed bar.
     """
-    if not swing_highs or not swing_lows or len(closes) < recent_candles:
+    if len(closes) < recent_candles:
         return None, None, None
+    for i in range(max(0,len(closes)-recent_candles),len(closes)):
+        sh=next((p for j,p in reversed(swing_highs) if j+swing_lookback<i),None)
+        sl=next((p for j,p in reversed(swing_lows) if j+swing_lookback<i),None)
+        if sh is not None and closes[i]>sh:
+            return "bullish",i,sh
+        if sl is not None and closes[i]<sl:
+            return "bearish",i,sl
+    return None,None,None
 
-    # Use last confirmed swing high/low (exclude very recent — not yet confirmed)
-    last_sh = swing_highs[-1][1] if swing_highs else None
-    last_sl = swing_lows[-1][1]  if swing_lows  else None
-
-    # Check if any of the last N candles broke structure WITH strong body
-    # (not just a wick poke — body must be >= 40% of candle range)
-    n = len(closes)
-
-    # Exclude last candle (index n-1) — still forming, close not final yet.
-    # Only check confirmed closed candles (up to index n-2).
-    for i in range(n - recent_candles, n - 1):
-        if i < 0:
-            continue
-        c = closes[i]
-        if last_sh and c > last_sh:
-            return "bullish", i, last_sh
-        if last_sl and c < last_sl:
-            return "bearish", i, last_sl
-
-    return None, None, None
-
-
-# ── SMC: Fair Value Gap ───────────────────────────────────────────────────────
 
 def detect_fvg(opens: list, highs: list, lows: list, closes: list,
                min_pct: float = SMC_FVG_MIN_PCT) -> dict:
@@ -431,7 +408,8 @@ def detect_order_block(opens: list, highs: list, lows: list, closes: list,
 
 def detect_liquidity_sweep(highs: list, lows: list, closes: list,
                             swing_highs: list, swing_lows: list,
-                            check_last: int = 4) -> dict:
+                            check_last: int = 4,
+                            swing_lookback: int = SMC_SWING_LOOKBACK) -> dict:
     """
     Detect liquidity sweeps (stop hunts).
 
@@ -443,14 +421,15 @@ def detect_liquidity_sweep(highs: list, lows: list, closes: list,
     if not swing_highs or not swing_lows:
         return {"bullish": False, "bearish": False}
 
-    recent_sh = [p for _, p in swing_highs[-4:]]
-    recent_sl = [p for _, p in swing_lows[-4:]]
 
     n = len(closes)
     bull_sweep = False
     bear_sweep = False
 
     for i in range(max(0, n - check_last), n):
+        # Levels must already be confirmed before the sweep candle.
+        recent_sh = [p for j,p in swing_highs if j+swing_lookback<i][-4:]
+        recent_sl = [p for j,p in swing_lows if j+swing_lookback<i][-4:]
         # Bullish sweep: wick below swing low, close above it
         for level in recent_sl:
             if lows[i] < level * 0.999 and closes[i] > level:
@@ -521,32 +500,17 @@ def detect_macd_divergence(closes: list, highs: list, lows: list,
 
 def detect_choch(closes: list, highs: list, lows: list,
                  swing_lookback: int = 3, check_recent: int = 8) -> str | None:
+    """Legacy micro-break label, using only then-confirmed swing levels.
+
+    This is not independent reversal evidence when its lookback matches BOS.
+    All input candles are closed; the last candle is eligible.
     """
-    Change of Character — faster micro-structure shift.
-
-    Uses a shorter swing lookback (3 vs BOS's 5) to detect when price breaks
-    a recent intermediate swing high/low before or alongside the main BOS.
-    Acts as early confirmation of the structural reversal.
-
-    Returns 'bullish', 'bearish', or None.
-    """
-    n = len(closes)
-    if n < swing_lookback * 2 + check_recent + 2:
+    if len(closes) < swing_lookback * 2 + check_recent + 2:
         return None
-    sh, sl = find_swing_points(highs, lows, lookback=swing_lookback)
-    if not sh or not sl:
-        return None
-    last_sh = sh[-1][1]
-    last_sl = sl[-1][1]
-    for i in range(max(0, n - check_recent), n - 1):
-        if closes[i] > last_sh:
-            return "bullish"
-        if closes[i] < last_sl:
-            return "bearish"
-    return None
+    sh,sl=find_swing_points(highs,lows,lookback=swing_lookback)
+    return detect_bos(closes,sh,sl,recent_candles=check_recent,
+                      swing_lookback=swing_lookback)[0]
 
-
-# ── Engulfing Pattern ─────────────────────────────────────────────────────────
 
 def detect_engulfing(opens: list, closes: list, lookback: int = 4) -> str | None:
     """

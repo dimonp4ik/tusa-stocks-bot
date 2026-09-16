@@ -33,6 +33,8 @@ the model's in-session expiry clock which this simplification does not model.
 from __future__ import annotations
 
 import os
+os.environ["BOT_STARTUP_ENABLED"] = "0"
+os.environ["PYTHON_DOTENV_DISABLED"] = "1"
 import random
 import sys
 import tempfile
@@ -68,7 +70,7 @@ def compare(runs: int = 400):
     agree = dis = skipped = 0
     kinds: dict[str, int] = {}
     for k in range(runs):
-        o, h, l, c = _series(60, 100.0, 0.006)
+        o, h, l, c = _series(48, 100.0, 0.006)
         entry, atr = o[0], o[0] * 0.004
         direction = "LONG" if k % 2 == 0 else "SHORT"
         tp1, tp2, sl = bt.calculate_tp_sl_local(
@@ -76,7 +78,7 @@ def compare(runs: int = 400):
             recent_high=max(h[:5]), recent_low=min(l[:5]),
         )
         shadow, _, _ = main._simulate_setup_outcome(
-            direction, entry, tp1, tp2, sl, h, l, c, atr=atr,
+            direction, entry, tp1, tp2, sl, h, l, c, atr=atr, opens=o, require_fill=False,
         )
         if shadow is None or shadow == "NO_FILL":
             skipped += 1

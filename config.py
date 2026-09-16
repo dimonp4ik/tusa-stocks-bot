@@ -33,15 +33,31 @@ load_dotenv()
 # dashboard because the comment was believed over the deploy.
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
 # --- Admin panel: Telegram user IDs that can access /admin in DM ---
 ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
+DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
+if DEPLOYMENT_MODE not in {"shadow", "live"}:
+    DEPLOYMENT_MODE = "shadow"
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "30"))  # non-crypto X-Perp pool is ~26 — take all
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
+# Direct X-Perp session modules stay disabled until they collect forward paper
+# evidence.  "paper" records their exact bracket; "live" also publishes it.
+STOCK_VENUE_FILTER_MODE = os.getenv("STOCK_VENUE_FILTER_MODE", "paper").strip().lower()
+if STOCK_VENUE_FILTER_MODE not in {"off", "paper", "live"}:
+    STOCK_VENUE_FILTER_MODE = "paper"
+if DEPLOYMENT_MODE == "shadow":
+    STOCK_VENUE_FILTER_MODE = "paper"
+STOCK_VENUE_FILTER_PROFILE = os.getenv(
+    "STOCK_VENUE_FILTER_PROFILE", "robust_dynamic_entry_filtered"
+).strip().lower()
+if STOCK_VENUE_FILTER_PROFILE not in {
+        "profit", "precision", "balanced", "frequency", "low_drawdown",
+        "robust_frequency", "robust_dynamic", "robust_dynamic_entry_filtered"}:
+    STOCK_VENUE_FILTER_PROFILE = "robust_dynamic_entry_filtered"
 # Lookback windows MUST match backtest.py's WINDOW_15M/WINDOW_1H/WINDOW_4H
 # (300/90/50) — see KLINES_1H_LIMIT below for what happened when they did not.
 KLINES_LIMIT = 300         # 300 × 15m (= WINDOW_15M)
@@ -370,7 +386,6 @@ RSI_SCORE_LONG_MAX  = float(os.getenv("RSI_SCORE_LONG_MAX",  "68"))
 RSI_SCORE_SHORT_MIN = float(os.getenv("RSI_SCORE_SHORT_MIN", "32"))
 RSI_SCORE_SHORT_MAX = float(os.getenv("RSI_SCORE_SHORT_MAX", "62"))
 
-MAX_SETUPS_TO_CLAUDE  = int(os.getenv("MAX_SETUPS_TO_CLAUDE", "7"))  # only strongest go to Claude
 
 # --- Entry zone (FVG / Order Block) ---
 # When enabled, setups without an active FVG or OB zone near price are skipped.
@@ -725,62 +740,7 @@ STABILITY_MIN_EFF_RATIO     = float(os.getenv("STABILITY_MIN_EFF_RATIO", "0.0"))
 STABILITY_MIN_VOLUME_RATIO  = float(os.getenv("STABILITY_MIN_VOLUME_RATIO", "0.0"))
 STABILITY_MIN_QUALITY_SCORE = float(os.getenv("STABILITY_MIN_QUALITY_SCORE", "0.0"))
 
-# --- Claude tiered analysis (cascade: cheap LIGHT gate + rare deep HEAVY) ---
-# LIGHT  : Haiku validates every passed setup in ONE cached batch call (JSON via tool).
-# HEAVY  : Sonnet re-checks only top setups (score >= HEAVY_MIN_SCORE) with coin memory.
-# Caching: static rules block cached 1h → cheap re-reads on the 5-min scan loop.
-CLAUDE_LIGHT_MODEL        = os.getenv("CLAUDE_LIGHT_MODEL", "claude-sonnet-4-5")
-CLAUDE_HEAVY_MODEL        = os.getenv("CLAUDE_HEAVY_MODEL", "claude-sonnet-4-5")
-CLAUDE_HEAVY_MIN_SCORE    = int(os.getenv("CLAUDE_HEAVY_MIN_SCORE", "9"))    # lowered 10→9: all survivors get Sonnet check
-CLAUDE_HEAVY_MAX_PER_SCAN = int(os.getenv("CLAUDE_HEAVY_MAX_PER_SCAN", "5")) # max HEAVY checks per scan
-CLAUDE_MEMORY_LIMIT       = int(os.getenv("CLAUDE_MEMORY_LIMIT", "25"))      # recent outcomes per coin (HEAVY)
-CLAUDE_MAX_RISK_SCORE     = int(os.getenv("CLAUDE_MAX_RISK_SCORE", "7"))     # counter-arg auto-reject if risk >= this (7 = "real concern" per scale)
 
-# Claude as a GATE, or as an observer. 1 = his verdict withholds setups (the
-# behaviour this bot has always had). 0 = SHADOW MODE: he is still called, still
-# scored, still logged, but the rules filter alone decides what trades.
-#
-# Why this switch exists. backtest.py never calls Claude, so its figures ARE the
-# rules-only book: 75.6% win rate on the current window once the live entry slip
-# is modelled honestly. Live, with Claude gating, the book wins 52.9%. The gap
-# is 23 points and Claude is the largest untested difference between the two.
-#
-# It could not be settled from the logs. Comparing his approvals against his
-# rejections needs the rejections' outcomes, and those come from the shadow
-# tracker — which until 2026-08-29 ran a different exit policy than the bot and
-# inflated unsent setups (TP2 share 51.4% against 6.9% for sent). Shadow mode
-# removes the need for that comparison entirely: every rule-passing setup is
-# really traded, so his verdict can be scored against real fills.
-#
-# Approval rate here is 80%, so trading rules-only adds about a quarter more
-# trades — a modest step. On the crypto desk it is 52%, which would nearly
-# double that book, so this stays OFF there until this one reports.
-#
-# ✅ IT REPORTS, 2026-09-06. Scored against real fills, which is what shadow
-# mode was built to make possible:
-#
-#   одобрено Клодом   161 сд   +0.161R на сделку   итого +25.88R
-#   отклонено Клодом   27 сд   -0.247R на сделку   итого  -6.66R
-#
-# Difference 0.408R per trade, 1.38 sigma — modest significance on 27 rejections,
-# but the sign is the one the experiment was set up to find, and the rejected
-# arm is outright negative rather than merely weaker. Gating would have returned
-# +6.66R for 14% fewer trades.
-#
-# Corroborating detail from the same read: the worst live trades carry Claude's
-# own warning in their reason text ("severely negative expectancy", "disaster")
-# and traded anyway because he is in shadow. Scoring that text as a signal, on a
-# holdout excluding the trades it was derived from, gives -0.323R against
-# +0.252R here (1.39 sigma) and -0.341R against +0.178R on the crypto desk
-# (1.61 sigma) — the same effect from a second direction.
-#
-# Recommendation: switch this back ON here. The crypto desk stays OFF for now —
-# its approval rate is 52%, so gating halves that book, which is a much larger
-# step than this one and deserves its own decision.
-CLAUDE_GATE_ENABLED = os.getenv("CLAUDE_GATE_ENABLED", "1") != "0"
-CLAUDE_CACHE_TTL          = os.getenv("CLAUDE_CACHE_TTL", "1h")              # prompt cache TTL ("5m" or "1h")
-CLAUDE_DAILY_BUDGET_USD   = float(os.getenv("CLAUDE_DAILY_BUDGET_USD", "1.00"))  # hard daily cap (real Sonnet usage ~$0.3-0.5/day)
-CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")) # stop when remaining < reserve
 
 # Epoch for the LIVE tier of Claude's self-feedback history (unix ts, 0 = off).
 # That tier looks back 30 days, which reaches into the pre-parity-fix bot: a
@@ -789,7 +749,9 @@ CLAUDE_BUDGET_RESERVE_USD = float(os.getenv("CLAUDE_BUDGET_RESERVE_USD", "0.05")
 # exists. On the crypto bot the stale record deadlocked Claude into rejecting
 # every setup. Live tier only — admin stats keep the full history.
 # 1785456000 = 2026-07-31 00:00 UTC, the day the parity fixes shipped.
-LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1785456000"))
+LIVE_HIST_EPOCH_TS = float(os.getenv("LIVE_HIST_EPOCH_TS", "1789516800"))
+if DEPLOYMENT_MODE == "shadow":
+    LIVE_HIST_EPOCH_TS = max(LIVE_HIST_EPOCH_TS, 1789516800.0)
 
 # --- Structure-based stops/takes (swing mode, 15m, 10x X-Perp leverage) ---
 # SL sits at swing invalidation (recent swing low/high) + ATR buffer, then
@@ -2111,12 +2073,15 @@ BACKTEST_TOP_COINS      = int(os.getenv("BACKTEST_TOP_COINS", "20"))
 # Every table recorded before this date was measured with costs 5x too high.
 # Overstated costs bias the model toward fewer trades and wider stops, so
 # cost-sensitive decisions need re-checking, not just re-baselining.
-BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0001"))
+# Public X-Perp base taker estimate; account-specific fees may differ.
+BACKTEST_FEE_RATE       = float(os.getenv("BACKTEST_FEE_RATE", "0.0005"))
 BACKTEST_SLIPPAGE_RATE  = float(os.getenv("BACKTEST_SLIPPAGE_RATE", "0.0001"))
 BACKTEST_USE_BTC_FILTER = os.getenv("BACKTEST_USE_BTC_FILTER", "1") != "0"
 
 # --- Autotrading (real OKX EU orders for allow-listed users) ---
-AUTOTRADE_ENABLED           = os.getenv("AUTOTRADE_ENABLED", "1") != "0"
+AUTOTRADE_ENABLED           = (
+    DEPLOYMENT_MODE == "live" and os.getenv("AUTOTRADE_ENABLED", "0") == "1"
+)
 AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
 AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
 AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
@@ -2124,10 +2089,6 @@ AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 # and set AUTOTRADE_ENC_KEY on the host. Keys are unreadable without it.
 
-# --- Reject cooldown + kill-switch (added after 8-SL chop cluster 2026-07-10) ---
-# After Claude rejects a setup, don't re-ask the same symbol+direction while
-# price is still in the same zone (1 ATR) — stops "ask every scan until yes".
-REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # N consecutive SL among today's closed signals → pause new signals until the
 # next Riga day. 0 = off.
 # Swept 2026-09-02 over 5 windows (04-10/05-07/06-05/07-15/08-26, 2800 candles)
@@ -2141,3 +2102,14 @@ REJECT_COOLDOWN_HOURS = float(os.getenv("REJECT_COOLDOWN_HOURS", "3"))
 # Loosening buys gross profit by admitting more trades while every risk ratio
 # falls — the leverage signature, so 3 stays. Tightening to 2 loses both.
 KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "3"))
+
+# Risk budget fractions. Portfolio cap covers positions tracked by this service.
+AUTOTRADE_RISK_PER_TRADE = float(os.getenv("AUTOTRADE_RISK_PER_TRADE", "0.0025"))
+AUTOTRADE_MAX_OPEN_RISK = float(os.getenv("AUTOTRADE_MAX_OPEN_RISK", "0.0075"))
+AUTOTRADE_COST_RESERVE = float(os.getenv("AUTOTRADE_COST_RESERVE", "0.0014"))
+AUTOTRADE_MAX_DAILY_LOSS = float(os.getenv("AUTOTRADE_MAX_DAILY_LOSS", "0.01"))
+AUTOTRADE_MAX_DRAWDOWN = float(os.getenv("AUTOTRADE_MAX_DRAWDOWN", "0.03"))
+# Optional known account high-water mark. Set this on the host when the first
+# guarded deployment happens after an existing drawdown; otherwise the guard
+# can only learn peaks observed from that deployment onward.
+AUTOTRADE_EQUITY_PEAK_FLOOR = float(os.getenv("AUTOTRADE_EQUITY_PEAK_FLOOR", "0"))
