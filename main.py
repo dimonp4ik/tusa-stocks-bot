@@ -21,7 +21,8 @@ from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
 import requests as _requests
 
 from config import (
-    SCAN_INTERVAL_MINUTES, TELEGRAM_TOKEN, SIGNAL_EXPIRY_HOURS, SIGNAL_EXPIRY_MAX_DAYS,
+    SCAN_INTERVAL_MINUTES, VENUE_MAX_SIGNALS_PER_SCAN, TELEGRAM_TOKEN,
+    SIGNAL_EXPIRY_HOURS, SIGNAL_EXPIRY_MAX_DAYS,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT, STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
     STOP_EXCHANGE_BACKSTOP_R, MTF_MIN_SCORE, TP1_R_MULT, TP1_CLOSE_FRAC, EXIT_PROFILE,
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
@@ -232,7 +233,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
-                            ("scan_cap", "лимит 3 за скан"),
+                            ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
             if st.get("n"):
@@ -399,6 +400,7 @@ def health():
 def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {STOCK_VENUE_FILTER_PROFILE}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
 
 
@@ -942,6 +944,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             f"Режим: *SHADOW / PAPER*\n"
             f"Профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
             "Вход: по текущей рыночной цене\n"
+            f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
             "Нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
@@ -2944,6 +2947,29 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
     }
 
 
+def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]]) -> int:
+    """Publish at most the historically replayed number of entries per scan."""
+    published = 0
+    ordered = sorted(candidates, key=lambda item: (
+        item[0].get("symbol", ""), item[0].get("direction", "")))
+    for analysis, setup_id in ordered:
+        if published >= VENUE_MAX_SIGNALS_PER_SCAN:
+            # This persistent block prevents the same 15m candle from being
+            # offered again by the next five-minute scheduler tick.
+            mark_setup_blocked(setup_id, "scan_cap")
+            continue
+        if not send_signal(analysis):
+            mark_setup_blocked(setup_id, "send_failed")
+            continue
+        mark_setup_sent(setup_id)
+        _cache_signal(analysis["symbol"], analysis["direction"])
+        signal_id = analysis.get("_signal_id")
+        if signal_id:
+            link_setup_to_signal(setup_id, signal_id)
+        published += 1
+    return published
+
+
 def _run_stock_venue_strategy_scan() -> None:
     """Run only the frozen stock X-Perp router and publish paper signals."""
     from src.market_hours import is_market_open
@@ -2985,7 +3011,7 @@ def _run_stock_venue_strategy_scan() -> None:
     blocked = {row["symbol"] for row in get_active_symbol_blocks()}
     if blocked:
         log.info("Stock venue scan: %d blocked symbol(s) skipped", len(blocked))
-    published = 0
+    candidates = []
     for symbol in targets:
         candles = fetched.get(symbol)
         if not candles or symbol in active or symbol in blocked:
@@ -3003,29 +3029,14 @@ def _run_stock_venue_strategy_scan() -> None:
                 if not setup_id:
                     continue
                 analysis["_setup_log_id"] = setup_id
-                if not send_signal(analysis):
-                    mark_setup_blocked(setup_id, "send_failed")
-                    continue
-                mark_setup_sent(setup_id)
-                _cache_signal(symbol, row["direction"])
-                signal_id = analysis.get("_signal_id")
-                if signal_id:
-                    link_setup_to_signal(setup_id, signal_id)
-                # No autotrader call here, and that is deliberate (2026-09-16).
-                # The old scan ended with autotrader.open_positions_for_signal();
-                # this strategy publishes paper signals only until it has its own
-                # forward evidence. Three further guards stand behind this line -
-                # AUTOTRADE_ENABLED needs DEPLOYMENT_MODE=live, the row is stored
-                # with autotrade_eligible=0, and the autotrader refuses such rows -
-                # so re-enabling real orders is a deliberate four-part change, not
-                # a flag flip.
-                published += 1
+                candidates.append((analysis, setup_id))
         except Exception as exc:
             log.warning("Stock venue strategy failed for %s: %s", symbol, exc)
+    published = _publish_stock_venue_candidates(candidates)
     _last_scan_stats.update(coins=len(targets), setups=published, fresh=published,
                             ts=time.time())
-    log.info("Stock venue scan complete: %s symbols, %s paper signals",
-             len(targets), published)
+    log.info("Stock venue scan complete: %s symbols, %s candidates, %s paper signals",
+             len(targets), len(candidates), published)
 
 
 def run_scan():

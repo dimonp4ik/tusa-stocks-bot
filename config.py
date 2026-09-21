@@ -39,6 +39,11 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
+# Opening-session modules often match several correlated stock perpetuals on
+# the same closed candle. Keep the publisher on the replayed three-entry cap.
+VENUE_MAX_SIGNALS_PER_SCAN = max(
+    1, min(3, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "3")))
+)
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
 if DEPLOYMENT_MODE not in {"shadow", "live"}:
     DEPLOYMENT_MODE = "shadow"

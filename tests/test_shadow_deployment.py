@@ -91,6 +91,23 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertNotIn("Автотрейдинг", labels)
         self.assertIn("Paper-сделки", labels)
 
+    def test_one_scan_cannot_publish_an_unbounded_signal_batch(self):
+        candidates = [
+            ({"symbol": f"S{i}USDT", "direction": "SHORT"}, i + 1)
+            for i in range(config.VENUE_MAX_SIGNALS_PER_SCAN + 2)
+        ]
+        with patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "mark_setup_sent") as sent, \
+             patch.object(main, "mark_setup_blocked") as blocked, \
+             patch.object(main, "_cache_signal"):
+            published = main._publish_stock_venue_candidates(candidates)
+        self.assertEqual(published, config.VENUE_MAX_SIGNALS_PER_SCAN)
+        self.assertEqual(send.call_count, config.VENUE_MAX_SIGNALS_PER_SCAN)
+        self.assertEqual(sent.call_count, config.VENUE_MAX_SIGNALS_PER_SCAN)
+        self.assertEqual(blocked.call_count, 2)
+        self.assertTrue(all(call.args[1] == "scan_cap"
+                            for call in blocked.call_args_list))
+
 
 if __name__ == "__main__":
     unittest.main()
