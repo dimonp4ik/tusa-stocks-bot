@@ -25,6 +25,8 @@ Thumbs.db
 
 # Database
 *.db
+*.db-shm
+*.db-wal
 signals.db
 
 # Backtest data cache (local pickles)

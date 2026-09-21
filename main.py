@@ -1,12 +1,9 @@
-"""
-TUSA Stocks Bot — entry point.
+"""Stocks paper-trading bot driven by the frozen X-Perp venue router.
 
-Flow every N minutes:
-  1. Fetch top 45 USDT pairs from KuCoin (by 24h volume)
-  2. Run SMC technical filter (BOS + FVG + OB + multi-timeframe)
-  3. Send only strong setups to Claude Sonnet
-  4. Claude returns LONG / SHORT / NO TRADE
-  5. Telegram receives only actionable signals
+Every scan loads the audited stock perpetuals and market context from X-Perp,
+evaluates the deterministic robust profile and publishes new market-entry
+paper signals. No model decides whether a setup is accepted and this
+deployment cannot open an order.
 """
 
 import json
