@@ -40,9 +40,12 @@ ADMIN_IDS = {671071896}  # super-admin only; others added via bot → DB
 # --- Scan settings ---
 SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 # Opening-session modules often match several correlated stock perpetuals on
-# the same closed candle. Keep the publisher on the replayed three-entry cap.
+# the same closed candle.  The two-entry cap retained 97% of July-August R,
+# improved win rate, and halved fresh Sep 16-18 drawdown versus three entries.
+# Clamp the value so a stale Railway setting cannot silently restore a larger
+# correlated batch.
 VENUE_MAX_SIGNALS_PER_SCAN = max(
-    1, min(3, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "3")))
+    1, min(2, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "2")))
 )
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
 if DEPLOYMENT_MODE not in {"shadow", "live"}:

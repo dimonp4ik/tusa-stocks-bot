@@ -92,6 +92,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("Paper-сделки", labels)
 
     def test_one_scan_cannot_publish_an_unbounded_signal_batch(self):
+        self.assertLessEqual(config.VENUE_MAX_SIGNALS_PER_SCAN, 2)
         candidates = [
             ({"symbol": f"S{i}USDT", "direction": "SHORT"}, i + 1)
             for i in range(config.VENUE_MAX_SIGNALS_PER_SCAN + 2)
