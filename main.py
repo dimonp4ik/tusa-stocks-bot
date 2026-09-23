@@ -2562,6 +2562,13 @@ _NEWS_ALERT_COOLDOWN_HOURS = 6
 # Send "scan paused" only on the FIRST blocked scan, "scan resumed" when it lifts.
 _scan_paused: bool = False
 
+# The scheduler fires the position monitor and the signal scan on the same
+# minute. APScheduler may run them on different worker threads, so the scan
+# could otherwise read the book before this minute's TP/SL closes were stored.
+# Serialise both paths and make run_scan reconcile the book itself before it
+# evaluates exposure and the daily loss pause.
+_portfolio_state_lock = threading.RLock()
+
 # ── Live price cache ───────────────────────────────────────────────────────────
 # Updated every 1 min by _check_open_signals() from kline close data.
 # Used by _format_open_signal() so "open trades" never makes a live API call.
@@ -3085,7 +3092,16 @@ def run_scan():
     different strategy, and keeping it reachable meant two books could publish
     into the same tables. This is now the only scan path.
     """
-    return _run_stock_venue_strategy_scan()
+    with _portfolio_state_lock:
+        try:
+            _check_open_signals()
+        except Exception as exc:
+            # Exposure and the loss-pause streak are unknown until open signals
+            # have been reconciled. Failing closed prevents a stale book from
+            # admitting a new batch after stops or while positions are open.
+            log.warning("Stock venue scan refused: open-signal reconciliation failed: %s", exc)
+            return None
+        return _run_stock_venue_strategy_scan()
 
 
 # ── Morning digest ────────────────────────────────────────────────────────────
@@ -3211,7 +3227,8 @@ def _setup_webhook():
 def _monitor_open_signals():
     """Lightweight 1-min job: check open trades for TP1/SL/BE hits. 24/7."""
     try:
-        _check_open_signals()
+        with _portfolio_state_lock:
+            _check_open_signals()
     except Exception as e:
         log.warning(f"Open-signal monitor failed: {e}")
     # Real exchange position state, independent of the engine's own (slower,

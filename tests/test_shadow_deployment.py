@@ -21,9 +21,21 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(config.STOCK_VENUE_FILTER_MODE, "paper")
 
     def test_scan_dispatches_only_frozen_router(self):
-        with patch.object(main, "_run_stock_venue_strategy_scan") as scan:
+        calls = []
+        with patch.object(main, "_check_open_signals",
+                          side_effect=lambda: calls.append("reconcile")), \
+             patch.object(main, "_run_stock_venue_strategy_scan",
+                          side_effect=lambda: calls.append("scan")) as scan:
             main.run_scan()
         scan.assert_called_once_with()
+        self.assertEqual(calls, ["reconcile", "scan"])
+
+    def test_scan_fails_closed_when_book_cannot_be_reconciled(self):
+        with patch.object(main, "_check_open_signals",
+                          side_effect=RuntimeError("feed unavailable")), \
+             patch.object(main, "_run_stock_venue_strategy_scan") as scan:
+            self.assertIsNone(main.run_scan())
+        scan.assert_not_called()
 
     def test_telegram_paper_signal_is_explicit_and_untradeable(self):
         analysis = {
