@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from stock_forward_monitor import frozen_rows
+from stock_forward_monitor import frozen_rows, validate_family_coverage
 from src.stock_venue_router import MAX_INDEX_INTRADAY_MOVE_ATR
 
 
@@ -44,6 +44,16 @@ class StockForwardMonitorParityTests(unittest.TestCase):
         rows = frozen_rows(frame, "robust_dynamic_entry_filtered")
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["module"], "drive_short_bear_open")
+
+    def test_truncated_warmup_is_rejected_instead_of_reporting_zero(self):
+        frame = pd.DataFrame([self._row(entry_time=2_000)])
+        with self.assertRaisesRegex(ValueError, "longer warm-up window"):
+            validate_family_coverage(frame, previous_max=1_000)
+
+    def test_family_dataset_must_extend_beyond_reference(self):
+        frame = pd.DataFrame([self._row(entry_time=1_000)])
+        with self.assertRaisesRegex(ValueError, "no interval after"):
+            validate_family_coverage(frame, previous_max=1_000)
 
 
 if __name__ == "__main__":

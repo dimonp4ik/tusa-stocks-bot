@@ -124,6 +124,22 @@ def portfolio_gate(rows: list[dict], direction_cap: int, scan_cap: int) -> list[
     return output
 
 
+def validate_family_coverage(families: pd.DataFrame, previous_max: int) -> None:
+    """Reject a warm-up-truncated family file instead of reporting false zeroes."""
+    if families.empty or "entry_time" not in families:
+        raise ValueError("family dataset is empty or missing entry_time")
+    first = int(families["entry_time"].min())
+    last = int(families["entry_time"].max())
+    if first > previous_max:
+        raise ValueError(
+            "family dataset starts after the reference cutoff; download a longer "
+            f"warm-up window (first={first}, reference={previous_max})")
+    if last <= previous_max:
+        raise ValueError(
+            "family dataset contains no interval after the reference cutoff "
+            f"(last={last}, reference={previous_max})")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reference-signals", type=Path, required=True)
@@ -139,6 +155,7 @@ def main() -> None:
     reference = pd.read_csv(args.reference_signals)
     families = pd.read_csv(args.families)
     previous_max = int(reference["entry_time"].max())
+    validate_family_coverage(families, previous_max)
     raw = frozen_rows(families, args.profile)
     fresh_raw = [row for row in raw if int(row["entry_time"]) > previous_max]
     accepted = portfolio_gate(fresh_raw, args.direction_cap, args.scan_cap)
