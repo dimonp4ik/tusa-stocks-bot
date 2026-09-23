@@ -25,14 +25,19 @@ def main() -> None:
                for item in instruments
                if "_UM_XPERP-" in item.get("instId", "") and item.get("state") == "live"}
     args.out.mkdir(parents=True, exist_ok=True)
+    # All symbols must describe the same point-in-time snapshot.  A per-symbol
+    # clock could cross a 15-minute close during this sequential download and
+    # give later symbols one additional completed bar.
+    request_anchor_ms = int(time.time() * 1000) + 60_000
     report = {"status": "PUBLIC_CURRENT_STOCK_XPERP", "created_at": datetime.now(timezone.utc).isoformat(),
-              "bars_requested": args.bars, "symbols": {}}
+              "bars_requested": args.bars, "request_anchor_ms": request_anchor_ms,
+              "symbols": {}}
     for symbol in (value.strip() for value in args.symbols.split(",") if value.strip()):
         instrument = mapping.get(symbol)
         if not instrument:
             report["symbols"][symbol] = {"status": "NO_INSTRUMENT"}
             continue
-        after = int(time.time() * 1000) + 60_000
+        after = request_anchor_ms
         received = {}
         for _ in range((args.bars + 299) // 300):
             response = requests.get(

@@ -4,8 +4,11 @@ from unittest.mock import patch
 from src import binance_client
 from src.stock_venue_router import (
     BALANCED_MODULES, FREQUENCY_MODULES, LOW_DRAWDOWN_MODULES,
-    PRECISION_MODULES, PROFIT_MODULES, ROBUST_FREQUENCY_EXCLUDED_SYMBOLS,
-    _entry_filter_matches, _target_for, stock_venue_setups,
+    GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO,
+    GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR,
+    MAX_INDEX_INTRADAY_MOVE_ATR, PRECISION_MODULES, PROFIT_MODULES,
+    ROBUST_FREQUENCY_EXCLUDED_SYMBOLS, _entry_filter_matches,
+    _index_context_is_sane, _target_for, stock_venue_setups,
 )
 
 
@@ -192,11 +195,17 @@ class StockVenueRouterTests(unittest.TestCase):
         drive_open = FREQUENCY_MODULES[5]
         profile = "robust_dynamic_entry_filtered"
         self.assertTrue(_entry_filter_matches(
-            gap_fade, {"qqq_gap_dir_atr": -1.0}, profile))
+            gap_fade, {"qqq_gap_dir_atr": -1.0,
+                       "qqq_prior_day_dir_atr": .5,
+                       "qqq_vol_ratio": 1.0}, profile))
         self.assertFalse(_entry_filter_matches(
-            gap_fade, {"qqq_gap_dir_atr": -.999}, profile))
+            gap_fade, {"qqq_gap_dir_atr": -.999,
+                       "qqq_prior_day_dir_atr": .5,
+                       "qqq_vol_ratio": 1.0}, profile))
         self.assertFalse(_entry_filter_matches(
-            gap_fade, {"qqq_gap_dir_atr": float("nan")}, profile))
+            gap_fade, {"qqq_gap_dir_atr": float("nan"),
+                       "qqq_prior_day_dir_atr": .5,
+                       "qqq_vol_ratio": 1.0}, profile))
         self.assertTrue(_entry_filter_matches(
             breakout_late, {"opening_range_atr": 2.0}, profile))
         self.assertFalse(_entry_filter_matches(
@@ -208,6 +217,68 @@ class StockVenueRouterTests(unittest.TestCase):
             drive_open, {"prior_range_ratio": 1.501}, profile))
         self.assertTrue(_entry_filter_matches(
             gap_fade, {"qqq_gap_dir_atr": 10.0}, "robust_dynamic"))
+
+    def test_gap_fade_exhaustion_guard_boundaries_fail_closed(self):
+        gap_fade = FREQUENCY_MODULES[2]
+        profile = "robust_dynamic_entry_filtered"
+        base = {"qqq_gap_dir_atr": -1.0}
+        self.assertTrue(_entry_filter_matches(gap_fade, {
+            **base,
+            "qqq_prior_day_dir_atr": GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR,
+            "qqq_vol_ratio": GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO,
+        }, profile))
+        self.assertFalse(_entry_filter_matches(gap_fade, {
+            **base,
+            "qqq_prior_day_dir_atr": GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR + .001,
+            "qqq_vol_ratio": GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO,
+        }, profile))
+        self.assertTrue(_entry_filter_matches(gap_fade, {
+            **base,
+            "qqq_prior_day_dir_atr": GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR + .001,
+            "qqq_vol_ratio": GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO + .001,
+        }, profile))
+        for missing in ({}, {"qqq_prior_day_dir_atr": 0.0},
+                        {"qqq_vol_ratio": 1.2}):
+            self.assertFalse(_entry_filter_matches(
+                gap_fade, {**base, **missing}, profile))
+
+    def test_index_context_sanity_guard_boundaries_fail_closed(self):
+        self.assertTrue(_index_context_is_sane({
+            "qqq_intraday_move_atr": MAX_INDEX_INTRADAY_MOVE_ATR,
+            "spy_intraday_move_atr": -MAX_INDEX_INTRADAY_MOVE_ATR,
+        }))
+        self.assertFalse(_index_context_is_sane({
+            "qqq_intraday_move_atr": MAX_INDEX_INTRADAY_MOVE_ATR + .001,
+            "spy_intraday_move_atr": 1.0,
+        }))
+        self.assertFalse(_index_context_is_sane({
+            "qqq_intraday_move_atr": 1.0,
+        }))
+        self.assertFalse(_index_context_is_sane({
+            "qqq_intraday_move_atr": float("nan"),
+            "spy_intraday_move_atr": 1.0,
+        }))
+
+    def test_entry_filtered_profile_blocks_abnormal_index_context(self):
+        row = {
+            "family": "gap_fade", "direction": "SHORT",
+            "qqq_regime": "bear", "session_bucket": "00_30",
+            "qqq_gap_dir_atr": -2.0,
+            "qqq_intraday_move_atr": MAX_INDEX_INTRADAY_MOVE_ATR + .001,
+            "spy_intraday_move_atr": 1.0,
+        }
+        with patch("src.stock_venue_router._latest_family_rows", return_value=[row]), \
+                patch("src.stock_venue_router.attach_market_context"), \
+                patch("src.stock_venue_router.attach_intraday_market_context"), \
+                patch("src.stock_venue_router.market_context_by_day", return_value={}), \
+                patch("src.stock_venue_router.market_intraday_context_by_time",
+                      return_value={}), \
+                patch("src.stock_venue_router.atr_at", return_value=2.0):
+            setups = stock_venue_setups(
+                {"time": []}, {}, {}, market_price=100.0,
+                profile="robust_dynamic_entry_filtered", symbol="AAPLUSDT",
+            )
+        self.assertEqual(setups, [])
 
     def test_xperp_fetch_uses_history_endpoint_after_first_page(self):
         def row(timestamp):

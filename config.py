@@ -47,6 +47,9 @@ SCAN_INTERVAL_MINUTES = int(os.getenv("SCAN_INTERVAL_MINUTES", "5"))
 VENUE_MAX_SIGNALS_PER_SCAN = max(
     1, min(2, int(os.getenv("VENUE_MAX_SIGNALS_PER_SCAN", "2")))
 )
+# The frozen portfolio replay uses a causal three-stop daily pause.  This must
+# stay on the venue path even though the legacy strategy was removed.
+VENUE_LOSS_PAUSE_STREAK = 3
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
 if DEPLOYMENT_MODE not in {"shadow", "live"}:
     DEPLOYMENT_MODE = "shadow"

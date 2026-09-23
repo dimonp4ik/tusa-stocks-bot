@@ -109,6 +109,28 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertTrue(all(call.args[1] == "scan_cap"
                             for call in blocked.call_args_list))
 
+    def test_venue_cooldown_is_per_symbol_and_direction(self):
+        now = 2_000_000.0
+        with patch.dict(main._signal_cache, {
+                "AAPLUSDT|SHORT": ("SHORT", now - 60)}, clear=True):
+            self.assertTrue(main._venue_signal_on_cooldown("AAPLUSDT", "SHORT", now))
+            self.assertFalse(main._venue_signal_on_cooldown("AAPLUSDT", "LONG", now))
+
+    def test_existing_direction_exposure_blocks_whole_new_batch(self):
+        candidates = [({"symbol": "AAPLUSDT", "direction": "SHORT"}, 1)]
+        with patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            published = main._publish_stock_venue_candidates(
+                candidates, {"SHORT": config.MAX_SAME_DIRECTION_POSITIONS})
+        self.assertEqual(published, 0)
+        send.assert_not_called()
+        blocked.assert_called_once_with(1, "dir_cap")
+
+    def test_daily_loss_pause_uses_only_closed_signal_streak(self):
+        with patch.object(main, "get_today_sl_streak",
+                          return_value=config.VENUE_LOSS_PAUSE_STREAK):
+            self.assertTrue(main._venue_daily_loss_pause())
+
 
 if __name__ == "__main__":
     unittest.main()

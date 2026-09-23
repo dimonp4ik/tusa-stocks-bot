@@ -22,6 +22,7 @@ from src.stock_venue_router import (
     PROFILE_MODULES,
     ROBUST_FREQUENCY_EXCLUDED_SYMBOLS,
     _entry_filter_matches,
+    _index_context_is_sane,
     _matches,
     _session_bucket,
     _target_for,
@@ -46,6 +47,13 @@ def frozen_rows(frame: pd.DataFrame, profile: str) -> list[dict]:
         for priority, module in enumerate(modules):
             for _, base_series in bases.iterrows():
                 base = base_series.to_dict()
+                # Keep the offline monitor on the exact production path.  The
+                # entry-filtered profile fails closed when thin overnight
+                # X-Perp data makes QQQ/SPY ATR context implausible; omitting
+                # this check previously counted rows that live routing rejects.
+                if profile == "robust_dynamic_entry_filtered" and not (
+                        _index_context_is_sane(base)):
+                    continue
                 if not _matches(module, base) or not _entry_filter_matches(
                     module, base, profile
                 ):
@@ -159,9 +167,10 @@ def main() -> None:
             str(args.families): hashlib.sha256(family_raw).hexdigest(),
         },
         "invariant": (
-            "production module order, entry filters and dynamic targets; only "
+            "production module order, index-context sanity guard, entry filters "
+            "and dynamic targets; only "
             "entries later than the audited reference; causal one-symbol, cooldown, "
-            "three-per-scan, loss-pause and direction-cap portfolio gate"
+            f"{args.scan_cap}-per-scan, loss-pause and direction-cap portfolio gate"
         ),
         "limitations": [
             "OHLC stop-first replay is a market-entry proxy, not account fills.",

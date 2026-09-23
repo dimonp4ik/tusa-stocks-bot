@@ -21,7 +21,8 @@ from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
 import requests as _requests
 
 from config import (
-    SCAN_INTERVAL_MINUTES, VENUE_MAX_SIGNALS_PER_SCAN, TELEGRAM_TOKEN,
+    SCAN_INTERVAL_MINUTES, VENUE_MAX_SIGNALS_PER_SCAN, VENUE_LOSS_PAUSE_STREAK,
+    TELEGRAM_TOKEN, SIGNAL_COOLDOWN_HOURS,
     SIGNAL_EXPIRY_HOURS, SIGNAL_EXPIRY_MAX_DAYS,
     TRAIL_RUNNER_ENABLED, TRAIL_ATR_MULT, STOP_CLOSE_CONFIRM, MAX_SAME_DIRECTION_POSITIONS,
     STOP_EXCHANGE_BACKSTOP_R, MTF_MIN_SCORE, TP1_R_MULT, TP1_CLOSE_FRAC, EXIT_PROFILE,
@@ -56,6 +57,7 @@ from src.db import (
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_mode_prompt, at_set_tp1_close_pct,
+    get_today_sl_streak,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -234,6 +236,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан"),
+                            ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
             if st.get("n"):
@@ -2599,8 +2602,25 @@ def _cooldowns_save() -> None:
 
 
 def _cache_signal(symbol: str, direction: str):
-    _signal_cache[symbol] = (direction, time.time())
+    _signal_cache[f"{symbol}|{direction}"] = (direction, time.time())
     _cooldowns_save()
+
+
+def _venue_signal_on_cooldown(symbol: str, direction: str, now: float | None = None) -> bool:
+    """Match the frozen portfolio's three-hour symbol+direction cooldown."""
+    now = time.time() if now is None else float(now)
+    for key in (f"{symbol}|{direction}", symbol):
+        cached = _signal_cache.get(key)
+        if cached and cached[0] == direction \
+                and now - float(cached[1]) < SIGNAL_COOLDOWN_HOURS * 3600:
+            return True
+    return False
+
+
+def _venue_daily_loss_pause() -> bool:
+    day_start = int(time.time() // 86400) * 86400
+    return (VENUE_LOSS_PAUSE_STREAK > 0
+            and get_today_sl_streak(day_start) >= VENUE_LOSS_PAUSE_STREAK)
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -2947,9 +2967,11 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
     }
 
 
-def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]]) -> int:
+def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
+                                    open_direction_counts: dict[str, int] | None = None) -> int:
     """Publish at most the historically replayed number of entries per scan."""
     published = 0
+    direction_counts = dict(open_direction_counts or {})
     ordered = sorted(candidates, key=lambda item: (
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
@@ -2957,6 +2979,10 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]]) -> int:
             # This persistent block prevents the same 15m candle from being
             # offered again by the next five-minute scheduler tick.
             mark_setup_blocked(setup_id, "scan_cap")
+            continue
+        direction = analysis.get("direction", "")
+        if direction_counts.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS:
+            mark_setup_blocked(setup_id, "dir_cap")
             continue
         if not send_signal(analysis):
             mark_setup_blocked(setup_id, "send_failed")
@@ -2967,6 +2993,7 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]]) -> int:
         if signal_id:
             link_setup_to_signal(setup_id, signal_id)
         published += 1
+        direction_counts[direction] = direction_counts.get(direction, 0) + 1
     return published
 
 
@@ -2982,6 +3009,10 @@ def _run_stock_venue_strategy_scan() -> None:
         return
     if STOCK_VENUE_FILTER_MODE == "off":
         log.warning("Stock venue scan disabled by STOCK_VENUE_FILTER_MODE=off")
+        return
+    if _venue_daily_loss_pause():
+        log.warning("Stock venue scan paused after %s consecutive UTC-day stops",
+                    VENUE_LOSS_PAUSE_STREAK)
         return
 
     available = set(get_xperp_instruments())
@@ -3005,7 +3036,12 @@ def _run_stock_venue_strategy_scan() -> None:
     if not qqq or not spy:
         log.warning("Stock venue scan refused: QQQ/SPY context is unavailable")
         return
-    active = {row["symbol"] for row in get_open_signals()}
+    active_rows = get_open_signals()
+    active = {row["symbol"] for row in active_rows}
+    open_direction_counts = {
+        direction: sum(row.get("direction") == direction for row in active_rows)
+        for direction in ("LONG", "SHORT")
+    }
     # Blocked tickers are skipped here too. The admin panel could block a symbol
     # and the scan would keep publishing it, which made the control a placebo.
     blocked = {row["symbol"] for row in get_active_symbol_blocks()}
@@ -3029,10 +3065,13 @@ def _run_stock_venue_strategy_scan() -> None:
                 if not setup_id:
                     continue
                 analysis["_setup_log_id"] = setup_id
+                if _venue_signal_on_cooldown(symbol, analysis["direction"]):
+                    mark_setup_blocked(setup_id, "cooldown")
+                    continue
                 candidates.append((analysis, setup_id))
         except Exception as exc:
             log.warning("Stock venue strategy failed for %s: %s", symbol, exc)
-    published = _publish_stock_venue_candidates(candidates)
+    published = _publish_stock_venue_candidates(candidates, open_direction_counts)
     _last_scan_stats.update(coins=len(targets), setups=published, fresh=published,
                             ts=time.time())
     log.info("Stock venue scan complete: %s symbols, %s candidates, %s paper signals",

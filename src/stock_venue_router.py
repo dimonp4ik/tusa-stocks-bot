@@ -242,6 +242,12 @@ LOW_DRAWDOWN_MODULES = (
 ROBUST_FREQUENCY_EXCLUDED_SYMBOLS = frozenset({
     "GOOGLUSDT", "INTCUSDT", "SPYUSDT", "TSLAUSDT",
 })
+# July-August's outcome-blind 95th percentile rounds to 12 ATR.  Values above
+# this are virtually absent from the 2017-2026 cash-session dataset and expose
+# the thin-overnight X-Perp denominator failure seen in September forward data.
+MAX_INDEX_INTRADAY_MOVE_ATR = 12.0
+GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR = 0.5
+GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO = 1.0
 PROFILE_MODULES = {
     "profit": PROFIT_MODULES,
     "precision": PRECISION_MODULES,
@@ -385,7 +391,35 @@ def _entry_filter_matches(module: Module, row: dict, profile: str) -> bool:
     value = row.get(field)
     if value is None or not math.isfinite(float(value)):
         return False
-    return value >= threshold if operator == "ge" else value <= threshold
+    matches = value >= threshold if operator == "ge" else value <= threshold
+    if not matches:
+        return False
+    if module.name != "gap_fade_short_bear_open":
+        return True
+    # A market-wide gap fade is vulnerable after QQQ already completed a
+    # strong down session and current volume remains weak.  This conditional
+    # guard preserved the direct-venue calibration while cutting the fresh
+    # clustered drawdown in half.  Missing context fails closed.
+    prior_day = row.get("qqq_prior_day_dir_atr")
+    volume_ratio = row.get("qqq_vol_ratio")
+    if prior_day is None or volume_ratio is None:
+        return False
+    if not math.isfinite(float(prior_day)) or not math.isfinite(float(volume_ratio)):
+        return False
+    return not (
+        float(prior_day) > GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR
+        and float(volume_ratio) <= GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO
+    )
+
+
+def _index_context_is_sane(row: dict) -> bool:
+    """Fail closed when the causal index context is missing or implausible."""
+    for field in ("qqq_intraday_move_atr", "spy_intraday_move_atr"):
+        value = row.get(field)
+        if value is None or not math.isfinite(float(value)) \
+                or abs(float(value)) > MAX_INDEX_INTRADAY_MOVE_ATR:
+            return False
+    return True
 
 
 def stock_venue_setups(candles: dict, qqq_candles: dict, spy_candles: dict, *,
@@ -410,6 +444,9 @@ def stock_venue_setups(candles: dict, qqq_candles: dict, spy_candles: dict, *,
         return []
     for module in modules:
         for row in rows:
+            if profile == "robust_dynamic_entry_filtered" \
+                    and not _index_context_is_sane(row):
+                continue
             if not _matches(module, row) or not _entry_filter_matches(
                     module, row, profile):
                 continue
