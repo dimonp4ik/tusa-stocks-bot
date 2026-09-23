@@ -1949,7 +1949,11 @@ STOP_EXCHANGE_BACKSTOP_R = float(os.getenv("STOP_EXCHANGE_BACKSTOP_R", "2.5"))
 # 3 is WRONG on this desk — it takes 04-10 from 8.48 to 10.15, worse than doing
 # nothing. The crypto desk measured its own optimum at 3; they are different
 # books and each is set from its own sweep.
-MAX_SAME_DIRECTION_POSITIONS = int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "4"))
+# The current stock venue replay uses a four-position direction cap. Railway
+# may lower it, but an old larger value must not change the deployed portfolio.
+MAX_SAME_DIRECTION_POSITIONS = max(
+    1, min(4, int(os.getenv("MAX_SAME_DIRECTION_POSITIONS", "4")))
+)
 
 # --- US market session gate (see src/market_hours.py) ---
 # Signals only while NYSE/Nasdaq is open — off-session X-Perp candles are thin

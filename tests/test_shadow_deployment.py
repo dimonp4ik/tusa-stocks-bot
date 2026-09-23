@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -93,6 +95,7 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_one_scan_cannot_publish_an_unbounded_signal_batch(self):
         self.assertLessEqual(config.VENUE_MAX_SIGNALS_PER_SCAN, 2)
+        self.assertLessEqual(config.MAX_SAME_DIRECTION_POSITIONS, 4)
         candidates = [
             ({"symbol": f"S{i}USDT", "direction": "SHORT"}, i + 1)
             for i in range(config.VENUE_MAX_SIGNALS_PER_SCAN + 2)
@@ -108,6 +111,15 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(blocked.call_count, 2)
         self.assertTrue(all(call.args[1] == "scan_cap"
                             for call in blocked.call_args_list))
+
+    def test_stale_environment_cannot_raise_direction_cap(self):
+        env = {**os.environ, "MAX_SAME_DIRECTION_POSITIONS": "99"}
+        value = subprocess.check_output(
+            [sys.executable, "-c",
+             "import config; print(config.MAX_SAME_DIRECTION_POSITIONS)"],
+            env=env, text=True,
+        ).strip()
+        self.assertEqual(value, "4")
 
     def test_venue_cooldown_is_per_symbol_and_direction(self):
         now = 2_000_000.0
