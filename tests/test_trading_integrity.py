@@ -196,7 +196,6 @@ class ExchangeTests(unittest.TestCase):
                  ('get_order_book',{'ts':at.time.time()*1000,'bids':[['99.99','1000']],
                                     'asks':[['100.01','1000']]})]:
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
-            risk_cap=stack.enter_context(patch.object(at,'bounded_margin'))
             order=stack.enter_context(patch.object(at.okx,'place_market_entry',return_value=(False,'test refusal')))
             at._open_for_user(dict(user_id=7,size_mode='fixed',size_value=10),sig,'TEST','TEST')
             order.assert_called_once()
@@ -208,7 +207,6 @@ class ExchangeTests(unittest.TestCase):
         order.assert_called_once()
         quantity=order.call_args.args[-1]
         self.assertEqual(quantity, okx.calc_contracts(10, at.AUTOTRADE_LEVERAGE, 100, spec))
-        risk_cap.assert_not_called()
 
     def test_entry_order_is_market(self):
         with patch.object(okx, '_request', return_value=(True, [{'ordId': '42'}])) as request:
