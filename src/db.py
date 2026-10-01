@@ -1379,6 +1379,27 @@ def get_unresolved_setups(max_age_sec: float, limit: int = 80) -> list:
         return [dict(r) for r in rows]
 
 
+def get_unresolved_venue_setups(limit: int = 80) -> list:
+    """Unsent venue setups that still need an X-Perp outcome.
+
+    Venue cap/cooldown rows were reintroduced after the legacy Claude tracker
+    was removed. Keep this query source-specific so retired strategy rows
+    cannot be judged with the venue exit model. There is deliberately no lower
+    timestamp bound: an outage or redeploy must not make an unresolved row
+    disappear forever after its expiry window passes.
+    """
+    with _conn() as c:
+        rows = c.execute(
+            """SELECT * FROM setup_log
+               WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
+                 AND COALESCE(sent,0)=0 AND source='stock_venue_regime'
+                 AND ts <= ?
+               ORDER BY ts ASC LIMIT ?""",
+            (time_mod.time() - 900, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def mark_setup_resolved(setup_id: int, outcome: str,
                         reached_tp1: int, reached_tp2: int,
                         net_r: float = None) -> None:

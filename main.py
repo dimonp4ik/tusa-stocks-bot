@@ -8,6 +8,7 @@ deployment cannot open an order.
 
 import json
 import logging
+import math
 import os
 import time
 import threading
@@ -44,6 +45,7 @@ from src.news_agent import get_daily_digest, get_day_events, generate_weekly_com
 from config import EXTENDED_SESSION_WINDOWS
 from src.market_hours import session_hours_between
 from src.r_model import blended_r
+from src.backtest_integrity import simulate_exit
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats, set_sl_xperp_only,
     get_sl_wick_stats, get_active_symbol_blocks, unblock_symbol, set_symbol_block,
@@ -55,6 +57,7 @@ from src.db import (
     get_cap_impact_stats, get_skew_response_stats, get_all_setups_since,
     get_all_signals_since, get_setup_accuracy, link_setup_to_signal,
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
+    get_unresolved_venue_setups, mark_setup_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_mode_prompt, at_set_tp1_close_pct,
     get_today_sl_streak,
@@ -2946,7 +2949,93 @@ def _check_open_signals():
 
 
 
-# ── Shadow-outcome tracker (rejected + sent setups) ───────────────────────────
+# ── Shadow outcomes for unsent venue setups ──────────────────────────────────
+def _resolve_unsent_venue_setup(setup: dict, candles: dict,
+                                now: float | None = None):
+    """Resolve one blocked/cooldown market setup on closed X-Perp candles.
+
+    This is deliberately narrower than the retired Claude shadow tracker: it
+    accepts only the fixed market bracket already persisted by the venue path.
+    The entry can occur inside the first 15-minute candle, so that candle is
+    treated conservatively as an intrabar entry and ambiguous stop/target bars
+    remain stop-first.
+    """
+    now = time.time() if now is None else float(now)
+    entry = float(setup["entry_price"])
+    stop = float(setup["sl"])
+    tp1 = float(setup["tp1"])
+    tp2 = float(setup["tp2"])
+    opened = float(setup["ts"])
+    signal_bar = float(setup.get("signal_bar_ts") or 0.0)
+    entry_bar_open = signal_bar + 900 if signal_bar > 0 else math.floor(opened / 900) * 900
+    sliced = _slice_candles_from_open(candles, entry_bar_open)
+    if not sliced.get("time"):
+        return None
+    intrabar = float(sliced["time"][0]) < opened
+    result = simulate_exit(
+        sliced, range(len(sliced["time"])), direction=setup["direction"],
+        entry=entry, sl=stop, tp1=tp1, tp2=tp2,
+        atr=float(setup.get("atr") or abs(entry - stop)),
+        tp1_fraction=1.0, trail=False, trail_mult=0.0,
+        stop_on_close=STOP_CLOSE_CONFIRM,
+        backstop_r=STOP_EXCHANGE_BACKSTOP_R,
+        choose_trail=lambda _h, _l, _c: 0.0,
+        intrabar_entry=intrabar,
+    )
+    if result.outcome != "EXPIRED":
+        reached_tp1 = int(result.outcome in {"TP1", "TP2", "TRAIL"})
+        reached_tp2 = int(result.outcome == "TP2")
+        return result.outcome, reached_tp1, reached_tp2, result.gross_r
+
+    session_expired = session_hours_between(opened, now) > SIGNAL_EXPIRY_HOURS
+    calendar_expired = (SIGNAL_EXPIRY_MAX_DAYS > 0
+                        and now - opened > SIGNAL_EXPIRY_MAX_DAYS * 86400)
+    if not (session_expired or calendar_expired):
+        return None
+    return "EXPIRED", int(result.reached_tp1), 0, result.gross_r
+
+
+def _track_unsent_venue_setups() -> None:
+    """Resolve scan-cap/cooldown candidates without sending Telegram messages."""
+    try:
+        pending = get_unresolved_venue_setups(limit=200)
+        if not pending:
+            return
+        grouped: dict[str, list[dict]] = {}
+        for setup in pending:
+            grouped.setdefault(setup["symbol"], []).append(setup)
+        resolved = 0
+        for symbol, setups in grouped.items():
+            oldest = min(float(setup["ts"]) for setup in setups)
+            limit = max(16, min(3000, int((time.time() - oldest) / 900) + 8))
+            try:
+                candles = get_klines_xperp(symbol, limit=limit)
+            except Exception as exc:
+                log.debug("Venue shadow candles failed %s: %s", symbol, exc)
+                continue
+            if not candles or not candles.get("time"):
+                continue
+            for setup in setups:
+                signal_bar = float(setup.get("signal_bar_ts") or 0.0)
+                needed = signal_bar + 900 if signal_bar > 0 else math.floor(
+                    float(setup["ts"]) / 900) * 900
+                if float(candles["time"][0]) > needed:
+                    log.warning("Venue shadow history truncated for setup #%s %s",
+                                setup["id"], symbol)
+                    continue
+                value = _resolve_unsent_venue_setup(setup, candles)
+                if value is None:
+                    continue
+                outcome, reached_tp1, reached_tp2, net_r = value
+                mark_setup_resolved(setup["id"], outcome, reached_tp1,
+                                    reached_tp2, net_r=net_r)
+                resolved += 1
+        if resolved:
+            log.info("Venue shadow tracker resolved %s unsent setup(s)", resolved)
+    except Exception as exc:
+        log.warning("Venue shadow tracker failed: %s", exc)
+
+
 # ── Main scanning function ────────────────────────────────────────────────────
 _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 
@@ -3351,6 +3440,14 @@ def start_bot():
     scheduler.add_job(
         _monitor_open_signals, "cron",
         minute="*",
+        timezone="UTC",
+    )
+
+    # Resolve candidates withheld by scan/direction/cooldown caps. This worker
+    # records evidence only; it cannot publish a message or place an order.
+    scheduler.add_job(
+        _track_unsent_venue_setups, "cron",
+        minute="3,18,33,48",
         timezone="UTC",
     )
 
