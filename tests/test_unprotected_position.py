@@ -11,7 +11,7 @@ class UnprotectedPositionTests(unittest.TestCase):
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
-                ('at_set_balance',None),('_check_threshold_cross',None),('get_bot_state',None),
+                ('at_set_balance',None),('get_bot_state',None),
                 ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
@@ -22,7 +22,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(at.okx,'get_position_size',side_effect=[(True,0),(True,.01)]))
             record=stack.enter_context(patch.object(at,'at_log_position',return_value=1))
-            at._open_for_user(dict(user_id=7,size_mode='fixed',size_value=10),sig,'TEST','TEST')
+            at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
         record.assert_called_once()
         self.assertEqual(record.call_args.args[7],'')
         self.assertEqual(record.call_args.args[4],.01)

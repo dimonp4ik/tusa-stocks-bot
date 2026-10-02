@@ -188,7 +188,7 @@ class ExchangeTests(unittest.TestCase):
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
-                 ('at_set_balance',None),('_check_threshold_cross',None),('get_bot_state',None),
+                 ('at_set_balance',None),('get_bot_state',None),
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
@@ -197,16 +197,23 @@ class ExchangeTests(unittest.TestCase):
                                     'asks':[['100.01','1000']]})]:
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             order=stack.enter_context(patch.object(at.okx,'place_market_entry',return_value=(False,'test refusal')))
-            at._open_for_user(dict(user_id=7,size_mode='fixed',size_value=10),sig,'TEST','TEST')
+            at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
             order.assert_called_once()
             for bad_book in (None, {'ts':0,'bids':[['99.99','1000']],'asks':[['100.01','1000']]},
                              {'ts':at.time.time()*1000,'bids':[['99','1000']],'asks':[['101','1000']]}):
                 with patch.object(at.okx,'get_order_book',return_value=bad_book):
-                    at._open_for_user(dict(user_id=7,size_mode='fixed',size_value=10),sig,'TEST','TEST')
+                    at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
                 order.assert_called_once()  # No additional market entry on refused depth.
         order.assert_called_once()
         quantity=order.call_args.args[-1]
-        self.assertEqual(quantity, okx.calc_contracts(10, at.AUTOTRADE_LEVERAGE, 100, spec))
+        self.assertEqual(quantity, okx.calc_contracts(3.84, at.AUTOTRADE_LEVERAGE, 100, spec))
+
+    def test_client_percentage_uses_latest_balance(self):
+        from src import autotrader as at
+        user = dict(size_mode='percent', size_value=3)
+        self.assertAlmostEqual(at._margin_for(user, 100), 3.0)
+        self.assertAlmostEqual(at._margin_for(user, 130), 3.9)
+        self.assertEqual(at._margin_for(dict(size_mode='fixed', size_value=3), 130), 0.0)
 
     def test_entry_order_is_market(self):
         with patch.object(okx, '_request', return_value=(True, [{'ordId': '42'}])) as request:

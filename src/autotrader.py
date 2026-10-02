@@ -14,7 +14,7 @@ Lifecycle glue (called from main.py):
     when/whether the engine's own status transition catches up.
 
 Per-user flow on open:
-  decrypt keys → balance (threshold-cross check) → size → set 10x isolated →
+  decrypt keys → current balance → client percentage size → set 10x isolated →
   market entry → protection OCO (SL at engine stop, TP at tp2) → DM the user.
 
 Fail-safe rules:
@@ -36,13 +36,13 @@ from src.risk_limits import equity_guard
 from config import (
     AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
     TELEGRAM_TOKEN,
-    AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE, AUTOTRADE_BALANCE_THRESHOLD,
+    AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_CONTACT,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
     get_bot_state, set_bot_state,
-    at_get_active_traders, at_get, at_set_balance, at_set_mode_prompt,
+    at_get_active_traders, at_get, at_set_balance,
     at_log_position, at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     at_has_open_position,
@@ -115,45 +115,13 @@ def _inst_id_of(symbol: str) -> str | None:
 
 
 def _margin_for(u: dict, balance: float) -> float:
-    """Margin ($) this user puts into one trade under their chosen mode."""
-    if u.get("size_mode") == "percent":
-        return balance * float(u.get("size_value") or 0) / 100.0
-    return float(u.get("size_value") or 0)
-
-
-def _check_threshold_cross(u: dict, balance: float) -> None:
-    """Balance crossed $100 against the chosen mode → ask once, keep trading
-    under the current mode until the user answers."""
-    mode = u.get("size_mode")
-    if not mode or u.get("mode_prompt_pending"):
-        return
-    below = balance < AUTOTRADE_BALANCE_THRESHOLD
-    if (below and mode == "percent") or (not below and mode == "fixed"):
-        at_set_mode_prompt(u["user_id"], True)
-        cur  = (f"{u['size_value']:.0f}% от депозита" if mode == "percent"
-                else f"${u['size_value']:.2f} на сделку")
-        alt  = "фиксированную сумму ($)" if mode == "percent" else "процент от депозита (1-10%)"
-        verb = "упал ниже" if below else "вырос выше"
-        kb = {"inline_keyboard": [[
-            {"text": "Оставить как есть", "callback_data": "at_mode_keep"},
-            {"text": "Сменить режим",     "callback_data": "at_mode_switch"},
-        ]]}
-        try:
-            requests.post(
-                f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                json={
-                    "chat_id": u["user_id"],
-                    "text": (f"⚖️ Твой депозит {verb} ${AUTOTRADE_BALANCE_THRESHOLD:.0f} "
-                             f"(сейчас ${balance:.2f}).\n"
-                             f"Текущий режим: *{cur}*.\n"
-                             f"Хочешь перейти на {alt}?"),
-                    "parse_mode": "Markdown",
-                    "reply_markup": kb,
-                },
-                timeout=10,
-            )
-        except Exception as e:
-            log.warning(f"threshold prompt to {u['user_id']} failed: {e}")
+    """Return margin as the client's percentage of the latest balance."""
+    if u.get("size_mode") != "percent":
+        return 0.0
+    pct = float(u.get("size_value") or 0)
+    if not 1.0 <= pct <= 10.0 or balance <= 0:
+        return 0.0
+    return balance * pct / 100.0
 
 
 _entry_locks = defaultdict(threading.Lock)
@@ -188,7 +156,6 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _dm(uid, f"⚠️ Автотрейдинг: не смог прочитать баланс OKX — сделка по {disp} пропущена.\n`{balance}`")
         return
     at_set_balance(uid, balance)
-    _check_threshold_cross(u, balance)
     try:
         state_key = f"risk_guard:{uid}"
         state = json.loads(get_bot_state(state_key) or '{}')

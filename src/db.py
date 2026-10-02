@@ -327,7 +327,7 @@ def init_db():
         # ── Autotrading: allow-listed users + their encrypted OKX keys ───────
         # allowed  — admin put the user on the list (gate for the DM button)
         # active   — onboarding finished, bot opens real positions
-        # size_mode 'percent' (1-10% of balance) | 'fixed' ($ per trade)
+        # size_mode is always 'percent' (1-10% of the latest balance)
         c.execute("""
             CREATE TABLE IF NOT EXISTS autotrade_users (
                 user_id        INTEGER PRIMARY KEY,
@@ -347,6 +347,21 @@ def init_db():
             )
         """)
         _ensure_column(c, "autotrade_users", "tp1_close_pct", "REAL NOT NULL DEFAULT 0")
+        # Legacy releases offered a fixed-dollar mode below $100. Values in the
+        # supported 1-10 range represent the same number the clients intended
+        # as their per-trade percentage. Unsafe legacy values require a fresh
+        # percentage choice and remain inactive until then.
+        c.execute("""
+            UPDATE autotrade_users
+            SET size_mode = 'percent', mode_prompt_pending = 0
+            WHERE size_mode = 'fixed' AND size_value BETWEEN 1 AND 10
+        """)
+        c.execute("""
+            UPDATE autotrade_users
+            SET active = 0, size_mode = NULL, size_value = NULL,
+                mode_prompt_pending = 0
+            WHERE size_mode = 'fixed'
+        """)
 
         # ── Autotrading: one row per live position per user per signal ───────
         c.execute("""
@@ -1966,6 +1981,8 @@ def at_set_keys(user_id: int, api_key_enc: str, api_secret_enc: str,
 
 
 def at_set_mode(user_id: int, size_mode: str, size_value: float) -> None:
+    if size_mode != "percent" or not 1 <= float(size_value) <= 10:
+        raise ValueError("trade size must be a percentage from 1 to 10")
     with _conn() as c:
         c.execute("""
             UPDATE autotrade_users
@@ -1987,12 +2004,6 @@ def at_set_balance(user_id: int, balance: float) -> None:
     with _conn() as c:
         c.execute("UPDATE autotrade_users SET last_balance = ? WHERE user_id = ?",
                   (balance, user_id))
-
-
-def at_set_mode_prompt(user_id: int, pending: bool) -> None:
-    with _conn() as c:
-        c.execute("UPDATE autotrade_users SET mode_prompt_pending = ? WHERE user_id = ?",
-                  (1 if pending else 0, user_id))
 
 
 def at_set_tp1_close_pct(user_id: int, pct: float) -> None:

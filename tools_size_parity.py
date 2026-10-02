@@ -1,27 +1,18 @@
 #!/usr/bin/env python3
-"""Does the LIVE position size match the one every backtest figure assumes?
-
-backtest._size_mult_for calls itself "Mirror of the live sizing rules in
-src/autotrader.py". Mirrors drift: twice in one day the live book carried a
-rule the model did not (kNN sizing), and the model carried rules the live
-bot did not (VOLUME_SPIKE, OFF_SESSION). Both were found by reading code,
-which is not a check that runs.
+"""Verify that live orders use exactly the client's percentage of balance.
 
 This drives the real _open_for_user with the exchange replaced by stubs and
-reads the margin it was about to send, then divides out the user's base
-margin to recover the live multiplier. The model's mirror is called on the
-same setup. A disagreement means reported R does not describe the money.
+captures the margin passed to contract sizing. Every setup must keep a 1.0
+multiplier: strategy fields may filter entries, but cannot resize them.
 
 Run: python tools_size_parity.py [runs]
 """
-import os, sys, random, tempfile, importlib
+import os, sys, random, tempfile
 
 os.environ.setdefault("DB_PATH", os.path.join(tempfile.mkdtemp(), "size.db"))
 import src.db as db          # noqa: E402
 db.init_db()
 import src.autotrader as at  # noqa: E402
-import backtest as bt        # noqa: E402
-import config as C           # noqa: E402
 
 _CAP = {"margin": None}
 
@@ -31,9 +22,11 @@ def _install_stubs():
     at._dm = lambda *a, **k: None
     at.at_has_open_position = lambda *a, **k: False
     at.at_set_balance = lambda *a, **k: None
-    at._check_threshold_cross = lambda *a, **k: None
-    at.at_add_position = lambda *a, **k: 1
+    at.get_bot_state = lambda *a, **k: '{}'
+    at.set_bot_state = lambda *a, **k: None
+    at.set_signal_size_mult = lambda *a, **k: None
     at.okx.get_balance = lambda creds: (True, 10000.0)
+    at.okx.get_position_size = lambda *a, **k: (True, 0.0)
     at.okx.get_xperp_spec = lambda inst: {"ctVal": 1.0, "lotSz": 0.01,
                                           "minSz": 0.01, "tickSz": 0.01, "lever": 10}
     at.okx.get_last_price = lambda inst: 100.0
@@ -71,10 +64,12 @@ def main_() -> int:
     for _ in range(runs):
         entry = 100.0
         sig = {
+            "id": 1,
             "symbol": random.choice(["AAPLUSDT", "TSLAUSDT", "NVDAUSDT", "XAUUSDT"]),
             "direction": random.choice(["LONG", "SHORT"]),
             "entry_price": entry,
             "sl": entry * (1 - random.uniform(0.012, 0.035)),
+            "tp1": entry * 1.1,
             "session": random.choice(sessions),
             "trend_1h": random.choice(trends),
             "trend_4h": random.choice(trends),
@@ -88,27 +83,13 @@ def main_() -> int:
             "rsi": round(random.uniform(30.0, 80.0), 2),
             "eff_ratio": round(random.uniform(0.0, 0.9), 3),
         }
+        if sig["direction"] == "SHORT":
+            sig["sl"], sig["tp1"] = entry * 1.03, entry * 0.9
         live = _live_mult(sig, user)
         if live is None:
             skipped += 1
             continue
-        # The model's mirror. Risk normalisation is live-only BY DESIGN (it is
-        # what makes 1R cost the same money at any stop width, which is the
-        # assumption every R figure rests on), so divide it back out before
-        # comparing -- otherwise this reports a difference that is supposed to
-        # be there.
-        model = bt._size_mult_for(sig)
-        risk_pct = abs(entry - sig["sl"]) / entry
-        norm = 1.0
-        if C.RISK_NORMALIZED_SIZING and risk_pct > C.RISK_REFERENCE_PCT:
-            norm = max(C.RISK_SIZE_MULT_MIN, C.RISK_REFERENCE_PCT / risk_pct)
-        # Cap first, normalisation last -- the order both bots now use. The
-        # reverse (fold normalisation in, then cap the product) lets the
-        # ceiling undo it, which is what the stocks autotrader did until
-        # 2026-09-02. This harness reported that as five bot bugs before the
-        # formula was fixed to mirror the live order; state the order
-        # explicitly rather than assume it.
-        expect = min(model, float(C.SIZE_MULT_MAX)) * norm
+        expect = 1.0
         if abs(live - expect) < 1e-6:
             agree += 1
         else:
@@ -128,23 +109,5 @@ def main_() -> int:
     return 0
 
 
-def main_all() -> int:
-    """Two passes: as configured, then with the fresh-break trim FORCED ON.
-
-    A rule sitting at 1.0 is invisible to this comparison -- the ceiling was
-    applied to the whole product live and to the boosts only in the model,
-    and those agree exactly while the trim is disabled. 400/400 meant
-    nothing for that rule. Forcing it on is what makes the check honest.
-    """
-    rc = main_()
-    import src.autotrader as _at
-    if float(C.EXTENSION_FRESH_SIZE_MULT) == 1.0:
-        print("\n--- второй проход: подрезка свежего слома принудительно 0.9 ---")
-        _at.EXTENSION_FRESH_SIZE_MULT = 0.9
-        bt.EXTENSION_FRESH_SIZE_MULT = 0.9
-        rc = main_() or rc
-    return rc
-
-
 if __name__ == "__main__":
-    raise SystemExit(main_all())
+    raise SystemExit(main_())

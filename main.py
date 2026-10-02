@@ -59,13 +59,13 @@ from src.db import (
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
     get_unresolved_venue_setups, mark_setup_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
-    at_set_active, at_set_balance, at_set_mode_prompt, at_set_tp1_close_pct,
+    at_set_active, at_set_balance, at_set_tp1_close_pct,
     get_today_sl_streak,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
-from config import ADMIN_IDS, AUTOTRADE_BALANCE_THRESHOLD, AUTOTRADE_CONTACT
+from config import ADMIN_IDS, AUTOTRADE_CONTACT
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
 
@@ -122,7 +122,7 @@ _pending_report_date: dict = {}
 _pending_add_autotrade: dict = {}
 # State: user is inside the autotrade onboarding dialog.
 # chat_id → {"step": str, "data": {...}}  (steps: api_key → api_secret →
-# passphrase → size_percent | size_fixed; 'switch_*' reuse the size steps)
+# passphrase → size_percent; resize_percent reuses the size step)
 _at_onboarding: dict = {}
 # State: which admin sub-section each chat is currently in, so detail-view
 # "« Назад" returns to that section menu instead of the top-level panel.
@@ -1843,27 +1843,22 @@ def _at_reply_kb(chat_id: int, text: str, kb_rows: list):
 
 
 def _at_ask_size(chat_id: int, balance: float, resize: bool = False):
-    """Route to percent (≥$100) or fixed (<$100) size question."""
+    """Ask for the percentage of the current balance used as margin."""
     prefix = "resize_" if resize else "size_"
-    if balance >= AUTOTRADE_BALANCE_THRESHOLD:
-        _at_onboarding[chat_id]["step"] = prefix + "percent"
-        _reply(chat_id,
-               f"💰 Твой баланс: *${balance:.2f}*.\n\n"
-               f"Какой *процент депозита* ставить на каждую сделку?\n"
-               f"Отправь число от *1 до 10* (например `2`).")
-    else:
-        _at_onboarding[chat_id]["step"] = prefix + "fixed"
-        _reply(chat_id,
-               f"💰 Твой баланс: *${balance:.2f}* (меньше ${AUTOTRADE_BALANCE_THRESHOLD:.0f}).\n\n"
-               f"Какую *фиксированную сумму в $* ставить на каждую сделку?\n"
-               f"Отправь число (например `5`). Это маржа сделки, позиция будет с плечом 10x.")
+    _at_onboarding[chat_id]["step"] = prefix + "percent"
+    _reply(chat_id,
+           f"💰 Твой текущий баланс: *${balance:.2f}*.\n\n"
+           f"Какой *процент депозита* использовать как маржу в каждой сделке?\n"
+           f"Отправь число от *1 до 10* (например `3`).\n\n"
+           f"При 3% сейчас маржа составит *${balance * 0.03:.2f}*, "
+           f"а размер позиции с плечом 10x — примерно *${balance * 0.30:.2f}*.\n"
+           f"_Перед каждым новым входом бот заново считает этот процент от свежего баланса._")
 
 
 def _at_show_menu(chat_id: int, u: dict):
     """Status panel for an onboarded (active or paused) autotrader."""
-    mode = u.get("size_mode")
-    mode_str = (f"{u['size_value']:.0f}% от депозита" if mode == "percent"
-                else f"${u['size_value']:.2f} на сделку" if mode == "fixed" else "—")
+    pct = float(u.get("size_value") or 0)
+    mode_str = f"{pct:g}% от текущего депозита" if 1 <= pct <= 10 else "не задан"
     bal = u.get("last_balance")
     bal_str = f"${bal:.2f}" if bal is not None else "—"
     state = "🟢 включён" if u.get("active") else "⏸ выключен"
@@ -1875,7 +1870,7 @@ def _at_show_menu(chat_id: int, u: dict):
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
-                 f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nРазмер: *{mode_str}*\n"
+                 f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nМаржа каждой сделки: *{mode_str}*\n"
                  f"Закрытие на TP1: *{tp1_str}*\n"
                  f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа",
                  rows)
@@ -1963,19 +1958,6 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
         _at_finish_size(chat_id, user_id, step, f"{pct:.0f}% от депозита")
         return True
 
-    if step in ("size_fixed", "resize_fixed"):
-        try:
-            usd = float(val.replace(",", ".").lstrip("$"))
-        except ValueError:
-            _reply(chat_id, "Нужно число — сумма в $. Например `5`.")
-            return True
-        if usd <= 0:
-            _reply(chat_id, "Сумма должна быть больше 0.")
-            return True
-        at_set_mode(user_id, "fixed", usd)
-        _at_finish_size(chat_id, user_id, step, f"${usd:.2f} на сделку")
-        return True
-
     if step == "tp1pct":
         try:
             pct = float(val.replace(",", ".").rstrip("%"))
@@ -2032,7 +2014,7 @@ def _at_show_final_confirm(chat_id: int, mode_str: str, tp1_pct: float):
     _at_reply_kb(chat_id,
                  f"⚠️ *Последний шаг*\n\n"
                  f"Бот будет *сам открывать реальные сделки* на твоём OKX:\n"
-                 f"• размер: *{mode_str}*\n"
+                 f"• маржа каждой сделки: *{mode_str}* от свежего баланса\n"
                  f"• плечо: 10x, изолированная маржа\n"
                  f"• TP1: {tp1_line}\n"
                  f"• стоп-лосс и тейки ставятся автоматически\n\n"
@@ -2086,16 +2068,6 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _reply(chat_id,
                "Какой % позиции закрывать на TP1? Напиши число *0-100* "
                "(0 = не закрывать, оставить всё под трейлинг).")
-    elif data == "at_mode_keep":
-        at_set_mode_prompt(user_id, False)
-        _answer_callback(cb_id, "Ок, оставляем как есть.")
-    elif data == "at_mode_switch":
-        at_set_mode_prompt(user_id, False)
-        bal = float(u.get("last_balance") or 0)
-        # Switch = pick the mode matching the CURRENT balance side
-        _at_onboarding[chat_id] = {"step": "", "data": {}}
-        _at_ask_size(chat_id, bal, resize=True)
-        _answer_callback(cb_id)
     else:
         _answer_callback(cb_id)
     return True
@@ -2317,8 +2289,11 @@ def webhook():
                        f"Чтобы подключиться — напиши `{AUTOTRADE_CONTACT}`.")
             elif not keystore_ready():
                 _reply(chat_id, f"⚠️ Автотрейдинг временно недоступен (техническая настройка). Напиши `{AUTOTRADE_CONTACT}`.")
-            elif u.get("api_key_enc") and u.get("size_mode"):
+            elif u.get("api_key_enc") and u.get("size_mode") == "percent":
                 _at_show_menu(chat_id, u)
+            elif u.get("api_key_enc"):
+                _at_onboarding[chat_id] = {"step": "", "data": {}}
+                _at_ask_size(chat_id, float(u.get("last_balance") or 0))
             else:
                 _at_begin_keys(chat_id)
 
