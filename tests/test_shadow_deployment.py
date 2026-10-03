@@ -51,6 +51,24 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("ОРДЕР НЕ ОТКРЫТ", sent[0])
         self.assertNotIn("Плечо", sent[0])
 
+    def test_telegram_barbell_signal_shows_both_market_exit_levels(self):
+        analysis = {
+            "symbol": "AAPLUSDT", "direction": "SHORT", "decision": "SHORT",
+            "current_price": 100.0, "atr": 1.0, "fixed_stop_atr": 1.0,
+            "fixed_target_r": .5, "fixed_runner_target_r": 1.0,
+            "strategy_tp1_close_frac": .70,
+            "signals": ["Venue module shadow_stock_5m_range_reversion_short"],
+            "_shadow_only": True,
+        }
+        sent = []
+        with patch.object(notifier, "_send_message",
+                          side_effect=lambda text: sent.append(text) or True), \
+             patch("src.db.log_signal", return_value=43):
+            self.assertTrue(notifier.send_signal(analysis))
+        self.assertIn("TP1, закрыть 70%", sent[0])
+        self.assertIn("TP2, остаток 30%", sent[0])
+        self.assertIn("`1.00R`", sent[0])
+
     def test_session_helpers_exist(self):
         """The venue scan calls all three on a closed-market tick.
 
@@ -113,6 +131,7 @@ class ShadowDeploymentTests(unittest.TestCase):
             for i in range(config.VENUE_MAX_SIGNALS_PER_SCAN + 2)
         ]
         with patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "get_recent_signals", return_value=[]), \
              patch.object(main, "mark_setup_sent") as sent, \
              patch.object(main, "mark_setup_blocked") as blocked, \
              patch.object(main, "_cache_signal"):
@@ -123,6 +142,152 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(blocked.call_count, 2)
         self.assertTrue(all(call.args[1] == "scan_cap"
                             for call in blocked.call_args_list))
+
+    def test_five_minute_analysis_is_permanently_shadow_only(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": 2.0,
+            "target_r": .5, "signal_bar_ts": 1_788_876_000.0,
+            "module": "shadow_stock_5m_range_reversion_short",
+            "qqq_regime": "5m_regime", "volume_ratio": .7,
+            "_shadow_experiment": True, "_five_minute_shadow": True,
+        }
+        with patch.object(main, "DEPLOYMENT_MODE", "live"):
+            analysis = main._stock_venue_analysis("AAPLUSDT", setup)
+        self.assertTrue(analysis["_shadow_only"])
+        self.assertTrue(analysis["_five_minute_shadow"])
+        self.assertEqual(analysis["source"], "stock_venue_shadow_5m")
+        self.assertEqual(analysis["fixed_runner_target_r"], 1.0)
+        self.assertEqual(analysis["strategy_tp1_close_frac"], .70)
+        self.assertEqual(analysis["strategy_runner_mode"], "fixed_be")
+        self.assertEqual(analysis["strategy_bar_seconds"], 300)
+        self.assertEqual(analysis["strategy_entry_bar_ts"], 1_788_876_300.0)
+        self.assertFalse(analysis["strategy_stop_on_close"])
+        self.assertGreater(analysis["strategy_expire_at"], 1_788_876_300.0)
+
+    def test_pullback_five_minute_analysis_uses_four_r_runner(self):
+        setup = {
+            "direction": "SHORT", "entry": 100.0, "atr": 2.0,
+            "target_r": .25, "signal_bar_ts": 1_800_000_000.0,
+            "module": "shadow_stock_5m_trend_pullback_short",
+            "qqq_regime": "5m_regime", "volume_ratio": .7,
+            "_shadow_experiment": True, "_five_minute_shadow": True,
+        }
+        analysis = main._stock_venue_analysis("AAPLUSDT", setup)
+        self.assertEqual(analysis["fixed_runner_target_r"], 4.0)
+
+    def test_five_minute_fixed_runner_uses_5m_bars_and_next_bar_breakeven(self):
+        start = 2_000_000_100.0
+        frame = {
+            "time": [start, start + 300],
+            "open": [99.8, 99.6], "high": [99.9, 100.0],
+            "low": [99.4, 99.0], "close": [99.6, 100.0],
+            "confirmed": [True, False],
+        }
+        signal = {
+            "id": 71, "symbol": "AAPLUSDT", "direction": "SHORT",
+            "entry_price": 100.0, "sl": 102.0, "tp1": 99.5, "tp2": 92.0,
+            "atr": 2.0, "opened_at": start - 60, "tp1_hit_at": start + 30,
+            "status": "TP1_PARTIAL", "strategy_tp1_close_frac": .70,
+            "strategy_runner_mode": "fixed_be", "strategy_bar_seconds": 300,
+            "strategy_entry_bar_ts": start,
+            "runner_activation_bar_ts": start,
+            "strategy_stop_on_close": 0,
+            "strategy_expire_at": start + 3600,
+        }
+        with patch.object(main, "get_open_signals", return_value=[signal]), \
+             patch.object(main.time, "time", return_value=start + 360), \
+             patch.object(main, "get_klines_xperp", return_value=frame) as candles, \
+             patch.object(main, "update_signal_status") as update, \
+             patch.object(main, "send_signal_update"), \
+             patch.object(main.autotrader, "mirror_transition"):
+            main._check_open_signals()
+        self.assertEqual(candles.call_args.kwargs["interval"], "5m")
+        self.assertEqual(update.call_args.args[1], "BREAKEVEN")
+        self.assertAlmostEqual(update.call_args.kwargs["realized_r"], .175)
+
+    def test_five_minute_stop_is_wick_touch_even_when_forming_close_recovers(self):
+        start = 2_000_001_000.0
+        frame = {
+            "time": [start], "open": [100.0], "high": [100.5],
+            "low": [97.8], "close": [100.0], "confirmed": [False],
+        }
+        signal = {
+            "id": 72, "symbol": "AAPLUSDT", "direction": "LONG",
+            "entry_price": 100.0, "sl": 98.0, "tp1": 101.0, "tp2": 104.0,
+            "atr": 2.0, "opened_at": start, "status": "OPEN",
+            "strategy_tp1_close_frac": .70, "strategy_runner_mode": "fixed_be",
+            "strategy_bar_seconds": 300, "strategy_entry_bar_ts": start,
+            "strategy_stop_on_close": 0,
+            "strategy_expire_at": start + 3600,
+        }
+        with patch.object(main, "get_open_signals", return_value=[signal]), \
+             patch.object(main.time, "time", return_value=start + 60), \
+             patch.object(main, "get_klines_xperp", return_value=frame), \
+             patch.object(main, "_deep_feed_breached", return_value=True), \
+             patch.object(main, "set_sl_xperp_only"), \
+             patch.object(main, "update_signal_status") as update, \
+             patch.object(main, "send_signal_update"), \
+             patch.object(main.autotrader, "mirror_transition"):
+            main._check_open_signals()
+        self.assertEqual(update.call_args.args[1], "SL_HIT")
+        self.assertEqual(update.call_args.kwargs["realized_r"], -1.0)
+
+    def test_stock_target_after_cash_session_close_is_ignored(self):
+        start = 2_000_010_000.0
+        frame = {
+            "time": [start, start + 300], "open": [100.0, 100.0],
+            "high": [100.2, 100.2], "low": [99.8, 90.0],
+            "close": [100.0, 90.0], "confirmed": [True, False],
+        }
+        signal = {
+            "id": 73, "symbol": "AAPLUSDT", "direction": "SHORT",
+            "entry_price": 100.0, "sl": 102.0, "tp1": 99.0, "tp2": 98.0,
+            "atr": 2.0, "opened_at": start, "status": "OPEN",
+            "strategy_tp1_close_frac": .70, "strategy_runner_mode": "fixed_be",
+            "strategy_bar_seconds": 300, "strategy_entry_bar_ts": start,
+            "strategy_stop_on_close": 0,
+            "strategy_expire_at": start + 300,
+        }
+        with patch.object(main, "get_open_signals", return_value=[signal]), \
+             patch.object(main.time, "time", return_value=start + 360), \
+             patch.object(main, "get_klines_xperp", return_value=frame), \
+             patch.object(main, "update_signal_status") as update, \
+             patch.object(main, "send_signal_update"), \
+             patch.object(main.autotrader, "mirror_transition"):
+            main._check_open_signals()
+        self.assertEqual(update.call_args.args[1], "EXPIRED")
+
+    def test_persistent_scan_cap_counts_previous_five_minute_tick(self):
+        candidates = [({
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_venue_shadow_5m",
+        }, 7)]
+        now = main.time.time()
+        prior = int(now // 900) * 900 + 1
+        with patch.object(main, "get_recent_signals", return_value=[
+                {"opened_at": prior}, {"opened_at": prior + 60},
+             ]), patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            self.assertEqual(main._publish_stock_venue_candidates(candidates), 0)
+        send.assert_not_called()
+        blocked.assert_called_once_with(7, "scan_cap")
+
+    def test_production_candidate_precedes_five_minute_shadow(self):
+        candidates = [
+            ({"symbol": "AAPLUSDT", "direction": "SHORT",
+              "source": "stock_venue_shadow_5m"}, 8),
+            ({"symbol": "NVDAUSDT", "direction": "SHORT",
+              "source": "stock_venue_regime"}, 9),
+        ]
+        with patch.object(main, "get_recent_signals", return_value=[
+                {"opened_at": int(main.time.time() // 900) * 900 + 1},
+             ]), patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "mark_setup_blocked") as blocked, \
+             patch.object(main, "_cache_signal"):
+            self.assertEqual(main._publish_stock_venue_candidates(candidates), 1)
+        self.assertEqual(send.call_args.args[0]["source"], "stock_venue_regime")
+        blocked.assert_called_once_with(8, "scan_cap")
 
     def test_stale_environment_cannot_raise_direction_cap(self):
         env = {**os.environ, "MAX_SAME_DIRECTION_POSITIONS": "99"}
@@ -143,6 +308,7 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_existing_direction_exposure_blocks_whole_new_batch(self):
         candidates = [({"symbol": "AAPLUSDT", "direction": "SHORT"}, 1)]
         with patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "get_recent_signals", return_value=[]), \
              patch.object(main, "mark_setup_blocked") as blocked:
             published = main._publish_stock_venue_candidates(
                 candidates, {"SHORT": config.MAX_SAME_DIRECTION_POSITIONS})

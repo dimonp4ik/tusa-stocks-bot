@@ -51,6 +51,13 @@ class StockRegimeFilterTests(unittest.TestCase):
         tp1, tp2, sl = bracket_for_analysis(analysis, 100)
         self.assertEqual((tp1, tp2, sl), (99.0, 99.0, 102.0))
 
+    def test_five_minute_barbell_bracket_separates_lock_and_runner(self):
+        analysis = {"direction": "SHORT", "atr": 2,
+                    "fixed_stop_atr": 1, "fixed_target_r": .5,
+                    "fixed_runner_target_r": 1.0}
+        tp1, tp2, sl = bracket_for_analysis(analysis, 100)
+        self.assertEqual((tp1, tp2, sl), (99.0, 98.0, 102.0))
+
     def test_latest_first_opening_range_break_is_a_market_short(self):
         previous = cash_day(datetime(2026, 8, 3), [100.0] * 26)
         current = cash_day(datetime(2026, 8, 4), [100.0, 100.0, 100.0, 98.0])

@@ -265,9 +265,32 @@ class DatabaseTests(unittest.TestCase):
                 db.init_db()
                 base = dict(symbol='TEST', direction='LONG', current_price=100)
                 live_id = db.log_signal(base, 106, 120, 90)
-                shadow_id = db.log_signal({**base, '_shadow_only': True}, 106, 120, 90)
+                shadow_id = db.log_signal({
+                    **base, '_shadow_only': True,
+                    'strategy_tp1_close_frac': .70,
+                    'strategy_runner_mode': 'fixed_be',
+                    'fixed_runner_target_r': 4.0,
+                    'strategy_bar_seconds': 300,
+                    'strategy_entry_bar_ts': 1234.0,
+                    'strategy_stop_on_close': False,
+                    'strategy_expire_at': 4321.0,
+                }, 106, 120, 90)
                 self.assertEqual(db.get_signal_by_id(live_id)['autotrade_eligible'], 1)
-                self.assertEqual(db.get_signal_by_id(shadow_id)['autotrade_eligible'], 0)
+                row = db.get_signal_by_id(shadow_id)
+                self.assertEqual(row['autotrade_eligible'], 0)
+                self.assertEqual(row['strategy_tp1_close_frac'], .70)
+                self.assertEqual(row['strategy_runner_mode'], 'fixed_be')
+                self.assertEqual(row['strategy_runner_target_r'], 4.0)
+                self.assertEqual(row['strategy_bar_seconds'], 300)
+                self.assertEqual(row['strategy_entry_bar_ts'], 1234.0)
+                self.assertEqual(row['strategy_stop_on_close'], 0)
+                self.assertEqual(row['strategy_expire_at'], 4321.0)
+                db.update_signal_status(
+                    shadow_id, 'TP1_PARTIAL', 106,
+                    runner_activation_bar_ts=1500.0)
+                self.assertEqual(
+                    db.get_signal_by_id(shadow_id)['runner_activation_bar_ts'],
+                    1500.0)
 
 
 if __name__ == '__main__':

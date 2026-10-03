@@ -110,7 +110,16 @@ def init_db():
                 premium       INTEGER DEFAULT 0,
                 atr           REAL,
                 realized_r    REAL,
-                runner_trail_atr_mult REAL
+                runner_trail_atr_mult REAL,
+                strategy_tp1_close_frac REAL,
+                strategy_runner_mode TEXT,
+                strategy_runner_target_r REAL,
+                strategy_bar_seconds INTEGER,
+                strategy_entry_bar_ts REAL,
+                strategy_stop_on_close INTEGER,
+                strategy_max_bars INTEGER,
+                strategy_expire_at REAL,
+                runner_activation_bar_ts REAL
             )
         """)
         # Migrate older DBs
@@ -128,6 +137,18 @@ def init_db():
             "atr":           "REAL",
             "realized_r":    "REAL",
             "runner_trail_atr_mult": "REAL",
+            # Per-signal execution contract for independently audited shadow
+            # families.  Keeping it on the row prevents the global 15m exit
+            # profile from silently changing a 5m forward test after restart.
+            "strategy_tp1_close_frac": "REAL",
+            "strategy_runner_mode": "TEXT",
+            "strategy_runner_target_r": "REAL",
+            "strategy_bar_seconds": "INTEGER",
+            "strategy_entry_bar_ts": "REAL",
+            "strategy_stop_on_close": "INTEGER",
+            "strategy_max_bars": "INTEGER",
+            "strategy_expire_at": "REAL",
+            "runner_activation_bar_ts": "REAL",
             # Signals forced through only to measure a disabled Claude gate stay
             # visible and resolvable, but must never reach a real-money opener.
             "autotrade_eligible": "INTEGER NOT NULL DEFAULT 1",
@@ -495,6 +516,24 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("trend_4h"),
             analysis.get("rsi"),
         ))
+        c.execute("""
+            UPDATE signals SET
+                strategy_tp1_close_frac = ?, strategy_runner_mode = ?,
+                strategy_runner_target_r = ?, strategy_bar_seconds = ?,
+                strategy_entry_bar_ts = ?, strategy_stop_on_close = ?,
+                strategy_max_bars = ?, strategy_expire_at = ?
+            WHERE id = ?
+        """, (
+            analysis.get("strategy_tp1_close_frac"),
+            analysis.get("strategy_runner_mode"),
+            analysis.get("fixed_runner_target_r"),
+            analysis.get("strategy_bar_seconds"),
+            analysis.get("strategy_entry_bar_ts"),
+            analysis.get("strategy_stop_on_close"),
+            analysis.get("strategy_max_bars"),
+            analysis.get("strategy_expire_at"),
+            cur.lastrowid,
+        ))
         if analysis.get("_shadow_only"):
             c.execute("UPDATE signals SET autotrade_eligible=0 WHERE id=?", (cur.lastrowid,))
         return cur.lastrowid
@@ -518,7 +557,7 @@ def get_open_signals() -> list:
 
 
 def update_signal_status(signal_id: int, status: str, exit_price=None, realized_r=None,
-                         runner_trail_atr_mult=None):
+                         runner_trail_atr_mult=None, runner_activation_bar_ts=None):
     """
     Update signal lifecycle.
     TP1_PARTIAL records TP1 but keeps signal active for TP2/BE monitoring.
@@ -533,9 +572,10 @@ def update_signal_status(signal_id: int, status: str, exit_price=None, realized_
             c.execute("""
                 UPDATE signals
                 SET status = 'TP1_PARTIAL', tp1_hit_at = ?, tp1_exit_price = ?,
-                    runner_trail_atr_mult = ?
+                    runner_trail_atr_mult = ?, runner_activation_bar_ts = ?
                 WHERE id = ? AND status = 'OPEN'
-            """, (now, exit_price, runner_trail_atr_mult, signal_id))
+            """, (now, exit_price, runner_trail_atr_mult,
+                  runner_activation_bar_ts, signal_id))
         else:
             c.execute("""
                 UPDATE signals SET status = ?, closed_at = ?, exit_price = ?, realized_r = ?
@@ -1403,14 +1443,16 @@ def get_unresolved_venue_setups(limit: int = 80) -> list:
     timestamp bound: an outage or redeploy must not make an unresolved row
     disappear forever after its expiry window passes.
     """
+    now = time_mod.time()
     with _conn() as c:
         rows = c.execute(
             """SELECT * FROM setup_log
                WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
-                 AND COALESCE(sent,0)=0 AND source='stock_venue_regime'
-                 AND ts <= ?
+                 AND COALESCE(sent,0)=0
+                 AND ((source='stock_venue_regime' AND ts <= ?)
+                      OR (source='stock_venue_shadow_5m' AND ts <= ?))
                ORDER BY ts ASC LIMIT ?""",
-            (time_mod.time() - 900, limit),
+            (now - 900, now - 300, limit),
         ).fetchall()
         return [dict(r) for r in rows]
 

@@ -36,6 +36,10 @@ from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
 )
 from src.stock_venue_router import AUDITED_SYMBOLS, stock_venue_setups
+from src.stock_5m_shadow_router import (
+    AUDITED_SYMBOLS as STOCK_5M_SHADOW_SYMBOLS,
+    shadow_setup as stock_five_minute_shadow_setup,
+)
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
     send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual,
@@ -60,7 +64,7 @@ from src.db import (
     get_unresolved_venue_setups, mark_setup_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct,
-    get_today_sl_streak,
+    get_today_sl_streak, get_recent_signals,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -238,7 +242,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A(f"## ВЛИЯНИЕ ЛИМИТОВ ({window_label})")
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
-                            ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за скан"),
+                            ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за 15 мин"),
                             ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
@@ -406,7 +410,7 @@ def health():
 def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {STOCK_VENUE_FILTER_PROFILE}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
-            f"Max signals/scan: {VENUE_MAX_SIGNALS_PER_SCAN}. "
+            f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
 
 
@@ -948,9 +952,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             chat_id, message_id,
             "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
             f"Режим: *SHADOW / PAPER*\n"
-            f"Профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
+            f"Боевой профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
+            "Теневая проверка: 2 режима на свечах 5m\n"
             "Вход: по текущей рыночной цене\n"
-            f"За один скан: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
+            f"За 15-минутное окно: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
             "Нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
@@ -2654,7 +2659,8 @@ def _post_tp1_trail_mult(direction: str, entry: float, tp1: float, tp2: float,
 
 
 def _deep_feed_breached(symbol: str, sl: float, direction: str,
-                        monitor_from: float, candle_lim: int):
+                        monitor_from: float, candle_lim: int,
+                        stop_close_confirm=None, bar_seconds: int = 900):
     """Did the DEEP global feed also breach this stop? None = unknown.
 
     One implementation for two callers: the sl_xperp_only diagnostic and
@@ -2666,9 +2672,15 @@ def _deep_feed_breached(symbol: str, sl: float, direction: str,
     would answer a different, near-always-yes question.
     """
     try:
-        g = get_klines(symbol, limit=candle_lim)
+        if int(bar_seconds) == 300:
+            g = get_klines(symbol, interval="5m", limit=candle_lim,
+                           interval_sec=300)
+        else:
+            g = get_klines(symbol, limit=candle_lim)
         gd = _slice_candles_from_open(g, monitor_from)
-        if STOP_CLOSE_CONFIRM:
+        close_confirm = (STOP_CLOSE_CONFIRM if stop_close_confirm is None
+                         else bool(stop_close_confirm))
+        if close_confirm:
             return any((float(x) <= sl) if direction == "LONG" else (float(x) >= sl)
                        for x in gd.get("close", []))
         if direction == "LONG":
@@ -2691,8 +2703,9 @@ def _check_open_signals():
         try:
             opened_at  = float(sig["opened_at"])
             age_hours  = (now - opened_at) / 3600
-            # 15m candles = 4 per hour; fetch enough to cover the signal's age
-            candle_lim = max(8, min(220, int(age_hours * 4) + 6))
+            bar_seconds = max(60, int(sig.get("strategy_bar_seconds") or 900))
+            bars_per_hour = max(1, int(round(3600 / bar_seconds)))
+            candle_lim = max(8, min(620, int(age_hours * bars_per_hour) + 6))
             # Judge TP/SL on the X-Perp (user's actual market) — its wicks are
             # what the user's position really experiences. Global feed = fallback.
             # include_forming=True: catch SL/TP touches within the current still-
@@ -2700,8 +2713,16 @@ def _check_open_signals():
             # it to close — was causing SL_HIT notifications to lag the real
             # exchange-side stop fill by minutes (found 2026-07-22 in the sister
             # crypto bot, same code pattern here — ported fix).
-            df_all     = get_klines_xperp(sig["symbol"], limit=candle_lim, include_forming=True) \
-                         or get_klines(sig["symbol"], limit=candle_lim)
+            interval = "5m" if bar_seconds == 300 else "15m"
+            df_all = get_klines_xperp(
+                sig["symbol"], limit=candle_lim, include_forming=True,
+                interval=interval)
+            if not df_all:
+                df_all = (get_klines(sig["symbol"], interval="5m",
+                                     limit=candle_lim, interval_sec=300,
+                                     closed_only=False)
+                          if bar_seconds == 300
+                          else get_klines(sig["symbol"], limit=candle_lim))
 
             # Cache last close price — used by "open trades" display (no extra API call)
             if df_all.get("close"):
@@ -2711,15 +2732,39 @@ def _check_open_signals():
             direction = sig["direction"]
             entry     = float(sig["entry_price"])
             tp1, tp2, sl = float(sig["tp1"]), float(sig["tp2"]), float(sig["sl"])
+            fixed_be_runner = str(sig.get("strategy_runner_mode") or "").lower() == "fixed_be"
 
             # Inspect only candles that opened after signal time (OPEN)
             # or after TP1 was recorded (TP1_PARTIAL) to avoid pre-entry moves
-            monitor_from = opened_at if status == "OPEN" else float(sig.get("tp1_hit_at") or opened_at)
+            if status == "OPEN":
+                monitor_from = float(sig.get("strategy_entry_bar_ts") or opened_at)
+            elif fixed_be_runner:
+                monitor_from = float(sig.get("runner_activation_bar_ts")
+                                     or sig.get("tp1_hit_at") or opened_at)
+            else:
+                monitor_from = float(sig.get("tp1_hit_at") or opened_at)
             df = _slice_candles_from_open(df_all, monitor_from)
+
+            expire_at = float(sig.get("strategy_expire_at") or 0.0)
+            if expire_at:
+                keep = [i for i, stamp in enumerate(df.get("time", []))
+                        if float(stamp) < expire_at]
+                df = {key: [values[i] for i in keep]
+                      for key, values in df.items()}
+            max_bars = int(sig.get("strategy_max_bars") or 0)
+            max_bars_reached = False
+            if max_bars > 0 and len(df.get("time", [])) >= max_bars:
+                last_i = max_bars - 1
+                flags = df.get("confirmed") or []
+                max_bars_reached = (
+                    bool(flags[last_i]) if last_i < len(flags)
+                    else float(df["time"][last_i]) + bar_seconds <= now)
+                df = {key: values[:max_bars] for key, values in df.items()}
 
             new_status   = None
             realized_r   = None
             runner_trail_atr_mult = None   # frozen at TP1 candle, reused next cycles
+            runner_activation_bar_ts = None
             live_trail_stop = None         # current trail level → autotrade SL amend
             exit_px      = df_all["close"][-1] if df_all.get("close") else entry
 
@@ -2729,9 +2774,15 @@ def _check_open_signals():
             risk       = abs(entry - sl)
             tp1_r      = (abs(tp1 - entry) / risk) if risk > 0 else 0.0
             tp2_r      = (abs(tp2 - entry) / risk) if risk > 0 else 0.0
-            tp1_close_frac = max(0.0, min(1.0, float(TP1_CLOSE_FRAC)))
+            strategy_frac = sig.get("strategy_tp1_close_frac")
+            tp1_close_frac = max(0.0, min(1.0, float(
+                TP1_CLOSE_FRAC if strategy_frac is None else strategy_frac)))
             runner_frac    = 1.0 - tp1_close_frac
-            use_trail  = TRAIL_RUNNER_ENABLED and atr > 0 and risk > 0
+            use_trail  = (TRAIL_RUNNER_ENABLED and atr > 0 and risk > 0
+                          and not fixed_be_runner)
+            strategy_stop = sig.get("strategy_stop_on_close")
+            stop_close_confirm = (STOP_CLOSE_CONFIRM if strategy_stop is None
+                                  else bool(strategy_stop))
             best_price = entry   # running peak since TP1
             # Trail multiple: reuse the one frozen at the TP1 candle; legacy rows
             # without it fall back to the flat base and recompute on first bar below.
@@ -2781,7 +2832,7 @@ def _check_open_signals():
                     _is_confirmed = bool(_conf_flags[i])
                 else:
                     _is_confirmed = i < len(df["close"]) - 1
-                if STOP_CLOSE_CONFIRM:
+                if stop_close_confirm:
                     _sl_breached = _is_confirmed and (
                         close <= sl if direction == "LONG" else close >= sl
                     )
@@ -2790,9 +2841,9 @@ def _check_open_signals():
                 # Exit price is the real close when confirmed on a close —
                 # booking it at the SL level would understate the loss. Matters
                 # more here than on crypto: a gap can close far past the level.
-                _sl_exit_px = close if STOP_CLOSE_CONFIRM else sl
+                _sl_exit_px = close if stop_close_confirm else sl
                 _sl_r = -1.0
-                if STOP_CLOSE_CONFIRM and risk > 0:
+                if stop_close_confirm and risk > 0:
                     _sl_r = round(
                         ((_sl_exit_px - entry) if direction == "LONG" else (entry - _sl_exit_px)) / risk,
                         4,
@@ -2806,6 +2857,8 @@ def _check_open_signals():
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if high >= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
+                            if fixed_be_runner:
+                                runner_activation_bar_ts = float(df["time"][i])
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
                     else:
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
@@ -2814,6 +2867,8 @@ def _check_open_signals():
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if low <= tp1:
                             runner_trail_atr_mult = _post_tp1_trail_mult(direction, entry, tp1, tp2, high, low, close)
+                            if fixed_be_runner:
+                                runner_activation_bar_ts = float(df["time"][i])
                             new_status, exit_px = "TP1_PARTIAL", tp1; break
 
                 elif status == "TP1_PARTIAL":
@@ -2844,8 +2899,17 @@ def _check_open_signals():
                                 realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                     else:
-                        # Legacy: SL moved to breakeven, fixed TP2 (no stored ATR).
+                        # The fixed runner can still reach TP2 on the TP1 bar;
+                        # breakeven becomes active only from the next 5m bar.
+                        activation_ts = float(sig.get("runner_activation_bar_ts") or 0.0)
+                        same_activation_bar = (fixed_be_runner and activation_ts
+                                               and float(df["time"][i]) <= activation_ts)
                         if direction == "LONG":
+                            if same_activation_bar:
+                                if high >= tp2:
+                                    realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
+                                    new_status, exit_px = "TP2_HIT", tp2; break
+                                continue
                             if low <= entry:
                                 realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
                                 new_status, exit_px = "BREAKEVEN", entry; break
@@ -2853,6 +2917,11 @@ def _check_open_signals():
                                 realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
                         else:
+                            if same_activation_bar:
+                                if low <= tp2:
+                                    realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
+                                    new_status, exit_px = "TP2_HIT", tp2; break
+                                continue
                             if high >= entry:
                                 realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
                                 new_status, exit_px = "BREAKEVEN", entry; break
@@ -2867,12 +2936,16 @@ def _check_open_signals():
             # SIGNAL_EXPIRY_MAX_DAYS is a hard calendar ceiling on top, so a
             # Friday entry cannot ride ~12 calendar days into its own earnings.
             _session_age = session_hours_between(opened_at, now)
-            if new_status is None and (
+            strategy_expired = (max_bars_reached
+                                or bool(expire_at and now >= expire_at))
+            global_expired = (not max_bars and not expire_at and (
                 _session_age > SIGNAL_EXPIRY_HOURS
-                or (SIGNAL_EXPIRY_MAX_DAYS > 0 and age_hours > SIGNAL_EXPIRY_MAX_DAYS * 24)
-            ):
+                or (SIGNAL_EXPIRY_MAX_DAYS > 0
+                    and age_hours > SIGNAL_EXPIRY_MAX_DAYS * 24)))
+            if new_status is None and (strategy_expired or global_expired):
                 new_status = "TP1_EXPIRED" if status == "TP1_PARTIAL" else "EXPIRED"
-                exit_px = latest_quote
+                exit_px = (float(df["close"][-1])
+                           if strategy_expired and df.get("close") else latest_quote)
                 realized_r = marked_r(direction=direction, entry=entry, exit_price=exit_px,
                     sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac,
                     reached_tp1=status == 'TP1_PARTIAL')
@@ -2885,18 +2958,20 @@ def _check_open_signals():
             if new_status == "SL_HIT":
                 from config import STOP_REQUIRE_GLOBAL_CONFIRM as _REQ_DEEP
                 _deep_ok = _deep_feed_breached(sig["symbol"], sl, direction,
-                                               monitor_from, candle_lim)
+                                               monitor_from, candle_lim,
+                                               stop_close_confirm, bar_seconds)
                 if _REQ_DEEP and _deep_ok is False:
                     log.info(f"  #{sig['id']} {sig['symbol']} — стоп только на X-Perp, "
                              f"глубокий фид не подтверждает, держим")
                     new_status = None
-            if new_status == 'SL_HIT' and STOP_CLOSE_CONFIRM:
+            if new_status == 'SL_HIT' and stop_close_confirm:
                 exit_px = latest_quote
                 realized_r = marked_r(direction=direction, entry=entry,
                     exit_price=exit_px, sl=sl, tp1=tp1)
             if new_status:
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
-                                     runner_trail_atr_mult=runner_trail_atr_mult)
+                                     runner_trail_atr_mult=runner_trail_atr_mult,
+                                     runner_activation_bar_ts=runner_activation_bar_ts)
                 # SL-wick diagnostic: real reversal (deep global feed also breached
                 # SL) or thin-X-Perp execution noise (only X-Perp wicked to it)?
                 if new_status == "SL_HIT" and _deep_ok is not None:
@@ -2931,7 +3006,7 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
 
     This is deliberately narrower than the retired Claude shadow tracker: it
     accepts only the fixed market bracket already persisted by the venue path.
-    The entry can occur inside the first 15-minute candle, so that candle is
+    The entry can occur inside the first strategy candle, so that candle is
     treated conservatively as an intrabar entry and ambiguous stop/target bars
     remain stop-first.
     """
@@ -2942,7 +3017,10 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
     tp2 = float(setup["tp2"])
     opened = float(setup["ts"])
     signal_bar = float(setup.get("signal_bar_ts") or 0.0)
-    entry_bar_open = signal_bar + 900 if signal_bar > 0 else math.floor(opened / 900) * 900
+    five_minute_shadow = setup.get("source") == "stock_venue_shadow_5m"
+    bar_seconds = 300 if five_minute_shadow else 900
+    entry_bar_open = (signal_bar + bar_seconds if signal_bar > 0
+                      else math.floor(opened / bar_seconds) * bar_seconds)
     sliced = _slice_candles_from_open(candles, entry_bar_open)
     if not sliced.get("time"):
         return None
@@ -2952,7 +3030,10 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         entry=entry, sl=stop, tp1=tp1, tp2=tp2,
         atr=float(setup.get("atr") or abs(entry - stop)),
         tp1_fraction=1.0, trail=False, trail_mult=0.0,
-        stop_on_close=STOP_CLOSE_CONFIRM,
+        # The frozen 5m research uses conservative touch stops.  Preserve the
+        # existing production venue exit rule while keeping its forward sample
+        # exactly comparable with the audited strategy.
+        stop_on_close=False if five_minute_shadow else STOP_CLOSE_CONFIRM,
         backstop_r=STOP_EXCHANGE_BACKSTOP_R,
         choose_trail=lambda _h, _l, _c: 0.0,
         intrabar_entry=intrabar,
@@ -2976,15 +3057,21 @@ def _track_unsent_venue_setups() -> None:
         pending = get_unresolved_venue_setups(limit=200)
         if not pending:
             return
-        grouped: dict[str, list[dict]] = {}
+        grouped: dict[tuple[str, int], list[dict]] = {}
         for setup in pending:
-            grouped.setdefault(setup["symbol"], []).append(setup)
+            bar_seconds = (300 if setup.get("source") == "stock_venue_shadow_5m"
+                           else 900)
+            grouped.setdefault((setup["symbol"], bar_seconds), []).append(setup)
         resolved = 0
-        for symbol, setups in grouped.items():
+        for (symbol, bar_seconds), setups in grouped.items():
             oldest = min(float(setup["ts"]) for setup in setups)
-            limit = max(16, min(3000, int((time.time() - oldest) / 900) + 8))
+            limit = max(16, min(3000,
+                                int((time.time() - oldest) / bar_seconds) + 8))
             try:
-                candles = get_klines_xperp(symbol, limit=limit)
+                if bar_seconds == 300:
+                    candles = get_klines_xperp(symbol, limit=limit, interval="5m")
+                else:
+                    candles = get_klines_xperp(symbol, limit=limit)
             except Exception as exc:
                 log.debug("Venue shadow candles failed %s: %s", symbol, exc)
                 continue
@@ -2992,8 +3079,8 @@ def _track_unsent_venue_setups() -> None:
                 continue
             for setup in setups:
                 signal_bar = float(setup.get("signal_bar_ts") or 0.0)
-                needed = signal_bar + 900 if signal_bar > 0 else math.floor(
-                    float(setup["ts"]) / 900) * 900
+                needed = (signal_bar + bar_seconds if signal_bar > 0 else math.floor(
+                    float(setup["ts"]) / bar_seconds) * bar_seconds)
                 if float(candles["time"][0]) > needed:
                     log.warning("Venue shadow history truncated for setup #%s %s",
                                 setup["id"], symbol)
@@ -3017,24 +3104,62 @@ _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 
 def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
     direction = setup["direction"]
+    five_minute_shadow = bool(setup.get("_five_minute_shadow"))
+    runner_target = None
+    expire_at = None
+    if five_minute_shadow:
+        runner_target = {
+            "shadow_stock_5m_range_reversion_short": 1.0,
+            "shadow_stock_5m_trend_pullback_short": 4.0,
+        }.get(setup.get("module"))
+        if runner_target is None:
+            raise ValueError("unknown 5m stock shadow module")
+        from src.market_hours import ET, _close_time_for
+        signal_local = datetime.fromtimestamp(float(setup["signal_bar_ts"]), ET)
+        expire_at = datetime.combine(
+            signal_local.date(), _close_time_for(signal_local.date()),
+            tzinfo=ET,
+        ).timestamp()
+    tags = [f"Venue module {setup['module']}",
+            f"QQQ regime {setup.get('qqq_regime', '?')}",
+            f"Fixed target {setup['target_r']:.2f}R"]
+    if five_minute_shadow:
+        tags.append(f"5m volume ratio {setup['volume_ratio']:.2f}")
+        tags.append(
+            f"Barbell 70% @ {setup['target_r']:.2f}R, "
+            f"runner 30% @ {runner_target:.2f}R")
     return {
         "symbol": symbol, "direction": direction, "decision": direction,
         "confidence": "HIGH", "risk_score": 1,
-        "reason": f"Frozen stock X-Perp module: {setup['module']}",
+        "reason": (f"Forward stock X-Perp shadow module: {setup['module']}"
+                   if five_minute_shadow
+                   else f"Frozen stock X-Perp module: {setup['module']}"),
         "counter": "The recent direct-venue regime may change after entry",
         "current_price": setup["entry"], "market_price": setup["entry"],
         "atr": setup["atr"], "fixed_stop_atr": 1.0,
         "fixed_target_r": setup["target_r"], "entry_source": "MARKET",
+        # Frozen forward-only exit contract selected on dev and confirmed on
+        # validation + untouched hidden data.  Persisting it prevents the
+        # global 15m trail from changing this 5m paper experiment on restart.
+        "fixed_runner_target_r": runner_target,
+        "strategy_tp1_close_frac": .70 if five_minute_shadow else None,
+        "strategy_runner_mode": "fixed_be" if five_minute_shadow else None,
+        "strategy_bar_seconds": 300 if five_minute_shadow else None,
+        "strategy_entry_bar_ts": (
+            float(setup["signal_bar_ts"]) + 300
+            if five_minute_shadow else None),
+        "strategy_stop_on_close": False if five_minute_shadow else None,
+        "strategy_expire_at": expire_at,
         "entry_low": setup["entry"], "entry_high": setup["entry"],
         "mtf_score": 18, "mtf_score_max": 18, "rsi": 50,
         "volume_ratio": 1.0, "session": "NEW_YORK",
         "swing_trend": "bull" if direction == "LONG" else "bear",
-        "signals": [f"Venue module {setup['module']}",
-                    f"QQQ regime {setup.get('qqq_regime', '?')}",
-                    f"Fixed target {setup['target_r']:.2f}R"],
-        "source": "stock_venue_regime",
+        "signals": tags,
+        "source": ("stock_venue_shadow_5m" if five_minute_shadow
+                   else "stock_venue_regime"),
         "signal_bar_ts": float(setup["signal_bar_ts"]),
-        "_shadow_only": DEPLOYMENT_MODE == "shadow",
+        "_shadow_only": five_minute_shadow or DEPLOYMENT_MODE == "shadow",
+        "_five_minute_shadow": five_minute_shadow,
     }
 
 
@@ -3043,10 +3168,22 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
     """Publish at most the historically replayed number of entries per scan."""
     published = 0
     direction_counts = dict(open_direction_counts or {})
+    scan_count = 0
+    if candidates:
+        try:
+            scan_bucket = int(time.time() // 900)
+            scan_count = sum(
+                int(float(row.get("opened_at") or 0) // 900) == scan_bucket
+                for row in get_recent_signals(limit=100))
+        except Exception as exc:
+            log.warning("Stock venue persistent scan count unavailable: %s", exc)
+            scan_count = VENUE_MAX_SIGNALS_PER_SCAN
+    source_priority = {"stock_venue_regime": 0, "stock_venue_shadow_5m": 1}
     ordered = sorted(candidates, key=lambda item: (
+        source_priority.get(item[0].get("source", "stock_venue_regime"), 1),
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
-        if published >= VENUE_MAX_SIGNALS_PER_SCAN:
+        if scan_count >= VENUE_MAX_SIGNALS_PER_SCAN:
             # This persistent block prevents the same 15m candle from being
             # offered again by the next five-minute scheduler tick.
             mark_setup_blocked(setup_id, "scan_cap")
@@ -3064,6 +3201,7 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         if signal_id:
             link_setup_to_signal(setup_id, signal_id)
         published += 1
+        scan_count += 1
         direction_counts[direction] = direction_counts.get(direction, 0) + 1
     return published
 
@@ -3090,20 +3228,28 @@ def _run_stock_venue_strategy_scan() -> None:
     targets = sorted(s for s in AUDITED_SYMBOLS if s[:-4] in available)
     fetch_symbols = sorted(set(targets) | {"QQQUSDT", "SPYUSDT"})
     fetched = {}
+    fetched_5m = {}
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
     def _fetch(symbol: str):
-        return symbol, get_klines_xperp(symbol, limit=3000)
+        fifteen = get_klines_xperp(symbol, limit=3000)
+        five = (get_klines_xperp(symbol, limit=110, interval="5m")
+                if DEPLOYMENT_MODE == "shadow"
+                and symbol in STOCK_5M_SHADOW_SYMBOLS else None)
+        return symbol, fifteen, five
     with ThreadPoolExecutor(max_workers=2) as pool:
         for future in as_completed([pool.submit(_fetch, symbol) for symbol in fetch_symbols]):
             try:
-                symbol, candles = future.result()
+                symbol, candles, candles_5m = future.result()
                 if candles:
                     fetched[symbol] = candles
+                if candles_5m:
+                    fetched_5m[symbol] = candles_5m
             except Exception as exc:
                 log.warning("Stock venue candle fetch failed: %s", exc)
 
     qqq, spy = fetched.get("QQQUSDT"), fetched.get("SPYUSDT")
+    qqq_5m = fetched_5m.get("QQQUSDT")
     if not qqq or not spy:
         log.warning("Stock venue scan refused: QQQ/SPY context is unavailable")
         return
@@ -3129,8 +3275,9 @@ def _run_stock_venue_strategy_scan() -> None:
                 candles, qqq, spy, market_price=float(market),
                 profile=STOCK_VENUE_FILTER_PROFILE, symbol=symbol,
             )
+            fresh_production = False
             for row in rows:
-                row["signal_bar_ts"] = candles["time"][-1]
+                row.setdefault("signal_bar_ts", candles["time"][-1])
                 analysis = _stock_venue_analysis(symbol, row)
                 setup_id = log_setup_candidate_once(analysis)
                 if not setup_id:
@@ -3140,6 +3287,23 @@ def _run_stock_venue_strategy_scan() -> None:
                     mark_setup_blocked(setup_id, "cooldown")
                     continue
                 candidates.append((analysis, setup_id))
+                fresh_production = True
+            candles_5m = fetched_5m.get(symbol)
+            if (not fresh_production and DEPLOYMENT_MODE == "shadow"
+                    and qqq_5m and candles_5m):
+                five_minute = stock_five_minute_shadow_setup(
+                    candles_5m, qqq_5m,
+                    entry_time=float(candles_5m["time"][-1]) + 300,
+                    market_price=float(market), symbol=symbol)
+                if five_minute:
+                    analysis = _stock_venue_analysis(symbol, five_minute)
+                    setup_id = log_setup_candidate_once(analysis)
+                    if setup_id:
+                        analysis["_setup_log_id"] = setup_id
+                        if _venue_signal_on_cooldown(symbol, analysis["direction"]):
+                            mark_setup_blocked(setup_id, "cooldown")
+                        else:
+                            candidates.append((analysis, setup_id))
         except Exception as exc:
             log.warning("Stock venue strategy failed for %s: %s", symbol, exc)
     published = _publish_stock_venue_candidates(candidates, open_direction_counts)

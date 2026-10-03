@@ -35,7 +35,7 @@ class SetupDedupTests(unittest.TestCase):
         self.assertEqual(sum(item is not None for item in ids), 1)
         self.assertEqual(rows, 1)
 
-    def test_unresolved_venue_query_keeps_old_rows_and_excludes_other_sources(self):
+    def test_unresolved_venue_query_keeps_both_active_sources_and_excludes_others(self):
         base = {
             "symbol": "TESTUSDT", "direction": "SHORT", "decision": "SHORT",
             "current_price": 100.0, "atr": 1.0, "fixed_stop_atr": 1.0,
@@ -51,6 +51,10 @@ class SetupDedupTests(unittest.TestCase):
                     **base, "signal_bar_ts": 1_700_000_000.0,
                     "source": "stock_venue_regime",
                 })
+                five_minute_id = db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": 1_700_000_300.0,
+                    "source": "stock_venue_shadow_5m",
+                })
                 db.log_setup_candidate_once({
                     **base, "signal_bar_ts": 1_700_000_900.0,
                     "source": "retired_strategy",
@@ -60,7 +64,37 @@ class SetupDedupTests(unittest.TestCase):
                                  (db.time_mod.time() - 10 * 86400,))
                 rows = db.get_unresolved_venue_setups()
 
-        self.assertEqual([row["id"] for row in rows], [venue_id])
+        self.assertCountEqual([row["id"] for row in rows],
+                              [venue_id, five_minute_id])
+
+    def test_five_minute_row_is_eligible_before_fifteen_minute_row(self):
+        base = {
+            "symbol": "TESTUSDT", "direction": "SHORT", "decision": "SHORT",
+            "current_price": 100.0, "atr": 1.0, "fixed_stop_atr": 1.0,
+            "fixed_target_r": 1.0,
+        }
+        now = 2_000_000_000.0
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "venue_age.db")
+            with patch.object(db, "DB_PATH", path), \
+                    patch("src.telegram_notifier.bracket_for_analysis",
+                          return_value=(99.0, 99.0, 101.0)):
+                db.init_db()
+                venue_id = db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": now - 900,
+                    "source": "stock_venue_regime",
+                })
+                five_minute_id = db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": now - 600,
+                    "source": "stock_venue_shadow_5m",
+                })
+                with db._conn() as conn:
+                    conn.execute("UPDATE setup_log SET ts=? WHERE id IN (?, ?)",
+                                 (now - 600, venue_id, five_minute_id))
+                with patch.object(db.time_mod, "time", return_value=now):
+                    rows = db.get_unresolved_venue_setups()
+
+        self.assertEqual([row["id"] for row in rows], [five_minute_id])
 
 
 if __name__ == "__main__":

@@ -49,6 +49,8 @@ _working_host = {"url": None}
 # NOTE: OKX 1D default is UTC+8 aligned — "1Dutc" keeps daily candles on UTC
 # boundaries (same as the old Bybit feed, so the daily trend filter is unmoved).
 TIMEFRAME_MAP = {
+    "5m":    "5m",
+    "5min":  "5m",
     "15min": "15m",
     "1h":    "1H",
     "1hour": "1H",
@@ -335,8 +337,8 @@ def get_klines(symbol, interval=TIMEFRAME_KUCOIN, limit=KLINES_LIMIT,
     }
 
 
-def get_klines_xperp(symbol, limit=60, include_forming=False):
-    """Closed 15m candles of the X-Perp contract (the user's actual market).
+def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
+    """Closed candles of the X-Perp contract (the user's actual market).
 
     Used by the open-position monitor so TP/SL hits are judged on the prices
     the user's position actually experiences (X-Perp wicks can differ slightly
@@ -355,9 +357,11 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
     for logic that specifically wants a settled/closed candle's close price.
     """
     try:
-        cache_key = ("xperp", symbol, limit)
+        bar = TIMEFRAME_MAP.get(interval, interval)
+        interval_seconds = {"5m": 300, "15m": 900, "1H": 3600}.get(bar, 900)
+        cache_key = ("xperp", symbol, bar, limit)
         if not include_forming:
-            cached = _kl_cache_get(cache_key, 15 * 60)
+            cached = _kl_cache_get(cache_key, interval_seconds)
             if cached is not None:
                 return cached
         inst_id = get_xperp_instruments().get(_base_of(symbol))
@@ -367,7 +371,7 @@ def get_klines_xperp(symbol, limit=60, include_forming=False):
         raw_newest_first = []
         after = None
         while len(raw_newest_first) < want:
-            params = {"instId": inst_id, "bar": "15m",
+            params = {"instId": inst_id, "bar": bar,
                       "limit": min(want - len(raw_newest_first), 300)}
             if after is not None:
                 params["after"] = after

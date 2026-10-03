@@ -56,6 +56,21 @@ class VenueShadowTrackerTests(unittest.TestCase):
         self.assertEqual(value[:3], ("EXPIRED", 0, 0))
         self.assertAlmostEqual(value[3], .2)
 
+    def test_five_minute_shadow_uses_next_5m_bar_and_touch_stop(self):
+        setup = {
+            **self.setup(), "source": "stock_venue_shadow_5m",
+            "ts": 1230.0, "signal_bar_ts": 900.0,
+        }
+        candles = {
+            "time": [900, 1200], "open": [100.0, 100.0],
+            "high": [101.5, 100.5], "low": [99.5, 98.8],
+            "close": [101.0, 100.2], "volume": [1.0, 1.0],
+        }
+        with patch.object(main, "STOP_CLOSE_CONFIRM", True):
+            value = main._resolve_unsent_venue_setup(setup, candles, now=1600)
+        self.assertEqual(value[:3], ("SL", 0, 0))
+        self.assertAlmostEqual(value[3], -1.0)
+
     def test_worker_only_persists_outcome(self):
         rows = [self.setup()]
         candles = self.candles(high=101.2, low=99.5, close=101.0)
@@ -67,6 +82,25 @@ class VenueShadowTrackerTests(unittest.TestCase):
             main._track_unsent_venue_setups()
         resolved.assert_called_once_with(7, "TP2", 1, 1, net_r=1.0)
         sent.assert_not_called()
+
+    def test_worker_fetches_five_minute_history_for_five_minute_source(self):
+        setup = {
+            **self.setup(), "source": "stock_venue_shadow_5m",
+            "ts": 1230.0, "signal_bar_ts": 900.0,
+        }
+        candles = {
+            "time": [1200], "open": [100.0], "high": [101.2],
+            "low": [99.5], "close": [101.0], "volume": [1.0],
+        }
+        with patch.object(main, "get_unresolved_venue_setups",
+                          return_value=[setup]), \
+                patch.object(main, "get_klines_xperp",
+                             return_value=candles) as fetch, \
+                patch.object(main, "mark_setup_resolved") as resolved, \
+                patch.object(main.time, "time", return_value=1600):
+            main._track_unsent_venue_setups()
+        self.assertEqual(fetch.call_args.kwargs["interval"], "5m")
+        resolved.assert_called_once_with(7, "TP2", 1, 1, net_r=1.0)
 
 
 if __name__ == "__main__":

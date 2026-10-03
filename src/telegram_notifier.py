@@ -123,13 +123,15 @@ def bracket_for_analysis(analysis: dict, price: float):
     stop_atr = analysis.get("fixed_stop_atr")
     if target_r is not None and stop_atr is not None:
         target_r = float(target_r)
+        runner_r = float(analysis.get("fixed_runner_target_r") or target_r)
         risk = float(analysis.get("atr") or 0) * float(stop_atr)
-        if price <= 0 or target_r <= 0 or risk <= 0 or risk >= price:
+        if price <= 0 or target_r <= 0 or runner_r <= 0 or risk <= 0 or risk >= price:
             raise ValueError("invalid fixed-R bracket")
         sign = 1 if analysis.get("direction") == "LONG" else -1
         target = price + sign * risk * target_r
+        runner = price + sign * risk * runner_r
         stop = price - sign * risk
-        return round(target, 8), round(target, 8), round(stop, 8)
+        return round(target, 8), round(runner, 8), round(stop, 8)
     return calculate_tp_sl(
         price, analysis.get("direction", ""),
         float(analysis.get("atr", 0.0) or 0.0),
@@ -226,13 +228,27 @@ def send_signal(analysis: dict) -> bool:
                        for item in analysis.get("signals", [])
                        if str(item).startswith("Venue module ")), "frozen_filter")
         timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
+        runner_r = analysis.get("fixed_runner_target_r")
+        if runner_r is not None:
+            lock_pct = round(100 * float(
+                analysis.get("strategy_tp1_close_frac") or 0.0))
+            target_text = (
+                f"🎯 TP1, закрыть {lock_pct}%: `{_format_price(tp1)}` "
+                f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+                f"🏃 TP2, остаток {100 - lock_pct}%: `{_format_price(tp2)}` "
+                f"(`{float(runner_r):.2f}R`)\n"
+            )
+        else:
+            target_text = (
+                f"🎯 Цель: `{_format_price(tp2)}` "
+                f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+            )
         message = (
             "🧪 *ТЕНЕВОЙ СИГНАЛ — ОРДЕР НЕ ОТКРЫТ*\n"
             f"{arrow} — *{_disp_sym(analysis['symbol'])}*\n"
             "━━━━━━━━━━━━━━━━━━━\n"
             f"💰 Вход по рынку: `{_format_price(price)}`\n"
-            f"🎯 Цель: `{_format_price(tp2)}` "
-            f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+            f"{target_text}"
             f"🛑 Стоп: `{_format_price(sl)}`\n"
             f"🧩 Фильтр: `{_esc(module)}`\n"
             "━━━━━━━━━━━━━━━━━━━\n"
@@ -367,23 +383,40 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     arrow = "🟢" if direction == "LONG" else "🔴"
     timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
     sign = "+" if lev_profit >= 0 else ""
+    strategy_frac = sig.get("strategy_tp1_close_frac")
+    fixed_be_runner = str(sig.get("strategy_runner_mode") or "").lower() == "fixed_be"
+    lock_pct = (round(100 * float(strategy_frac))
+                if strategy_frac is not None else 0)
+    runner_pct = 100 - lock_pct
 
     if new_status == "TP1_PARTIAL":
         icon  = "✅"
         title = "TP1 ДОСТИГНУТ"
-        body  = (
-            f"Цена дошла до `{_format_price(exit_price)}`\n"
-            f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
-            f"🛡 Позиция остаётся ПОЛНОСТЬЮ открытой — 100% объёма\n"
-            f"🔄 Включён автоматический трейлинг-стоп "
-            f"(минимум — вход `{_format_price(entry)}`, дальше подтягивается по силе движения)\n"
-            f"Цель: TP2 `{_format_price(tp2)}`"
-        )
+        if fixed_be_runner and strategy_frac is not None:
+            body = (
+                f"Цена дошла до `{_format_price(exit_price)}`\n"
+                f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
+                f"✅ Зафиксировано {lock_pct}% позиции\n"
+                f"🛡 Остаток {runner_pct}% защищён безубытком от следующей 5m свечи\n"
+                f"Цель остатка: TP2 `{_format_price(tp2)}`"
+            )
+        else:
+            body  = (
+                f"Цена дошла до `{_format_price(exit_price)}`\n"
+                f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
+                f"🛡 Позиция остаётся ПОЛНОСТЬЮ открытой — 100% объёма\n"
+                f"🔄 Включён автоматический трейлинг-стоп "
+                f"(минимум — вход `{_format_price(entry)}`, дальше подтягивается по силе движения)\n"
+                f"Цель: TP2 `{_format_price(tp2)}`"
+            )
     elif new_status == "TP2_HIT":
         icon  = "🎯"
         title = "TP2 ДОСТИГНУТ"
+        closed_text = (f"Закрыт остаток {runner_pct}%"
+                       if fixed_be_runner and strategy_frac is not None
+                       else "Закрыто 100%")
         body  = (
-            f"Закрыто 100% по `{_format_price(exit_price)}`\n"
+            f"{closed_text} по `{_format_price(exit_price)}`\n"
             f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
             f"✅ Сделка полностью закрыта"
         )
@@ -403,13 +436,14 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         )
     elif new_status == "EXPIRED":
         icon  = "⌛"
-        title = "ИСТЁК (48ч)"
+        title = ("ИСТЁК (конец сессии)"
+                 if sig.get("strategy_expire_at") else "ИСТЁК")
         body  = f"Цена: `{_format_price(exit_price)}`  — цель не достигнута"
     elif new_status == "TP1_EXPIRED":
         icon  = "⏳"
         title = "TP1 ИСТЁК"
         body  = (
-            f"TP1 был взят, TP2 не достигнут за 48ч\n"
+            f"TP1 был взят, TP2 не достигнут до окончания стратегии\n"
             f"Цена: `{_format_price(exit_price)}`"
         )
     elif new_status == "TP1_TRAIL":

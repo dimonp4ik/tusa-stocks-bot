@@ -323,6 +323,24 @@ class StockVenueRouterTests(unittest.TestCase):
         self.assertEqual(with_forming["time"], [2, 3, 4, 5])
         self.assertEqual(with_forming["confirmed"], [1, 1, 1, 0])
 
+    def test_xperp_five_minute_fetch_uses_requested_bar(self):
+        def row(timestamp):
+            value = float(timestamp)
+            return [str(timestamp * 1000), str(value), str(value + 1),
+                    str(value - 1), str(value), "0", "1", "0", "1"]
+
+        page = [row(timestamp) for timestamp in range(5, 0, -1)]
+        with binance_client._kl_lock:
+            binance_client._kl_cache.clear()
+        with patch.object(binance_client, "get_xperp_instruments",
+                          return_value={"AAPL": "AAPL_USD_UM_XPERP-15SEP26"}), \
+                patch.object(binance_client, "_okx_get",
+                             return_value={"data": page}) as request:
+            candles = binance_client.get_klines_xperp(
+                "AAPLUSDT", limit=3, interval="5m")
+        self.assertEqual(candles["time"], [3, 4, 5])
+        self.assertEqual(request.call_args.args[1]["bar"], "5m")
+
 
 if __name__ == "__main__":
     unittest.main()
