@@ -55,6 +55,26 @@ class StockVenueRouterTests(unittest.TestCase):
             self.assertEqual(stock_venue_setups({"time": []}, {}, {}, market_price=100.0,
                                                 profile="precision"), [])
 
+    def test_micro_target_is_never_published(self):
+        row = {
+            "family": "opening_drive", "direction": "SHORT",
+            "qqq_regime": "bear", "session_bucket": "00_30",
+            "trend_5_20_dir_atr": 1.2,
+        }
+        with patch("src.stock_venue_router._latest_family_rows",
+                   return_value=[row]), \
+                patch("src.stock_venue_router.attach_market_context"), \
+                patch("src.stock_venue_router.attach_intraday_market_context"), \
+                patch("src.stock_venue_router.market_context_by_day",
+                      return_value={}), \
+                patch("src.stock_venue_router.market_intraday_context_by_time",
+                      return_value={}), \
+                patch("src.stock_venue_router.atr_at", return_value=.1):
+            setups = stock_venue_setups(
+                {"time": []}, {}, {}, market_price=100.0,
+                profile="profit")
+        self.assertEqual(setups, [])
+
     def test_balanced_profile_has_frozen_targets_and_no_gap_fade(self):
         self.assertEqual(len(BALANCED_MODULES), 5)
         self.assertNotIn("gap_fade", {module.family for module in BALANCED_MODULES})

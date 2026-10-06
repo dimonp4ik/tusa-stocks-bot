@@ -246,6 +246,7 @@ ROBUST_FREQUENCY_EXCLUDED_SYMBOLS = frozenset({
 # this are virtually absent from the 2017-2026 cash-session dataset and expose
 # the thin-overnight X-Perp denominator failure seen in September forward data.
 MAX_INDEX_INTRADAY_MOVE_ATR = 12.0
+MIN_FIRST_TARGET_MOVE_PCT = .50
 GAP_FADE_EXHAUSTION_PRIOR_DAY_ATR = 0.5
 GAP_FADE_EXHAUSTION_MAX_QQQ_VOL_RATIO = 1.0
 PROFILE_MODULES = {
@@ -454,10 +455,13 @@ def stock_venue_setups(candles: dict, qqq_candles: dict, spy_candles: dict, *,
             sign = 1 if row["direction"] == "LONG" else -1
             stop = entry - sign * risk
             target = entry + sign * risk * target_r
-            if min(stop, target) <= 0:
+            first_target_move_pct = 100.0 * risk * target_r / entry
+            if (min(stop, target) <= 0
+                    or first_target_move_pct < MIN_FIRST_TARGET_MOVE_PCT):
                 continue
             return [{**row, "module": module.name, "entry_source": "MARKET",
                      "entry": entry, "sl": stop, "tp": target,
                      "atr": risk, "target_r": target_r,
+                     "first_target_move_pct": first_target_move_pct,
                      "profile": profile}]
     return []

@@ -3276,12 +3276,12 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
     tags = [f"Venue module {setup['module']}",
             f"QQQ regime {setup.get('qqq_regime', '?')}",
             f"Fixed target {setup['target_r']:.2f}R"]
+    first_target_move_pct = float(setup.get("first_target_move_pct") or (
+        100.0 * float(setup["atr"]) * float(setup["target_r"])
+        / float(setup["entry"])))
+    tags.append(f"First target move {first_target_move_pct:.2f}%")
     if five_minute_shadow:
-        first_target_move_pct = float(setup.get("first_target_move_pct") or (
-            100.0 * float(setup["atr"]) * float(setup["target_r"])
-            / float(setup["entry"])))
         tags.append(f"5m volume ratio {setup['volume_ratio']:.2f}")
-        tags.append(f"First target move {first_target_move_pct:.2f}%")
         tags.append(
             f"Barbell 70% @ {setup['target_r']:.2f}R, "
             f"runner 30% @ {runner_target:.2f}R")
