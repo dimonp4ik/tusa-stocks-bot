@@ -345,6 +345,29 @@ def init_db():
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
+        # Independent forward outcomes for frozen shadow exit candidates.
+        # A variant is attached to the immutable setup row and is never read by
+        # the order path.  This lets a three-target candidate accumulate honest
+        # forward evidence beside the currently published two-target bracket.
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS shadow_exit_variants (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                setup_log_id INTEGER NOT NULL,
+                variant      TEXT NOT NULL,
+                policy_json  TEXT NOT NULL,
+                created_at   REAL NOT NULL,
+                resolved     INTEGER NOT NULL DEFAULT 0,
+                outcome      TEXT,
+                net_r        REAL,
+                resolved_ts  REAL,
+                UNIQUE(setup_log_id, variant)
+            )
+        """)
+        c.execute("""
+            CREATE INDEX IF NOT EXISTS idx_shadow_exit_variants_pending
+            ON shadow_exit_variants(resolved, created_at)
+        """)
+
         # ── Autotrading: allow-listed users + their encrypted OKX keys ───────
         # allowed  — admin put the user on the list (gate for the DM button)
         # active   — onboarding finished, bot opens real positions
@@ -1283,6 +1306,23 @@ def _insert_setup_candidate(c, values: tuple) -> int:
     return cur.lastrowid
 
 
+def _insert_shadow_exit_variant(c, setup_log_id: int,
+                                variant: dict | None) -> None:
+    """Attach a paper-only exit contract to an immutable setup, idempotently."""
+    if not variant:
+        return
+    name = str(variant.get("name") or "").strip()
+    if not name:
+        raise ValueError("shadow exit variant requires a name")
+    c.execute("""
+        INSERT OR IGNORE INTO shadow_exit_variants
+            (setup_log_id, variant, policy_json, created_at)
+        VALUES (?, ?, ?, ?)
+    """, (int(setup_log_id), name,
+          json.dumps(variant, sort_keys=True, separators=(",", ":")),
+          time_mod.time()))
+
+
 def log_setup_candidate(analysis: dict) -> int:
     """Log a setup that reached Claude (before/after verdict). Returns row id.
 
@@ -1292,7 +1332,10 @@ def log_setup_candidate(analysis: dict) -> int:
     """
     values = _prepared_setup_candidate(analysis)
     with _conn() as c:
-        return _insert_setup_candidate(c, values)
+        setup_id = _insert_setup_candidate(c, values)
+        _insert_shadow_exit_variant(
+            c, setup_id, analysis.get("shadow_exit_variant"))
+        return setup_id
 
 
 def log_setup_candidate_once(analysis: dict) -> int | None:
@@ -1315,8 +1358,46 @@ def log_setup_candidate_once(analysis: dict) -> int | None:
              analysis.get("direction", ""), float(signal_bar_ts)),
         ).fetchone()
         if row:
+            _insert_shadow_exit_variant(
+                c, int(row["id"]), analysis.get("shadow_exit_variant"))
             return None
-        return _insert_setup_candidate(c, values)
+        setup_id = _insert_setup_candidate(c, values)
+        _insert_shadow_exit_variant(
+            c, setup_id, analysis.get("shadow_exit_variant"))
+        return setup_id
+
+
+def get_unresolved_shadow_exit_variants(limit: int = 200) -> list:
+    """Return paper-only exit candidates with their immutable setup inputs."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT v.id AS variant_id, v.variant, v.policy_json,
+                   s.id AS setup_log_id, s.ts, s.symbol, s.direction,
+                   s.entry_price, s.tp1, s.tp2, s.sl, s.atr,
+                   s.signal_bar_ts, s.source
+            FROM shadow_exit_variants v
+            JOIN setup_log s ON s.id = v.setup_log_id
+            WHERE v.resolved = 0
+            ORDER BY v.created_at ASC
+            LIMIT ?
+        """, (int(limit),)).fetchall()
+        output = []
+        for row in rows:
+            item = dict(row)
+            item["policy"] = json.loads(item.pop("policy_json"))
+            output.append(item)
+        return output
+
+
+def mark_shadow_exit_variant_resolved(variant_id: int, outcome: str,
+                                      net_r: float) -> None:
+    """Store one terminal paper outcome without touching the live signal."""
+    with _conn() as c:
+        c.execute("""
+            UPDATE shadow_exit_variants
+            SET resolved=1, outcome=?, net_r=?, resolved_ts=?
+            WHERE id=? AND resolved=0
+        """, (str(outcome), float(net_r), time_mod.time(), int(variant_id)))
 
 
 def mark_setup_blocked(setup_log_id: int, reason: str) -> None:

@@ -20,7 +20,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--targets", default=".25,.5,.75,1.0",
+                        help="Comma-separated R targets for the replay")
     args = parser.parse_args()
+    targets = tuple(float(value) for value in args.targets.split(","))
+    if not targets or any(value <= 0 for value in targets):
+        parser.error("targets must contain positive numbers")
     manifest_raw = args.manifest.read_bytes()
     manifest = json.loads(manifest_raw)
     source_meta = manifest["symbols"]
@@ -51,7 +56,7 @@ def main() -> None:
             digest = hashlib.sha256(raw).hexdigest()
             if digest != meta["sha256"]:
                 raise ValueError(f"{symbol}: cache hash changed after manifest creation")
-            rows = replay(pickle.loads(raw), symbol)
+            rows = replay(pickle.loads(raw), symbol, targets=targets)
             attach_market_context(rows, qqq_context)
             attach_intraday_market_context(rows, qqq_intraday, "qqq")
             attach_intraday_market_context(rows, spy_intraday, "spy")
@@ -82,11 +87,12 @@ def main() -> None:
         "symbol_rows": symbol_counts,
         "year_target_rows": {
             str(year): {str(target): counts[(year, target)]
-                        for target in (.25, .5, .75, 1.0)}
+                        for target in targets}
             for year in sorted({key[0] for key in counts})
         },
         "method": ("next 15-minute bar market-entry proxy; causal prior-session QQQ "
                    "and exact closed-bar intraday QQQ/SPY context"),
+        "targets_r": targets,
         "limitations": [
             "Dukascopy validates long-run session structure; exact entries require X-Perp transfer checks.",
             "MRVL history begins in 2022 and MU history begins in late 2017.",

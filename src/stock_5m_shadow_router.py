@@ -28,6 +28,16 @@ PULLBACK_QQQ_TREND_DIR_ATR_MAX = 2.750618811881214
 PULLBACK_VOLUME_RATIO_MAX = .6818181818181818
 PULLBACK_STOP_ATR = 2.0
 PULLBACK_TARGET_R = .25
+MIN_FIRST_TARGET_MOVE_PCT = .50
+PULLBACK_LADDER_TREND_MIN = 4.805659570596825
+PULLBACK_LADDER_VARIANT = "stock_5m_pullback_ladder_v1"
+PULLBACK_LADDER_POLICY = {
+    "first_fraction": .50,
+    "mid_fraction": .20,
+    "far_fraction": .30,
+    "mid_target_r": .50,
+    "far_target_r": 4.0,
+}
 
 
 def _mean(values: list[float]) -> float:
@@ -140,6 +150,7 @@ def candidate_context(candles: dict, qqq_candles: dict,
     if (pullback_fresh
             and qqq_trend_dir <= PULLBACK_QQQ_TREND_DIR_ATR_MAX
             and values["volume_ratio"] <= PULLBACK_VOLUME_RATIO_MAX):
+        trend_dir_atr = -(values["ma20"] - values["ma96"]) / values["atr"]
         return {
             "module": PULLBACK_MODULE,
             "family": "trend_pullback",
@@ -151,6 +162,7 @@ def candidate_context(candles: dict, qqq_candles: dict,
             "signal_minutes": signal_minutes,
             "signal_bar_ts": signal_time,
             "qqq_trend_dir_atr": qqq_trend_dir,
+            "trend_dir_atr": trend_dir_atr,
         }
     return None
 
@@ -164,14 +176,27 @@ def shadow_setup(candles: dict, qqq_candles: dict, *, entry_time: float,
     risk = context["source_atr"] * context["stop_atr_mult"]
     if not math.isfinite(risk) or risk <= 0 or risk >= entry:
         return None
-    return {
+    first_target_move_pct = 100.0 * risk * float(context["target_r"]) / entry
+    if first_target_move_pct < MIN_FIRST_TARGET_MOVE_PCT:
+        return None
+    setup = {
         **context,
         "symbol": symbol,
         "entry": entry,
         "atr": risk,
         "entry_time": float(entry_time),
+        "first_target_move_pct": first_target_move_pct,
         "qqq_regime": "5m_regime",
         "eff_ratio": _features(candles, len(candles["close"]) - 1)["efficiency"],
         "_shadow_experiment": True,
         "_five_minute_shadow": True,
     }
+    if (context["module"] == PULLBACK_MODULE
+            and float(context["trend_dir_atr"]) >= PULLBACK_LADDER_TREND_MIN):
+        setup["_shadow_exit_variant"] = {
+            "name": PULLBACK_LADDER_VARIANT,
+            **PULLBACK_LADDER_POLICY,
+            "observed_trend_dir_atr": float(context["trend_dir_atr"]),
+            "condition_trend_dir_atr_min": PULLBACK_LADDER_TREND_MIN,
+        }
+    return setup

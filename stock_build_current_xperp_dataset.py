@@ -22,7 +22,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache-dir", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--targets", default=".25,.5,.75,1.0",
+                        help="Comma-separated R targets for the replay")
     args = parser.parse_args()
+    targets = tuple(float(value) for value in args.targets.split(","))
+    if not targets or any(value <= 0 for value in targets):
+        parser.error("targets must contain positive numbers")
     caches = {}
     sources = {}
     for path in sorted(args.cache_dir.glob("*_15min_current.pkl")):
@@ -32,7 +37,7 @@ def main() -> None:
         sources[str(path)] = hashlib.sha256(raw).hexdigest()
     rows = []
     for symbol, candles in caches.items():
-        rows.extend(replay(candles, symbol, execution=candles))
+        rows.extend(replay(candles, symbol, targets=targets, execution=candles))
     if "QQQUSDT" in caches:
         attach_market_context(rows, market_context_by_day(caches["QQQUSDT"]))
         attach_intraday_market_context(
@@ -46,6 +51,7 @@ def main() -> None:
     month = pd.to_datetime(frame["entry_time"], unit="s", utc=True).dt.strftime("%Y-%m")
     report = {
         "status": "DIRECT_CURRENT_XPERP_FAMILIES",
+        "targets_r": targets,
         "rows": len(frame), "symbols": sorted(caches),
         "range": [pd.to_datetime(frame["entry_time"].min(), unit="s", utc=True).isoformat(),
                   pd.to_datetime(frame["entry_time"].max(), unit="s", utc=True).isoformat()],

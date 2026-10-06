@@ -11,6 +11,37 @@ from src import db
 
 
 class SetupDedupTests(unittest.TestCase):
+    def test_shadow_exit_variant_is_attached_once_to_deduplicated_setup(self):
+        analysis = {
+            "symbol": "TESTUSDT", "direction": "SHORT", "decision": "SHORT",
+            "current_price": 100.0, "atr": 1.0, "fixed_stop_atr": 1.0,
+            "fixed_target_r": .25, "signal_bar_ts": 1_700_000_000.0,
+            "source": "stock_venue_shadow_5m",
+            "shadow_exit_variant": {
+                "name": "candidate_v1", "first_fraction": .5,
+                "mid_fraction": .2, "far_fraction": .3,
+                "mid_target_r": .5, "far_target_r": 4.0,
+                "entry_bar_ts": 1_700_000_300.0,
+                "expire_at": 1_700_010_000.0,
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "variant.db")
+            with patch.object(db, "DB_PATH", path), \
+                    patch("src.telegram_notifier.bracket_for_analysis",
+                          return_value=(99.75, 92.0, 102.0)):
+                db.init_db()
+                first = db.log_setup_candidate_once(analysis)
+                second = db.log_setup_candidate_once(analysis)
+                rows = db.get_unresolved_shadow_exit_variants()
+
+        self.assertIsNotNone(first)
+        self.assertIsNone(second)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["setup_log_id"], first)
+        self.assertEqual(rows[0]["variant"], "candidate_v1")
+        self.assertEqual(rows[0]["policy"]["far_target_r"], 4.0)
+
     def test_concurrent_scans_claim_closed_bar_once(self):
         analysis = {
             "symbol": "TESTUSDT", "direction": "SHORT", "decision": "SHORT",

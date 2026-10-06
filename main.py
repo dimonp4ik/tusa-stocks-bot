@@ -62,6 +62,7 @@ from src.db import (
     get_all_signals_since, get_setup_accuracy, link_setup_to_signal,
     resolve_sent_setups_from_signals, backfill_setup_signal_links, get_weekly_stats,
     get_unresolved_venue_setups, mark_setup_resolved,
+    get_unresolved_shadow_exit_variants, mark_shadow_exit_variant_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct,
     get_today_sl_streak, get_recent_signals,
@@ -3098,6 +3099,151 @@ def _track_unsent_venue_setups() -> None:
         log.warning("Venue shadow tracker failed: %s", exc)
 
 
+def _resolve_shadow_exit_variant(row: dict, candles: dict,
+                                 now: float | None = None):
+    """Resolve the frozen three-target paper exit on completed 5m bars only."""
+    now = time.time() if now is None else float(now)
+    policy = row["policy"]
+    first_fraction = float(policy["first_fraction"])
+    mid_fraction = float(policy["mid_fraction"])
+    far_fraction = float(policy["far_fraction"])
+    if (min(first_fraction, mid_fraction, far_fraction) <= 0
+            or abs(first_fraction + mid_fraction + far_fraction - 1.0) > 1e-9):
+        raise ValueError("invalid shadow exit fractions")
+
+    entry = float(row["entry_price"])
+    stop = float(row["sl"])
+    near = float(row["tp1"])
+    risk = abs(entry - stop)
+    direction = 1 if row["direction"] == "LONG" else -1
+    if (not all(math.isfinite(value) for value in (entry, stop, near, risk))
+            or entry <= 0 or risk <= 0
+            or direction * (near - entry) <= 0
+            or direction * (entry - stop) <= 0):
+        raise ValueError("invalid shadow exit bracket")
+
+    mid_target_r = float(policy["mid_target_r"])
+    far_target_r = float(policy["far_target_r"])
+    near_target_r = direction * (near - entry) / risk
+    if not 0 < near_target_r < mid_target_r < far_target_r:
+        raise ValueError("shadow exit targets must be strictly increasing")
+    middle = entry + direction * risk * mid_target_r
+    far = entry + direction * risk * far_target_r
+    entry_bar = float(policy["entry_bar_ts"])
+    expire_at = float(policy["expire_at"])
+    cutoff = min(now, expire_at)
+
+    bars = []
+    confirmed = candles.get("confirmed")
+    for index, raw_ts in enumerate(candles.get("time", [])):
+        timestamp = float(raw_ts)
+        if timestamp < entry_bar or timestamp + 300 > cutoff:
+            continue
+        if confirmed is not None and index < len(confirmed) and not confirmed[index]:
+            continue
+        bars.append(index)
+    if not bars:
+        return None
+
+    activated = False
+    middle_filled = False
+    for index in bars:
+        low = float(candles["low"][index])
+        high = float(candles["high"][index])
+        if not activated:
+            stop_hit = low <= stop if direction > 0 else high >= stop
+            near_hit = high >= near if direction > 0 else low <= near
+            if stop_hit:  # conservative when stop and target share one bar
+                return "SL", -1.0
+            if not near_hit:
+                continue
+            activated = True
+            middle_filled = (high >= middle if direction > 0 else low <= middle)
+            far_hit = high >= far if direction > 0 else low <= far
+            if far_hit:
+                return "TP_FAR", (
+                    first_fraction * near_target_r
+                    + mid_fraction * mid_target_r
+                    + far_fraction * far_target_r)
+            # Breakeven starts on the following bar, as in the audit.
+            continue
+
+        be_hit = low <= entry if direction > 0 else high >= entry
+        middle_hit = high >= middle if direction > 0 else low <= middle
+        far_hit = high >= far if direction > 0 else low <= far
+        if be_hit:
+            result = first_fraction * near_target_r
+            if middle_filled:
+                result += mid_fraction * mid_target_r
+            return ("TP_MID_BE" if middle_filled else "TP_NEAR_BE"), result
+        if middle_hit:
+            middle_filled = True
+        if far_hit:
+            return "TP_FAR", (
+                first_fraction * near_target_r
+                + mid_fraction * mid_target_r
+                + far_fraction * far_target_r)
+
+    if now < expire_at:
+        return None
+    # Do not mark a session-close outcome from a truncated feed.  The worker
+    # may run immediately after the bell while the last completed candle is
+    # still absent from the API response.
+    if float(candles["time"][bars[-1]]) + 300 < expire_at:
+        return None
+    close = float(candles["close"][bars[-1]])
+    close_r = direction * (close - entry) / risk
+    if not activated:
+        return "CLOSE", max(-1.0, min(near_target_r, close_r))
+    close_r = max(0.0, min(far_target_r, close_r))
+    result = first_fraction * near_target_r
+    if middle_filled:
+        result += mid_fraction * mid_target_r
+    else:
+        result += mid_fraction * close_r
+    result += far_fraction * close_r
+    return ("TP_MID_CLOSE" if middle_filled else "TP_NEAR_CLOSE"), result
+
+
+def _track_shadow_exit_variants() -> None:
+    """Collect forward evidence for exit candidates without changing signals."""
+    try:
+        pending = get_unresolved_shadow_exit_variants(limit=200)
+        if not pending:
+            return
+        grouped: dict[str, list[dict]] = {}
+        for row in pending:
+            grouped.setdefault(row["symbol"], []).append(row)
+        resolved = 0
+        for symbol, rows in grouped.items():
+            oldest = min(float(row["policy"]["entry_bar_ts"]) for row in rows)
+            limit = max(16, min(3000, int((time.time() - oldest) / 300) + 8))
+            try:
+                candles = get_klines_xperp(symbol, limit=limit, interval="5m")
+            except Exception as exc:
+                log.debug("Shadow exit variant candles failed %s: %s", symbol, exc)
+                continue
+            if not candles or not candles.get("time"):
+                continue
+            for row in rows:
+                needed = float(row["policy"]["entry_bar_ts"])
+                if float(candles["time"][0]) > needed:
+                    log.warning("Shadow exit variant history truncated #%s %s",
+                                row["variant_id"], symbol)
+                    continue
+                value = _resolve_shadow_exit_variant(row, candles)
+                if value is None:
+                    continue
+                outcome, net_r = value
+                mark_shadow_exit_variant_resolved(
+                    row["variant_id"], outcome, net_r)
+                resolved += 1
+        if resolved:
+            log.info("Shadow exit tracker resolved %s variant(s)", resolved)
+    except Exception as exc:
+        log.warning("Shadow exit tracker failed: %s", exc)
+
+
 # ── Main scanning function ────────────────────────────────────────────────────
 _OI_MIN_DELTA_PCT = 0.3  # ignore OI moves below this (noise floor)
 
@@ -3120,11 +3266,22 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
             signal_local.date(), _close_time_for(signal_local.date()),
             tzinfo=ET,
         ).timestamp()
+    shadow_exit_variant = None
+    if five_minute_shadow and setup.get("_shadow_exit_variant"):
+        shadow_exit_variant = {
+            **setup["_shadow_exit_variant"],
+            "entry_bar_ts": float(setup["signal_bar_ts"]) + 300,
+            "expire_at": float(expire_at),
+        }
     tags = [f"Venue module {setup['module']}",
             f"QQQ regime {setup.get('qqq_regime', '?')}",
             f"Fixed target {setup['target_r']:.2f}R"]
     if five_minute_shadow:
+        first_target_move_pct = float(setup.get("first_target_move_pct") or (
+            100.0 * float(setup["atr"]) * float(setup["target_r"])
+            / float(setup["entry"])))
         tags.append(f"5m volume ratio {setup['volume_ratio']:.2f}")
+        tags.append(f"First target move {first_target_move_pct:.2f}%")
         tags.append(
             f"Barbell 70% @ {setup['target_r']:.2f}R, "
             f"runner 30% @ {runner_target:.2f}R")
@@ -3150,6 +3307,9 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
             if five_minute_shadow else None),
         "strategy_stop_on_close": False if five_minute_shadow else None,
         "strategy_expire_at": expire_at,
+        # Stored in a separate paper-only table.  The order and Telegram paths
+        # continue using the frozen two-target contract above.
+        "shadow_exit_variant": shadow_exit_variant,
         "entry_low": setup["entry"], "entry_high": setup["entry"],
         "mtf_score": 18, "mtf_score_max": 18, "rsi": 50,
         "volume_ratio": 1.0, "session": "NEW_YORK",
@@ -3587,6 +3747,14 @@ def start_bot():
     scheduler.add_job(
         _track_unsent_venue_setups, "cron",
         minute="3,18,33,48",
+        timezone="UTC",
+    )
+
+    # Resolve the independent three-target paper variant one minute later so
+    # it never competes with the primary setup tracker for network/DB time.
+    scheduler.add_job(
+        _track_shadow_exit_variants, "cron",
+        minute="4,19,34,49",
         timezone="UTC",
     )
 
