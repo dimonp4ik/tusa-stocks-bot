@@ -1,0 +1,1190 @@
+{
+  "confirmation_2024": {
+    "cascade": {
+      "average_selected_target_pct": 0.5592,
+      "dd_pct": 12.3625,
+      "literal_target_hit_rate": 63.0252,
+      "literal_target_hits": 750,
+      "max_non_target_streak": 12,
+      "median_month_pct": -0.9339,
+      "minimum_month_pct": -4.9523,
+      "monthly_return_pct": {
+        "2024-01": -4.9523,
+        "2024-02": -1.4176,
+        "2024-03": -0.7162,
+        "2024-04": -2.4573,
+        "2024-05": -1.1516,
+        "2024-06": 1.9284,
+        "2024-07": -1.8259,
+        "2024-08": 5.1774,
+        "2024-09": 0.9438,
+        "2024-10": 7.3953,
+        "2024-11": 0.9907,
+        "2024-12": -1.771
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1190,
+      "negative_months": 7,
+      "return_pct": 1.5277,
+      "stops": 390,
+      "target_distribution": {
+        "0.5": 1101,
+        "1.0": 39,
+        "1.5": 48,
+        "2.0": 2
+      },
+      "timeouts": 50,
+      "trades_per_active_day": 4.837,
+      "trades_per_calendar_day": 3.26
+    },
+    "fixed": {
+      "average_selected_target_pct": 0.5,
+      "dd_pct": 12.697,
+      "literal_target_hit_rate": 64.4167,
+      "literal_target_hits": 773,
+      "max_non_target_streak": 10,
+      "median_month_pct": -0.7225,
+      "minimum_month_pct": -4.3166,
+      "monthly_return_pct": {
+        "2024-01": -4.3166,
+        "2024-02": -1.5568,
+        "2024-03": -0.8621,
+        "2024-04": -3.1937,
+        "2024-05": -0.547,
+        "2024-06": 1.9284,
+        "2024-07": -2.5556,
+        "2024-08": 4.3959,
+        "2024-09": -1.4253,
+        "2024-10": 6.0723,
+        "2024-11": -0.0339,
+        "2024-12": -0.5829
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1200,
+      "negative_months": 9,
+      "return_pct": -3.1276,
+      "stops": 385,
+      "target_distribution": {
+        "0.5": 1200,
+        "1.0": 0,
+        "1.5": 0,
+        "2.0": 0
+      },
+      "timeouts": 42,
+      "trades_per_active_day": 4.878,
+      "trades_per_calendar_day": 3.288
+    }
+  },
+  "frontier_top20": [
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8558,
+        "dd_pct": 8.3248,
+        "literal_target_hit_rate": 58.1014,
+        "literal_target_hits": 814,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.3712,
+        "minimum_month_pct": -4.4687,
+        "monthly_return_pct": {
+          "2022-01": -1.2943,
+          "2022-02": 5.3309,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.5362,
+          "2022-06": -0.2918,
+          "2022-07": -2.9588,
+          "2022-08": 3.7383,
+          "2022-09": -0.0053,
+          "2022-10": 5.4629,
+          "2022-11": -4.4687,
+          "2022-12": 2.7478
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1401,
+        "negative_months": 6,
+        "return_pct": 20.8703,
+        "stops": 531,
+        "target_distribution": {
+          "0.5": 986,
+          "1.0": 37,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 56,
+        "trades_per_active_day": 5.742,
+        "trades_per_calendar_day": 3.87
+      },
+      "thresholds": {
+        "1.0": 0.5506387347693058,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7182,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.2655,
+        "literal_target_hits": 896,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8981,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": 0.0579,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.3282,
+          "2022-08": 4.0006,
+          "2022-09": -0.4775,
+          "2022-10": 5.774,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1439,
+        "negative_months": 4,
+        "return_pct": 20.6488,
+        "stops": 495,
+        "target_distribution": {
+          "0.5": 1221,
+          "1.0": 13,
+          "1.5": 0,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.898,
+        "trades_per_calendar_day": 3.975
+      },
+      "thresholds": {
+        "1.0": 0.5944381436855136,
+        "1.5": 0.5928385314183837,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8439,
+        "dd_pct": 8.4559,
+        "literal_target_hit_rate": 58.3926,
+        "literal_target_hits": 821,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.2788,
+        "minimum_month_pct": -4.3119,
+        "monthly_return_pct": {
+          "2022-01": -0.9971,
+          "2022-02": 5.0163,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.2016,
+          "2022-06": -0.7365,
+          "2022-07": -2.9548,
+          "2022-08": 3.5832,
+          "2022-09": -0.0385,
+          "2022-10": 5.4622,
+          "2022-11": -4.0347,
+          "2022-12": 2.5961
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1406,
+        "negative_months": 6,
+        "return_pct": 20.1266,
+        "stops": 530,
+        "target_distribution": {
+          "0.5": 1021,
+          "1.0": 7,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 55,
+        "trades_per_active_day": 5.762,
+        "trades_per_calendar_day": 3.884
+      },
+      "thresholds": {
+        "1.0": 0.5944381436855136,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7134,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.3872,
+        "literal_target_hits": 899,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8703,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": -0.0909,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.4754,
+          "2022-08": 4.0006,
+          "2022-09": -0.4764,
+          "2022-10": 5.6858,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1441,
+        "negative_months": 5,
+        "return_pct": 20.1909,
+        "stops": 495,
+        "target_distribution": {
+          "0.5": 1236,
+          "1.0": 0,
+          "1.5": 0,
+          "2.0": 205
+        },
+        "timeouts": 47,
+        "trades_per_active_day": 5.906,
+        "trades_per_calendar_day": 3.981
+      },
+      "thresholds": {
+        "1.0": 0.6738120884616259,
+        "1.5": 0.5928385314183837,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8409,
+        "dd_pct": 8.4559,
+        "literal_target_hit_rate": 58.5227,
+        "literal_target_hits": 824,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.2794,
+        "minimum_month_pct": -4.3119,
+        "monthly_return_pct": {
+          "2022-01": -0.9971,
+          "2022-02": 5.0163,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.2016,
+          "2022-06": -0.7365,
+          "2022-07": -2.9548,
+          "2022-08": 3.5832,
+          "2022-09": -0.0373,
+          "2022-10": 5.3732,
+          "2022-11": -4.0347,
+          "2022-12": 2.5961
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1408,
+        "negative_months": 6,
+        "return_pct": 20.0265,
+        "stops": 530,
+        "target_distribution": {
+          "0.5": 1030,
+          "1.0": 0,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 54,
+        "trades_per_active_day": 5.77,
+        "trades_per_calendar_day": 3.89
+      },
+      "thresholds": {
+        "1.0": 0.6738120884616259,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7141,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.3178,
+        "literal_target_hits": 898,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8703,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": -0.0909,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.4754,
+          "2022-08": 4.0006,
+          "2022-09": -0.4764,
+          "2022-10": 5.6158,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1441,
+        "negative_months": 5,
+        "return_pct": 20.1112,
+        "stops": 495,
+        "target_distribution": {
+          "0.5": 1234,
+          "1.0": 2,
+          "1.5": 0,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.906,
+        "trades_per_calendar_day": 3.981
+      },
+      "thresholds": {
+        "1.0": 0.6120055668687214,
+        "1.5": 0.5928385314183837,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8416,
+        "dd_pct": 8.4559,
+        "literal_target_hit_rate": 58.4517,
+        "literal_target_hits": 823,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.2794,
+        "minimum_month_pct": -4.3119,
+        "monthly_return_pct": {
+          "2022-01": -0.9971,
+          "2022-02": 5.0163,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.2016,
+          "2022-06": -0.7365,
+          "2022-07": -2.9548,
+          "2022-08": 3.5832,
+          "2022-09": -0.0373,
+          "2022-10": 5.3037,
+          "2022-11": -4.0347,
+          "2022-12": 2.5961
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1408,
+        "negative_months": 6,
+        "return_pct": 19.9474,
+        "stops": 530,
+        "target_distribution": {
+          "0.5": 1028,
+          "1.0": 2,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 55,
+        "trades_per_active_day": 5.77,
+        "trades_per_calendar_day": 3.89
+      },
+      "thresholds": {
+        "1.0": 0.6120055668687214,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7197,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.1697,
+        "literal_target_hits": 894,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8981,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": 0.0579,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.922,
+          "2022-08": 4.0006,
+          "2022-09": -0.4775,
+          "2022-10": 5.774,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1438,
+        "negative_months": 4,
+        "return_pct": 19.9228,
+        "stops": 496,
+        "target_distribution": {
+          "0.5": 1219,
+          "1.0": 11,
+          "1.5": 3,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.893,
+        "trades_per_calendar_day": 3.972
+      },
+      "thresholds": {
+        "1.0": 0.5944381436855136,
+        "1.5": 0.5513258997890674,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8496,
+        "dd_pct": 8.7337,
+        "literal_target_hit_rate": 58.2324,
+        "literal_target_hits": 817,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.3531,
+        "minimum_month_pct": -4.4687,
+        "monthly_return_pct": {
+          "2022-01": -0.9971,
+          "2022-02": 5.0163,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.3689,
+          "2022-06": -0.7365,
+          "2022-07": -2.9588,
+          "2022-08": 3.7383,
+          "2022-09": 0.1101,
+          "2022-10": 5.4629,
+          "2022-11": -4.4687,
+          "2022-12": 2.5961
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1403,
+        "negative_months": 5,
+        "return_pct": 20.1152,
+        "stops": 531,
+        "target_distribution": {
+          "0.5": 1004,
+          "1.0": 21,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 55,
+        "trades_per_active_day": 5.75,
+        "trades_per_calendar_day": 3.876
+      },
+      "thresholds": {
+        "1.0": 0.563999638380838,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8463,
+        "dd_pct": 8.5935,
+        "literal_target_hit_rate": 58.2918,
+        "literal_target_hits": 819,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.2788,
+        "minimum_month_pct": -4.4687,
+        "monthly_return_pct": {
+          "2022-01": -0.9971,
+          "2022-02": 5.0163,
+          "2022-03": -4.3119,
+          "2022-04": 3.9083,
+          "2022-05": 12.2016,
+          "2022-06": -0.7365,
+          "2022-07": -2.8097,
+          "2022-08": 3.5832,
+          "2022-09": -0.0385,
+          "2022-10": 5.4629,
+          "2022-11": -4.4687,
+          "2022-12": 2.5961
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1405,
+        "negative_months": 6,
+        "return_pct": 19.763,
+        "stops": 531,
+        "target_distribution": {
+          "0.5": 1014,
+          "1.0": 13,
+          "1.5": 174,
+          "2.0": 204
+        },
+        "timeouts": 55,
+        "trades_per_active_day": 5.758,
+        "trades_per_calendar_day": 3.881
+      },
+      "thresholds": {
+        "1.0": 0.5755372478667324,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7156,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.2917,
+        "literal_target_hits": 897,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8703,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": -0.0909,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -2.0682,
+          "2022-08": 4.0006,
+          "2022-09": -0.4764,
+          "2022-10": 5.6858,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1440,
+        "negative_months": 5,
+        "return_pct": 19.4676,
+        "stops": 496,
+        "target_distribution": {
+          "0.5": 1232,
+          "1.0": 0,
+          "1.5": 3,
+          "2.0": 205
+        },
+        "timeouts": 47,
+        "trades_per_active_day": 5.902,
+        "trades_per_calendar_day": 3.978
+      },
+      "thresholds": {
+        "1.0": 0.6738120884616259,
+        "1.5": 0.5513258997890674,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7163,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.2222,
+        "literal_target_hits": 896,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8703,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": -0.0909,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 2.2869,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -2.0682,
+          "2022-08": 4.0006,
+          "2022-09": -0.4764,
+          "2022-10": 5.6158,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1440,
+        "negative_months": 5,
+        "return_pct": 19.3884,
+        "stops": 496,
+        "target_distribution": {
+          "0.5": 1230,
+          "1.0": 2,
+          "1.5": 3,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.902,
+        "trades_per_calendar_day": 3.978
+      },
+      "thresholds": {
+        "1.0": 0.6120055668687214,
+        "1.5": 0.5513258997890674,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.9502,
+        "dd_pct": 9.4078,
+        "literal_target_hit_rate": 55.6277,
+        "literal_target_hits": 771,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.2006,
+        "minimum_month_pct": -4.5359,
+        "monthly_return_pct": {
+          "2022-01": -1.6504,
+          "2022-02": 4.2226,
+          "2022-03": -4.4406,
+          "2022-04": 5.0001,
+          "2022-05": 13.2298,
+          "2022-06": -0.1435,
+          "2022-07": -4.5359,
+          "2022-08": 4.719,
+          "2022-09": -0.6855,
+          "2022-10": 5.9264,
+          "2022-11": -3.6832,
+          "2022-12": 2.5448
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1386,
+        "negative_months": 6,
+        "return_pct": 20.7905,
+        "stops": 544,
+        "target_distribution": {
+          "0.5": 920,
+          "1.0": 27,
+          "1.5": 96,
+          "2.0": 343
+        },
+        "timeouts": 71,
+        "trades_per_active_day": 5.68,
+        "trades_per_calendar_day": 3.829
+      },
+      "thresholds": {
+        "1.0": 0.5506387347693058,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3023415744493032
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7246,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 61.9081,
+        "literal_target_hits": 889,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.8702,
+        "minimum_month_pct": -4.8306,
+        "monthly_return_pct": {
+          "2022-01": -0.3931,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 1.8327,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.626,
+          "2022-08": 4.1567,
+          "2022-09": -0.4775,
+          "2022-10": 5.9313,
+          "2022-11": -4.8306,
+          "2022-12": 1.738
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1436,
+        "negative_months": 5,
+        "return_pct": 19.0271,
+        "stops": 499,
+        "target_distribution": {
+          "0.5": 1201,
+          "1.0": 30,
+          "1.5": 0,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.885,
+        "trades_per_calendar_day": 3.967
+      },
+      "thresholds": {
+        "1.0": 0.5755372478667324,
+        "1.5": 0.5928385314183837,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.8782,
+        "dd_pct": 8.7698,
+        "literal_target_hit_rate": 57.1121,
+        "literal_target_hits": 795,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.5978,
+        "minimum_month_pct": -5.188,
+        "monthly_return_pct": {
+          "2022-01": -1.0702,
+          "2022-02": 4.8592,
+          "2022-03": -4.3119,
+          "2022-04": 3.7548,
+          "2022-05": 12.2592,
+          "2022-06": 0.1537,
+          "2022-07": -2.9422,
+          "2022-08": 3.1198,
+          "2022-09": 0.2931,
+          "2022-10": 5.385,
+          "2022-11": -5.188,
+          "2022-12": 2.9026
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1392,
+        "negative_months": 4,
+        "return_pct": 19.5091,
+        "stops": 538,
+        "target_distribution": {
+          "0.5": 920,
+          "1.0": 95,
+          "1.5": 173,
+          "2.0": 204
+        },
+        "timeouts": 59,
+        "trades_per_active_day": 5.705,
+        "trades_per_calendar_day": 3.845
+      },
+      "thresholds": {
+        "1.0": 0.5306520720024595,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7413,
+        "dd_pct": 8.4946,
+        "literal_target_hit_rate": 61.5385,
+        "literal_target_hits": 880,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.048,
+        "minimum_month_pct": -4.5429,
+        "monthly_return_pct": {
+          "2022-01": 0.2066,
+          "2022-02": 5.3526,
+          "2022-03": -3.4449,
+          "2022-04": 1.9789,
+          "2022-05": 10.4908,
+          "2022-06": -0.1249,
+          "2022-07": -1.6291,
+          "2022-08": 3.8442,
+          "2022-09": -0.9274,
+          "2022-10": 5.2976,
+          "2022-11": -4.5429,
+          "2022-12": 1.8895
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1430,
+        "negative_months": 5,
+        "return_pct": 18.8964,
+        "stops": 501,
+        "target_distribution": {
+          "0.5": 1183,
+          "1.0": 9,
+          "1.5": 33,
+          "2.0": 205
+        },
+        "timeouts": 49,
+        "trades_per_active_day": 5.861,
+        "trades_per_calendar_day": 3.95
+      },
+      "thresholds": {
+        "1.0": 0.5944381436855136,
+        "1.5": 0.4693462037753519,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7378,
+        "dd_pct": 8.4946,
+        "literal_target_hit_rate": 61.662,
+        "literal_target_hits": 883,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.048,
+        "minimum_month_pct": -4.5429,
+        "monthly_return_pct": {
+          "2022-01": 0.2066,
+          "2022-02": 5.3526,
+          "2022-03": -3.4449,
+          "2022-04": 1.9789,
+          "2022-05": 10.4908,
+          "2022-06": -0.1249,
+          "2022-07": -1.6291,
+          "2022-08": 3.8442,
+          "2022-09": -0.9263,
+          "2022-10": 5.2098,
+          "2022-11": -4.5429,
+          "2022-12": 1.8895
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1432,
+        "negative_months": 5,
+        "return_pct": 18.7986,
+        "stops": 501,
+        "target_distribution": {
+          "0.5": 1194,
+          "1.0": 0,
+          "1.5": 33,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.869,
+        "trades_per_calendar_day": 3.956
+      },
+      "thresholds": {
+        "1.0": 0.6738120884616259,
+        "1.5": 0.4693462037753519,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7218,
+        "dd_pct": 8.5275,
+        "literal_target_hit_rate": 62.0306,
+        "literal_target_hits": 892,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.7175,
+        "minimum_month_pct": -4.3989,
+        "monthly_return_pct": {
+          "2022-01": 0.0579,
+          "2022-02": 5.5141,
+          "2022-03": -3.4796,
+          "2022-04": 1.3771,
+          "2022-05": 10.1628,
+          "2022-06": 0.0025,
+          "2022-07": -1.922,
+          "2022-08": 4.0006,
+          "2022-09": -0.4775,
+          "2022-10": 5.774,
+          "2022-11": -4.3989,
+          "2022-12": 1.7382
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1438,
+        "negative_months": 4,
+        "return_pct": 18.8563,
+        "stops": 498,
+        "target_distribution": {
+          "0.5": 1216,
+          "1.0": 11,
+          "1.5": 6,
+          "2.0": 205
+        },
+        "timeouts": 48,
+        "trades_per_active_day": 5.893,
+        "trades_per_calendar_day": 3.972
+      },
+      "thresholds": {
+        "1.0": 0.5944381436855136,
+        "1.5": 0.5199801769887551,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.7385,
+        "dd_pct": 8.4946,
+        "literal_target_hit_rate": 61.5922,
+        "literal_target_hits": 882,
+        "max_non_target_streak": 9,
+        "median_month_pct": 1.048,
+        "minimum_month_pct": -4.5429,
+        "monthly_return_pct": {
+          "2022-01": 0.2066,
+          "2022-02": 5.3526,
+          "2022-03": -3.4449,
+          "2022-04": 1.9789,
+          "2022-05": 10.4908,
+          "2022-06": -0.1249,
+          "2022-07": -1.6291,
+          "2022-08": 3.8442,
+          "2022-09": -0.9263,
+          "2022-10": 5.14,
+          "2022-11": -4.5429,
+          "2022-12": 1.8895
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1432,
+        "negative_months": 5,
+        "return_pct": 18.7198,
+        "stops": 501,
+        "target_distribution": {
+          "0.5": 1192,
+          "1.0": 2,
+          "1.5": 33,
+          "2.0": 205
+        },
+        "timeouts": 49,
+        "trades_per_active_day": 5.869,
+        "trades_per_calendar_day": 3.956
+      },
+      "thresholds": {
+        "1.0": 0.6120055668687214,
+        "1.5": 0.4693462037753519,
+        "2.0": 0.3356636063618465
+      }
+    },
+    {
+      "selection_2022": {
+        "average_selected_target_pct": 0.9386,
+        "dd_pct": 9.5374,
+        "literal_target_hit_rate": 55.9943,
+        "literal_target_hits": 780,
+        "max_non_target_streak": 9,
+        "median_month_pct": 0.9121,
+        "minimum_month_pct": -4.532,
+        "monthly_return_pct": {
+          "2022-01": -1.2072,
+          "2022-02": 4.0663,
+          "2022-03": -4.4406,
+          "2022-04": 5.0001,
+          "2022-05": 12.8934,
+          "2022-06": -0.589,
+          "2022-07": -4.532,
+          "2022-08": 4.5624,
+          "2022-09": -0.5695,
+          "2022-10": 5.9254,
+          "2022-11": -3.2456,
+          "2022-12": 2.3937
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1393,
+        "negative_months": 6,
+        "return_pct": 20.5865,
+        "stops": 543,
+        "target_distribution": {
+          "0.5": 953,
+          "1.0": 1,
+          "1.5": 96,
+          "2.0": 343
+        },
+        "timeouts": 70,
+        "trades_per_active_day": 5.709,
+        "trades_per_calendar_day": 3.848
+      },
+      "thresholds": {
+        "1.0": 0.6120055668687214,
+        "1.5": 0.41529689253393576,
+        "2.0": 0.3023415744493032
+      }
+    }
+  ],
+  "frozen_before_2023": {
+    "fixed_2022": {
+      "average_selected_target_pct": 0.5,
+      "dd_pct": 6.2657,
+      "literal_target_hit_rate": 66.8928,
+      "literal_target_hits": 986,
+      "max_non_target_streak": 9,
+      "median_month_pct": 0.4228,
+      "minimum_month_pct": -4.3828,
+      "monthly_return_pct": {
+        "2022-01": -0.6379,
+        "2022-02": 2.9981,
+        "2022-03": -1.4148,
+        "2022-04": 0.9574,
+        "2022-05": 2.7009,
+        "2022-06": 1.6811,
+        "2022-07": -1.6698,
+        "2022-08": 3.5618,
+        "2022-09": -1.0976,
+        "2022-10": 3.9481,
+        "2022-11": -4.3828,
+        "2022-12": -0.1118
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1474,
+      "negative_months": 6,
+      "return_pct": 6.3592,
+      "stops": 465,
+      "target_distribution": {
+        "0.5": 1474,
+        "1.0": 0,
+        "1.5": 0,
+        "2.0": 0
+      },
+      "timeouts": 23,
+      "trades_per_active_day": 6.041,
+      "trades_per_calendar_day": 4.072
+    },
+    "rank": 2.5505000000000004,
+    "selection_2022": {
+      "average_selected_target_pct": 0.6072,
+      "dd_pct": 7.0542,
+      "literal_target_hit_rate": 64.1915,
+      "literal_target_hits": 925,
+      "max_non_target_streak": 9,
+      "median_month_pct": 0.2308,
+      "minimum_month_pct": -3.5282,
+      "monthly_return_pct": {
+        "2022-01": 0.2425,
+        "2022-02": 3.291,
+        "2022-03": -1.5277,
+        "2022-04": 2.1573,
+        "2022-05": 5.4912,
+        "2022-06": 0.219,
+        "2022-07": -2.1132,
+        "2022-08": 3.7134,
+        "2022-09": -0.8169,
+        "2022-10": 3.4065,
+        "2022-11": -3.5282,
+        "2022-12": -0.1147
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1441,
+      "negative_months": 5,
+      "return_pct": 10.4867,
+      "stops": 486,
+      "target_distribution": {
+        "0.5": 1256,
+        "1.0": 65,
+        "1.5": 116,
+        "2.0": 4
+      },
+      "timeouts": 30,
+      "trades_per_active_day": 5.906,
+      "trades_per_calendar_day": 3.981
+    },
+    "thresholds": {
+      "1.0": 0.563999638380838,
+      "1.5": 0.4693462037753519,
+      "2.0": 0.48924145456221374
+    }
+  },
+  "later": null,
+  "protocol": {
+    "base_threshold": 0.64327171372379,
+    "confirmation": 2024,
+    "fit": [
+      2017,
+      2018,
+      2019,
+      2020,
+      2021
+    ],
+    "hidden_if_confirmation_passes": [
+      2025,
+      2026
+    ],
+    "hold": "same cash session only",
+    "money": "3% current equity margin, fixed 10x gross",
+    "selection": 2022,
+    "stop_pct": 1.0,
+    "targets_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "validation": 2023
+  },
+  "rows": 150493,
+  "selection_combinations": 343,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AAPLUSDT_15min_65000.pkl": "efd86c403c8d270a1bd9a2d53a6cf968239b81874a0c8f535ece878a8d06aabb",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AMZNUSDT_15min_65000.pkl": "023eff87649ac11055aae72a6aaf1fdc48433ead0552bfa87c64aa3a7bd03b1a",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\GOOGLUSDT_15min_65000.pkl": "f6a5c30afc82dbc78bc0bf3e4ca5f3aeedb9dde298ae03e2e94c1beef926035d",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\INTCUSDT_15min_65000.pkl": "66050f5e1431062b4c84c40186adab0a76136e97e61779a5ed6757113a372429",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\METAUSDT_15min_65000.pkl": "f52f099ff72aba30eab22390d308f319ad0818236dd0d97ae1fa4a0b3fc873ee",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MRVLUSDT_15min_65000.pkl": "f843b111a5a45344d1de5ec4cbc6a9914d0a62dbbc1395ce56a06ebcecdb4f0e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MSFTUSDT_15min_65000.pkl": "316acaee3b18187053dc27397c90bb710ddb775e79fab9de57fc003847bea85e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MUUSDT_15min_65000.pkl": "b6d3000e1caeb8e6aa249f52a19624fdf246a6d1a97e97bb38fdbd094ff79992",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\NVDAUSDT_15min_65000.pkl": "98266cb60bff8f80f81a10af2daf932f69d571900363c7a56f5894872cc5b35e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\QQQUSDT_15min_65000.pkl": "2a286266d443b78761d81d1df47a92e6ee9deda7774dd3154f21fa07e65231ff",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\SPYUSDT_15min_65000.pkl": "a0a6eb03ab9a14436058552f7bc0408284480bf13c6d68362c8637d97cfafd98",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\TSLAUSDT_15min_65000.pkl": "367fc3f3841e03e98a9d05320884e0fed27273109df03306bc15971051deb262",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_cash_literal_target_cascade_oct7_audit.py": "82d43e3aa58d1e57c02fc7a13e4d2c3407ad57fc7178f5b1f4ead79f4352aedc",
+    "reports\\audit_2026_09_08\\stock_extended_history_manifest.json": "0c06da01ffd6a9138a030f40290689edfa89f7e61a4df053a26506745a92b7e2"
+  },
+  "status": "REJECTED_2024",
+  "validation_2023": {
+    "cascade": {
+      "average_selected_target_pct": 0.5366,
+      "dd_pct": 5.3413,
+      "literal_target_hit_rate": 65.8537,
+      "literal_target_hits": 837,
+      "max_non_target_streak": 7,
+      "median_month_pct": 0.3707,
+      "minimum_month_pct": -1.8287,
+      "monthly_return_pct": {
+        "2023-01": 2.0903,
+        "2023-02": -0.2012,
+        "2023-03": 2.7324,
+        "2023-04": 0.0193,
+        "2023-05": -1.5181,
+        "2023-06": -0.4288,
+        "2023-07": 0.7221,
+        "2023-08": 6.9367,
+        "2023-09": 2.1955,
+        "2023-10": -1.8287,
+        "2023-11": -1.184,
+        "2023-12": 0.9295
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1271,
+      "negative_months": 5,
+      "return_pct": 10.6381,
+      "stops": 395,
+      "target_distribution": {
+        "0.5": 1210,
+        "1.0": 31,
+        "1.5": 28,
+        "2.0": 2
+      },
+      "timeouts": 39,
+      "trades_per_active_day": 5.167,
+      "trades_per_calendar_day": 3.521
+    },
+    "fixed": {
+      "average_selected_target_pct": 0.5,
+      "dd_pct": 5.3379,
+      "literal_target_hit_rate": 67.0047,
+      "literal_target_hits": 859,
+      "max_non_target_streak": 7,
+      "median_month_pct": 0.3369,
+      "minimum_month_pct": -2.5597,
+      "monthly_return_pct": {
+        "2023-01": 1.0231,
+        "2023-02": -0.0483,
+        "2023-03": 3.2059,
+        "2023-04": -0.1314,
+        "2023-05": -1.5181,
+        "2023-06": -0.4288,
+        "2023-07": 0.7221,
+        "2023-08": 5.9355,
+        "2023-09": 2.5284,
+        "2023-10": -2.5597,
+        "2023-11": -0.7386,
+        "2023-12": 0.7632
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 1282,
+      "negative_months": 6,
+      "return_pct": 8.8093,
+      "stops": 388,
+      "target_distribution": {
+        "0.5": 1282,
+        "1.0": 0,
+        "1.5": 0,
+        "2.0": 0
+      },
+      "timeouts": 35,
+      "trades_per_active_day": 5.211,
+      "trades_per_calendar_day": 3.551
+    }
+  }
+}
