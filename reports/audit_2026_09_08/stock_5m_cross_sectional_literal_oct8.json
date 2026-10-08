@@ -1,0 +1,1759 @@
+{
+  "status": "REJECTED_ON_INITIAL_REVEAL",
+  "protocol": {
+    "data": "native public X-Perp 5m bars; seven stocks plus QQQ",
+    "signal": "closed-bar cross-sectional continuation or exhaustion reversal",
+    "entry": "next 5m market-open proxy",
+    "targets_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "stops_pct": [
+      0.5,
+      0.75,
+      1.0
+    ],
+    "holds_bars": [
+      6,
+      12,
+      24,
+      48
+    ],
+    "intrabar": "stop first when stop and target share a 5m candle",
+    "selection": "development then validation; one route per semantic family",
+    "development_gate_revision": "60% to 55% hit floor after development-only frontier; validation was not evaluated before the revision",
+    "confirmation_gate": ">=8 accepted, >=65% literal target hits, positive return, <=1.5% DD, max loss streak <=3",
+    "one_time_refinement": "if primary confirmation fails, up to three declared brake atoms must independently pass all pre-Oct3 segments at >=60% literal hits",
+    "reveal_rule": "Oct 3-7 is evaluated only after confirmation passes",
+    "portfolio": "one symbol open, 3h same-symbol/direction cooldown, cap2/15m, direction cap4, pause after 3 losses",
+    "money": "3% current-equity margin and fixed 10x gross",
+    "orders": "market proxies only; research creates no orders"
+  },
+  "periods": {
+    "development": [
+      "2026-08-06",
+      "2026-08-24"
+    ],
+    "validation": [
+      "2026-08-24",
+      "2026-09-08"
+    ],
+    "confirmation": [
+      "2026-09-08",
+      "2026-10-03"
+    ],
+    "reveal": [
+      "2026-10-03",
+      "2026-10-08"
+    ]
+  },
+  "data": {
+    "feature_rows": 14973,
+    "start_utc": "2026-08-06T17:45:00+00:00",
+    "end_utc": "2026-10-07T18:30:00+00:00"
+  },
+  "search": {
+    "profiles": 32,
+    "routes_evaluated": 1536,
+    "passed_development": 10,
+    "qualified_development_and_validation": 2
+  },
+  "frozen_routes": [
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 52,
+        "wr": 61.54,
+        "return_pct": 1.2819,
+        "dd_pct": 0.8162,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 1.2819
+        },
+        "max_loss_streak": 3,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.25,
+        "trades_per_active_day": 4.333,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 29,
+        "literal_target_hit_rate": 55.77,
+        "outcomes": {
+          "CLOSE": 15,
+          "SL": 8,
+          "TP": 29
+        }
+      },
+      "validation": {
+        "n": 52,
+        "wr": 71.15,
+        "return_pct": 1.3674,
+        "dd_pct": 0.7365,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.8869,
+          "2026-09": -0.5099
+        },
+        "max_loss_streak": 2,
+        "active_days": 11,
+        "trades_per_calendar_day": 3.467,
+        "trades_per_active_day": 4.727,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 33,
+        "literal_target_hit_rate": 63.46,
+        "outcomes": {
+          "CLOSE": 8,
+          "SL": 11,
+          "TP": 33
+        }
+      },
+      "selection_score": 62.2291
+    }
+  ],
+  "confirmation": {
+    "n": 71,
+    "wr": 64.79,
+    "return_pct": 1.4712,
+    "dd_pct": 1.3956,
+    "negative_months": 0,
+    "monthly_return_pct": {
+      "2026-09": 0.9523,
+      "2026-10": 0.5141
+    },
+    "max_loss_streak": 5,
+    "active_days": 19,
+    "trades_per_calendar_day": 2.84,
+    "trades_per_active_day": 3.737,
+    "by_module_count": {
+      "stock_5m_literal_cross_sectional_exhaustion_reversal": 71
+    },
+    "literal_target_hits": 42,
+    "literal_target_hit_rate": 59.15,
+    "outcomes": {
+      "CLOSE": 17,
+      "SL": 12,
+      "TP": 42
+    }
+  },
+  "primary_confirmation_passed": false,
+  "refinement_candidates": 1,
+  "frozen_refinement": {
+    "atoms": [
+      "exclude_AAPL",
+      "minutes_le_200",
+      "volume_le_10"
+    ],
+    "metrics": {
+      "development": {
+        "n": 36,
+        "wr": 66.67,
+        "return_pct": 1.0259,
+        "dd_pct": 0.8162,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 1.0259
+        },
+        "max_loss_streak": 3,
+        "active_days": 12,
+        "trades_per_calendar_day": 2.25,
+        "trades_per_active_day": 3.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 36
+        },
+        "literal_target_hits": 22,
+        "literal_target_hit_rate": 61.11,
+        "outcomes": {
+          "CLOSE": 8,
+          "SL": 6,
+          "TP": 22
+        }
+      },
+      "validation": {
+        "n": 36,
+        "wr": 72.22,
+        "return_pct": 0.9823,
+        "dd_pct": 0.5098,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.2065,
+          "2026-09": -0.2216
+        },
+        "max_loss_streak": 1,
+        "active_days": 10,
+        "trades_per_calendar_day": 3.0,
+        "trades_per_active_day": 3.6,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 36
+        },
+        "literal_target_hits": 22,
+        "literal_target_hit_rate": 61.11,
+        "outcomes": {
+          "CLOSE": 7,
+          "SL": 7,
+          "TP": 22
+        }
+      },
+      "confirmation": {
+        "n": 34,
+        "wr": 64.71,
+        "return_pct": 1.0754,
+        "dd_pct": 1.0853,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-09": 0.7729,
+          "2026-10": 0.3002
+        },
+        "max_loss_streak": 3,
+        "active_days": 17,
+        "trades_per_calendar_day": 1.36,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 34
+        },
+        "literal_target_hits": 21,
+        "literal_target_hit_rate": 61.76,
+        "outcomes": {
+          "CLOSE": 7,
+          "SL": 6,
+          "TP": 21
+        }
+      }
+    },
+    "score": 61.7823
+  },
+  "pre_reveal_passed": true,
+  "reveal": {
+    "n": 3,
+    "wr": 33.33,
+    "return_pct": -0.1848,
+    "dd_pct": 0.3,
+    "negative_months": 1,
+    "monthly_return_pct": {
+      "2026-10": -0.1848
+    },
+    "max_loss_streak": 1,
+    "active_days": 3,
+    "trades_per_calendar_day": 1.0,
+    "trades_per_active_day": 1.0,
+    "by_module_count": {
+      "stock_5m_literal_cross_sectional_exhaustion_reversal": 3
+    },
+    "literal_target_hits": 1,
+    "literal_target_hit_rate": 33.33,
+    "outcomes": {
+      "CLOSE": 1,
+      "SL": 1,
+      "TP": 1
+    }
+  },
+  "initial_reveal_passed": false,
+  "combined_only_if_passed": {
+    "n": 109,
+    "wr": 66.97,
+    "return_pct": 2.9249,
+    "dd_pct": 1.0853,
+    "negative_months": 0,
+    "monthly_return_pct": {
+      "2026-08": 2.2448,
+      "2026-09": 0.5496,
+      "2026-10": 0.1149
+    },
+    "max_loss_streak": 3,
+    "active_days": 42,
+    "trades_per_calendar_day": 1.73,
+    "trades_per_active_day": 2.595,
+    "by_module_count": {
+      "stock_5m_literal_cross_sectional_exhaustion_reversal": 109
+    },
+    "literal_target_hits": 66,
+    "literal_target_hit_rate": 60.55,
+    "outcomes": {
+      "CLOSE": 23,
+      "SL": 20,
+      "TP": 66
+    }
+  },
+  "frontier": [
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 52,
+        "wr": 61.54,
+        "return_pct": 1.2819,
+        "dd_pct": 0.8162,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 1.2819
+        },
+        "max_loss_streak": 3,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.25,
+        "trades_per_active_day": 4.333,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 29,
+        "literal_target_hit_rate": 55.77,
+        "outcomes": {
+          "CLOSE": 15,
+          "SL": 8,
+          "TP": 29
+        }
+      },
+      "validation": {
+        "n": 52,
+        "wr": 71.15,
+        "return_pct": 1.3674,
+        "dd_pct": 0.7365,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.8869,
+          "2026-09": -0.5099
+        },
+        "max_loss_streak": 2,
+        "active_days": 11,
+        "trades_per_calendar_day": 3.467,
+        "trades_per_active_day": 4.727,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 33,
+        "literal_target_hit_rate": 63.46,
+        "outcomes": {
+          "CLOSE": 8,
+          "SL": 11,
+          "TP": 33
+        }
+      },
+      "selection_score": 62.2291
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_medium_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 27,
+        "wr": 62.96,
+        "return_pct": 0.6849,
+        "dd_pct": 0.6683,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6849
+        },
+        "max_loss_streak": 3,
+        "active_days": 11,
+        "trades_per_calendar_day": 1.688,
+        "trades_per_active_day": 2.455,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 27
+        },
+        "literal_target_hits": 16,
+        "literal_target_hit_rate": 59.26,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 5,
+          "TP": 16
+        }
+      },
+      "validation": {
+        "n": 36,
+        "wr": 75.0,
+        "return_pct": 0.9786,
+        "dd_pct": 0.8105,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.0419,
+          "2026-09": -0.0627
+        },
+        "max_loss_streak": 2,
+        "active_days": 10,
+        "trades_per_calendar_day": 3.0,
+        "trades_per_active_day": 3.6,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 36
+        },
+        "literal_target_hits": 23,
+        "literal_target_hit_rate": 63.89,
+        "outcomes": {
+          "CLOSE": 4,
+          "SL": 9,
+          "TP": 23
+        }
+      },
+      "selection_score": 61.7476
+    }
+  ],
+  "development_frontier": [
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_medium_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 27,
+        "wr": 62.96,
+        "return_pct": 0.6849,
+        "dd_pct": 0.6683,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6849
+        },
+        "max_loss_streak": 3,
+        "active_days": 11,
+        "trades_per_calendar_day": 1.688,
+        "trades_per_active_day": 2.455,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 27
+        },
+        "literal_target_hits": 16,
+        "literal_target_hit_rate": 59.26,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 5,
+          "TP": 16
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_medium_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 41,
+        "wr": 65.85,
+        "return_pct": 0.6612,
+        "dd_pct": 0.7094,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6612
+        },
+        "max_loss_streak": 2,
+        "active_days": 12,
+        "trades_per_calendar_day": 2.562,
+        "trades_per_active_day": 3.417,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 41
+        },
+        "literal_target_hits": 24,
+        "literal_target_hit_rate": 58.54,
+        "outcomes": {
+          "CLOSE": 9,
+          "SL": 8,
+          "TP": 24
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 63,
+        "wr": 63.49,
+        "return_pct": 0.402,
+        "dd_pct": 1.8121,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.402
+        },
+        "max_loss_streak": 4,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.938,
+        "trades_per_active_day": 5.25,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 63
+        },
+        "literal_target_hits": 36,
+        "literal_target_hit_rate": 57.14,
+        "outcomes": {
+          "CLOSE": 13,
+          "SL": 14,
+          "TP": 36
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 52,
+        "wr": 61.54,
+        "return_pct": 1.2819,
+        "dd_pct": 0.8162,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 1.2819
+        },
+        "max_loss_streak": 3,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.25,
+        "trades_per_active_day": 4.333,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 29,
+        "literal_target_hit_rate": 55.77,
+        "outcomes": {
+          "CLOSE": 15,
+          "SL": 8,
+          "TP": 29
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_medium_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 27,
+        "wr": 59.26,
+        "return_pct": 0.6858,
+        "dd_pct": 0.4493,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6858
+        },
+        "max_loss_streak": 3,
+        "active_days": 11,
+        "trades_per_calendar_day": 1.688,
+        "trades_per_active_day": 2.455,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 27
+        },
+        "literal_target_hits": 15,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 6,
+          "TP": 15
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold24",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 24,
+      "development": {
+        "n": 9,
+        "wr": 66.67,
+        "return_pct": 0.3456,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.3456
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.2664,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.2664
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl1.0_hold24",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 24,
+      "development": {
+        "n": 9,
+        "wr": 66.67,
+        "return_pct": 0.1948,
+        "dd_pct": 0.45,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1948
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold12",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 12,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.1384,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1384
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.1157,
+        "dd_pct": 0.45,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1157
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl1.0_hold12",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 12,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": -0.0121,
+        "dd_pct": 0.45,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": -0.0121
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_medium_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 41,
+        "wr": 58.54,
+        "return_pct": 0.2143,
+        "dd_pct": 0.7623,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.2143
+        },
+        "max_loss_streak": 2,
+        "active_days": 12,
+        "trades_per_calendar_day": 2.562,
+        "trades_per_active_day": 3.417,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 41
+        },
+        "literal_target_hits": 22,
+        "literal_target_hit_rate": 53.66,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 13,
+          "TP": 22
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_strict_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 15,
+        "wr": 53.33,
+        "return_pct": 0.04,
+        "dd_pct": 0.3749,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.04
+        },
+        "max_loss_streak": 3,
+        "active_days": 9,
+        "trades_per_calendar_day": 1.0,
+        "trades_per_active_day": 1.667,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 15
+        },
+        "literal_target_hits": 8,
+        "literal_target_hit_rate": 53.33,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 5,
+          "TP": 8
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_strict_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 15,
+        "wr": 53.33,
+        "return_pct": -0.3353,
+        "dd_pct": 0.6002,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": -0.3353
+        },
+        "max_loss_streak": 3,
+        "active_days": 9,
+        "trades_per_calendar_day": 1.0,
+        "trades_per_active_day": 1.667,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 15
+        },
+        "literal_target_hits": 8,
+        "literal_target_hit_rate": 53.33,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 5,
+          "TP": 8
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_loose_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 61,
+        "wr": 57.38,
+        "return_pct": 0.1095,
+        "dd_pct": 1.3961,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1095
+        },
+        "max_loss_streak": 4,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.812,
+        "trades_per_active_day": 5.083,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 61
+        },
+        "literal_target_hits": 32,
+        "literal_target_hit_rate": 52.46,
+        "outcomes": {
+          "CLOSE": 10,
+          "SL": 19,
+          "TP": 32
+        }
+      }
+    }
+  ],
+  "validation_frontier": [
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_medium_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 27,
+        "wr": 62.96,
+        "return_pct": 0.6849,
+        "dd_pct": 0.6683,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6849
+        },
+        "max_loss_streak": 3,
+        "active_days": 11,
+        "trades_per_calendar_day": 1.688,
+        "trades_per_active_day": 2.455,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 27
+        },
+        "literal_target_hits": 16,
+        "literal_target_hit_rate": 59.26,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 5,
+          "TP": 16
+        }
+      },
+      "validation": {
+        "n": 36,
+        "wr": 75.0,
+        "return_pct": 0.9786,
+        "dd_pct": 0.8105,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.0419,
+          "2026-09": -0.0627
+        },
+        "max_loss_streak": 2,
+        "active_days": 10,
+        "trades_per_calendar_day": 3.0,
+        "trades_per_active_day": 3.6,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 36
+        },
+        "literal_target_hits": 23,
+        "literal_target_hit_rate": 63.89,
+        "outcomes": {
+          "CLOSE": 4,
+          "SL": 9,
+          "TP": 23
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 52,
+        "wr": 61.54,
+        "return_pct": 1.2819,
+        "dd_pct": 0.8162,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 1.2819
+        },
+        "max_loss_streak": 3,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.25,
+        "trades_per_active_day": 4.333,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 29,
+        "literal_target_hit_rate": 55.77,
+        "outcomes": {
+          "CLOSE": 15,
+          "SL": 8,
+          "TP": 29
+        }
+      },
+      "validation": {
+        "n": 52,
+        "wr": 71.15,
+        "return_pct": 1.3674,
+        "dd_pct": 0.7365,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.8869,
+          "2026-09": -0.5099
+        },
+        "max_loss_streak": 2,
+        "active_days": 11,
+        "trades_per_calendar_day": 3.467,
+        "trades_per_active_day": 4.727,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 52
+        },
+        "literal_target_hits": 33,
+        "literal_target_hit_rate": 63.46,
+        "outcomes": {
+          "CLOSE": 8,
+          "SL": 11,
+          "TP": 33
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_medium_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 27,
+        "wr": 59.26,
+        "return_pct": 0.6858,
+        "dd_pct": 0.4493,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6858
+        },
+        "max_loss_streak": 3,
+        "active_days": 11,
+        "trades_per_calendar_day": 1.688,
+        "trades_per_active_day": 2.455,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 27
+        },
+        "literal_target_hits": 15,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 6,
+          "TP": 15
+        }
+      },
+      "validation": {
+        "n": 34,
+        "wr": 70.59,
+        "return_pct": 0.9815,
+        "dd_pct": 0.675,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.9676,
+          "2026-09": 0.0138
+        },
+        "max_loss_streak": 3,
+        "active_days": 10,
+        "trades_per_calendar_day": 2.833,
+        "trades_per_active_day": 3.4,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 34
+        },
+        "literal_target_hits": 20,
+        "literal_target_hit_rate": 58.82,
+        "outcomes": {
+          "CLOSE": 4,
+          "SL": 10,
+          "TP": 20
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 48,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.2664,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.2664
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      },
+      "validation": {
+        "n": 12,
+        "wr": 66.67,
+        "return_pct": 0.3379,
+        "dd_pct": 0.6731,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.0374,
+          "2026-09": 0.3004
+        },
+        "max_loss_streak": 3,
+        "active_days": 6,
+        "trades_per_calendar_day": 1.091,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 12
+        },
+        "literal_target_hits": 7,
+        "literal_target_hit_rate": 58.33,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 3,
+          "TP": 7
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.1157,
+        "dd_pct": 0.45,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1157
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      },
+      "validation": {
+        "n": 12,
+        "wr": 66.67,
+        "return_pct": 0.1119,
+        "dd_pct": 0.8969,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": -0.1129,
+          "2026-09": 0.225
+        },
+        "max_loss_streak": 3,
+        "active_days": 6,
+        "trades_per_calendar_day": 1.091,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 12
+        },
+        "literal_target_hits": 7,
+        "literal_target_hit_rate": 58.33,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 3,
+          "TP": 7
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_medium_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "medium",
+        "name": "medium",
+        "move": 0.5,
+        "rank": 0.71,
+        "body": 0.05,
+        "close_pos": 0.65,
+        "volume": 0.9,
+        "divergence": 0.15
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 41,
+        "wr": 65.85,
+        "return_pct": 0.6612,
+        "dd_pct": 0.7094,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.6612
+        },
+        "max_loss_streak": 2,
+        "active_days": 12,
+        "trades_per_calendar_day": 2.562,
+        "trades_per_active_day": 3.417,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 41
+        },
+        "literal_target_hits": 24,
+        "literal_target_hit_rate": 58.54,
+        "outcomes": {
+          "CLOSE": 9,
+          "SL": 8,
+          "TP": 24
+        }
+      },
+      "validation": {
+        "n": 45,
+        "wr": 64.44,
+        "return_pct": 0.2157,
+        "dd_pct": 1.1973,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.0014,
+          "2026-09": -0.7779
+        },
+        "max_loss_streak": 3,
+        "active_days": 10,
+        "trades_per_calendar_day": 3.75,
+        "trades_per_active_day": 4.5,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 45
+        },
+        "literal_target_hits": 24,
+        "literal_target_hit_rate": 53.33,
+        "outcomes": {
+          "CLOSE": 10,
+          "SL": 11,
+          "TP": 24
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h12_loose_tp0.5_sl1.0_hold48",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 12,
+        "level": "loose",
+        "name": "loose",
+        "move": 0.35,
+        "rank": 0.71,
+        "body": 0.03,
+        "close_pos": 0.6,
+        "volume": 0.7,
+        "divergence": 0.1
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 48,
+      "development": {
+        "n": 63,
+        "wr": 63.49,
+        "return_pct": 0.402,
+        "dd_pct": 1.8121,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.402
+        },
+        "max_loss_streak": 4,
+        "active_days": 12,
+        "trades_per_calendar_day": 3.938,
+        "trades_per_active_day": 5.25,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 63
+        },
+        "literal_target_hits": 36,
+        "literal_target_hit_rate": 57.14,
+        "outcomes": {
+          "CLOSE": 13,
+          "SL": 14,
+          "TP": 36
+        }
+      },
+      "validation": {
+        "n": 61,
+        "wr": 62.3,
+        "return_pct": 0.6197,
+        "dd_pct": 0.8067,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 1.3711,
+          "2026-09": -0.7412
+        },
+        "max_loss_streak": 4,
+        "active_days": 11,
+        "trades_per_calendar_day": 4.067,
+        "trades_per_active_day": 5.545,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 61
+        },
+        "literal_target_hits": 32,
+        "literal_target_hit_rate": 52.46,
+        "outcomes": {
+          "CLOSE": 17,
+          "SL": 12,
+          "TP": 32
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold24",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 24,
+      "development": {
+        "n": 9,
+        "wr": 66.67,
+        "return_pct": 0.3456,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.3456
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      },
+      "validation": {
+        "n": 12,
+        "wr": 66.67,
+        "return_pct": 0.5055,
+        "dd_pct": 0.4998,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.3057,
+          "2026-09": 0.1992
+        },
+        "max_loss_streak": 3,
+        "active_days": 6,
+        "trades_per_calendar_day": 1.091,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 12
+        },
+        "literal_target_hits": 6,
+        "literal_target_hit_rate": 50.0,
+        "outcomes": {
+          "CLOSE": 4,
+          "SL": 2,
+          "TP": 6
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl1.0_hold24",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 1.0,
+      "hold_bars": 24,
+      "development": {
+        "n": 9,
+        "wr": 66.67,
+        "return_pct": 0.1948,
+        "dd_pct": 0.45,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1948
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      },
+      "validation": {
+        "n": 12,
+        "wr": 66.67,
+        "return_pct": 0.3546,
+        "dd_pct": 0.6492,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.2305,
+          "2026-09": 0.1238
+        },
+        "max_loss_streak": 3,
+        "active_days": 6,
+        "trades_per_calendar_day": 1.091,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 12
+        },
+        "literal_target_hits": 6,
+        "literal_target_hit_rate": 50.0,
+        "outcomes": {
+          "CLOSE": 4,
+          "SL": 2,
+          "TP": 6
+        }
+      }
+    },
+    {
+      "route_id": "cross_sectional_exhaustion_reversal_h6_strict_tp0.5_sl0.75_hold12",
+      "profile": {
+        "family": "cross_sectional_exhaustion_reversal",
+        "horizon": 6,
+        "level": "strict",
+        "name": "strict",
+        "move": 0.7,
+        "rank": 0.86,
+        "body": 0.08,
+        "close_pos": 0.7,
+        "volume": 1.1,
+        "divergence": 0.2
+      },
+      "target_pct": 0.5,
+      "stop_pct": 0.75,
+      "hold_bars": 12,
+      "development": {
+        "n": 9,
+        "wr": 55.56,
+        "return_pct": 0.1384,
+        "dd_pct": 0.3002,
+        "negative_months": 0,
+        "monthly_return_pct": {
+          "2026-08": 0.1384
+        },
+        "max_loss_streak": 1,
+        "active_days": 8,
+        "trades_per_calendar_day": 0.6,
+        "trades_per_active_day": 1.125,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 9
+        },
+        "literal_target_hits": 5,
+        "literal_target_hit_rate": 55.56,
+        "outcomes": {
+          "CLOSE": 2,
+          "SL": 2,
+          "TP": 5
+        }
+      },
+      "validation": {
+        "n": 12,
+        "wr": 58.33,
+        "return_pct": 0.2053,
+        "dd_pct": 0.5176,
+        "negative_months": 1,
+        "monthly_return_pct": {
+          "2026-08": 0.2247,
+          "2026-09": -0.0194
+        },
+        "max_loss_streak": 3,
+        "active_days": 6,
+        "trades_per_calendar_day": 1.091,
+        "trades_per_active_day": 2.0,
+        "by_module_count": {
+          "stock_5m_literal_cross_sectional_exhaustion_reversal": 12
+        },
+        "literal_target_hits": 4,
+        "literal_target_hit_rate": 33.33,
+        "outcomes": {
+          "CLOSE": 6,
+          "SL": 2,
+          "TP": 4
+        }
+      }
+    }
+  ],
+  "readiness": {
+    "live_activation_allowed": false,
+    "reason": "initial independent reveal was negative"
+  },
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\manifest.json": "fb0a9282dc28d2b886ff9888c96886013ef5e3f63180abb567b3c13722639046",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\AAPLUSDT_5min_current.pkl": "80ff62c5e5644e9c34c01868c34d7a9627167f67041c495318fa57fbb7405211",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\AMZNUSDT_5min_current.pkl": "433ba953eb683966584bb32382bfa90d52461fed3176dee0bec1f47eb7810e64",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\METAUSDT_5min_current.pkl": "5ec4ec44d3e650c5ea47b330e7ba6e09a0747feea860cb03278c37165499c6b0",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MRVLUSDT_5min_current.pkl": "923b95e6f2950e1f83f276dc598525740ff953b653abc35be3406dcebe8b955b",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MSFTUSDT_5min_current.pkl": "361e65206e4d5d90fd26a3ff7c9237109625c68debfea09419425f71272e9526",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MUUSDT_5min_current.pkl": "b50029e161de2b1e3db31f6e30b4bb347dae971b0392f273bfb3df502ebaac6d",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\NVDAUSDT_5min_current.pkl": "fe6d0dd40ec26d07be33b51cb680734cd65b80b93e8d8b77efef175f2fd97b57",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\QQQUSDT_5min_current.pkl": "df13f6ae06f2087e23eb62c8bcd6e1819873e6a1fcdf2f5147eefbcbb34ad793"
+  },
+  "limitations": [
+    "Direct native five-minute history spans only about two months.",
+    "The instrument universe contains only seven stock contracts.",
+    "OHLC bars cannot reproduce spread, latency or intrabar path.",
+    "No result can guarantee a monthly return or eliminate losing months."
+  ]
+}
