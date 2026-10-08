@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "created_at": "2026-10-08T04:40:52.401563+00:00",
+  "profile": "robust_dynamic_entry_filtered",
+  "scan_cap": 2,
+  "previous_max_entry_time": 1790961300,
+  "previous_max_entry_iso": "2026-10-02T17:15:00+00:00",
+  "family_range": {
+    "first": 1783431900,
+    "last": 1791396000
+  },
+  "raw_frozen_signals": 176,
+  "fresh_raw_signals": 0,
+  "fresh_raw": [],
+  "fresh_portfolio_signals": 0,
+  "fresh_metrics": {
+    "n": 0,
+    "wr": 0,
+    "wr_lower_95": 0,
+    "net_r": 0,
+    "mean_r": 0,
+    "pf": null,
+    "dd_r": 0.0,
+    "active_days": 0,
+    "daily_lcb": -1000000000.0,
+    "symbols": 0,
+    "stress_net_r": 0
+  },
+  "fresh": [],
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_forward_oct3_families.csv": "64b6c6dfe23a81a73bded535d2a55fe7288077a1ae1ebc23a90855bb2e5b9f43",
+    "reports\\audit_2026_09_08\\stock_forward_oct8_families.csv": "950d9f372a667520eb9a5b7e66c678451532566b631aca9c8fe75c79478a6c6a"
+  },
+  "invariant": "production module order, index-context sanity guard, entry filters and dynamic targets; only entries later than the audited reference; causal one-symbol, cooldown, 2-per-scan, loss-pause and direction-cap portfolio gate",
+  "limitations": [
+    "OHLC stop-first replay is a market-entry proxy, not account fills.",
+    "The fresh slice is too short to establish a stable win rate."
+  ]
+}

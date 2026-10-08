@@ -1,0 +1,241 @@
+{
+  "full_current_runtime_window": {
+    "active_days": 1,
+    "by_module_count": {
+      "shadow_stock_5m_range_reversion_short": 1
+    },
+    "dd_pct": 0.0,
+    "first_entry_utc": "2026-08-19T16:10:00+00:00",
+    "first_target_move_pct": {
+      "above_2pct": 0,
+      "max": 0.614632,
+      "median": 0.614632,
+      "min": 0.614632
+    },
+    "last_entry_utc": "2026-08-19T16:10:00+00:00",
+    "literal_target_hit_rate": 100.0,
+    "literal_target_hits": 1,
+    "max_loss_streak": 0,
+    "module_count": {
+      "shadow_stock_5m_range_reversion_short": 1
+    },
+    "monthly_return_pct": {
+      "2026-08": 0.2397
+    },
+    "n": 1,
+    "negative_months": 0,
+    "outcomes": {
+      "TP_RUNNER": 1
+    },
+    "return_pct": 0.2397,
+    "trades_per_active_day": 1.0,
+    "trades_per_calendar_day": 1.0,
+    "wr": 100.0
+  },
+  "genuinely_post_material_freeze": {
+    "accepted_events": 0,
+    "by_day": {},
+    "cutoff": 1791263451,
+    "cutoff_utc": "2026-10-06T05:10:51+00:00",
+    "material_events": 0,
+    "raw_events": 5,
+    "result": {
+      "dd_pct": 0.0,
+      "first_entry_utc": null,
+      "last_entry_utc": null,
+      "literal_target_hit_rate": 0.0,
+      "literal_target_hits": 0,
+      "module_count": {},
+      "n": 0,
+      "outcomes": {},
+      "return_pct": 0.0,
+      "wr": 0.0
+    }
+  },
+  "integrity": {
+    "candle_overlap": {
+      "AAPLUSDT": {
+        "overlap_bars": 16624,
+        "overlap_end": 1791021300,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "AMZNUSDT": {
+        "overlap_bars": 16624,
+        "overlap_end": 1791021300,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "METAUSDT": {
+        "overlap_bars": 16625,
+        "overlap_end": 1791021600,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "MRVLUSDT": {
+        "overlap_bars": 16625,
+        "overlap_end": 1791021600,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "MSFTUSDT": {
+        "overlap_bars": 16625,
+        "overlap_end": 1791021600,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "MUUSDT": {
+        "overlap_bars": 16625,
+        "overlap_end": 1791021600,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "NVDAUSDT": {
+        "overlap_bars": 16625,
+        "overlap_end": 1791021600,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      },
+      "QQQUSDT": {
+        "overlap_bars": 16626,
+        "overlap_end": 1791021900,
+        "overlap_start": 1786034400,
+        "revisions": {
+          "close": 0,
+          "high": 0,
+          "low": 0,
+          "open": 0,
+          "volume": 0
+        }
+      }
+    },
+    "legacy_research_event_parity": {
+      "current_runtime_events": 150,
+      "interpretation": "Exact parity proves the current fresh-transition runtime reproduces the legacy selected events on their shared period. Material-target eligibility is measured separately below.",
+      "legacy_events": 150,
+      "legacy_missing_from_runtime": 0,
+      "matched": 150,
+      "period_end": 1790876700,
+      "period_start": 1786109700,
+      "runtime_unexpected": 0
+    }
+  },
+  "limitations": [
+    "The material-target rule has only about one completed US session of true post-freeze data.",
+    "Public OHLC cannot reproduce live spread, latency or order-book slippage.",
+    "The 30-200% monthly objective and absence of losing months remain unproven."
+  ],
+  "material_filter": {
+    "all_current_runtime_events": 157,
+    "all_events_passing_0_5pct": 2,
+    "pass_rate_pct": 1.2739,
+    "rejected_below_0_5pct": 155
+  },
+  "post_prior_data": {
+    "accepted_events": 0,
+    "by_day": {},
+    "by_month": {},
+    "cutoff": 1790876700,
+    "cutoff_utc": "2026-10-01T17:45:00+00:00",
+    "material_events": 0,
+    "raw_events": 7,
+    "result": {
+      "dd_pct": 0.0,
+      "first_entry_utc": null,
+      "last_entry_utc": null,
+      "literal_target_hit_rate": 0.0,
+      "literal_target_hits": 0,
+      "module_count": {},
+      "n": 0,
+      "outcomes": {},
+      "return_pct": 0.0,
+      "wr": 0.0
+    }
+  },
+  "protocol": {
+    "entry": "next 5m market open proxy",
+    "exit": "70% near target, 30% runner, breakeven from next bar, stop-first",
+    "expiry": "same US cash-session close",
+    "minimum_first_target_move_pct": 0.5,
+    "money": "3% current-equity margin, fixed 10x gross",
+    "orders": "market proxy only; shadow runtime cannot place real orders",
+    "portfolio": "one symbol open, 3h cooldown, cap2/15m, direction cap4, daily pause after 3 losses",
+    "runners_r": {
+      "shadow_stock_5m_range_reversion_short": 1.0,
+      "shadow_stock_5m_trend_pullback_short": 4.0
+    },
+    "selection": "exact current src.stock_5m_shadow_router; no fitting",
+    "signal": "fresh closed 5m X-Perp event in US regular session"
+  },
+  "readiness": {
+    "live_activation_allowed": false,
+    "observed_genuinely_new_accepted": 0,
+    "required_genuinely_new_accepted": 30,
+    "statistically_ready": false
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\src\\stock_5m_shadow_router.py": "0a7b6e31551b32d2ac92ea91f0dba78244be967f6372d0774ff3b55b306de989",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_material_forward_oct8_audit.py": "8273f6016b641c441ed01eaaf61d870480864657ae58708a7ce5b69b2fb1acc4",
+    "reports\\audit_2026_09_08\\stock_5m_regime_filter_oct3_rows.csv": "1153d66d0670c2901ea4b451fbb7c4612e04304c707b927414a740677b197e48",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AAPLUSDT_5min_current.pkl": "e11722ed5475cc18c1bfb37d1f39354ad943235f0186dde04f03738817d3f911",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AMZNUSDT_5min_current.pkl": "bc55888b20cc3c10d635126a0efa0acc6aefcc38606e223ee16c6a184e1c949e",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\METAUSDT_5min_current.pkl": "786895fc9cba0bafb1d9f0f4e3be758d5385d3ade69f559fea29d669731ff4e2",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MRVLUSDT_5min_current.pkl": "123b6b09f1601594e2faea57c062d89076d3f4230859e0a2a65488c48803ac7a",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MSFTUSDT_5min_current.pkl": "2c7370adba9b5dee5f8c64448eff253453337159eb5f75ff9d44c60e4f037238",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MUUSDT_5min_current.pkl": "52f4b05bb444a30f163b07bda0cfcf38a2fe8b59f3e715001f704fc68467f4ce",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\NVDAUSDT_5min_current.pkl": "3c10b1d854f848a84c5319a97aa9376a8264f9829979ced2cad103f77ffcf313",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\QQQUSDT_5min_current.pkl": "a23c2a3839f52a93636dd3d6c4da1b0a5ab40fbefe7a147c484e43736980950c",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\AAPLUSDT_5min_current.pkl": "80ff62c5e5644e9c34c01868c34d7a9627167f67041c495318fa57fbb7405211",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\AMZNUSDT_5min_current.pkl": "433ba953eb683966584bb32382bfa90d52461fed3176dee0bec1f47eb7810e64",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\METAUSDT_5min_current.pkl": "5ec4ec44d3e650c5ea47b330e7ba6e09a0747feea860cb03278c37165499c6b0",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MRVLUSDT_5min_current.pkl": "923b95e6f2950e1f83f276dc598525740ff953b653abc35be3406dcebe8b955b",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MSFTUSDT_5min_current.pkl": "361e65206e4d5d90fd26a3ff7c9237109625c68debfea09419425f71272e9526",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MUUSDT_5min_current.pkl": "b50029e161de2b1e3db31f6e30b4bb347dae971b0392f273bfb3df502ebaac6d",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\NVDAUSDT_5min_current.pkl": "fe6d0dd40ec26d07be33b51cb680734cd65b80b93e8d8b77efef175f2fd97b57",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\QQQUSDT_5min_current.pkl": "df13f6ae06f2087e23eb62c8bcd6e1819873e6a1fcdf2f5147eefbcbb34ad793",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\manifest.json": "fb0a9282dc28d2b886ff9888c96886013ef5e3f63180abb567b3c13722639046"
+  },
+  "status": "CURRENT_RUNTIME_FORWARD_OBSERVED"
+}
