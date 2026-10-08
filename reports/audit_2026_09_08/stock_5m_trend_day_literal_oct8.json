@@ -228,6 +228,72 @@
   "confirmation_passed": false,
   "reveal": null,
   "initial_reveal_passed": false,
+  "economic_objective_checks": {
+    "development": {
+      "n": 18,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 1.5,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.304346,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 3.0551,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "validation": {
+      "n": 12,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 1.0909090909090908,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.233733,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 1.6939,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "confirmation": {
+      "n": 31,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 1.631578947368421,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": -0.020329,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": -0.2247,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "initial_reveal": {
+      "n": 1,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 0.3333333333333333,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.5,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 1.1052,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    }
+  },
   "frontier": [
     {
       "config": {
@@ -1491,7 +1557,7 @@
     "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\MUUSDT_5min_current.pkl": "b50029e161de2b1e3db31f6e30b4bb347dae971b0392f273bfb3df502ebaac6d",
     "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\NVDAUSDT_5min_current.pkl": "fe6d0dd40ec26d07be33b51cb680734cd65b80b93e8d8b77efef175f2fd97b57",
     "reports\\audit_2026_09_08\\stock_xperp_5m_oct8_forward\\QQQUSDT_5min_current.pkl": "df13f6ae06f2087e23eb62c8bcd6e1819873e6a1fcdf2f5147eefbcbb34ad793",
-    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_trend_day_literal_oct8_audit.py": "66d0e309d7e948fab43b60226705c9307d318fd1b4695148e0fe685b25ae63fb"
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_trend_day_literal_oct8_audit.py": "81bd36eb29965bd30581cb208d1d57c4a05dac0e52239cce42f87fa76de89ec1"
   },
   "limitations": [
     "Native five-minute history spans only about two months.",

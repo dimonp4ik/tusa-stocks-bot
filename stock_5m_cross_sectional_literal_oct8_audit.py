@@ -22,6 +22,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from stock_5m_high_payoff_oct3_audit import accepted, money
+from src.research_profit_gate import economic_gate
 
 
 ROOT = Path("reports/audit_2026_09_08")
@@ -271,6 +272,16 @@ def bounds(rows: list[dict], period: tuple[str, str]) -> list[dict]:
     return [row for row in rows if start <= float(row["entry_time"]) < end]
 
 
+def economics(rows: list[dict], period: tuple[str, str]) -> dict:
+    selected = accepted(bounds(rows, period))
+    market_days = len(pd.bdate_range(
+        period[0], pd.Timestamp(period[1])-pd.Timedelta(days=1)))
+    frequency = len(selected)/market_days if market_days else 0.0
+    signed = [float(row["risk_pct"])*float(row["net_r"])
+              for row in selected]
+    return economic_gate(signed, frequency)
+
+
 def detail(rows: list[dict]) -> dict:
     selected = accepted(rows)
     base = money(rows)
@@ -468,6 +479,13 @@ def main() -> None:
                   if refinement else [])
     pre_reveal_passed = bool(primary_passed or refinement)
     reveal = detail(bounds(final_rows, REVEAL)) if pre_reveal_passed else None
+    economic_checks = ({name: economics(final_rows, period)
+                        for name, period in (
+                            ("development", DEVELOPMENT),
+                            ("validation", VALIDATION),
+                            ("confirmation", CONFIRMATION),
+                            ("initial_reveal", REVEAL))}
+                       if final_rows else {})
     reveal_passed = bool(reveal and reveal["return_pct"] > 0
                          and reveal["literal_target_hit_rate"] >= 50
                          and reveal["max_loss_streak"] <= 3)
@@ -513,6 +531,7 @@ def main() -> None:
         "reveal": reveal,
         "initial_reveal_passed": reveal_passed,
         "combined_only_if_passed": combined,
+        "economic_objective_checks": economic_checks,
         "frontier": candidates[:15],
         "development_frontier": development_frontier[:15],
         "validation_frontier": validation_frontier[:15],

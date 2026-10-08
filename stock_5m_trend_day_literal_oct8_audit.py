@@ -11,6 +11,7 @@ import pandas as pd
 
 import stock_5m_cross_sectional_literal_oct8_audit as base
 from stock_5m_high_payoff_oct3_audit import accepted, money
+from src.research_profit_gate import economic_gate
 
 
 ROOT = Path("reports/audit_2026_09_08")
@@ -143,6 +144,16 @@ def period(rows: list[dict], bounds: tuple[str, str]) -> list[dict]:
     return base.bounds(rows, bounds)
 
 
+def economics(rows: list[dict], bounds: tuple[str, str]) -> dict:
+    chosen = accepted(period(rows, bounds))
+    market_days = len(pd.bdate_range(
+        bounds[0], pd.Timestamp(bounds[1])-pd.Timedelta(days=1)))
+    frequency = len(chosen)/market_days if market_days else 0.0
+    signed = [float(row["risk_pct"])*float(row["net_r"])
+              for row in chosen]
+    return economic_gate(signed, frequency)
+
+
 def stage_ok(value: dict, target: float, minimum: int) -> bool:
     return bool(value["n"] >= minimum
                 and value["literal_target_hit_rate"] >= HIT_FLOORS[target]
@@ -209,6 +220,13 @@ def main() -> None:
     reveal_passed = bool(reveal and reveal["n"] >= 3
                          and reveal["return_pct"] > 0
                          and reveal["max_loss_streak"] <= 3)
+    economic_checks = ({name: economics(ensemble, bounds)
+                        for name, bounds in (
+                            ("development", base.DEVELOPMENT),
+                            ("validation", base.VALIDATION),
+                            ("confirmation", base.CONFIRMATION),
+                            ("initial_reveal", base.REVEAL))}
+                       if ensemble else {})
     status = ("RESEARCH_CANDIDATE_AWAITING_MORE_FORWARD" if reveal_passed
               else "REJECTED_ON_INITIAL_REVEAL" if confirmation_passed
               else "REJECTED_BEFORE_REVEAL")
@@ -236,6 +254,7 @@ def main() -> None:
         "confirmation": confirmation,
         "confirmation_passed": confirmation_passed,
         "reveal": reveal, "initial_reveal_passed": reveal_passed,
+        "economic_objective_checks": economic_checks,
         "frontier": candidates[:15],
         "development_only_frontier": frontiers[:15],
         "readiness": {"live_activation_allowed": False,

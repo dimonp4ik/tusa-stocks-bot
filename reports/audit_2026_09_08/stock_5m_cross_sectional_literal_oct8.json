@@ -293,6 +293,72 @@
       "TP": 66
     }
   },
+  "economic_objective_checks": {
+    "development": {
+      "n": 36,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 3.0,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.094952,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 1.8873,
+      "frequency_pass": true,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "validation": {
+      "n": 36,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 3.272727272727273,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.090849,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 1.9695,
+      "frequency_pass": true,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "confirmation": {
+      "n": 34,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 1.7894736842105263,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": 0.105342,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": 1.2458,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    },
+    "initial_reveal": {
+      "n": 3,
+      "margin_fraction": 0.03,
+      "leverage": 10.0,
+      "observed_trades_per_day": 1.0,
+      "required_trades_per_day": 3.0,
+      "market_days_per_month": 22,
+      "monthly_target_pct": 30.0,
+      "mean_signed_price_return_pct": -0.204839,
+      "required_constant_signed_price_return_pct": 1.327709,
+      "projected_monthly_return_pct": -1.347,
+      "frequency_pass": false,
+      "return_pass": false,
+      "passes": false,
+      "interpretation": "diagnostic projection from observed geometric trade return; not a forecast"
+    }
+  },
   "frontier": [
     {
       "route_id": "cross_sectional_exhaustion_reversal_h6_loose_tp0.5_sl1.0_hold48",
