@@ -1,0 +1,2181 @@
+{
+  "status": "IMMUTABLE_PUBLIC_RESEARCH_INPUT",
+  "provider": "Yahoo Finance visualization earnings entity",
+  "source": "https://query1.finance.yahoo.com/v1/finance/visualization",
+  "known_provider_limit": "endpoint stopped updating during 2025",
+  "requested_start": "2017-01-01",
+  "requested_end_exclusive": "2025-06-01",
+  "created_at": "2026-10-09T14:15:55.956121+00:00",
+  "symbols": [
+    "AAPL",
+    "AMZN",
+    "META",
+    "MRVL",
+    "MSFT",
+    "MU",
+    "NVDA"
+  ],
+  "payload_sha256": {
+    "AAPL": "4cee8a94ed6622fc4450925bd34da35b7f13d0ce46ae2e22346ca5de5edc9011",
+    "AMZN": "31a7dc98c1e48f0f0852f50710f2e364b2d5ec447e76492f61d94a18b9b110a8",
+    "META": "e21cb1f032b64fc1b43c3942103b2a2f151979e9adcfdf2603a7229a0d9b3adb",
+    "MRVL": "e4747d175eda39e137ce52df3f44eeba0617baafd3f3afbf84b0fa7ded274aee",
+    "MSFT": "b04f446eb76aa7f10db2881aa9e3c9267296ac03ba9ce4b3e39b0b58f61d53f1",
+    "MU": "e8d35dee0374cb237b9c8c354b2b79f4340164bb4342ace05b6636db8c1a5b6c",
+    "NVDA": "62a30b8a362557f97c6b797d5f19170d68a6eb6dd4ecf7a2e99f3bbfebd048e0"
+  },
+  "response_rows": {
+    "AAPL": 100,
+    "AMZN": 100,
+    "META": 53,
+    "MRVL": 99,
+    "MSFT": 100,
+    "MU": 100,
+    "NVDA": 100
+  },
+  "records": 237,
+  "records_by_symbol": {
+    "AAPL": 34,
+    "AMZN": 34,
+    "META": 34,
+    "MRVL": 34,
+    "MSFT": 34,
+    "MU": 33,
+    "NVDA": 34
+  },
+  "earnings": [
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2017-01-26",
+      "event_time_utc": "2017-01-26T21:09:00+00:00",
+      "event_time_et": "2017-01-26T16:09:00-05:00",
+      "eps_estimate": 0.79,
+      "eps_actual": 0.84,
+      "surprise_pct": 6.2
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2017-01-31",
+      "event_time_utc": "2017-01-31T21:30:00+00:00",
+      "event_time_et": "2017-01-31T16:30:00-05:00",
+      "eps_estimate": 0.8,
+      "eps_actual": 0.84,
+      "surprise_pct": 4.55
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2017-02-01",
+      "event_time_utc": "2017-02-01T21:01:00+00:00",
+      "event_time_et": "2017-02-01T16:01:00-05:00",
+      "eps_estimate": 1.31,
+      "eps_actual": 1.41,
+      "surprise_pct": 7.62
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2017-02-02",
+      "event_time_utc": "2017-02-02T21:01:00+00:00",
+      "event_time_et": "2017-02-02T16:01:00-05:00",
+      "eps_estimate": 0.07,
+      "eps_actual": 0.08,
+      "surprise_pct": 14.35
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2017-02-09",
+      "event_time_utc": "2017-02-09T21:20:00+00:00",
+      "event_time_et": "2017-02-09T16:20:00-05:00",
+      "eps_estimate": 0.21,
+      "eps_actual": 0.25,
+      "surprise_pct": 19.62
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2017-03-02",
+      "event_time_utc": "2017-03-02T21:05:00+00:00",
+      "event_time_et": "2017-03-02T16:05:00-05:00",
+      "eps_estimate": 0.19,
+      "eps_actual": 0.22,
+      "surprise_pct": 15.53
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2017-03-23",
+      "event_time_utc": "2017-03-23T20:04:00+00:00",
+      "event_time_et": "2017-03-23T16:04:00-04:00",
+      "eps_estimate": 0.86,
+      "eps_actual": 0.9,
+      "surprise_pct": 4.78
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2017-04-27",
+      "event_time_utc": "2017-04-27T20:01:00+00:00",
+      "event_time_et": "2017-04-27T16:01:00-04:00",
+      "eps_estimate": 0.05,
+      "eps_actual": 0.07,
+      "surprise_pct": 36.46
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2017-04-27",
+      "event_time_utc": "2017-04-27T20:05:00+00:00",
+      "event_time_et": "2017-04-27T16:05:00-04:00",
+      "eps_estimate": 0.7,
+      "eps_actual": 0.73,
+      "surprise_pct": 4.66
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2017-05-02",
+      "event_time_utc": "2017-05-02T20:30:00+00:00",
+      "event_time_et": "2017-05-02T16:30:00-04:00",
+      "eps_estimate": 0.5,
+      "eps_actual": 0.53,
+      "surprise_pct": 3.97
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2017-05-03",
+      "event_time_utc": "2017-05-03T20:11:00+00:00",
+      "event_time_et": "2017-05-03T16:11:00-04:00",
+      "eps_estimate": 1.12,
+      "eps_actual": 1.3,
+      "surprise_pct": 16.04
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2017-05-09",
+      "event_time_utc": "2017-05-09T20:20:00+00:00",
+      "event_time_et": "2017-05-09T16:20:00-04:00",
+      "eps_estimate": 0.16,
+      "eps_actual": 0.2,
+      "surprise_pct": 19.86
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2017-05-25",
+      "event_time_utc": "2017-05-25T20:15:00+00:00",
+      "event_time_et": "2017-05-25T16:15:00-04:00",
+      "eps_estimate": 0.21,
+      "eps_actual": 0.24,
+      "surprise_pct": 12.68
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2017-06-29",
+      "event_time_utc": "2017-06-29T20:00:00+00:00",
+      "event_time_et": "2017-06-29T16:00:00-04:00",
+      "eps_estimate": 1.51,
+      "eps_actual": 1.62,
+      "surprise_pct": 7.52
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2017-07-20",
+      "event_time_utc": "2017-07-20T20:06:00+00:00",
+      "event_time_et": "2017-07-20T16:06:00-04:00",
+      "eps_estimate": 0.71,
+      "eps_actual": 0.98,
+      "surprise_pct": 38.93
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2017-07-26",
+      "event_time_utc": "2017-07-26T20:05:00+00:00",
+      "event_time_et": "2017-07-26T16:05:00-04:00",
+      "eps_estimate": 1.13,
+      "eps_actual": 1.32,
+      "surprise_pct": 16.93
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2017-07-27",
+      "event_time_utc": "2017-07-27T20:01:00+00:00",
+      "event_time_et": "2017-07-27T16:01:00-04:00",
+      "eps_estimate": 0.07,
+      "eps_actual": 0.02,
+      "surprise_pct": -71.81
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2017-08-01",
+      "event_time_utc": "2017-08-01T20:30:00+00:00",
+      "event_time_et": "2017-08-01T16:30:00-04:00",
+      "eps_estimate": 0.39,
+      "eps_actual": 0.42,
+      "surprise_pct": 6.27
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2017-08-10",
+      "event_time_utc": "2017-08-10T20:20:00+00:00",
+      "event_time_et": "2017-08-10T16:20:00-04:00",
+      "eps_estimate": 0.17,
+      "eps_actual": 0.23,
+      "surprise_pct": 31.84
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2017-08-24",
+      "event_time_utc": "2017-08-24T20:05:00+00:00",
+      "event_time_et": "2017-08-24T16:05:00-04:00",
+      "eps_estimate": 0.28,
+      "eps_actual": 0.3,
+      "surprise_pct": 6.93
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2017-09-26",
+      "event_time_utc": "2017-09-26T20:00:00+00:00",
+      "event_time_et": "2017-09-26T16:00:00-04:00",
+      "eps_estimate": 1.83,
+      "eps_actual": 2.02,
+      "surprise_pct": 10.09
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2017-10-26",
+      "event_time_utc": "2017-10-26T20:01:00+00:00",
+      "event_time_et": "2017-10-26T16:01:00-04:00",
+      "eps_estimate": 0.0,
+      "eps_actual": 0.03,
+      "surprise_pct": 1656.76
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2017-10-26",
+      "event_time_utc": "2017-10-26T20:02:00+00:00",
+      "event_time_et": "2017-10-26T16:02:00-04:00",
+      "eps_estimate": 0.72,
+      "eps_actual": 0.84,
+      "surprise_pct": 16.55
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2017-11-01",
+      "event_time_utc": "2017-11-01T20:05:00+00:00",
+      "event_time_et": "2017-11-01T16:05:00-04:00",
+      "eps_estimate": 1.28,
+      "eps_actual": 1.59,
+      "surprise_pct": 24.11
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2017-11-02",
+      "event_time_utc": "2017-11-02T20:30:00+00:00",
+      "event_time_et": "2017-11-02T16:30:00-04:00",
+      "eps_estimate": 0.47,
+      "eps_actual": 0.52,
+      "surprise_pct": 10.85
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2017-11-09",
+      "event_time_utc": "2017-11-09T21:20:00+00:00",
+      "event_time_et": "2017-11-09T16:20:00-05:00",
+      "eps_estimate": 0.24,
+      "eps_actual": 0.33,
+      "surprise_pct": 40.83
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2017-11-28",
+      "event_time_utc": "2017-11-28T21:05:00+00:00",
+      "event_time_et": "2017-11-28T16:05:00-05:00",
+      "eps_estimate": 0.33,
+      "eps_actual": 0.34,
+      "surprise_pct": 4.44
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2017-12-19",
+      "event_time_utc": "2017-12-19T21:00:00+00:00",
+      "event_time_et": "2017-12-19T16:00:00-05:00",
+      "eps_estimate": 2.21,
+      "eps_actual": 2.45,
+      "surprise_pct": 11.01
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2018-01-31",
+      "event_time_utc": "2018-01-31T21:05:00+00:00",
+      "event_time_et": "2018-01-31T16:05:00-05:00",
+      "eps_estimate": 1.95,
+      "eps_actual": 2.21,
+      "surprise_pct": 13.2
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2018-01-31",
+      "event_time_utc": "2018-01-31T21:05:00+00:00",
+      "event_time_et": "2018-01-31T16:05:00-05:00",
+      "eps_estimate": 0.86,
+      "eps_actual": 0.96,
+      "surprise_pct": 11.0
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2018-02-01",
+      "event_time_utc": "2018-02-01T21:30:00+00:00",
+      "event_time_et": "2018-02-01T16:30:00-05:00",
+      "eps_estimate": 0.96,
+      "eps_actual": 0.97,
+      "surprise_pct": 0.87
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2018-02-01",
+      "event_time_utc": "2018-02-01T21:04:00+00:00",
+      "event_time_et": "2018-02-01T16:04:00-05:00",
+      "eps_estimate": 0.09,
+      "eps_actual": 0.11,
+      "surprise_pct": 17.33
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2018-02-08",
+      "event_time_utc": "2018-02-08T21:20:00+00:00",
+      "event_time_et": "2018-02-08T16:20:00-05:00",
+      "eps_estimate": 0.29,
+      "eps_actual": 0.39,
+      "surprise_pct": 34.37
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2018-03-08",
+      "event_time_utc": "2018-03-08T21:05:00+00:00",
+      "event_time_et": "2018-03-08T16:05:00-05:00",
+      "eps_estimate": 0.31,
+      "eps_actual": 0.32,
+      "surprise_pct": 2.89
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2018-03-22",
+      "event_time_utc": "2018-03-22T20:00:00+00:00",
+      "event_time_et": "2018-03-22T16:00:00-04:00",
+      "eps_estimate": 2.73,
+      "eps_actual": 2.82,
+      "surprise_pct": 3.16
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2018-04-25",
+      "event_time_utc": "2018-04-25T20:05:00+00:00",
+      "event_time_et": "2018-04-25T16:05:00-04:00",
+      "eps_estimate": 1.35,
+      "eps_actual": 1.69,
+      "surprise_pct": 25.12
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2018-04-26",
+      "event_time_utc": "2018-04-26T20:01:00+00:00",
+      "event_time_et": "2018-04-26T16:01:00-04:00",
+      "eps_estimate": 0.06,
+      "eps_actual": 0.16,
+      "surprise_pct": 159.65
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2018-04-26",
+      "event_time_utc": "2018-04-26T20:04:00+00:00",
+      "event_time_et": "2018-04-26T16:04:00-04:00",
+      "eps_estimate": 0.85,
+      "eps_actual": 0.95,
+      "surprise_pct": 11.86
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2018-05-01",
+      "event_time_utc": "2018-05-01T20:30:00+00:00",
+      "event_time_et": "2018-05-01T16:30:00-04:00",
+      "eps_estimate": 0.67,
+      "eps_actual": 0.68,
+      "surprise_pct": 2.14
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2018-05-10",
+      "event_time_utc": "2018-05-10T20:20:00+00:00",
+      "event_time_et": "2018-05-10T16:20:00-04:00",
+      "eps_estimate": 0.4,
+      "eps_actual": 0.51,
+      "surprise_pct": 28.67
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2018-05-31",
+      "event_time_utc": "2018-05-31T20:05:00+00:00",
+      "event_time_et": "2018-05-31T16:05:00-04:00",
+      "eps_estimate": 0.31,
+      "eps_actual": 0.32,
+      "surprise_pct": 2.13
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2018-06-20",
+      "event_time_utc": "2018-06-20T20:01:00+00:00",
+      "event_time_et": "2018-06-20T16:01:00-04:00",
+      "eps_estimate": 3.14,
+      "eps_actual": 3.15,
+      "surprise_pct": 0.24
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2018-07-19",
+      "event_time_utc": "2018-07-19T20:05:00+00:00",
+      "event_time_et": "2018-07-19T16:05:00-04:00",
+      "eps_estimate": 1.08,
+      "eps_actual": 1.13,
+      "surprise_pct": 5.02
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2018-07-25",
+      "event_time_utc": "2018-07-25T20:05:00+00:00",
+      "event_time_et": "2018-07-25T16:05:00-04:00",
+      "eps_estimate": 1.72,
+      "eps_actual": 1.74,
+      "surprise_pct": 1.1
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2018-07-26",
+      "event_time_utc": "2018-07-26T20:01:00+00:00",
+      "event_time_et": "2018-07-26T16:01:00-04:00",
+      "eps_estimate": 0.13,
+      "eps_actual": 0.25,
+      "surprise_pct": 99.84
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2018-07-31",
+      "event_time_utc": "2018-07-31T20:30:00+00:00",
+      "event_time_et": "2018-07-31T16:30:00-04:00",
+      "eps_estimate": 0.55,
+      "eps_actual": 0.59,
+      "surprise_pct": 7.27
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2018-08-16",
+      "event_time_utc": "2018-08-16T20:20:00+00:00",
+      "event_time_et": "2018-08-16T16:20:00-04:00",
+      "eps_estimate": 0.44,
+      "eps_actual": 0.49,
+      "surprise_pct": 9.8
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2018-09-06",
+      "event_time_utc": "2018-09-06T20:05:00+00:00",
+      "event_time_et": "2018-09-06T16:05:00-04:00",
+      "eps_estimate": 0.35,
+      "eps_actual": 0.28,
+      "surprise_pct": -19.0
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2018-09-20",
+      "event_time_utc": "2018-09-20T20:01:00+00:00",
+      "event_time_et": "2018-09-20T16:01:00-04:00",
+      "eps_estimate": 3.34,
+      "eps_actual": 3.53,
+      "surprise_pct": 5.79
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2018-10-24",
+      "event_time_utc": "2018-10-24T20:07:00+00:00",
+      "event_time_et": "2018-10-24T16:07:00-04:00",
+      "eps_estimate": 0.96,
+      "eps_actual": 1.14,
+      "surprise_pct": 18.37
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2018-10-25",
+      "event_time_utc": "2018-10-25T20:01:00+00:00",
+      "event_time_et": "2018-10-25T16:01:00-04:00",
+      "eps_estimate": 0.16,
+      "eps_actual": 0.29,
+      "surprise_pct": 82.98
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2018-10-30",
+      "event_time_utc": "2018-10-30T20:05:00+00:00",
+      "event_time_et": "2018-10-30T16:05:00-04:00",
+      "eps_estimate": 1.47,
+      "eps_actual": 1.76,
+      "surprise_pct": 19.68
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2018-11-01",
+      "event_time_utc": "2018-11-01T20:30:00+00:00",
+      "event_time_et": "2018-11-01T16:30:00-04:00",
+      "eps_estimate": 0.7,
+      "eps_actual": 0.73,
+      "surprise_pct": 4.56
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2018-11-15",
+      "event_time_utc": "2018-11-15T21:20:00+00:00",
+      "event_time_et": "2018-11-15T16:20:00-05:00",
+      "eps_estimate": 0.47,
+      "eps_actual": 0.46,
+      "surprise_pct": -1.32
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2018-12-04",
+      "event_time_utc": "2018-12-04T21:48:00+00:00",
+      "event_time_et": "2018-12-04T16:48:00-05:00",
+      "eps_estimate": 0.32,
+      "eps_actual": 0.33,
+      "surprise_pct": 3.15
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2018-12-18",
+      "event_time_utc": "2018-12-18T21:01:00+00:00",
+      "event_time_et": "2018-12-18T16:01:00-05:00",
+      "eps_estimate": 2.96,
+      "eps_actual": 2.97,
+      "surprise_pct": 0.5
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2019-01-29",
+      "event_time_utc": "2019-01-29T21:30:00+00:00",
+      "event_time_et": "2019-01-29T16:30:00-05:00",
+      "eps_estimate": 1.04,
+      "eps_actual": 1.05,
+      "surprise_pct": 0.31
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2019-01-30",
+      "event_time_utc": "2019-01-30T21:05:00+00:00",
+      "event_time_et": "2019-01-30T16:05:00-05:00",
+      "eps_estimate": 2.19,
+      "eps_actual": 2.38,
+      "surprise_pct": 8.88
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2019-01-30",
+      "event_time_utc": "2019-01-30T21:06:00+00:00",
+      "event_time_et": "2019-01-30T16:06:00-05:00",
+      "eps_estimate": 1.09,
+      "eps_actual": 1.1,
+      "surprise_pct": 0.7
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2019-01-31",
+      "event_time_utc": "2019-01-31T21:01:00+00:00",
+      "event_time_et": "2019-01-31T16:01:00-05:00",
+      "eps_estimate": 0.28,
+      "eps_actual": 0.3,
+      "surprise_pct": 6.34
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2019-02-14",
+      "event_time_utc": "2019-02-14T21:26:00+00:00",
+      "event_time_et": "2019-02-14T16:26:00-05:00",
+      "eps_estimate": 0.19,
+      "eps_actual": 0.2,
+      "surprise_pct": 6.48
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2019-03-07",
+      "event_time_utc": "2019-03-07T21:05:00+00:00",
+      "event_time_et": "2019-03-07T16:05:00-05:00",
+      "eps_estimate": 0.25,
+      "eps_actual": 0.25,
+      "surprise_pct": -1.67
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2019-03-20",
+      "event_time_utc": "2019-03-20T20:01:00+00:00",
+      "event_time_et": "2019-03-20T16:01:00-04:00",
+      "eps_estimate": 1.67,
+      "eps_actual": 1.71,
+      "surprise_pct": 2.38
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2019-04-24",
+      "event_time_utc": "2019-04-24T20:05:00+00:00",
+      "event_time_et": "2019-04-24T16:05:00-04:00",
+      "eps_estimate": 1.63,
+      "eps_actual": 1.89,
+      "surprise_pct": 16.25
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2019-04-24",
+      "event_time_utc": "2019-04-24T20:07:00+00:00",
+      "event_time_et": "2019-04-24T16:07:00-04:00",
+      "eps_estimate": 1.0,
+      "eps_actual": 1.14,
+      "surprise_pct": 14.15
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2019-04-25",
+      "event_time_utc": "2019-04-25T20:01:00+00:00",
+      "event_time_et": "2019-04-25T16:01:00-04:00",
+      "eps_estimate": 0.24,
+      "eps_actual": 0.35,
+      "surprise_pct": 50.11
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2019-04-30",
+      "event_time_utc": "2019-04-30T20:30:00+00:00",
+      "event_time_et": "2019-04-30T16:30:00-04:00",
+      "eps_estimate": 0.59,
+      "eps_actual": 0.62,
+      "surprise_pct": 4.18
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2019-05-16",
+      "event_time_utc": "2019-05-16T20:20:00+00:00",
+      "event_time_et": "2019-05-16T16:20:00-04:00",
+      "eps_estimate": 0.2,
+      "eps_actual": 0.22,
+      "surprise_pct": 8.69
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2019-05-30",
+      "event_time_utc": "2019-05-30T20:05:00+00:00",
+      "event_time_et": "2019-05-30T16:05:00-04:00",
+      "eps_estimate": 0.14,
+      "eps_actual": 0.16,
+      "surprise_pct": 11.2
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2019-06-25",
+      "event_time_utc": "2019-06-25T20:05:00+00:00",
+      "event_time_et": "2019-06-25T16:05:00-04:00",
+      "eps_estimate": 0.79,
+      "eps_actual": 1.05,
+      "surprise_pct": 33.13
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2019-07-18",
+      "event_time_utc": "2019-07-18T20:07:00+00:00",
+      "event_time_et": "2019-07-18T16:07:00-04:00",
+      "eps_estimate": 1.21,
+      "eps_actual": 1.37,
+      "surprise_pct": 12.95
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2019-07-24",
+      "event_time_utc": "2019-07-24T20:05:00+00:00",
+      "event_time_et": "2019-07-24T16:05:00-04:00",
+      "eps_estimate": 1.88,
+      "eps_actual": 1.99,
+      "surprise_pct": 5.77
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2019-07-25",
+      "event_time_utc": "2019-07-25T20:01:00+00:00",
+      "event_time_et": "2019-07-25T16:01:00-04:00",
+      "eps_estimate": 0.28,
+      "eps_actual": 0.26,
+      "surprise_pct": -6.27
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2019-07-30",
+      "event_time_utc": "2019-07-30T20:31:00+00:00",
+      "event_time_et": "2019-07-30T16:31:00-04:00",
+      "eps_estimate": 0.52,
+      "eps_actual": 0.55,
+      "surprise_pct": 3.9
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2019-08-15",
+      "event_time_utc": "2019-08-15T20:20:00+00:00",
+      "event_time_et": "2019-08-15T16:20:00-04:00",
+      "eps_estimate": 0.29,
+      "eps_actual": 0.31,
+      "surprise_pct": 8.29
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2019-08-29",
+      "event_time_utc": "2019-08-29T20:05:00+00:00",
+      "event_time_et": "2019-08-29T16:05:00-04:00",
+      "eps_estimate": 0.15,
+      "eps_actual": 0.16,
+      "surprise_pct": 7.38
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2019-09-26",
+      "event_time_utc": "2019-09-26T20:01:00+00:00",
+      "event_time_et": "2019-09-26T16:01:00-04:00",
+      "eps_estimate": 0.49,
+      "eps_actual": 0.56,
+      "surprise_pct": 14.95
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2019-10-23",
+      "event_time_utc": "2019-10-23T20:08:00+00:00",
+      "event_time_et": "2019-10-23T16:08:00-04:00",
+      "eps_estimate": 1.25,
+      "eps_actual": 1.38,
+      "surprise_pct": 10.83
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2019-10-24",
+      "event_time_utc": "2019-10-24T20:01:00+00:00",
+      "event_time_et": "2019-10-24T16:01:00-04:00",
+      "eps_estimate": 0.23,
+      "eps_actual": 0.21,
+      "surprise_pct": -8.43
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2019-10-30",
+      "event_time_utc": "2019-10-30T20:30:00+00:00",
+      "event_time_et": "2019-10-30T16:30:00-04:00",
+      "eps_estimate": 0.71,
+      "eps_actual": 0.76,
+      "surprise_pct": 6.71
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2019-10-30",
+      "event_time_utc": "2019-10-30T20:05:00+00:00",
+      "event_time_et": "2019-10-30T16:05:00-04:00",
+      "eps_estimate": 1.91,
+      "eps_actual": 2.12,
+      "surprise_pct": 10.92
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2019-11-14",
+      "event_time_utc": "2019-11-14T21:22:00+00:00",
+      "event_time_et": "2019-11-14T16:22:00-05:00",
+      "eps_estimate": 0.39,
+      "eps_actual": 0.45,
+      "surprise_pct": 13.07
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2019-12-03",
+      "event_time_utc": "2019-12-03T21:05:00+00:00",
+      "event_time_et": "2019-12-03T16:05:00-05:00",
+      "eps_estimate": 0.17,
+      "eps_actual": 0.17,
+      "surprise_pct": -2.5
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2019-12-18",
+      "event_time_utc": "2019-12-18T21:01:00+00:00",
+      "event_time_et": "2019-12-18T16:01:00-05:00",
+      "eps_estimate": 0.47,
+      "eps_actual": 0.48,
+      "surprise_pct": 1.5
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2020-01-28",
+      "event_time_utc": "2020-01-28T21:30:00+00:00",
+      "event_time_et": "2020-01-28T16:30:00-05:00",
+      "eps_estimate": 1.14,
+      "eps_actual": 1.25,
+      "surprise_pct": 9.73
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2020-01-29",
+      "event_time_utc": "2020-01-29T21:06:00+00:00",
+      "event_time_et": "2020-01-29T16:06:00-05:00",
+      "eps_estimate": 2.53,
+      "eps_actual": 2.56,
+      "surprise_pct": 1.36
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2020-01-29",
+      "event_time_utc": "2020-01-29T21:05:00+00:00",
+      "event_time_et": "2020-01-29T16:05:00-05:00",
+      "eps_estimate": 1.32,
+      "eps_actual": 1.51,
+      "surprise_pct": 14.49
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2020-01-30",
+      "event_time_utc": "2020-01-30T21:01:00+00:00",
+      "event_time_et": "2020-01-30T16:01:00-05:00",
+      "eps_estimate": 0.2,
+      "eps_actual": 0.32,
+      "surprise_pct": 60.62
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2020-02-13",
+      "event_time_utc": "2020-02-13T21:20:00+00:00",
+      "event_time_et": "2020-02-13T16:20:00-05:00",
+      "eps_estimate": 0.42,
+      "eps_actual": 0.47,
+      "surprise_pct": 13.24
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2020-03-04",
+      "event_time_utc": "2020-03-04T21:05:00+00:00",
+      "event_time_et": "2020-03-04T16:05:00-05:00",
+      "eps_estimate": 0.16,
+      "eps_actual": 0.17,
+      "surprise_pct": 5.56
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2020-03-25",
+      "event_time_utc": "2020-03-25T20:01:00+00:00",
+      "event_time_et": "2020-03-25T16:01:00-04:00",
+      "eps_estimate": 0.37,
+      "eps_actual": 0.45,
+      "surprise_pct": 23.11
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2020-04-29",
+      "event_time_utc": "2020-04-29T20:05:00+00:00",
+      "event_time_et": "2020-04-29T16:05:00-04:00",
+      "eps_estimate": 1.75,
+      "eps_actual": 1.71,
+      "surprise_pct": -2.56
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2020-04-29",
+      "event_time_utc": "2020-04-29T20:03:00+00:00",
+      "event_time_et": "2020-04-29T16:03:00-04:00",
+      "eps_estimate": 1.26,
+      "eps_actual": 1.4,
+      "surprise_pct": 10.7
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2020-04-30",
+      "event_time_utc": "2020-04-30T20:30:00+00:00",
+      "event_time_et": "2020-04-30T16:30:00-04:00",
+      "eps_estimate": 0.57,
+      "eps_actual": 0.64,
+      "surprise_pct": 12.78
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2020-04-30",
+      "event_time_utc": "2020-04-30T20:01:00+00:00",
+      "event_time_et": "2020-04-30T16:01:00-04:00",
+      "eps_estimate": 0.31,
+      "eps_actual": 0.25,
+      "surprise_pct": -19.83
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2020-05-21",
+      "event_time_utc": "2020-05-21T20:20:00+00:00",
+      "event_time_et": "2020-05-21T16:20:00-04:00",
+      "eps_estimate": 0.42,
+      "eps_actual": 0.45,
+      "surprise_pct": 6.75
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2020-05-28",
+      "event_time_utc": "2020-05-28T20:05:00+00:00",
+      "event_time_et": "2020-05-28T16:05:00-04:00",
+      "eps_estimate": 0.14,
+      "eps_actual": 0.18,
+      "surprise_pct": 28.35
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2020-06-29",
+      "event_time_utc": "2020-06-29T20:01:00+00:00",
+      "event_time_et": "2020-06-29T16:01:00-04:00",
+      "eps_estimate": 0.77,
+      "eps_actual": 0.82,
+      "surprise_pct": 5.82
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2020-07-22",
+      "event_time_utc": "2020-07-22T20:03:00+00:00",
+      "event_time_et": "2020-07-22T16:03:00-04:00",
+      "eps_estimate": 1.34,
+      "eps_actual": 1.46,
+      "surprise_pct": 8.72
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2020-07-30",
+      "event_time_utc": "2020-07-30T20:33:00+00:00",
+      "event_time_et": "2020-07-30T16:33:00-04:00",
+      "eps_estimate": 0.51,
+      "eps_actual": 0.65,
+      "surprise_pct": 26.25
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2020-07-30",
+      "event_time_utc": "2020-07-30T20:08:00+00:00",
+      "event_time_et": "2020-07-30T16:08:00-04:00",
+      "eps_estimate": 0.07,
+      "eps_actual": 0.52,
+      "surprise_pct": 605.29
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2020-07-30",
+      "event_time_utc": "2020-07-30T20:05:00+00:00",
+      "event_time_et": "2020-07-30T16:05:00-04:00",
+      "eps_estimate": 1.39,
+      "eps_actual": 1.8,
+      "surprise_pct": 29.58
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2020-08-19",
+      "event_time_utc": "2020-08-19T20:20:00+00:00",
+      "event_time_et": "2020-08-19T16:20:00-04:00",
+      "eps_estimate": 0.49,
+      "eps_actual": 0.55,
+      "surprise_pct": 10.79
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2020-08-27",
+      "event_time_utc": "2020-08-27T20:05:00+00:00",
+      "event_time_et": "2020-08-27T16:05:00-04:00",
+      "eps_estimate": 0.2,
+      "eps_actual": 0.21,
+      "surprise_pct": 4.54
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2020-09-29",
+      "event_time_utc": "2020-09-29T20:04:00+00:00",
+      "event_time_et": "2020-09-29T16:04:00-04:00",
+      "eps_estimate": 0.99,
+      "eps_actual": 1.08,
+      "surprise_pct": 9.27
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2020-10-27",
+      "event_time_utc": "2020-10-27T20:13:00+00:00",
+      "event_time_et": "2020-10-27T16:13:00-04:00",
+      "eps_estimate": 1.54,
+      "eps_actual": 1.82,
+      "surprise_pct": 17.91
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2020-10-29",
+      "event_time_utc": "2020-10-29T20:32:00+00:00",
+      "event_time_et": "2020-10-29T16:32:00-04:00",
+      "eps_estimate": 0.7,
+      "eps_actual": 0.73,
+      "surprise_pct": 4.25
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2020-10-29",
+      "event_time_utc": "2020-10-29T20:01:00+00:00",
+      "event_time_et": "2020-10-29T16:01:00-04:00",
+      "eps_estimate": 0.37,
+      "eps_actual": 0.62,
+      "surprise_pct": 66.95
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2020-10-29",
+      "event_time_utc": "2020-10-29T20:05:00+00:00",
+      "event_time_et": "2020-10-29T16:05:00-04:00",
+      "eps_estimate": 1.91,
+      "eps_actual": 2.4,
+      "surprise_pct": 25.95
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2020-11-18",
+      "event_time_utc": "2020-11-18T21:23:00+00:00",
+      "event_time_et": "2020-11-18T16:23:00-05:00",
+      "eps_estimate": 0.64,
+      "eps_actual": 0.73,
+      "surprise_pct": 13.1
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2020-12-03",
+      "event_time_utc": "2020-12-03T21:05:00+00:00",
+      "event_time_et": "2020-12-03T16:05:00-05:00",
+      "eps_estimate": 0.25,
+      "eps_actual": 0.25,
+      "surprise_pct": -0.63
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2021-01-07",
+      "event_time_utc": "2021-01-07T21:03:00+00:00",
+      "event_time_et": "2021-01-07T16:03:00-05:00",
+      "eps_estimate": 0.71,
+      "eps_actual": 0.78,
+      "surprise_pct": 9.83
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2021-01-26",
+      "event_time_utc": "2021-01-26T21:04:00+00:00",
+      "event_time_et": "2021-01-26T16:04:00-05:00",
+      "eps_estimate": 1.64,
+      "eps_actual": 2.03,
+      "surprise_pct": 23.69
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2021-01-27",
+      "event_time_utc": "2021-01-27T21:31:00+00:00",
+      "event_time_et": "2021-01-27T16:31:00-05:00",
+      "eps_estimate": 1.41,
+      "eps_actual": 1.68,
+      "surprise_pct": 19.02
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2021-01-27",
+      "event_time_utc": "2021-01-27T21:05:00+00:00",
+      "event_time_et": "2021-01-27T16:05:00-05:00",
+      "eps_estimate": 3.22,
+      "eps_actual": 3.88,
+      "surprise_pct": 20.62
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2021-02-02",
+      "event_time_utc": "2021-02-02T21:03:00+00:00",
+      "event_time_et": "2021-02-02T16:03:00-05:00",
+      "eps_estimate": 0.36,
+      "eps_actual": 0.7,
+      "surprise_pct": 94.84
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2021-02-24",
+      "event_time_utc": "2021-02-24T21:30:00+00:00",
+      "event_time_et": "2021-02-24T16:30:00-05:00",
+      "eps_estimate": 0.7,
+      "eps_actual": 0.78,
+      "surprise_pct": 10.33
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2021-03-03",
+      "event_time_utc": "2021-03-03T21:05:00+00:00",
+      "event_time_et": "2021-03-03T16:05:00-05:00",
+      "eps_estimate": 0.29,
+      "eps_actual": 0.29,
+      "surprise_pct": -0.34
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2021-03-31",
+      "event_time_utc": "2021-03-31T20:05:00+00:00",
+      "event_time_et": "2021-03-31T16:05:00-04:00",
+      "eps_estimate": 0.95,
+      "eps_actual": 0.98,
+      "surprise_pct": 3.52
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2021-04-27",
+      "event_time_utc": "2021-04-27T20:03:00+00:00",
+      "event_time_et": "2021-04-27T16:03:00-04:00",
+      "eps_estimate": 1.78,
+      "eps_actual": 1.95,
+      "surprise_pct": 9.63
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2021-04-28",
+      "event_time_utc": "2021-04-28T20:30:00+00:00",
+      "event_time_et": "2021-04-28T16:30:00-04:00",
+      "eps_estimate": 0.99,
+      "eps_actual": 1.4,
+      "surprise_pct": 41.89
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2021-04-28",
+      "event_time_utc": "2021-04-28T20:05:00+00:00",
+      "event_time_et": "2021-04-28T16:05:00-04:00",
+      "eps_estimate": 2.37,
+      "eps_actual": 3.3,
+      "surprise_pct": 39.41
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2021-04-29",
+      "event_time_utc": "2021-04-29T20:11:00+00:00",
+      "event_time_et": "2021-04-29T16:11:00-04:00",
+      "eps_estimate": 0.48,
+      "eps_actual": 0.79,
+      "surprise_pct": 65.48
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2021-05-26",
+      "event_time_utc": "2021-05-26T20:20:00+00:00",
+      "event_time_et": "2021-05-26T16:20:00-04:00",
+      "eps_estimate": 0.82,
+      "eps_actual": 0.92,
+      "surprise_pct": 11.46
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2021-06-07",
+      "event_time_utc": "2021-06-07T20:05:00+00:00",
+      "event_time_et": "2021-06-07T16:05:00-04:00",
+      "eps_estimate": 0.27,
+      "eps_actual": 0.29,
+      "surprise_pct": 7.07
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2021-06-30",
+      "event_time_utc": "2021-06-30T20:08:00+00:00",
+      "event_time_et": "2021-06-30T16:08:00-04:00",
+      "eps_estimate": 1.72,
+      "eps_actual": 1.88,
+      "surprise_pct": 9.32
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2021-07-27",
+      "event_time_utc": "2021-07-27T20:30:00+00:00",
+      "event_time_et": "2021-07-27T16:30:00-04:00",
+      "eps_estimate": 1.01,
+      "eps_actual": 1.3,
+      "surprise_pct": 29.12
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2021-07-27",
+      "event_time_utc": "2021-07-27T20:02:00+00:00",
+      "event_time_et": "2021-07-27T16:02:00-04:00",
+      "eps_estimate": 1.92,
+      "eps_actual": 2.17,
+      "surprise_pct": 13.26
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2021-07-28",
+      "event_time_utc": "2021-07-28T20:05:00+00:00",
+      "event_time_et": "2021-07-28T16:05:00-04:00",
+      "eps_estimate": 3.03,
+      "eps_actual": 3.61,
+      "surprise_pct": 18.99
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2021-07-29",
+      "event_time_utc": "2021-07-29T20:01:00+00:00",
+      "event_time_et": "2021-07-29T16:01:00-04:00",
+      "eps_estimate": 0.62,
+      "eps_actual": 0.76,
+      "surprise_pct": 22.91
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2021-08-18",
+      "event_time_utc": "2021-08-18T20:20:00+00:00",
+      "event_time_et": "2021-08-18T16:20:00-04:00",
+      "eps_estimate": 1.01,
+      "eps_actual": 1.04,
+      "surprise_pct": 2.51
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2021-08-26",
+      "event_time_utc": "2021-08-26T20:05:00+00:00",
+      "event_time_et": "2021-08-26T16:05:00-04:00",
+      "eps_estimate": 0.31,
+      "eps_actual": 0.34,
+      "surprise_pct": 8.71
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2021-09-28",
+      "event_time_utc": "2021-09-28T20:01:00+00:00",
+      "event_time_et": "2021-09-28T16:01:00-04:00",
+      "eps_estimate": 2.33,
+      "eps_actual": 2.42,
+      "surprise_pct": 3.67
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2021-10-25",
+      "event_time_utc": "2021-10-25T20:05:00+00:00",
+      "event_time_et": "2021-10-25T16:05:00-04:00",
+      "eps_estimate": 3.19,
+      "eps_actual": 3.22,
+      "surprise_pct": 0.99
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2021-10-26",
+      "event_time_utc": "2021-10-26T20:05:00+00:00",
+      "event_time_et": "2021-10-26T16:05:00-04:00",
+      "eps_estimate": 2.07,
+      "eps_actual": 2.27,
+      "surprise_pct": 9.41
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2021-10-28",
+      "event_time_utc": "2021-10-28T20:30:00+00:00",
+      "event_time_et": "2021-10-28T16:30:00-04:00",
+      "eps_estimate": 1.24,
+      "eps_actual": 1.24,
+      "surprise_pct": 0.3
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2021-10-28",
+      "event_time_utc": "2021-10-28T20:01:00+00:00",
+      "event_time_et": "2021-10-28T16:01:00-04:00",
+      "eps_estimate": 0.45,
+      "eps_actual": 0.31,
+      "surprise_pct": -31.39
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2021-11-17",
+      "event_time_utc": "2021-11-17T21:21:00+00:00",
+      "event_time_et": "2021-11-17T16:21:00-05:00",
+      "eps_estimate": 1.11,
+      "eps_actual": 1.17,
+      "surprise_pct": 5.76
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2021-12-02",
+      "event_time_utc": "2021-12-02T21:05:00+00:00",
+      "event_time_et": "2021-12-02T16:05:00-05:00",
+      "eps_estimate": 0.39,
+      "eps_actual": 0.43,
+      "surprise_pct": 11.56
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2021-12-20",
+      "event_time_utc": "2021-12-20T21:02:00+00:00",
+      "event_time_et": "2021-12-20T16:02:00-05:00",
+      "eps_estimate": 2.11,
+      "eps_actual": 2.16,
+      "surprise_pct": 2.49
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2022-01-25",
+      "event_time_utc": "2022-01-25T21:04:00+00:00",
+      "event_time_et": "2022-01-25T16:04:00-05:00",
+      "eps_estimate": 2.31,
+      "eps_actual": 2.48,
+      "surprise_pct": 7.25
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2022-01-27",
+      "event_time_utc": "2022-01-27T21:30:00+00:00",
+      "event_time_et": "2022-01-27T16:30:00-05:00",
+      "eps_estimate": 1.89,
+      "eps_actual": 2.1,
+      "surprise_pct": 11.17
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2022-02-02",
+      "event_time_utc": "2022-02-02T21:08:00+00:00",
+      "event_time_et": "2022-02-02T16:08:00-05:00",
+      "eps_estimate": 3.84,
+      "eps_actual": 3.67,
+      "surprise_pct": -4.39
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2022-02-03",
+      "event_time_utc": "2022-02-03T21:03:00+00:00",
+      "event_time_et": "2022-02-03T16:03:00-05:00",
+      "eps_estimate": 0.18,
+      "eps_actual": 0.29,
+      "surprise_pct": 62.48
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2022-02-16",
+      "event_time_utc": "2022-02-16T21:24:00+00:00",
+      "event_time_et": "2022-02-16T16:24:00-05:00",
+      "eps_estimate": 1.22,
+      "eps_actual": 1.32,
+      "surprise_pct": 7.99
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2022-03-03",
+      "event_time_utc": "2022-03-03T21:05:00+00:00",
+      "event_time_et": "2022-03-03T16:05:00-05:00",
+      "eps_estimate": 0.48,
+      "eps_actual": 0.5,
+      "surprise_pct": 3.67
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2022-03-29",
+      "event_time_utc": "2022-03-29T20:06:00+00:00",
+      "event_time_et": "2022-03-29T16:06:00-04:00",
+      "eps_estimate": 1.97,
+      "eps_actual": 2.14,
+      "surprise_pct": 8.83
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2022-04-26",
+      "event_time_utc": "2022-04-26T20:04:00+00:00",
+      "event_time_et": "2022-04-26T16:04:00-04:00",
+      "eps_estimate": 2.19,
+      "eps_actual": 2.22,
+      "surprise_pct": 1.6
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2022-04-27",
+      "event_time_utc": "2022-04-27T20:05:00+00:00",
+      "event_time_et": "2022-04-27T16:05:00-04:00",
+      "eps_estimate": 2.56,
+      "eps_actual": 2.72,
+      "surprise_pct": 6.35
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2022-04-28",
+      "event_time_utc": "2022-04-28T20:30:00+00:00",
+      "event_time_et": "2022-04-28T16:30:00-04:00",
+      "eps_estimate": 1.43,
+      "eps_actual": 1.52,
+      "surprise_pct": 6.44
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2022-04-28",
+      "event_time_utc": "2022-04-28T20:01:00+00:00",
+      "event_time_et": "2022-04-28T16:01:00-04:00",
+      "eps_estimate": 0.42,
+      "eps_actual": 0.37,
+      "surprise_pct": -11.7
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2022-05-25",
+      "event_time_utc": "2022-05-25T20:20:00+00:00",
+      "event_time_et": "2022-05-25T16:20:00-04:00",
+      "eps_estimate": 1.29,
+      "eps_actual": 1.36,
+      "surprise_pct": 5.15
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2022-05-26",
+      "event_time_utc": "2022-05-26T20:05:00+00:00",
+      "event_time_et": "2022-05-26T16:05:00-04:00",
+      "eps_estimate": 0.51,
+      "eps_actual": 0.52,
+      "surprise_pct": 1.36
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2022-06-30",
+      "event_time_utc": "2022-06-30T20:01:00+00:00",
+      "event_time_et": "2022-06-30T16:01:00-04:00",
+      "eps_estimate": 2.43,
+      "eps_actual": 2.59,
+      "surprise_pct": 6.45
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2022-07-26",
+      "event_time_utc": "2022-07-26T20:09:00+00:00",
+      "event_time_et": "2022-07-26T16:09:00-04:00",
+      "eps_estimate": 2.29,
+      "eps_actual": 2.23,
+      "surprise_pct": -2.74
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2022-07-27",
+      "event_time_utc": "2022-07-27T20:05:00+00:00",
+      "event_time_et": "2022-07-27T16:05:00-04:00",
+      "eps_estimate": 2.59,
+      "eps_actual": 2.46,
+      "surprise_pct": -4.95
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2022-07-28",
+      "event_time_utc": "2022-07-28T20:30:00+00:00",
+      "event_time_et": "2022-07-28T16:30:00-04:00",
+      "eps_estimate": 1.16,
+      "eps_actual": 1.2,
+      "surprise_pct": 3.25
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2022-07-28",
+      "event_time_utc": "2022-07-28T20:01:00+00:00",
+      "event_time_et": "2022-07-28T16:01:00-04:00",
+      "eps_estimate": 0.14,
+      "eps_actual": 0.18,
+      "surprise_pct": 24.9
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2022-08-24",
+      "event_time_utc": "2022-08-24T20:20:00+00:00",
+      "event_time_et": "2022-08-24T16:20:00-04:00",
+      "eps_estimate": 1.26,
+      "eps_actual": 0.51,
+      "surprise_pct": -59.38
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2022-08-25",
+      "event_time_utc": "2022-08-25T20:05:00+00:00",
+      "event_time_et": "2022-08-25T16:05:00-04:00",
+      "eps_estimate": 0.56,
+      "eps_actual": 0.57,
+      "surprise_pct": 1.07
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2022-09-29",
+      "event_time_utc": "2022-09-29T20:02:00+00:00",
+      "event_time_et": "2022-09-29T16:02:00-04:00",
+      "eps_estimate": 1.3,
+      "eps_actual": 1.45,
+      "surprise_pct": 11.67
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2022-10-25",
+      "event_time_utc": "2022-10-25T20:02:00+00:00",
+      "event_time_et": "2022-10-25T16:02:00-04:00",
+      "eps_estimate": 2.3,
+      "eps_actual": 2.35,
+      "surprise_pct": 2.05
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2022-10-26",
+      "event_time_utc": "2022-10-26T20:05:00+00:00",
+      "event_time_et": "2022-10-26T16:05:00-04:00",
+      "eps_estimate": 1.89,
+      "eps_actual": 1.64,
+      "surprise_pct": -13.09
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2022-10-27",
+      "event_time_utc": "2022-10-27T20:30:00+00:00",
+      "event_time_et": "2022-10-27T16:30:00-04:00",
+      "eps_estimate": 1.27,
+      "eps_actual": 1.29,
+      "surprise_pct": 1.55
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2022-10-27",
+      "event_time_utc": "2022-10-27T20:01:00+00:00",
+      "event_time_et": "2022-10-27T16:01:00-04:00",
+      "eps_estimate": 0.22,
+      "eps_actual": 0.17,
+      "surprise_pct": -21.08
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2022-11-16",
+      "event_time_utc": "2022-11-16T21:20:00+00:00",
+      "event_time_et": "2022-11-16T16:20:00-05:00",
+      "eps_estimate": 0.69,
+      "eps_actual": 0.58,
+      "surprise_pct": -16.47
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2022-12-01",
+      "event_time_utc": "2022-12-01T21:05:00+00:00",
+      "event_time_et": "2022-12-01T16:05:00-05:00",
+      "eps_estimate": 0.59,
+      "eps_actual": 0.57,
+      "surprise_pct": -2.85
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2022-12-21",
+      "event_time_utc": "2022-12-21T21:02:00+00:00",
+      "event_time_et": "2022-12-21T16:02:00-05:00",
+      "eps_estimate": -0.01,
+      "eps_actual": -0.04,
+      "surprise_pct": -194.55
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2023-01-24",
+      "event_time_utc": "2023-01-24T21:04:00+00:00",
+      "event_time_et": "2023-01-24T16:04:00-05:00",
+      "eps_estimate": 2.29,
+      "eps_actual": 2.32,
+      "surprise_pct": 1.09
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2023-02-01",
+      "event_time_utc": "2023-02-01T21:05:00+00:00",
+      "event_time_et": "2023-02-01T16:05:00-05:00",
+      "eps_estimate": 2.22,
+      "eps_actual": 1.76,
+      "surprise_pct": -20.6
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2023-02-02",
+      "event_time_utc": "2023-02-02T21:30:00+00:00",
+      "event_time_et": "2023-02-02T16:30:00-05:00",
+      "eps_estimate": 1.94,
+      "eps_actual": 1.88,
+      "surprise_pct": -2.88
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2023-02-02",
+      "event_time_utc": "2023-02-02T21:01:00+00:00",
+      "event_time_et": "2023-02-02T16:01:00-05:00",
+      "eps_estimate": 0.18,
+      "eps_actual": 0.25,
+      "surprise_pct": 42.56
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2023-02-22",
+      "event_time_utc": "2023-02-22T21:50:00+00:00",
+      "event_time_et": "2023-02-22T16:50:00-05:00",
+      "eps_estimate": 0.81,
+      "eps_actual": 0.88,
+      "surprise_pct": 8.75
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2023-03-02",
+      "event_time_utc": "2023-03-02T21:05:00+00:00",
+      "event_time_et": "2023-03-02T16:05:00-05:00",
+      "eps_estimate": 0.47,
+      "eps_actual": 0.46,
+      "surprise_pct": -1.72
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2023-03-28",
+      "event_time_utc": "2023-03-28T20:06:00+00:00",
+      "event_time_et": "2023-03-28T16:06:00-04:00",
+      "eps_estimate": -0.86,
+      "eps_actual": -1.91,
+      "surprise_pct": -121.84
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2023-04-25",
+      "event_time_utc": "2023-04-25T20:05:00+00:00",
+      "event_time_et": "2023-04-25T16:05:00-04:00",
+      "eps_estimate": 2.23,
+      "eps_actual": 2.45,
+      "surprise_pct": 9.81
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2023-04-26",
+      "event_time_utc": "2023-04-26T20:10:00+00:00",
+      "event_time_et": "2023-04-26T16:10:00-04:00",
+      "eps_estimate": 2.03,
+      "eps_actual": 2.2,
+      "surprise_pct": 8.51
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2023-04-27",
+      "event_time_utc": "2023-04-27T20:03:00+00:00",
+      "event_time_et": "2023-04-27T16:03:00-04:00",
+      "eps_estimate": 0.21,
+      "eps_actual": 0.31,
+      "surprise_pct": 46.36
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2023-05-04",
+      "event_time_utc": "2023-05-04T20:30:00+00:00",
+      "event_time_et": "2023-05-04T16:30:00-04:00",
+      "eps_estimate": 1.43,
+      "eps_actual": 1.52,
+      "surprise_pct": 6.03
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2023-05-24",
+      "event_time_utc": "2023-05-24T20:20:00+00:00",
+      "event_time_et": "2023-05-24T16:20:00-04:00",
+      "eps_estimate": 0.92,
+      "eps_actual": 1.09,
+      "surprise_pct": 18.57
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2023-05-25",
+      "event_time_utc": "2023-05-25T20:05:00+00:00",
+      "event_time_et": "2023-05-25T16:05:00-04:00",
+      "eps_estimate": 0.29,
+      "eps_actual": 0.31,
+      "surprise_pct": 5.77
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2023-06-28",
+      "event_time_utc": "2023-06-28T20:04:00+00:00",
+      "event_time_et": "2023-06-28T16:04:00-04:00",
+      "eps_estimate": -1.58,
+      "eps_actual": -1.43,
+      "surprise_pct": 9.74
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2023-07-25",
+      "event_time_utc": "2023-07-25T20:01:00+00:00",
+      "event_time_et": "2023-07-25T16:01:00-04:00",
+      "eps_estimate": 2.55,
+      "eps_actual": 2.69,
+      "surprise_pct": 5.49
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2023-07-26",
+      "event_time_utc": "2023-07-26T20:05:00+00:00",
+      "event_time_et": "2023-07-26T16:05:00-04:00",
+      "eps_estimate": 2.92,
+      "eps_actual": 2.98,
+      "surprise_pct": 2.23
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2023-08-03",
+      "event_time_utc": "2023-08-03T20:30:00+00:00",
+      "event_time_et": "2023-08-03T16:30:00-04:00",
+      "eps_estimate": 1.19,
+      "eps_actual": 1.26,
+      "surprise_pct": 5.49
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2023-08-03",
+      "event_time_utc": "2023-08-03T20:01:00+00:00",
+      "event_time_et": "2023-08-03T16:01:00-04:00",
+      "eps_estimate": 0.35,
+      "eps_actual": 0.65,
+      "surprise_pct": 85.73
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2023-08-23",
+      "event_time_utc": "2023-08-23T20:20:00+00:00",
+      "event_time_et": "2023-08-23T16:20:00-04:00",
+      "eps_estimate": 2.09,
+      "eps_actual": 2.7,
+      "surprise_pct": 29.41
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2023-08-24",
+      "event_time_utc": "2023-08-24T20:05:00+00:00",
+      "event_time_et": "2023-08-24T16:05:00-04:00",
+      "eps_estimate": 0.32,
+      "eps_actual": 0.33,
+      "surprise_pct": 2.28
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2023-09-27",
+      "event_time_utc": "2023-09-27T20:01:00+00:00",
+      "event_time_et": "2023-09-27T16:01:00-04:00",
+      "eps_estimate": -1.18,
+      "eps_actual": -1.07,
+      "surprise_pct": 9.31
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2023-10-24",
+      "event_time_utc": "2023-10-24T20:02:00+00:00",
+      "event_time_et": "2023-10-24T16:02:00-04:00",
+      "eps_estimate": 2.65,
+      "eps_actual": 2.99,
+      "surprise_pct": 12.7
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2023-10-25",
+      "event_time_utc": "2023-10-25T20:16:00+00:00",
+      "event_time_et": "2023-10-25T16:16:00-04:00",
+      "eps_estimate": 3.63,
+      "eps_actual": 4.39,
+      "surprise_pct": 20.89
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2023-10-26",
+      "event_time_utc": "2023-10-26T20:01:00+00:00",
+      "event_time_et": "2023-10-26T16:01:00-04:00",
+      "eps_estimate": 0.58,
+      "eps_actual": 0.94,
+      "surprise_pct": 60.85
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2023-11-02",
+      "event_time_utc": "2023-11-02T20:30:00+00:00",
+      "event_time_et": "2023-11-02T16:30:00-04:00",
+      "eps_estimate": 1.39,
+      "eps_actual": 1.46,
+      "surprise_pct": 4.92
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2023-11-21",
+      "event_time_utc": "2023-11-21T21:20:00+00:00",
+      "event_time_et": "2023-11-21T16:20:00-05:00",
+      "eps_estimate": 3.37,
+      "eps_actual": 4.02,
+      "surprise_pct": 19.21
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2023-11-30",
+      "event_time_utc": "2023-11-30T21:05:00+00:00",
+      "event_time_et": "2023-11-30T16:05:00-05:00",
+      "eps_estimate": 0.4,
+      "eps_actual": 0.41,
+      "surprise_pct": 2.21
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2023-12-20",
+      "event_time_utc": "2023-12-20T21:01:00+00:00",
+      "event_time_et": "2023-12-20T16:01:00-05:00",
+      "eps_estimate": -0.97,
+      "eps_actual": -0.95,
+      "surprise_pct": 2.36
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2024-01-30",
+      "event_time_utc": "2024-01-30T21:04:00+00:00",
+      "event_time_et": "2024-01-30T16:04:00-05:00",
+      "eps_estimate": 2.78,
+      "eps_actual": 2.93,
+      "surprise_pct": 5.34
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2024-02-01",
+      "event_time_utc": "2024-02-01T21:00:00+00:00",
+      "event_time_et": "2024-02-01T16:00:00-05:00",
+      "eps_estimate": 2.1,
+      "eps_actual": 2.18,
+      "surprise_pct": 3.9
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2024-02-01",
+      "event_time_utc": "2024-02-01T21:00:00+00:00",
+      "event_time_et": "2024-02-01T16:00:00-05:00",
+      "eps_estimate": 0.8,
+      "eps_actual": 1.0,
+      "surprise_pct": 24.55
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2024-02-01",
+      "event_time_utc": "2024-02-01T21:06:00+00:00",
+      "event_time_et": "2024-02-01T16:06:00-05:00",
+      "eps_estimate": 4.96,
+      "eps_actual": 5.33,
+      "surprise_pct": 7.51
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2024-02-21",
+      "event_time_utc": "2024-02-21T21:22:00+00:00",
+      "event_time_et": "2024-02-21T16:22:00-05:00",
+      "eps_estimate": 4.64,
+      "eps_actual": 5.16,
+      "surprise_pct": 11.32
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2024-03-07",
+      "event_time_utc": "2024-03-07T21:05:00+00:00",
+      "event_time_et": "2024-03-07T16:05:00-05:00",
+      "eps_estimate": 0.46,
+      "eps_actual": 0.46,
+      "surprise_pct": -0.35
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2024-03-20",
+      "event_time_utc": "2024-03-20T20:13:00+00:00",
+      "event_time_et": "2024-03-20T16:13:00-04:00",
+      "eps_estimate": -0.25,
+      "eps_actual": 0.42,
+      "surprise_pct": 270.04
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2024-04-24",
+      "event_time_utc": "2024-04-24T20:05:00+00:00",
+      "event_time_et": "2024-04-24T16:05:00-04:00",
+      "eps_estimate": 4.32,
+      "eps_actual": 4.71,
+      "surprise_pct": 8.99
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2024-04-25",
+      "event_time_utc": "2024-04-25T20:23:00+00:00",
+      "event_time_et": "2024-04-25T16:23:00-04:00",
+      "eps_estimate": 2.82,
+      "eps_actual": 2.94,
+      "surprise_pct": 4.32
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2024-04-30",
+      "event_time_utc": "2024-04-30T20:01:00+00:00",
+      "event_time_et": "2024-04-30T16:01:00-04:00",
+      "eps_estimate": 0.83,
+      "eps_actual": 0.98,
+      "surprise_pct": 17.91
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2024-05-02",
+      "event_time_utc": "2024-05-02T20:31:00+00:00",
+      "event_time_et": "2024-05-02T16:31:00-04:00",
+      "eps_estimate": 1.5,
+      "eps_actual": 1.53,
+      "surprise_pct": 1.97
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2024-05-22",
+      "event_time_utc": "2024-05-22T20:22:00+00:00",
+      "event_time_et": "2024-05-22T16:22:00-04:00",
+      "eps_estimate": 0.56,
+      "eps_actual": 0.61,
+      "surprise_pct": 9.48
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2024-05-30",
+      "event_time_utc": "2024-05-30T20:05:00+00:00",
+      "event_time_et": "2024-05-30T16:05:00-04:00",
+      "eps_estimate": 0.25,
+      "eps_actual": 0.24,
+      "surprise_pct": -3.32
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2024-06-26",
+      "event_time_utc": "2024-06-26T20:04:00+00:00",
+      "event_time_et": "2024-06-26T16:04:00-04:00",
+      "eps_estimate": 0.51,
+      "eps_actual": 0.62,
+      "surprise_pct": 21.93
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2024-07-30",
+      "event_time_utc": "2024-07-30T20:03:00+00:00",
+      "event_time_et": "2024-07-30T16:03:00-04:00",
+      "eps_estimate": 2.93,
+      "eps_actual": 2.95,
+      "surprise_pct": 0.54
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2024-07-31",
+      "event_time_utc": "2024-07-31T20:07:00+00:00",
+      "event_time_et": "2024-07-31T16:07:00-04:00",
+      "eps_estimate": 4.73,
+      "eps_actual": 5.16,
+      "surprise_pct": 9.17
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2024-08-01",
+      "event_time_utc": "2024-08-01T20:30:00+00:00",
+      "event_time_et": "2024-08-01T16:30:00-04:00",
+      "eps_estimate": 1.35,
+      "eps_actual": 1.4,
+      "surprise_pct": 3.99
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2024-08-01",
+      "event_time_utc": "2024-08-01T20:01:00+00:00",
+      "event_time_et": "2024-08-01T16:01:00-04:00",
+      "eps_estimate": 1.03,
+      "eps_actual": 1.26,
+      "surprise_pct": 22.58
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2024-08-28",
+      "event_time_utc": "2024-08-28T20:20:00+00:00",
+      "event_time_et": "2024-08-28T16:20:00-04:00",
+      "eps_estimate": 0.64,
+      "eps_actual": 0.68,
+      "surprise_pct": 6.03
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2024-08-29",
+      "event_time_utc": "2024-08-29T20:07:00+00:00",
+      "event_time_et": "2024-08-29T16:07:00-04:00",
+      "eps_estimate": 0.3,
+      "eps_actual": 0.3,
+      "surprise_pct": 0.92
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2024-09-25",
+      "event_time_utc": "2024-09-25T20:02:00+00:00",
+      "event_time_et": "2024-09-25T16:02:00-04:00",
+      "eps_estimate": 1.14,
+      "eps_actual": 1.18,
+      "surprise_pct": 3.68
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2024-10-30",
+      "event_time_utc": "2024-10-30T20:05:00+00:00",
+      "event_time_et": "2024-10-30T16:05:00-04:00",
+      "eps_estimate": 5.25,
+      "eps_actual": 6.03,
+      "surprise_pct": 14.81
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2024-10-30",
+      "event_time_utc": "2024-10-30T20:01:00+00:00",
+      "event_time_et": "2024-10-30T16:01:00-04:00",
+      "eps_estimate": 3.1,
+      "eps_actual": 3.3,
+      "surprise_pct": 6.52
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2024-10-31",
+      "event_time_utc": "2024-10-31T20:31:00+00:00",
+      "event_time_et": "2024-10-31T16:31:00-04:00",
+      "eps_estimate": 1.6,
+      "eps_actual": 1.64,
+      "surprise_pct": 2.35
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2024-10-31",
+      "event_time_utc": "2024-10-31T20:01:00+00:00",
+      "event_time_et": "2024-10-31T16:01:00-04:00",
+      "eps_estimate": 1.14,
+      "eps_actual": 1.43,
+      "surprise_pct": 25.17
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2024-11-20",
+      "event_time_utc": "2024-11-20T21:20:00+00:00",
+      "event_time_et": "2024-11-20T16:20:00-05:00",
+      "eps_estimate": 0.75,
+      "eps_actual": 0.81,
+      "surprise_pct": 8.58
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2024-12-03",
+      "event_time_utc": "2024-12-03T21:07:00+00:00",
+      "event_time_et": "2024-12-03T16:07:00-05:00",
+      "eps_estimate": 0.41,
+      "eps_actual": 0.43,
+      "surprise_pct": 5.64
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2024-12-18",
+      "event_time_utc": "2024-12-18T21:01:00+00:00",
+      "event_time_et": "2024-12-18T16:01:00-05:00",
+      "eps_estimate": 1.75,
+      "eps_actual": 1.79,
+      "surprise_pct": 2.09
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2025-01-29",
+      "event_time_utc": "2025-01-29T21:42:00+00:00",
+      "event_time_et": "2025-01-29T16:42:00-05:00",
+      "eps_estimate": 6.77,
+      "eps_actual": 8.02,
+      "surprise_pct": 18.39
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2025-01-29",
+      "event_time_utc": "2025-01-29T21:01:00+00:00",
+      "event_time_et": "2025-01-29T16:01:00-05:00",
+      "eps_estimate": 3.11,
+      "eps_actual": 3.23,
+      "surprise_pct": 3.82
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2025-01-30",
+      "event_time_utc": "2025-01-30T21:31:00+00:00",
+      "event_time_et": "2025-01-30T16:31:00-05:00",
+      "eps_estimate": 2.35,
+      "eps_actual": 2.4,
+      "surprise_pct": 2.15
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2025-02-06",
+      "event_time_utc": "2025-02-06T21:01:00+00:00",
+      "event_time_et": "2025-02-06T16:01:00-05:00",
+      "eps_estimate": 1.49,
+      "eps_actual": 1.86,
+      "surprise_pct": 24.47
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2025-02-26",
+      "event_time_utc": "2025-02-26T21:20:00+00:00",
+      "event_time_et": "2025-02-26T16:20:00-05:00",
+      "eps_estimate": 0.84,
+      "eps_actual": 0.89,
+      "surprise_pct": 5.5
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2025-03-05",
+      "event_time_utc": "2025-03-05T21:06:00+00:00",
+      "event_time_et": "2025-03-05T16:06:00-05:00",
+      "eps_estimate": 0.59,
+      "eps_actual": 0.6,
+      "surprise_pct": 1.75
+    },
+    {
+      "symbol": "MU",
+      "announcement_date": "2025-03-20",
+      "event_time_utc": "2025-03-20T20:00:00+00:00",
+      "event_time_et": "2025-03-20T16:00:00-04:00",
+      "eps_estimate": 1.42,
+      "eps_actual": 1.56,
+      "surprise_pct": 9.59
+    },
+    {
+      "symbol": "META",
+      "announcement_date": "2025-04-30",
+      "event_time_utc": "2025-04-30T20:05:00+00:00",
+      "event_time_et": "2025-04-30T16:05:00-04:00",
+      "eps_estimate": 5.28,
+      "eps_actual": 6.43,
+      "surprise_pct": 21.77
+    },
+    {
+      "symbol": "MSFT",
+      "announcement_date": "2025-04-30",
+      "event_time_utc": "2025-04-30T20:05:00+00:00",
+      "event_time_et": "2025-04-30T16:05:00-04:00",
+      "eps_estimate": 3.22,
+      "eps_actual": 3.46,
+      "surprise_pct": 7.45
+    },
+    {
+      "symbol": "AAPL",
+      "announcement_date": "2025-05-01",
+      "event_time_utc": "2025-05-01T20:30:00+00:00",
+      "event_time_et": "2025-05-01T16:30:00-04:00",
+      "eps_estimate": 1.63,
+      "eps_actual": 1.65,
+      "surprise_pct": 1.41
+    },
+    {
+      "symbol": "AMZN",
+      "announcement_date": "2025-05-01",
+      "event_time_utc": "2025-05-01T20:01:00+00:00",
+      "event_time_et": "2025-05-01T16:01:00-04:00",
+      "eps_estimate": 1.36,
+      "eps_actual": 1.59,
+      "surprise_pct": 16.73
+    },
+    {
+      "symbol": "NVDA",
+      "announcement_date": "2025-05-28",
+      "event_time_utc": "2025-05-28T20:20:00+00:00",
+      "event_time_et": "2025-05-28T16:20:00-04:00",
+      "eps_estimate": 0.93,
+      "eps_actual": 0.96,
+      "surprise_pct": 2.84
+    },
+    {
+      "symbol": "MRVL",
+      "announcement_date": "2025-05-29",
+      "event_time_utc": "2025-05-29T20:07:00+00:00",
+      "event_time_et": "2025-05-29T16:07:00-04:00",
+      "eps_estimate": 0.61,
+      "eps_actual": 0.62,
+      "surprise_pct": 1.12
+    }
+  ]
+}
