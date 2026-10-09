@@ -1,0 +1,53 @@
+{
+  "causal_availability": "Each observation is delayed by two later US stock sessions before use; this is conservative versus the next-business-day H.15 update.",
+  "data_path": "reports\\audit_2026_09_08\\stock_fred_rates_oct10\\fred_rates_daily.pkl",
+  "data_sha256": "0489f796e1ea0ca5a15ec0ff0c13549b44cad47153e1d3affeb87516965246f5",
+  "provider": "Federal Reserve Bank of St. Louis FRED",
+  "quality": {
+    "first_date": "2015-01-02",
+    "last_date": "2025-12-31",
+    "missing_calendar_days_are_not_forward_filled": true,
+    "normalized_complete_rows": 2750
+  },
+  "requested_end": "2025-12-31",
+  "requested_start": "2015-01-01",
+  "sources": {
+    "dfii10": {
+      "first_date": "2015-01-02",
+      "last_date": "2025-12-31",
+      "path": "reports\\audit_2026_09_08\\stock_fred_rates_oct10\\DFII10.csv",
+      "rows": 2750,
+      "series": "DFII10",
+      "sha256": "bd99e042a7e8674d7249ffeff9150a941989ea4b3d59a8df01b7a73bc415e58a",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFII10&cosd=2015-01-01&coed=2025-12-31"
+    },
+    "dgs10": {
+      "first_date": "2015-01-02",
+      "last_date": "2025-12-31",
+      "path": "reports\\audit_2026_09_08\\stock_fred_rates_oct10\\DGS10.csv",
+      "rows": 2750,
+      "series": "DGS10",
+      "sha256": "c6859a35c3fd817c9b882f6098726d9485b569b065855350ead9240d1203ccc5",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10&cosd=2015-01-01&coed=2025-12-31"
+    },
+    "dgs2": {
+      "first_date": "2015-01-02",
+      "last_date": "2025-12-31",
+      "path": "reports\\audit_2026_09_08\\stock_fred_rates_oct10\\DGS2.csv",
+      "rows": 2750,
+      "series": "DGS2",
+      "sha256": "61edc71fce8934dbc85901720d28463159c86d2c1eb3ab7c4a439b715ee861e0",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2&cosd=2015-01-01&coed=2025-12-31"
+    },
+    "t10yie": {
+      "first_date": "2015-01-02",
+      "last_date": "2025-12-31",
+      "path": "reports\\audit_2026_09_08\\stock_fred_rates_oct10\\T10YIE.csv",
+      "rows": 2750,
+      "series": "T10YIE",
+      "sha256": "d65bd9713030f092600dd652206b3f271ac39e1495f2808bad7ab99d031041f5",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=T10YIE&cosd=2015-01-01&coed=2025-12-31"
+    }
+  },
+  "status": "IMMUTABLE_PUBLIC_RESEARCH_INPUT"
+}

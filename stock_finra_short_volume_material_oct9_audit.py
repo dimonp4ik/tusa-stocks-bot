@@ -22,11 +22,12 @@ EXITS = (
     {"name": "swing", "target": 1.5, "stop": .75, "sessions": 2},
     {"name": "runner", "target": 2.0, "stop": 1.0, "sessions": 3},
 )
-FAMILIES = (
+BASE_FAMILIES = (
     "short_pressure_continuation", "short_covering_squeeze",
     "low_short_momentum", "short_price_divergence",
     "cross_sectional_pressure",
 )
+FAMILIES = (*BASE_FAMILIES, "short_volume_router")
 PROFILES = ("broad", "strict")
 DEV_YEARS = (2019, 2020, 2021)
 VALIDATION_YEARS = (2022, 2023)
@@ -132,6 +133,17 @@ def directed(frame: pd.DataFrame, direction: pd.Series) -> pd.DataFrame:
 
 
 def entries(frame: pd.DataFrame, family: str, profile: str) -> pd.DataFrame:
+    if family == "short_volume_router":
+        pieces = [entries(frame, name, profile) for name in BASE_FAMILIES]
+        output = pd.concat([value for value in pieces if not value.empty],
+                           ignore_index=True)
+        consensus = output.groupby(
+            ["symbol", "entry_time"]).direction_n.transform("nunique").eq(1)
+        output = output.loc[consensus].sort_values(
+            ["score", "symbol"], ascending=[False, True]).drop_duplicates(
+                ["symbol", "entry_time"], keep="first")
+        output["family"] = family
+        return output
     strict = profile == "strict"
     if family == "short_pressure_continuation":
         found = directed(frame, pd.Series(-1, index=frame.index))
