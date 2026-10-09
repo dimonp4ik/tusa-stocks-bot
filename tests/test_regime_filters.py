@@ -29,6 +29,18 @@ def combine(*parts):
 
 
 class StockRegimeFilterTests(unittest.TestCase):
+    def test_generic_bracket_enforces_half_percent_first_target(self):
+        long_tp1, _, long_sl = bracket_for_analysis({
+            "direction": "LONG", "atr": 0, "recent_low": 99.9,
+            "tp1_level": 100.4,
+        }, 100)
+        short_tp1, _, short_sl = bracket_for_analysis({
+            "direction": "SHORT", "atr": 0, "recent_high": 100.1,
+            "tp1_level": 99.6,
+        }, 100)
+        self.assertEqual((long_tp1, long_sl), (100.5, 99.6))
+        self.assertEqual((short_tp1, short_sl), (99.5, 100.4))
+
     def test_regime_paper_row_is_logged_once_with_exact_bracket(self):
         from src import db
         with tempfile.TemporaryDirectory() as tmp, patch.object(

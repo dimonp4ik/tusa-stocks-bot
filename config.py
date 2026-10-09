@@ -795,6 +795,11 @@ ATR_PERIOD    = 14
 # for this before its profit line is believed.
 SL_ATR_BUFFER = float(os.getenv("SL_ATR_BUFFER", "0.5"))   # buffer beyond swing, in ATR
 RISK_MIN_PCT  = float(os.getenv("RISK_MIN_PCT", "0.004"))  # min SL distance = 0.4%
+# A signal is not useful to the material-move system when its first target is
+# closer than 0.5% of entry.  Keep this independent from RISK_MIN_PCT: the stop
+# may still sit at a valid 0.4% structural invalidation while reward must clear
+# the owner's minimum observable price move.
+MIN_TP1_MOVE_PCT = 0.005
 # --- 2026-08-28: swept, and REJECTED despite looking like the biggest find yet -
 # This clamp is not a rare safety net on this desk, it is the main mechanism
 # placing stops: 44-47% of trades sit exactly at this ceiling and another
