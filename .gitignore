@@ -32,6 +32,7 @@ signals.db
 # Backtest data cache (local pickles)
 backtest_cache/
 backtest_cache_hist/
+reports/audit_2026_09_08/stock_finra_short_volume_oct9/daily_cache/
 backtest_cache_duka/
 
 # Backtest scratch output
