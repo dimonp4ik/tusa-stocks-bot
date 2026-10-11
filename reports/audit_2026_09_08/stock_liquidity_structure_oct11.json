@@ -1,0 +1,564 @@
+{
+  "base": {
+    "2017": {
+      "dd_pct": 16.4103,
+      "max_loss_streak": 13,
+      "months": 10,
+      "n": 1769,
+      "negative_months": 9,
+      "return_pct": -15.8813,
+      "trades_per_market_day": 8.344,
+      "wr": 40.9836
+    },
+    "2018": {
+      "dd_pct": 12.6578,
+      "max_loss_streak": 12,
+      "months": 13,
+      "n": 2728,
+      "negative_months": 9,
+      "return_pct": -6.9167,
+      "trades_per_market_day": 10.74,
+      "wr": 55.6085
+    },
+    "2019": {
+      "dd_pct": 15.0519,
+      "max_loss_streak": 11,
+      "months": 13,
+      "n": 2520,
+      "negative_months": 7,
+      "return_pct": -7.7857,
+      "trades_per_market_day": 9.844,
+      "wr": 50.7937
+    },
+    "2020": {
+      "dd_pct": 33.0769,
+      "max_loss_streak": 13,
+      "months": 13,
+      "n": 2715,
+      "negative_months": 12,
+      "return_pct": -31.2488,
+      "trades_per_market_day": 10.564,
+      "wr": 55.7274
+    },
+    "2021": {
+      "dd_pct": 18.2698,
+      "max_loss_streak": 10,
+      "months": 13,
+      "n": 2619,
+      "negative_months": 7,
+      "return_pct": -11.3976,
+      "trades_per_market_day": 10.311,
+      "wr": 54.0664
+    },
+    "2022": {
+      "dd_pct": 43.3412,
+      "max_loss_streak": 10,
+      "months": 13,
+      "n": 3061,
+      "negative_months": 11,
+      "return_pct": -40.7229,
+      "trades_per_market_day": 12.051,
+      "wr": 58.935
+    },
+    "2023": {
+      "dd_pct": 25.4653,
+      "max_loss_streak": 7,
+      "months": 13,
+      "n": 3068,
+      "negative_months": 10,
+      "return_pct": -23.4138,
+      "trades_per_market_day": 12.126,
+      "wr": 55.867
+    },
+    "2024": {
+      "dd_pct": 25.5586,
+      "max_loss_streak": 8,
+      "months": 13,
+      "n": 2956,
+      "negative_months": 10,
+      "return_pct": -19.7428,
+      "trades_per_market_day": 11.547,
+      "wr": 55.3112
+    },
+    "2025": {
+      "dd_pct": 27.2624,
+      "max_loss_streak": 9,
+      "months": 13,
+      "n": 2870,
+      "negative_months": 10,
+      "return_pct": -21.7186,
+      "trades_per_market_day": 11.344,
+      "wr": 56.8641
+    },
+    "2026": {
+      "dd_pct": 29.9639,
+      "max_loss_streak": 8,
+      "months": 10,
+      "n": 2043,
+      "negative_months": 8,
+      "return_pct": -27.1315,
+      "trades_per_market_day": 11.478,
+      "wr": 56.5835
+    }
+  },
+  "frozen_before_test": null,
+  "limitations": [
+    "Cash CFD candles test structure across eras but are not X-Perp fills.",
+    "The bounded tree/threshold grid creates selection risk.",
+    "Only genuinely new paper-forward outcomes can authorize runtime use."
+  ],
+  "protocol": {
+    "candidate_count": 0,
+    "entry": "next 15m market open",
+    "fit": [
+      2017,
+      2018,
+      2019,
+      2020
+    ],
+    "models": [
+      {
+        "depth": 2,
+        "leaf": 100
+      },
+      {
+        "depth": 2,
+        "leaf": 200
+      },
+      {
+        "depth": 2,
+        "leaf": 400
+      },
+      {
+        "depth": 3,
+        "leaf": 100
+      },
+      {
+        "depth": 3,
+        "leaf": 200
+      },
+      {
+        "depth": 3,
+        "leaf": 400
+      },
+      {
+        "depth": 4,
+        "leaf": 100
+      },
+      {
+        "depth": 4,
+        "leaf": 200
+      },
+      {
+        "depth": 4,
+        "leaf": 400
+      },
+      {
+        "depth": 5,
+        "leaf": 100
+      },
+      {
+        "depth": 5,
+        "leaf": 200
+      },
+      {
+        "depth": 5,
+        "leaf": 400
+      }
+    ],
+    "observed": "2026 cash and direct X-Perp",
+    "orders": "market only",
+    "routes": [
+      "liquidity sweep reclaim",
+      "confirmed level break"
+    ],
+    "selection": [
+      2021,
+      2022
+    ],
+    "stop_pct": 1.0,
+    "target_pct": 0.5,
+    "test": 2025,
+    "validation": [
+      2023,
+      2024
+    ]
+  },
+  "result": null,
+  "rows": {
+    "direct": 1565,
+    "history": 73843
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AAPLUSDT_15min_65000.pkl": "efd86c403c8d270a1bd9a2d53a6cf968239b81874a0c8f535ece878a8d06aabb",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AMZNUSDT_15min_65000.pkl": "023eff87649ac11055aae72a6aaf1fdc48433ead0552bfa87c64aa3a7bd03b1a",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\GOOGLUSDT_15min_65000.pkl": "f6a5c30afc82dbc78bc0bf3e4ca5f3aeedb9dde298ae03e2e94c1beef926035d",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\INTCUSDT_15min_65000.pkl": "66050f5e1431062b4c84c40186adab0a76136e97e61779a5ed6757113a372429",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\METAUSDT_15min_65000.pkl": "f52f099ff72aba30eab22390d308f319ad0818236dd0d97ae1fa4a0b3fc873ee",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MRVLUSDT_15min_65000.pkl": "f843b111a5a45344d1de5ec4cbc6a9914d0a62dbbc1395ce56a06ebcecdb4f0e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MSFTUSDT_15min_65000.pkl": "316acaee3b18187053dc27397c90bb710ddb775e79fab9de57fc003847bea85e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MUUSDT_15min_65000.pkl": "b6d3000e1caeb8e6aa249f52a19624fdf246a6d1a97e97bb38fdbd094ff79992",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\NVDAUSDT_15min_65000.pkl": "98266cb60bff8f80f81a10af2daf932f69d571900363c7a56f5894872cc5b35e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\QQQUSDT_15min_65000.pkl": "2a286266d443b78761d81d1df47a92e6ee9deda7774dd3154f21fa07e65231ff",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\SPYUSDT_15min_65000.pkl": "a0a6eb03ab9a14436058552f7bc0408284480bf13c6d68362c8637d97cfafd98",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\TSLAUSDT_15min_65000.pkl": "367fc3f3841e03e98a9d05320884e0fed27273109df03306bc15971051deb262",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_liquidity_structure_oct11_audit.py": "32c2a315ce5c5d5125b38027390ae24f8062b4b146f2d84c2600ca818a8a2809",
+    "reports\\audit_2026_09_08\\stock_extended_history_manifest.json": "0c06da01ffd6a9138a030f40290689edfa89f7e61a4df053a26506745a92b7e2",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\AAPLUSDT_15min_current.pkl": "685c3863eeda8108a197ce2fa5febe1e169f40b5e584d2460169fd7dfd887255",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\AMZNUSDT_15min_current.pkl": "2e7e9742075286ac5906d495be7555e307ac53cfe19bd843da5e60f4a78708ac",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\GOOGLUSDT_15min_current.pkl": "7f266a8fea19523e5b1e1c079b3e3a5ef20b86fcbfc4ec54098bc04678e12151",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\INTCUSDT_15min_current.pkl": "0c5727a28e4b4b21b089a62696bcfe7df12ef461e8b1274fb67b23166278c485",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\METAUSDT_15min_current.pkl": "24d037d47526d06e8f44cdb3942c675f9d53c0942f99af3060f2f53618103125",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MRVLUSDT_15min_current.pkl": "5819380b2c6096ada8ef92bf5b085ba6fc0282f1c6729a1eae8be694447c734c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MSFTUSDT_15min_current.pkl": "828e731955447d450973c258a7d95cf9c35a27e8141a397ae4c449e6752c4192",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MUUSDT_15min_current.pkl": "a8811aa1e89aca70a9b08cb0fcc484626d400aead5b265275bff4e64d9bb781d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\NVDAUSDT_15min_current.pkl": "90d7b382ea7e18aa7f4b972ecc4a331f89265615140ae6577a7732efb32d3b55",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\QQQUSDT_15min_current.pkl": "3daccc7a913ec902c7ed7a68e8894929aa75784c30c6a040553efdc0b6e4b7f2",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\SPYUSDT_15min_current.pkl": "4f8457d3f7f75edf6604d9ee5442ed6adcb1c855f8eaa711d876b909744f85a7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\TSLAUSDT_15min_current.pkl": "7ece658f3b88541da3d2a2fd6f2573cba422c5c5b0b4b90e7f09ead93f1f7dcd",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\manifest.json": "586c834c65edaa913e81eab15e5a09f0fe30b411e82ce0444ac42a44356d7bf0"
+  },
+  "status": "REJECTED_BEFORE_TEST",
+  "top_selection_frontier": [
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 6.3889,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 768,
+        "negative_months": 7,
+        "return_pct": 7.3498,
+        "trades_per_market_day": 2.341,
+        "wr": 65.8854
+      },
+      "threshold": 0.65
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 6.3889,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 768,
+        "negative_months": 7,
+        "return_pct": 7.3498,
+        "trades_per_market_day": 2.341,
+        "wr": 65.8854
+      },
+      "threshold": 0.654572940287226
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 5.3907,
+        "max_loss_streak": 6,
+        "months": 25,
+        "n": 381,
+        "negative_months": 9,
+        "return_pct": 4.3998,
+        "trades_per_market_day": 2.027,
+        "wr": 65.6168
+      },
+      "threshold": 0.675
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 5.3907,
+        "max_loss_streak": 6,
+        "months": 25,
+        "n": 381,
+        "negative_months": 9,
+        "return_pct": 4.3998,
+        "trades_per_market_day": 2.027,
+        "wr": 65.6168
+      },
+      "threshold": 0.6804878048780488
+    },
+    {
+      "config": {
+        "depth": 3,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 6.7539,
+        "max_loss_streak": 6,
+        "months": 25,
+        "n": 1177,
+        "negative_months": 9,
+        "return_pct": 12.0224,
+        "trades_per_market_day": 2.857,
+        "wr": 64.2311
+      },
+      "threshold": 0.6200989722116482
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 8.1121,
+        "max_loss_streak": 8,
+        "months": 25,
+        "n": 916,
+        "negative_months": 13,
+        "return_pct": -0.4633,
+        "trades_per_market_day": 2.503,
+        "wr": 62.3362
+      },
+      "threshold": 0.65
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 8.1121,
+        "max_loss_streak": 8,
+        "months": 25,
+        "n": 916,
+        "negative_months": 13,
+        "return_pct": -0.4633,
+        "trades_per_market_day": 2.503,
+        "wr": 62.3362
+      },
+      "threshold": 0.6683870967741935
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.7261,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 1670,
+        "negative_months": 15,
+        "return_pct": -7.0843,
+        "trades_per_market_day": 3.584,
+        "wr": 61.976
+      },
+      "threshold": 0.6400966183574879
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 13.0011,
+        "max_loss_streak": 9,
+        "months": 25,
+        "n": 1538,
+        "negative_months": 15,
+        "return_pct": -5.035,
+        "trades_per_market_day": 3.488,
+        "wr": 61.9636
+      },
+      "threshold": 0.6418672501823487
+    },
+    {
+      "config": {
+        "depth": 2,
+        "leaf": 100
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.5465,
+        "max_loss_streak": 9,
+        "months": 25,
+        "n": 1700,
+        "negative_months": 14,
+        "return_pct": -4.7938,
+        "trades_per_market_day": 3.846,
+        "wr": 61.8824
+      },
+      "threshold": 0.6009591115598183
+    },
+    {
+      "config": {
+        "depth": 2,
+        "leaf": 200
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.5465,
+        "max_loss_streak": 9,
+        "months": 25,
+        "n": 1700,
+        "negative_months": 14,
+        "return_pct": -4.7938,
+        "trades_per_market_day": 3.846,
+        "wr": 61.8824
+      },
+      "threshold": 0.6009591115598183
+    },
+    {
+      "config": {
+        "depth": 2,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.5465,
+        "max_loss_streak": 9,
+        "months": 25,
+        "n": 1700,
+        "negative_months": 14,
+        "return_pct": -4.7938,
+        "trades_per_market_day": 3.846,
+        "wr": 61.8824
+      },
+      "threshold": 0.6009591115598183
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 17.4813,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 1900,
+        "negative_months": 14,
+        "return_pct": -9.7583,
+        "trades_per_market_day": 4.025,
+        "wr": 61.7895
+      },
+      "threshold": 0.5933333333333334
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 100
+      },
+      "selection_2021_2022": {
+        "dd_pct": 3.719,
+        "max_loss_streak": 6,
+        "months": 24,
+        "n": 330,
+        "negative_months": 14,
+        "return_pct": -1.2306,
+        "trades_per_market_day": 1.369,
+        "wr": 61.5152
+      },
+      "threshold": 0.675
+    },
+    {
+      "config": {
+        "depth": 3,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.2232,
+        "max_loss_streak": 8,
+        "months": 25,
+        "n": 2069,
+        "negative_months": 13,
+        "return_pct": -1.8468,
+        "trades_per_market_day": 4.338,
+        "wr": 61.479
+      },
+      "threshold": 0.6141164348274085
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 200
+      },
+      "selection_2021_2022": {
+        "dd_pct": 3.719,
+        "max_loss_streak": 6,
+        "months": 24,
+        "n": 327,
+        "negative_months": 13,
+        "return_pct": -1.2307,
+        "trades_per_market_day": 1.357,
+        "wr": 61.4679
+      },
+      "threshold": 0.675
+    },
+    {
+      "config": {
+        "depth": 3,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.8972,
+        "max_loss_streak": 8,
+        "months": 25,
+        "n": 2263,
+        "negative_months": 13,
+        "return_pct": -5.4936,
+        "trades_per_market_day": 4.581,
+        "wr": 61.2461
+      },
+      "threshold": 0.5957446808510638
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 200
+      },
+      "selection_2021_2022": {
+        "dd_pct": 18.6853,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 2296,
+        "negative_months": 13,
+        "return_pct": -12.4338,
+        "trades_per_market_day": 4.705,
+        "wr": 61.1934
+      },
+      "threshold": 0.6138754620415127
+    },
+    {
+      "config": {
+        "depth": 4,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 18.1866,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 2228,
+        "negative_months": 14,
+        "return_pct": -11.1511,
+        "trades_per_market_day": 4.603,
+        "wr": 61.1311
+      },
+      "threshold": 0.5851226993865031
+    },
+    {
+      "config": {
+        "depth": 5,
+        "leaf": 400
+      },
+      "selection_2021_2022": {
+        "dd_pct": 12.6452,
+        "max_loss_streak": 7,
+        "months": 25,
+        "n": 1500,
+        "negative_months": 14,
+        "return_pct": -10.0669,
+        "trades_per_market_day": 3.275,
+        "wr": 61.0667
+      },
+      "threshold": 0.6303317535545023
+    }
+  ]
+}
