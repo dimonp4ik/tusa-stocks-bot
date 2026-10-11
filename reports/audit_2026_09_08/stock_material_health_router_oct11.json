@@ -1,0 +1,451 @@
+{
+  "baseline": {
+    "all_2018_2026": {
+      "dd_pct": 17.171912,
+      "n": 1288,
+      "negative_months": 33,
+      "net_r": 30.262126,
+      "return_pct": 4.163834,
+      "signed_price_return_pct": 15.103264,
+      "trades_per_market_day": 2.2131,
+      "wr": 51.8634
+    },
+    "development_2018_2021": {
+      "dd_pct": 17.091132,
+      "n": 465,
+      "negative_months": 14,
+      "net_r": -20.733405,
+      "return_pct": -9.507144,
+      "signed_price_return_pct": -32.717994,
+      "trades_per_market_day": 2.1528,
+      "wr": 48.172
+    },
+    "holdout_2025_2026": {
+      "dd_pct": 3.266775,
+      "n": 272,
+      "negative_months": 5,
+      "net_r": 38.05688,
+      "return_pct": 10.604721,
+      "signed_price_return_pct": 33.960497,
+      "trades_per_market_day": 2.1935,
+      "wr": 58.4559
+    },
+    "test_2024": {
+      "dd_pct": 5.484958,
+      "n": 112,
+      "negative_months": 6,
+      "net_r": -18.937006,
+      "return_pct": -4.977265,
+      "signed_price_return_pct": -16.901575,
+      "trades_per_market_day": 2.2857,
+      "wr": 42.8571
+    },
+    "validation_2022_2023": {
+      "dd_pct": 4.435314,
+      "n": 439,
+      "negative_months": 8,
+      "net_r": 31.875657,
+      "return_pct": 9.522026,
+      "signed_price_return_pct": 30.762336,
+      "trades_per_market_day": 2.2746,
+      "wr": 53.9863
+    }
+  },
+  "limitations": [
+    "Health uses paper outcomes of every frozen candidate, including candidates not funded by the portfolio.",
+    "A bounded 72-policy grid still creates selection risk.",
+    "The cash proxy is not a direct X-Perp fill history."
+  ],
+  "protocol": {
+    "candidate_count": 72,
+    "development": [
+      2018,
+      2019,
+      2020,
+      2021
+    ],
+    "gate": "only completed prior candidate outcomes; trailing module or module-symbol health",
+    "holdout_revealed_after_freeze": [
+      2025,
+      2026
+    ],
+    "selection": "strict net-R improvement and non-worse drawdown in development and validation",
+    "test_revealed_after_freeze": [
+      2024
+    ],
+    "validation": [
+      2022,
+      2023
+    ],
+    "warmup": 2017
+  },
+  "qualified_before_test": 16,
+  "runtime_change_allowed": false,
+  "selected": {
+    "development": {
+      "dd_pct": 4.707934,
+      "n": 206,
+      "negative_months": 9,
+      "net_r": 1.766595,
+      "return_pct": 0.443666,
+      "signed_price_return_pct": 1.641338,
+      "trades_per_market_day": 1.807,
+      "wr": 50.0
+    },
+    "holdout_2025_2026_revealed_after_freeze": {
+      "dd_pct": 3.559268,
+      "n": 90,
+      "negative_months": 9,
+      "net_r": 1.727469,
+      "return_pct": -0.178154,
+      "signed_price_return_pct": -0.490966,
+      "trades_per_market_day": 1.5789,
+      "wr": 51.1111
+    },
+    "holdout_baseline": {
+      "dd_pct": 3.266775,
+      "n": 272,
+      "negative_months": 5,
+      "net_r": 38.05688,
+      "return_pct": 10.604721,
+      "signed_price_return_pct": 33.960497,
+      "trades_per_market_day": 2.1935,
+      "wr": 58.4559
+    },
+    "holdout_pass": false,
+    "params": {
+      "lookback_days": 252,
+      "min_mean_r": 0.05,
+      "min_trades": 16,
+      "scope": "module"
+    },
+    "test_2024_pass": false,
+    "test_2024_revealed_after_freeze": {
+      "dd_pct": 1.938849,
+      "n": 15,
+      "negative_months": 1,
+      "net_r": -3.0,
+      "return_pct": -0.987876,
+      "signed_price_return_pct": -3.290021,
+      "trades_per_market_day": 1.875,
+      "wr": 40.0
+    },
+    "validation": {
+      "dd_pct": 1.652279,
+      "n": 243,
+      "negative_months": 5,
+      "net_r": 44.875657,
+      "return_pct": 12.33457,
+      "signed_price_return_pct": 39.021511,
+      "trades_per_market_day": 1.8,
+      "wr": 59.2593
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_material_health_router_oct11_audit.py": "4dfdd2dd3ee5e0cda4799d8f46a12b16a9fdfed3a81ae447ef85b57bf4e8e6a7",
+    "reports\\audit_2026_09_08\\stock_current_router_cross_era_oct11_rows.csv": "21887691dd03da59c448c7f039ce919d749c6953989b26e29d6be4a619739754"
+  },
+  "status": "REJECTED",
+  "top_pre_test": [
+    {
+      "development": {
+        "dd_pct": 4.707934,
+        "n": 206,
+        "negative_months": 9,
+        "net_r": 1.766595,
+        "return_pct": 0.443666,
+        "signed_price_return_pct": 1.641338,
+        "trades_per_market_day": 1.807,
+        "wr": 50.0
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": 0.05,
+        "min_trades": 16,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 1.652279,
+        "n": 243,
+        "negative_months": 5,
+        "net_r": 44.875657,
+        "return_pct": 12.33457,
+        "signed_price_return_pct": 39.021511,
+        "trades_per_market_day": 1.8,
+        "wr": 59.2593
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 3.98931,
+        "n": 211,
+        "negative_months": 8,
+        "net_r": 8.766595,
+        "return_pct": 1.337111,
+        "signed_price_return_pct": 4.596996,
+        "trades_per_market_day": 1.819,
+        "wr": 51.6588
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": 0.0,
+        "min_trades": 24,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.133506,
+        "n": 248,
+        "negative_months": 6,
+        "net_r": 43.875657,
+        "return_pct": 11.572549,
+        "signed_price_return_pct": 36.760586,
+        "trades_per_market_day": 1.8507,
+        "wr": 58.871
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 4.5768,
+        "n": 191,
+        "negative_months": 9,
+        "net_r": 2.766595,
+        "return_pct": 0.378074,
+        "signed_price_return_pct": 1.411515,
+        "trades_per_market_day": 1.819,
+        "wr": 50.2618
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": 0.05,
+        "min_trades": 24,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 1.652279,
+        "n": 238,
+        "negative_months": 5,
+        "net_r": 43.875657,
+        "return_pct": 12.153981,
+        "signed_price_return_pct": 38.480871,
+        "trades_per_market_day": 1.8168,
+        "wr": 59.2437
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 2.835452,
+        "n": 217,
+        "negative_months": 7,
+        "net_r": 16.766595,
+        "return_pct": 3.595196,
+        "signed_price_return_pct": 11.952081,
+        "trades_per_market_day": 1.8235,
+        "wr": 53.4562
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": -0.05,
+        "min_trades": 24,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.296529,
+        "n": 261,
+        "negative_months": 6,
+        "net_r": 42.875657,
+        "return_pct": 11.191827,
+        "signed_price_return_pct": 35.628963,
+        "trades_per_market_day": 1.8511,
+        "wr": 58.2375
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 3.139287,
+        "n": 231,
+        "negative_months": 7,
+        "net_r": 14.766595,
+        "return_pct": 3.480943,
+        "signed_price_return_pct": 11.595745,
+        "trades_per_market_day": 1.8333,
+        "wr": 52.8139
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": -0.05,
+        "min_trades": 16,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 3.06702,
+        "n": 275,
+        "negative_months": 7,
+        "net_r": 42.875657,
+        "return_pct": 11.189229,
+        "signed_price_return_pct": 35.631296,
+        "trades_per_market_day": 1.8333,
+        "wr": 57.8182
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 4.289536,
+        "n": 225,
+        "negative_months": 8,
+        "net_r": 6.766595,
+        "return_pct": 1.225349,
+        "signed_price_return_pct": 4.24066,
+        "trades_per_market_day": 1.8293,
+        "wr": 51.1111
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": 0.0,
+        "min_trades": 16,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.88746,
+        "n": 262,
+        "negative_months": 7,
+        "net_r": 41.875657,
+        "return_pct": 11.106765,
+        "signed_price_return_pct": 35.375714,
+        "trades_per_market_day": 1.8322,
+        "wr": 58.0153
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 3.123431,
+        "n": 211,
+        "negative_months": 8,
+        "net_r": 13.862831,
+        "return_pct": 5.044789,
+        "signed_price_return_pct": 16.589009,
+        "trades_per_market_day": 1.8509,
+        "wr": 53.0806
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 120,
+        "min_mean_r": 0.0,
+        "min_trades": 8,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 3.259302,
+        "n": 275,
+        "negative_months": 9,
+        "net_r": 40.875657,
+        "return_pct": 11.299861,
+        "signed_price_return_pct": 35.969857,
+        "trades_per_market_day": 1.8966,
+        "wr": 57.4545
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 2.405407,
+        "n": 169,
+        "negative_months": 6,
+        "net_r": 7.862831,
+        "return_pct": 2.39913,
+        "signed_price_return_pct": 8.043811,
+        "trades_per_market_day": 1.837,
+        "wr": 52.071
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 120,
+        "min_mean_r": 0.0,
+        "min_trades": 16,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.852672,
+        "n": 247,
+        "negative_months": 7,
+        "net_r": 40.875657,
+        "return_pct": 11.198386,
+        "signed_price_return_pct": 35.637238,
+        "trades_per_market_day": 1.8855,
+        "wr": 58.2996
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 7.071356,
+        "n": 232,
+        "negative_months": 13,
+        "net_r": -12.233405,
+        "return_pct": -2.770216,
+        "signed_price_return_pct": -9.156127,
+        "trades_per_market_day": 1.8413,
+        "wr": 46.9828
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 252,
+        "min_mean_r": 0.05,
+        "min_trades": 8,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.320678,
+        "n": 255,
+        "negative_months": 7,
+        "net_r": 40.875657,
+        "return_pct": 10.783305,
+        "signed_price_return_pct": 34.396598,
+        "trades_per_market_day": 1.7958,
+        "wr": 58.0392
+      },
+      "validation_pass": true
+    },
+    {
+      "development": {
+        "dd_pct": 3.466704,
+        "n": 195,
+        "negative_months": 7,
+        "net_r": 15.862831,
+        "return_pct": 5.420931,
+        "signed_price_return_pct": 17.768675,
+        "trades_per_market_day": 1.875,
+        "wr": 53.8462
+      },
+      "development_pass": true,
+      "params": {
+        "lookback_days": 120,
+        "min_mean_r": 0.05,
+        "min_trades": 8,
+        "scope": "module"
+      },
+      "validation": {
+        "dd_pct": 2.17889,
+        "n": 238,
+        "negative_months": 7,
+        "net_r": 39.875657,
+        "return_pct": 11.091571,
+        "signed_price_return_pct": 35.313062,
+        "trades_per_market_day": 1.8889,
+        "wr": 58.4034
+      },
+      "validation_pass": true
+    }
+  ]
+}

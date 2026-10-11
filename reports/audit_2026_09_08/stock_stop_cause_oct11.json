@@ -1,0 +1,999 @@
+{
+  "baseline": {
+    "all": {
+      "dd_pct": 0.423745,
+      "max_loss_streak": 2,
+      "n": 127,
+      "net_r": 64.165289,
+      "return_3pct_margin_pct": 6.388817,
+      "signed_price_return_pct": 20.668763,
+      "stops": 18,
+      "wr": 85.8268
+    },
+    "by_month": {
+      "2026-07": {
+        "dd_pct": 0.094122,
+        "max_loss_streak": 1,
+        "n": 48,
+        "net_r": 31.415289,
+        "return_3pct_margin_pct": 3.984708,
+        "signed_price_return_pct": 13.037009,
+        "stops": 3,
+        "wr": 93.75
+      },
+      "2026-08": {
+        "dd_pct": 0.209814,
+        "max_loss_streak": 2,
+        "n": 33,
+        "net_r": 14.0,
+        "return_3pct_margin_pct": 1.363246,
+        "signed_price_return_pct": 4.518974,
+        "stops": 6,
+        "wr": 81.8182
+      },
+      "2026-09": {
+        "dd_pct": 0.423745,
+        "max_loss_streak": 1,
+        "n": 46,
+        "net_r": 18.75,
+        "return_3pct_margin_pct": 0.935978,
+        "signed_price_return_pct": 3.11278,
+        "stops": 9,
+        "wr": 80.4348
+      }
+    }
+  },
+  "candidate_filter_audit": {
+    "baseline": {
+      "2026-07": {
+        "dd_pct": 0.094122,
+        "max_loss_streak": 1,
+        "n": 48,
+        "net_r": 31.415289,
+        "return_3pct_margin_pct": 3.984708,
+        "signed_price_return_pct": 13.037009,
+        "stops": 3,
+        "wr": 93.75
+      },
+      "2026-08": {
+        "dd_pct": 0.209814,
+        "max_loss_streak": 2,
+        "n": 33,
+        "net_r": 14.0,
+        "return_3pct_margin_pct": 1.363246,
+        "signed_price_return_pct": 4.518974,
+        "stops": 6,
+        "wr": 81.8182
+      },
+      "2026-09": {
+        "dd_pct": 0.423745,
+        "max_loss_streak": 1,
+        "n": 46,
+        "net_r": 18.75,
+        "return_3pct_margin_pct": 0.935978,
+        "signed_price_return_pct": 3.11278,
+        "stops": 9,
+        "wr": 80.4348
+      }
+    },
+    "protocol": {
+      "development": "2026-07",
+      "gate": "retain >=60%; non-worse WR/net R/drawdown in development and validation",
+      "hidden": "2026-09; revealed only for rules passing both earlier gates",
+      "thresholds": "fixed structural definitions; no outcome-fitted numeric search",
+      "validation": "2026-08"
+    },
+    "rules": [
+      {
+        "development": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 47,
+          "net_r": 30.415289,
+          "return_3pct_margin_pct": 3.954256,
+          "signed_price_return_pct": 12.939362,
+          "stops": 3,
+          "wr": 93.617
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "reject_adverse_failed_breakout",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 1,
+          "n": 31,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.269998,
+          "signed_price_return_pct": 4.211889,
+          "stops": 5,
+          "wr": 83.871
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": true
+      },
+      {
+        "development": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 39,
+          "net_r": 28.165289,
+          "return_3pct_margin_pct": 3.578236,
+          "signed_price_return_pct": 11.730621,
+          "stops": 2,
+          "wr": 94.8718
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "reject_index_opposition",
+        "validation": {
+          "dd_pct": 0.142067,
+          "max_loss_streak": 2,
+          "n": 24,
+          "net_r": 12.0,
+          "return_3pct_margin_pct": 1.292893,
+          "signed_price_return_pct": 4.286243,
+          "stops": 4,
+          "wr": 83.3333
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.295398,
+          "max_loss_streak": 1,
+          "n": 27,
+          "net_r": 19.0,
+          "return_3pct_margin_pct": 2.136855,
+          "signed_price_return_pct": 7.057061,
+          "stops": 2,
+          "wr": 92.5926
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "reject_opposing_ob",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 1,
+          "n": 19,
+          "net_r": 11.25,
+          "return_3pct_margin_pct": 0.91905,
+          "signed_price_return_pct": 3.052309,
+          "stops": 2,
+          "wr": 89.4737
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.295398,
+          "max_loss_streak": 1,
+          "n": 27,
+          "net_r": 15.415289,
+          "return_3pct_margin_pct": 1.728774,
+          "signed_price_return_pct": 5.721406,
+          "stops": 3,
+          "wr": 88.8889
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "reject_stop_zone_swing",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 23,
+          "net_r": 10.5,
+          "return_3pct_margin_pct": 1.133732,
+          "signed_price_return_pct": 3.762089,
+          "stops": 4,
+          "wr": 82.6087
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.295398,
+          "max_loss_streak": 1,
+          "n": 38,
+          "net_r": 21.415289,
+          "return_3pct_margin_pct": 2.604767,
+          "signed_price_return_pct": 8.582393,
+          "stops": 4,
+          "wr": 89.4737
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "require_target_liquidity_closer",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 23,
+          "net_r": 13.25,
+          "return_3pct_margin_pct": 1.298866,
+          "signed_price_return_pct": 4.30586,
+          "stops": 3,
+          "wr": 86.9565
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.295398,
+          "max_loss_streak": 1,
+          "n": 40,
+          "net_r": 22.665289,
+          "return_3pct_margin_pct": 2.73613,
+          "signed_price_return_pct": 9.009082,
+          "stops": 4,
+          "wr": 90.0
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "reject_structure_conflict",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 1,
+          "n": 23,
+          "net_r": 12.5,
+          "return_3pct_margin_pct": 1.249756,
+          "signed_price_return_pct": 4.144404,
+          "stops": 3,
+          "wr": 86.9565
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 23,
+          "net_r": 12.75,
+          "return_3pct_margin_pct": 1.102505,
+          "signed_price_return_pct": 3.657032,
+          "stops": 2,
+          "wr": 91.3043
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "single_directional_signal_per_scan",
+        "validation": {
+          "dd_pct": 0.287476,
+          "max_loss_streak": 2,
+          "n": 12,
+          "net_r": 1.75,
+          "return_3pct_margin_pct": 0.004691,
+          "signed_price_return_pct": 0.017239,
+          "stops": 4,
+          "wr": 66.6667
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      },
+      {
+        "development": {
+          "dd_pct": 0.295398,
+          "max_loss_streak": 1,
+          "n": 9,
+          "net_r": 7.0,
+          "return_3pct_margin_pct": 1.839931,
+          "signed_price_return_pct": 6.08869,
+          "stops": 1,
+          "wr": 88.8889
+        },
+        "development_baseline": {
+          "dd_pct": 0.094122,
+          "max_loss_streak": 1,
+          "n": 48,
+          "net_r": 31.415289,
+          "return_3pct_margin_pct": 3.984708,
+          "signed_price_return_pct": 13.037009,
+          "stops": 3,
+          "wr": 93.75
+        },
+        "development_pass": false,
+        "hidden_baseline": null,
+        "hidden_revealed": null,
+        "rule": "material_target_0_5pct",
+        "validation": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 1,
+          "n": 5,
+          "net_r": 3.0,
+          "return_3pct_margin_pct": 0.861159,
+          "signed_price_return_pct": 2.864,
+          "stops": 1,
+          "wr": 80.0
+        },
+        "validation_baseline": {
+          "dd_pct": 0.209814,
+          "max_loss_streak": 2,
+          "n": 33,
+          "net_r": 14.0,
+          "return_3pct_margin_pct": 1.363246,
+          "signed_price_return_pct": 4.518974,
+          "stops": 6,
+          "wr": 81.8182
+        },
+        "validation_pass": false
+      }
+    ],
+    "runtime_change_allowed": false,
+    "selected": null
+  },
+  "cluster": {
+    "accepted_same_scan_distribution": {
+      "1": 59,
+      "2": 68
+    },
+    "same_scan_stops": {
+      "1": {
+        "dd_pct": 0.345628,
+        "max_loss_streak": 2,
+        "n": 59,
+        "net_r": 22.0,
+        "return_3pct_margin_pct": 1.653811,
+        "signed_price_return_pct": 5.475443,
+        "stops": 11,
+        "wr": 81.3559
+      },
+      "2": {
+        "dd_pct": 0.290132,
+        "max_loss_streak": 2,
+        "n": 68,
+        "net_r": 42.165289,
+        "return_3pct_margin_pct": 4.657973,
+        "signed_price_return_pct": 15.19332,
+        "stops": 7,
+        "wr": 89.7059
+      }
+    }
+  },
+  "limitations": [
+    "Direct X-Perp evidence covers July-September 2026, so it cannot establish cross-era robustness.",
+    "Swing and order-block fields are explicit OHLC proxies, not exchange order-book liquidity.",
+    "Only the 0.5% material subset matches the current minimum-move runtime; it is too small for activation.",
+    "Post-stop recovery describes stop geometry and cannot be used as an entry feature."
+  ],
+  "material_move_subset": {
+    "dd_pct": 0.290132,
+    "max_loss_streak": 1,
+    "n": 16,
+    "net_r": 10.0,
+    "return_3pct_margin_pct": 2.533384,
+    "signed_price_return_pct": 8.355646,
+    "stops": 3,
+    "wr": 81.25
+  },
+  "scope": {
+    "causal_rule": "all filter features use bars closed before entry",
+    "period": [
+      1783431900,
+      1790790300
+    ],
+    "portfolio_accepted_entries": 127,
+    "post_stop_is_diagnostic_only": true,
+    "raw_frozen_entries": 176,
+    "router": "robust_dynamic_entry_filtered"
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_stop_cause_oct11_audit.py": "a0705b3cb7f34885891742e95f3c51b2f1b38f25c742f8a04161148414a26f26",
+    "reports\\audit_2026_09_08\\stock_forward_sep30_families.csv": "b88dad2b6aa22fe6f98eec07c0b2e022fb08e22df078c1f5c41dc9b7f122177d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\AAPLUSDT_15min_current.pkl": "685c3863eeda8108a197ce2fa5febe1e169f40b5e584d2460169fd7dfd887255",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\AMZNUSDT_15min_current.pkl": "2e7e9742075286ac5906d495be7555e307ac53cfe19bd843da5e60f4a78708ac",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\GOOGLUSDT_15min_current.pkl": "7f266a8fea19523e5b1e1c079b3e3a5ef20b86fcbfc4ec54098bc04678e12151",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\INTCUSDT_15min_current.pkl": "0c5727a28e4b4b21b089a62696bcfe7df12ef461e8b1274fb67b23166278c485",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\METAUSDT_15min_current.pkl": "24d037d47526d06e8f44cdb3942c675f9d53c0942f99af3060f2f53618103125",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MRVLUSDT_15min_current.pkl": "5819380b2c6096ada8ef92bf5b085ba6fc0282f1c6729a1eae8be694447c734c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MSFTUSDT_15min_current.pkl": "828e731955447d450973c258a7d95cf9c35a27e8141a397ae4c449e6752c4192",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\MUUSDT_15min_current.pkl": "a8811aa1e89aca70a9b08cb0fcc484626d400aead5b265275bff4e64d9bb781d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\NVDAUSDT_15min_current.pkl": "90d7b382ea7e18aa7f4b972ecc4a331f89265615140ae6577a7732efb32d3b55",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\QQQUSDT_15min_current.pkl": "3daccc7a913ec902c7ed7a68e8894929aa75784c30c6a040553efdc0b6e4b7f2",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\SPYUSDT_15min_current.pkl": "4f8457d3f7f75edf6604d9ee5442ed6adcb1c855f8eaa711d876b909744f85a7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\TSLAUSDT_15min_current.pkl": "7ece658f3b88541da3d2a2fd6f2573cba422c5c5b0b4b90e7f09ead93f1f7dcd",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_sep30\\manifest.json": "586c834c65edaa913e81eab15e5a09f0fe30b411e82ce0444ac42a44356d7bf0"
+  },
+  "status": "DIAGNOSTIC_COMPLETE_NO_RUNTIME_CHANGE",
+  "stop_factors": {
+    "adverse_failed_breakout": {
+      "clear": {
+        "dd_pct": 0.423745,
+        "max_loss_streak": 1,
+        "n": 121,
+        "net_r": 60.165289,
+        "return_3pct_margin_pct": 6.072132,
+        "signed_price_return_pct": 19.674556,
+        "stops": 17,
+        "wr": 85.9504
+      },
+      "exposed": {
+        "dd_pct": 0.039309,
+        "max_loss_streak": 1,
+        "n": 6,
+        "net_r": 4.0,
+        "return_3pct_margin_pct": 0.298556,
+        "signed_price_return_pct": 0.994207,
+        "stops": 1,
+        "wr": 83.3333
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.0,
+          "max_loss_streak": 0,
+          "n": 1,
+          "net_r": 1.0,
+          "return_3pct_margin_pct": 0.029294,
+          "signed_price_return_pct": 0.097646,
+          "stops": 0,
+          "wr": 100.0
+        },
+        "2026-08": {
+          "dd_pct": 0.039309,
+          "max_loss_streak": 1,
+          "n": 3,
+          "net_r": 1.0,
+          "return_3pct_margin_pct": 0.163305,
+          "signed_price_return_pct": 0.544291,
+          "stops": 1,
+          "wr": 66.6667
+        },
+        "2026-09": {
+          "dd_pct": 0.0,
+          "max_loss_streak": 0,
+          "n": 2,
+          "net_r": 2.0,
+          "return_3pct_margin_pct": 0.105706,
+          "signed_price_return_pct": 0.35227,
+          "stops": 0,
+          "wr": 100.0
+        }
+      },
+      "stop_rate_lift": 1.1759
+    },
+    "both_indices_against": {
+      "clear": {
+        "dd_pct": 0.471243,
+        "max_loss_streak": 2,
+        "n": 98,
+        "net_r": 56.415289,
+        "return_3pct_margin_pct": 5.90375,
+        "signed_price_return_pct": 19.142419,
+        "stops": 13,
+        "wr": 86.7347
+      },
+      "exposed": {
+        "dd_pct": 0.414517,
+        "max_loss_streak": 2,
+        "n": 29,
+        "net_r": 7.75,
+        "return_3pct_margin_pct": 0.458026,
+        "signed_price_return_pct": 1.526343,
+        "stops": 5,
+        "wr": 82.7586
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.085326,
+          "max_loss_streak": 1,
+          "n": 9,
+          "net_r": 3.25,
+          "return_3pct_margin_pct": 0.39243,
+          "signed_price_return_pct": 1.306388,
+          "stops": 1,
+          "wr": 88.8889
+        },
+        "2026-08": {
+          "dd_pct": 0.255336,
+          "max_loss_streak": 1,
+          "n": 9,
+          "net_r": 2.0,
+          "return_3pct_margin_pct": 0.069454,
+          "signed_price_return_pct": 0.232731,
+          "stops": 2,
+          "wr": 77.7778
+        },
+        "2026-09": {
+          "dd_pct": 0.159589,
+          "max_loss_streak": 1,
+          "n": 11,
+          "net_r": 2.5,
+          "return_3pct_margin_pct": -0.004111,
+          "signed_price_return_pct": -0.012775,
+          "stops": 2,
+          "wr": 81.8182
+        }
+      },
+      "stop_rate_lift": 1.2165
+    },
+    "index_divergence": {
+      "clear": {
+        "dd_pct": 0.462467,
+        "max_loss_streak": 3,
+        "n": 103,
+        "net_r": 51.25,
+        "return_3pct_margin_pct": 4.539165,
+        "signed_price_return_pct": 14.816242,
+        "stops": 15,
+        "wr": 85.4369
+      },
+      "exposed": {
+        "dd_pct": 0.125223,
+        "max_loss_streak": 1,
+        "n": 24,
+        "net_r": 12.915289,
+        "return_3pct_margin_pct": 1.769339,
+        "signed_price_return_pct": 5.852521,
+        "stops": 3,
+        "wr": 87.5
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.071399,
+          "max_loss_streak": 1,
+          "n": 9,
+          "net_r": 4.165289,
+          "return_3pct_margin_pct": 1.002915,
+          "signed_price_return_pct": 3.330556,
+          "stops": 1,
+          "wr": 88.8889
+        },
+        "2026-08": {
+          "dd_pct": 0.0,
+          "max_loss_streak": 0,
+          "n": 7,
+          "net_r": 7.0,
+          "return_3pct_margin_pct": 0.685474,
+          "signed_price_return_pct": 2.278389,
+          "stops": 0,
+          "wr": 100.0
+        },
+        "2026-09": {
+          "dd_pct": 0.125223,
+          "max_loss_streak": 1,
+          "n": 8,
+          "net_r": 1.75,
+          "return_3pct_margin_pct": 0.072841,
+          "signed_price_return_pct": 0.243576,
+          "stops": 2,
+          "wr": 75.0
+        }
+      },
+      "stop_rate_lift": 0.8819
+    },
+    "liquidity_closer_to_stop": {
+      "clear": {
+        "dd_pct": 0.442709,
+        "max_loss_streak": 2,
+        "n": 88,
+        "net_r": 41.665289,
+        "return_3pct_margin_pct": 4.180026,
+        "signed_price_return_pct": 13.669015,
+        "stops": 14,
+        "wr": 84.0909
+      },
+      "exposed": {
+        "dd_pct": 0.142067,
+        "max_loss_streak": 1,
+        "n": 39,
+        "net_r": 22.5,
+        "return_3pct_margin_pct": 2.120167,
+        "signed_price_return_pct": 6.999747,
+        "stops": 4,
+        "wr": 89.7436
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.0,
+          "max_loss_streak": 0,
+          "n": 14,
+          "net_r": 11.25,
+          "return_3pct_margin_pct": 1.107271,
+          "signed_price_return_pct": 3.673569,
+          "stops": 0,
+          "wr": 100.0
+        },
+        "2026-08": {
+          "dd_pct": 0.142067,
+          "max_loss_streak": 1,
+          "n": 12,
+          "net_r": 2.25,
+          "return_3pct_margin_pct": 0.159911,
+          "signed_price_return_pct": 0.534038,
+          "stops": 3,
+          "wr": 75.0
+        },
+        "2026-09": {
+          "dd_pct": 0.030037,
+          "max_loss_streak": 1,
+          "n": 13,
+          "net_r": 9.0,
+          "return_3pct_margin_pct": 0.840548,
+          "signed_price_return_pct": 2.792141,
+          "stops": 1,
+          "wr": 92.3077
+        }
+      },
+      "stop_rate_lift": 0.7236
+    },
+    "opposing_order_block_proxy": {
+      "clear": {
+        "dd_pct": 0.404503,
+        "max_loss_streak": 3,
+        "n": 63,
+        "net_r": 33.25,
+        "return_3pct_margin_pct": 3.069285,
+        "signed_price_return_pct": 10.090465,
+        "stops": 10,
+        "wr": 84.127
+      },
+      "exposed": {
+        "dd_pct": 0.290132,
+        "max_loss_streak": 2,
+        "n": 64,
+        "net_r": 30.915289,
+        "return_3pct_margin_pct": 3.22068,
+        "signed_price_return_pct": 10.578298,
+        "stops": 8,
+        "wr": 87.5
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.085326,
+          "max_loss_streak": 1,
+          "n": 24,
+          "net_r": 12.665289,
+          "return_3pct_margin_pct": 1.690041,
+          "signed_price_return_pct": 5.591581,
+          "stops": 2,
+          "wr": 91.6667
+        },
+        "2026-08": {
+          "dd_pct": 0.157848,
+          "max_loss_streak": 2,
+          "n": 15,
+          "net_r": 3.25,
+          "return_3pct_margin_pct": 0.466331,
+          "signed_price_return_pct": 1.553551,
+          "stops": 4,
+          "wr": 73.3333
+        },
+        "2026-09": {
+          "dd_pct": 0.290132,
+          "max_loss_streak": 1,
+          "n": 25,
+          "net_r": 15.0,
+          "return_3pct_margin_pct": 1.034047,
+          "signed_price_return_pct": 3.433166,
+          "stops": 2,
+          "wr": 92.0
+        }
+      },
+      "stop_rate_lift": 0.8819
+    },
+    "stop_zone_has_prior_swing": {
+      "clear": {
+        "dd_pct": 0.275233,
+        "max_loss_streak": 2,
+        "n": 78,
+        "net_r": 35.415289,
+        "return_3pct_margin_pct": 3.656334,
+        "signed_price_return_pct": 11.985865,
+        "stops": 14,
+        "wr": 82.0513
+      },
+      "exposed": {
+        "dd_pct": 0.290132,
+        "max_loss_streak": 1,
+        "n": 49,
+        "net_r": 28.75,
+        "return_3pct_margin_pct": 2.636099,
+        "signed_price_return_pct": 8.682897,
+        "stops": 4,
+        "wr": 91.8367
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.085326,
+          "max_loss_streak": 1,
+          "n": 24,
+          "net_r": 16.25,
+          "return_3pct_margin_pct": 1.945,
+          "signed_price_return_pct": 6.426937,
+          "stops": 1,
+          "wr": 95.8333
+        },
+        "2026-08": {
+          "dd_pct": 0.142067,
+          "max_loss_streak": 1,
+          "n": 11,
+          "net_r": 4.0,
+          "return_3pct_margin_pct": 0.261518,
+          "signed_price_return_pct": 0.871881,
+          "stops": 2,
+          "wr": 81.8182
+        },
+        "2026-09": {
+          "dd_pct": 0.290132,
+          "max_loss_streak": 1,
+          "n": 14,
+          "net_r": 8.5,
+          "return_3pct_margin_pct": 0.41531,
+          "signed_price_return_pct": 1.384079,
+          "stops": 1,
+          "wr": 92.8571
+        }
+      },
+      "stop_rate_lift": 0.576
+    },
+    "supportive_sweep": {
+      "clear": {
+        "dd_pct": 0.256189,
+        "max_loss_streak": 2,
+        "n": 112,
+        "net_r": 55.665289,
+        "return_3pct_margin_pct": 5.480226,
+        "signed_price_return_pct": 17.804535,
+        "stops": 17,
+        "wr": 84.8214
+      },
+      "exposed": {
+        "dd_pct": 0.290132,
+        "max_loss_streak": 1,
+        "n": 15,
+        "net_r": 8.5,
+        "return_3pct_margin_pct": 0.861385,
+        "signed_price_return_pct": 2.864228,
+        "stops": 1,
+        "wr": 93.3333
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.0,
+          "max_loss_streak": 0,
+          "n": 5,
+          "net_r": 3.5,
+          "return_3pct_margin_pct": 0.75953,
+          "signed_price_return_pct": 2.525643,
+          "stops": 0,
+          "wr": 100.0
+        },
+        "2026-09": {
+          "dd_pct": 0.290132,
+          "max_loss_streak": 1,
+          "n": 10,
+          "net_r": 5.0,
+          "return_3pct_margin_pct": 0.101087,
+          "signed_price_return_pct": 0.338584,
+          "stops": 1,
+          "wr": 90.0
+        }
+      },
+      "stop_rate_lift": 0.4704
+    },
+    "target_path_has_prior_swing": {
+      "clear": {
+        "dd_pct": 0.232718,
+        "max_loss_streak": 2,
+        "n": 83,
+        "net_r": 33.75,
+        "return_3pct_margin_pct": 3.318729,
+        "signed_price_return_pct": 10.89553,
+        "stops": 13,
+        "wr": 84.3373
+      },
+      "exposed": {
+        "dd_pct": 0.290132,
+        "max_loss_streak": 1,
+        "n": 44,
+        "net_r": 30.415289,
+        "return_3pct_margin_pct": 2.971473,
+        "signed_price_return_pct": 9.773232,
+        "stops": 5,
+        "wr": 88.6364
+      },
+      "exposed_by_month": {
+        "2026-07": {
+          "dd_pct": 0.071399,
+          "max_loss_streak": 1,
+          "n": 19,
+          "net_r": 14.665289,
+          "return_3pct_margin_pct": 1.972503,
+          "signed_price_return_pct": 6.518006,
+          "stops": 1,
+          "wr": 94.7368
+        },
+        "2026-08": {
+          "dd_pct": 0.142067,
+          "max_loss_streak": 1,
+          "n": 9,
+          "net_r": 5.0,
+          "return_3pct_margin_pct": 0.604866,
+          "signed_price_return_pct": 2.012653,
+          "stops": 2,
+          "wr": 77.7778
+        },
+        "2026-09": {
+          "dd_pct": 0.290132,
+          "max_loss_streak": 1,
+          "n": 16,
+          "net_r": 10.75,
+          "return_3pct_margin_pct": 0.372528,
+          "signed_price_return_pct": 1.242573,
+          "stops": 2,
+          "wr": 87.5
+        }
+      },
+      "stop_rate_lift": 0.8018
+    }
+  },
+  "stop_path": {
+    "entry_after_stop_same_session": {
+      "count": 8,
+      "pct": 44.4444
+    },
+    "hard_reversal_proxy": {
+      "count": 6,
+      "pct": 33.3333
+    },
+    "stop_and_target_same_bar": {
+      "count": 0,
+      "pct": 0.0
+    },
+    "stop_candle_closed_back_inside": {
+      "count": 8,
+      "pct": 44.4444
+    },
+    "stops": 18,
+    "target_after_stop_13h": {
+      "count": 6,
+      "pct": 33.3333
+    },
+    "target_after_stop_same_session": {
+      "count": 5,
+      "pct": 27.7778
+    }
+  }
+}

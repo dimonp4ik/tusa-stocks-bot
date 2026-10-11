@@ -1,0 +1,1620 @@
+{
+  "activation": {
+    "allowed": false,
+    "reason": "The current material route lacks adequate frequency and stable positive yearly evidence."
+  },
+  "current_material_route": {
+    "all": {
+      "dd_pct": 17.171912,
+      "n": 1298,
+      "negative_months": 34,
+      "net_r": 30.262126,
+      "return_pct": 4.07464,
+      "signed_price_return_pct": 14.823312,
+      "trades_per_market_day": 2.1926,
+      "wr": 51.849
+    },
+    "by_module": {
+      "breakout_long_bear_45_90": {
+        "all": {
+          "dd_pct": 8.331939,
+          "n": 157,
+          "negative_months": 24,
+          "net_r": -2.029417,
+          "return_pct": -1.656642,
+          "signed_price_return_pct": -5.3707,
+          "trades_per_market_day": 1.4404,
+          "wr": 49.6815
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2018": {
+            "dd_pct": 1.016357,
+            "n": 13,
+            "negative_months": 2,
+            "net_r": 1.0,
+            "return_pct": 0.367957,
+            "signed_price_return_pct": 1.242169,
+            "trades_per_market_day": 1.3,
+            "wr": 53.8462
+          },
+          "2019": {
+            "dd_pct": 0.422734,
+            "n": 9,
+            "negative_months": 2,
+            "net_r": 1.0,
+            "return_pct": 0.206588,
+            "signed_price_return_pct": 0.693469,
+            "trades_per_market_day": 1.5,
+            "wr": 55.5556
+          },
+          "2020": {
+            "dd_pct": 3.308154,
+            "n": 16,
+            "negative_months": 4,
+            "net_r": -8.0,
+            "return_pct": -2.987695,
+            "signed_price_return_pct": -10.073093,
+            "trades_per_market_day": 1.6,
+            "wr": 25.0
+          },
+          "2021": {
+            "dd_pct": 1.844365,
+            "n": 13,
+            "negative_months": 3,
+            "net_r": -5.0,
+            "return_pct": -1.283419,
+            "signed_price_return_pct": -4.294168,
+            "trades_per_market_day": 1.625,
+            "wr": 30.7692
+          },
+          "2022": {
+            "dd_pct": 3.918864,
+            "n": 45,
+            "negative_months": 5,
+            "net_r": -7.0,
+            "return_pct": -1.429527,
+            "signed_price_return_pct": -4.740151,
+            "trades_per_market_day": 1.6667,
+            "wr": 42.2222
+          },
+          "2023": {
+            "dd_pct": 0.818,
+            "n": 15,
+            "negative_months": 3,
+            "net_r": 5.0,
+            "return_pct": 1.197811,
+            "signed_price_return_pct": 3.984628,
+            "trades_per_market_day": 1.25,
+            "wr": 66.6667
+          },
+          "2024": {
+            "dd_pct": 0.541009,
+            "n": 9,
+            "negative_months": 2,
+            "net_r": 0.062994,
+            "return_pct": 0.086044,
+            "signed_price_return_pct": 0.29488,
+            "trades_per_market_day": 1.125,
+            "wr": 55.5556
+          },
+          "2025": {
+            "dd_pct": 0.680997,
+            "n": 13,
+            "negative_months": 2,
+            "net_r": 4.49697,
+            "return_pct": 0.373829,
+            "signed_price_return_pct": 1.257385,
+            "trades_per_market_day": 1.3,
+            "wr": 69.2308
+          },
+          "2026": {
+            "dd_pct": 0.722179,
+            "n": 24,
+            "negative_months": 1,
+            "net_r": 6.410619,
+            "return_pct": 1.888407,
+            "signed_price_return_pct": 6.26418,
+            "trades_per_market_day": 1.3333,
+            "wr": 62.5
+          }
+        }
+      },
+      "breakout_long_bear_open": {
+        "all": {
+          "dd_pct": 4.748022,
+          "n": 86,
+          "negative_months": 17,
+          "net_r": -9.5,
+          "return_pct": -4.199996,
+          "signed_price_return_pct": -14.170846,
+          "trades_per_market_day": 1.3231,
+          "wr": 52.3256
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2018": {
+            "dd_pct": 0.384837,
+            "n": 5,
+            "negative_months": 2,
+            "net_r": -0.0,
+            "return_pct": -0.050912,
+            "signed_price_return_pct": -0.165661,
+            "trades_per_market_day": 1.0,
+            "wr": 60.0
+          },
+          "2019": {
+            "dd_pct": 0.0,
+            "n": 1,
+            "negative_months": 0,
+            "net_r": 1.0,
+            "return_pct": 0.179063,
+            "signed_price_return_pct": 0.596876,
+            "trades_per_market_day": 1.0,
+            "wr": 100.0
+          },
+          "2020": {
+            "dd_pct": 2.968183,
+            "n": 13,
+            "negative_months": 2,
+            "net_r": -6.5,
+            "return_pct": -2.728703,
+            "signed_price_return_pct": -9.185431,
+            "trades_per_market_day": 1.625,
+            "wr": 30.7692
+          },
+          "2021": {
+            "dd_pct": 0.0,
+            "n": 3,
+            "negative_months": 0,
+            "net_r": 1.5,
+            "return_pct": 0.4822,
+            "signed_price_return_pct": 1.604763,
+            "trades_per_market_day": 1.0,
+            "wr": 100.0
+          },
+          "2022": {
+            "dd_pct": 1.006033,
+            "n": 25,
+            "negative_months": 5,
+            "net_r": 0.5,
+            "return_pct": 0.140692,
+            "signed_price_return_pct": 0.497991,
+            "trades_per_market_day": 1.1905,
+            "wr": 56.0
+          },
+          "2023": {
+            "dd_pct": 0.628843,
+            "n": 6,
+            "negative_months": 2,
+            "net_r": -2.5,
+            "return_pct": -0.450246,
+            "signed_price_return_pct": -1.499422,
+            "trades_per_market_day": 1.2,
+            "wr": 33.3333
+          },
+          "2024": {
+            "dd_pct": 0.816558,
+            "n": 7,
+            "negative_months": 1,
+            "net_r": 1.0,
+            "return_pct": 0.230798,
+            "signed_price_return_pct": 0.778043,
+            "trades_per_market_day": 1.4,
+            "wr": 71.4286
+          },
+          "2025": {
+            "dd_pct": 2.96224,
+            "n": 12,
+            "negative_months": 2,
+            "net_r": -5.0,
+            "return_pct": -2.17912,
+            "signed_price_return_pct": -7.315704,
+            "trades_per_market_day": 1.5,
+            "wr": 33.3333
+          },
+          "2026": {
+            "dd_pct": 0.860587,
+            "n": 14,
+            "negative_months": 3,
+            "net_r": 0.5,
+            "return_pct": 0.150324,
+            "signed_price_return_pct": 0.517699,
+            "trades_per_market_day": 1.5556,
+            "wr": 64.2857
+          }
+        }
+      },
+      "drive_long_bear_open": {
+        "all": {
+          "dd_pct": 2.916956,
+          "n": 116,
+          "negative_months": 19,
+          "net_r": 16.5,
+          "return_pct": 4.164062,
+          "signed_price_return_pct": 13.729359,
+          "trades_per_market_day": 1.3182,
+          "wr": 57.7586
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2018": {
+            "dd_pct": 0.520829,
+            "n": 10,
+            "negative_months": 2,
+            "net_r": 2.0,
+            "return_pct": 0.56333,
+            "signed_price_return_pct": 1.882232,
+            "trades_per_market_day": 1.25,
+            "wr": 60.0
+          },
+          "2019": {
+            "dd_pct": 0.939831,
+            "n": 8,
+            "negative_months": 1,
+            "net_r": -2.0,
+            "return_pct": -0.338924,
+            "signed_price_return_pct": -1.126615,
+            "trades_per_market_day": 1.3333,
+            "wr": 37.5
+          },
+          "2020": {
+            "dd_pct": 1.105841,
+            "n": 15,
+            "negative_months": 2,
+            "net_r": 1.5,
+            "return_pct": -0.077773,
+            "signed_price_return_pct": -0.236844,
+            "trades_per_market_day": 1.5,
+            "wr": 60.0
+          },
+          "2021": {
+            "dd_pct": 0.410385,
+            "n": 5,
+            "negative_months": 1,
+            "net_r": 1.0,
+            "return_pct": 0.240659,
+            "signed_price_return_pct": 0.805133,
+            "trades_per_market_day": 1.0,
+            "wr": 60.0
+          },
+          "2022": {
+            "dd_pct": 0.478242,
+            "n": 29,
+            "negative_months": 2,
+            "net_r": 13.0,
+            "return_pct": 2.976985,
+            "signed_price_return_pct": 9.806719,
+            "trades_per_market_day": 1.3182,
+            "wr": 72.4138
+          },
+          "2023": {
+            "dd_pct": 1.663634,
+            "n": 16,
+            "negative_months": 7,
+            "net_r": -8.0,
+            "return_pct": -1.597207,
+            "signed_price_return_pct": -5.355772,
+            "trades_per_market_day": 1.2308,
+            "wr": 25.0
+          },
+          "2024": {
+            "dd_pct": 1.274526,
+            "n": 10,
+            "negative_months": 3,
+            "net_r": -4.0,
+            "return_pct": -1.060443,
+            "signed_price_return_pct": -3.534733,
+            "trades_per_market_day": 1.4286,
+            "wr": 30.0
+          },
+          "2025": {
+            "dd_pct": 0.445808,
+            "n": 14,
+            "negative_months": 0,
+            "net_r": 8.0,
+            "return_pct": 1.912141,
+            "signed_price_return_pct": 6.328859,
+            "trades_per_market_day": 1.4,
+            "wr": 78.5714
+          },
+          "2026": {
+            "dd_pct": 0.388785,
+            "n": 9,
+            "negative_months": 1,
+            "net_r": 5.0,
+            "return_pct": 1.555437,
+            "signed_price_return_pct": 5.16038,
+            "trades_per_market_day": 1.2857,
+            "wr": 77.7778
+          }
+        }
+      },
+      "drive_short_bear_open": {
+        "all": {
+          "dd_pct": 6.606209,
+          "n": 616,
+          "negative_months": 31,
+          "net_r": 45.178713,
+          "return_pct": 12.507374,
+          "signed_price_return_pct": 39.998409,
+          "trades_per_market_day": 1.5477,
+          "wr": 53.5714
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.621669,
+            "n": 7,
+            "negative_months": 3,
+            "net_r": -3.0,
+            "return_pct": -0.620615,
+            "signed_price_return_pct": -2.071197,
+            "trades_per_market_day": 1.0,
+            "wr": 28.5714
+          },
+          "2018": {
+            "dd_pct": 2.286045,
+            "n": 85,
+            "negative_months": 4,
+            "net_r": 21.0,
+            "return_pct": 5.653976,
+            "signed_price_return_pct": 18.422315,
+            "trades_per_market_day": 1.5741,
+            "wr": 62.3529
+          },
+          "2019": {
+            "dd_pct": 2.65569,
+            "n": 35,
+            "negative_months": 4,
+            "net_r": -8.096236,
+            "return_pct": -1.613201,
+            "signed_price_return_pct": -5.39952,
+            "trades_per_market_day": 1.2963,
+            "wr": 37.1429
+          },
+          "2020": {
+            "dd_pct": 4.732171,
+            "n": 58,
+            "negative_months": 2,
+            "net_r": -8.0,
+            "return_pct": -3.313388,
+            "signed_price_return_pct": -11.098893,
+            "trades_per_market_day": 1.7059,
+            "wr": 43.1034
+          },
+          "2021": {
+            "dd_pct": 0.656245,
+            "n": 49,
+            "negative_months": 3,
+            "net_r": 3.0,
+            "return_pct": 0.832664,
+            "signed_price_return_pct": 2.799956,
+            "trades_per_market_day": 1.4412,
+            "wr": 53.0612
+          },
+          "2022": {
+            "dd_pct": 1.20663,
+            "n": 175,
+            "negative_months": 1,
+            "net_r": 42.875657,
+            "return_pct": 11.811507,
+            "signed_price_return_pct": 37.404079,
+            "trades_per_market_day": 1.7157,
+            "wr": 62.2857
+          },
+          "2023": {
+            "dd_pct": 3.630807,
+            "n": 47,
+            "negative_months": 5,
+            "net_r": -11.0,
+            "return_pct": -2.598348,
+            "signed_price_return_pct": -8.739264,
+            "trades_per_market_day": 1.5161,
+            "wr": 38.2979
+          },
+          "2024": {
+            "dd_pct": 3.770802,
+            "n": 46,
+            "negative_months": 4,
+            "net_r": -8.0,
+            "return_pct": -2.518664,
+            "signed_price_return_pct": -8.452028,
+            "trades_per_market_day": 1.4839,
+            "wr": 41.3043
+          },
+          "2025": {
+            "dd_pct": 1.190404,
+            "n": 58,
+            "negative_months": 2,
+            "net_r": 8.0,
+            "return_pct": 3.49034,
+            "signed_price_return_pct": 11.517059,
+            "trades_per_market_day": 1.5263,
+            "wr": 56.8966
+          },
+          "2026": {
+            "dd_pct": 1.395042,
+            "n": 56,
+            "negative_months": 3,
+            "net_r": 8.399291,
+            "return_pct": 1.676436,
+            "signed_price_return_pct": 5.615902,
+            "trades_per_market_day": 1.4,
+            "wr": 57.1429
+          }
+        }
+      },
+      "gap_fade_short_bear_open": {
+        "all": {
+          "dd_pct": 9.162823,
+          "n": 318,
+          "negative_months": 35,
+          "net_r": -21.137169,
+          "return_pct": -6.527423,
+          "signed_price_return_pct": -22.167709,
+          "trades_per_market_day": 1.6224,
+          "wr": 46.5409
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.0,
+            "n": 3,
+            "negative_months": 0,
+            "net_r": 3.0,
+            "return_pct": 0.538327,
+            "signed_price_return_pct": 1.791245,
+            "trades_per_market_day": 1.0,
+            "wr": 100.0
+          },
+          "2018": {
+            "dd_pct": 1.11048,
+            "n": 49,
+            "negative_months": 5,
+            "net_r": 1.862831,
+            "return_pct": 0.212396,
+            "signed_price_return_pct": 0.756559,
+            "trades_per_market_day": 1.5806,
+            "wr": 51.0204
+          },
+          "2019": {
+            "dd_pct": 0.482986,
+            "n": 13,
+            "negative_months": 2,
+            "net_r": -1.0,
+            "return_pct": -0.200148,
+            "signed_price_return_pct": -0.660035,
+            "trades_per_market_day": 1.625,
+            "wr": 46.1538
+          },
+          "2020": {
+            "dd_pct": 5.381291,
+            "n": 36,
+            "negative_months": 3,
+            "net_r": -10.0,
+            "return_pct": -4.327867,
+            "signed_price_return_pct": -14.681189,
+            "trades_per_market_day": 1.8947,
+            "wr": 36.1111
+          },
+          "2021": {
+            "dd_pct": 2.23672,
+            "n": 29,
+            "negative_months": 5,
+            "net_r": -7.0,
+            "return_pct": -1.37703,
+            "signed_price_return_pct": -4.600015,
+            "trades_per_market_day": 1.45,
+            "wr": 37.931
+          },
+          "2022": {
+            "dd_pct": 1.794138,
+            "n": 54,
+            "negative_months": 4,
+            "net_r": -2.0,
+            "return_pct": -0.162001,
+            "signed_price_return_pct": -0.490514,
+            "trades_per_market_day": 1.7419,
+            "wr": 48.1481
+          },
+          "2023": {
+            "dd_pct": 1.417959,
+            "n": 27,
+            "negative_months": 3,
+            "net_r": 1.0,
+            "return_pct": -0.037654,
+            "signed_price_return_pct": -0.105957,
+            "trades_per_market_day": 1.5,
+            "wr": 51.8519
+          },
+          "2024": {
+            "dd_pct": 2.587599,
+            "n": 40,
+            "negative_months": 5,
+            "net_r": -8.0,
+            "return_pct": -1.788718,
+            "signed_price_return_pct": -5.987738,
+            "trades_per_market_day": 1.6,
+            "wr": 40.0
+          },
+          "2025": {
+            "dd_pct": 1.198569,
+            "n": 29,
+            "negative_months": 3,
+            "net_r": -1.0,
+            "return_pct": -0.418823,
+            "signed_price_return_pct": -1.369773,
+            "trades_per_market_day": 1.7059,
+            "wr": 48.2759
+          },
+          "2026": {
+            "dd_pct": 1.051472,
+            "n": 38,
+            "negative_months": 5,
+            "net_r": 2.0,
+            "return_pct": 0.940801,
+            "signed_price_return_pct": 3.179709,
+            "trades_per_market_day": 1.5833,
+            "wr": 52.6316
+          }
+        }
+      },
+      "reclaim_long_bear_45_90": {
+        "all": {
+          "dd_pct": 0.0,
+          "n": 5,
+          "negative_months": 0,
+          "net_r": 1.25,
+          "return_pct": 0.844274,
+          "signed_price_return_pct": 2.804801,
+          "trades_per_market_day": 1.25,
+          "wr": 100.0
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2018": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2019": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2020": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2021": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2022": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2023": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2024": {
+            "dd_pct": 0.0,
+            "n": 0,
+            "negative_months": 0,
+            "net_r": 0.0,
+            "return_pct": 0.0,
+            "trades_per_market_day": 0.0,
+            "wr": 0.0
+          },
+          "2025": {
+            "dd_pct": 0.0,
+            "n": 3,
+            "negative_months": 0,
+            "net_r": 0.75,
+            "return_pct": 0.52845,
+            "signed_price_return_pct": 1.758409,
+            "trades_per_market_day": 1.5,
+            "wr": 100.0
+          },
+          "2026": {
+            "dd_pct": 0.0,
+            "n": 2,
+            "negative_months": 0,
+            "net_r": 0.5,
+            "return_pct": 0.314164,
+            "signed_price_return_pct": 1.046392,
+            "trades_per_market_day": 1.0,
+            "wr": 100.0
+          }
+        }
+      }
+    },
+    "by_year": {
+      "2017": {
+        "dd_pct": 0.620949,
+        "n": 10,
+        "negative_months": 1,
+        "net_r": 0.0,
+        "return_pct": -0.085629,
+        "signed_price_return_pct": -0.279952,
+        "trades_per_market_day": 1.0,
+        "wr": 50.0
+      },
+      "2018": {
+        "dd_pct": 2.914754,
+        "n": 162,
+        "negative_months": 4,
+        "net_r": 25.862831,
+        "return_pct": 6.812198,
+        "signed_price_return_pct": 22.137615,
+        "trades_per_market_day": 2.025,
+        "wr": 58.0247
+      },
+      "2019": {
+        "dd_pct": 3.507514,
+        "n": 66,
+        "negative_months": 4,
+        "net_r": -9.096236,
+        "return_pct": -1.76516,
+        "signed_price_return_pct": -5.895825,
+        "trades_per_market_day": 1.8857,
+        "wr": 42.4242
+      },
+      "2020": {
+        "dd_pct": 14.93306,
+        "n": 138,
+        "negative_months": 3,
+        "net_r": -31.0,
+        "return_pct": -12.778122,
+        "signed_price_return_pct": -45.275451,
+        "trades_per_market_day": 2.875,
+        "wr": 39.8551
+      },
+      "2021": {
+        "dd_pct": 2.318875,
+        "n": 99,
+        "negative_months": 3,
+        "net_r": -6.5,
+        "return_pct": -1.121364,
+        "signed_price_return_pct": -3.684332,
+        "trades_per_market_day": 1.8679,
+        "wr": 47.4747
+      },
+      "2022": {
+        "dd_pct": 2.404767,
+        "n": 328,
+        "negative_months": 2,
+        "net_r": 47.375657,
+        "return_pct": 13.469717,
+        "signed_price_return_pct": 42.478124,
+        "trades_per_market_day": 2.4118,
+        "wr": 57.622
+      },
+      "2023": {
+        "dd_pct": 4.435314,
+        "n": 111,
+        "negative_months": 6,
+        "net_r": -15.5,
+        "return_pct": -3.47907,
+        "signed_price_return_pct": -11.715788,
+        "trades_per_market_day": 1.9474,
+        "wr": 43.2432
+      },
+      "2024": {
+        "dd_pct": 5.484958,
+        "n": 112,
+        "negative_months": 6,
+        "net_r": -18.937006,
+        "return_pct": -4.977265,
+        "signed_price_return_pct": -16.901575,
+        "trades_per_market_day": 2.2857,
+        "wr": 42.8571
+      },
+      "2025": {
+        "dd_pct": 3.266775,
+        "n": 129,
+        "negative_months": 2,
+        "net_r": 15.24697,
+        "return_pct": 3.667837,
+        "signed_price_return_pct": 12.176235,
+        "trades_per_market_day": 2.15,
+        "wr": 57.3643
+      },
+      "2026": {
+        "dd_pct": 1.989283,
+        "n": 143,
+        "negative_months": 3,
+        "net_r": 22.80991,
+        "return_pct": 6.691453,
+        "signed_price_return_pct": 21.784261,
+        "trades_per_market_day": 2.2344,
+        "wr": 59.4406
+      }
+    },
+    "raw_eligible": 2103
+  },
+  "limitations": [
+    "Cash-proxy bars test cross-era structure but are not X-Perp fills.",
+    "Gross results exclude fees and slippage at user request.",
+    "Historical outcomes cannot guarantee future return or remove losing months."
+  ],
+  "pre_material_route": {
+    "all": {
+      "dd_pct": 19.254736,
+      "n": 2790,
+      "negative_months": 39,
+      "net_r": 45.757446,
+      "return_pct": 6.733112,
+      "signed_price_return_pct": 23.41,
+      "trades_per_market_day": 3.6187,
+      "wr": 59.2473
+    },
+    "by_module": {
+      "breakout_long_bear_45_90": {
+        "all": {
+          "dd_pct": 9.926224,
+          "n": 424,
+          "negative_months": 31,
+          "net_r": 2.470583,
+          "return_pct": -2.3799,
+          "signed_price_return_pct": -7.78918,
+          "trades_per_market_day": 1.6759,
+          "wr": 64.3868
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.223345,
+            "n": 34,
+            "negative_months": 1,
+            "net_r": 4.5,
+            "return_pct": 0.599584,
+            "signed_price_return_pct": 1.99544,
+            "trades_per_market_day": 1.7,
+            "wr": 76.4706
+          },
+          "2018": {
+            "dd_pct": 1.543714,
+            "n": 38,
+            "negative_months": 2,
+            "net_r": 0.75,
+            "return_pct": 0.030518,
+            "signed_price_return_pct": 0.126305,
+            "trades_per_market_day": 1.5833,
+            "wr": 65.7895
+          },
+          "2019": {
+            "dd_pct": 1.220617,
+            "n": 31,
+            "negative_months": 3,
+            "net_r": -2.25,
+            "return_pct": -0.456081,
+            "signed_price_return_pct": -1.513963,
+            "trades_per_market_day": 2.0667,
+            "wr": 54.8387
+          },
+          "2020": {
+            "dd_pct": 4.166056,
+            "n": 25,
+            "negative_months": 5,
+            "net_r": -10.75,
+            "return_pct": -3.830969,
+            "signed_price_return_pct": -12.976934,
+            "trades_per_market_day": 1.6667,
+            "wr": 36.0
+          },
+          "2021": {
+            "dd_pct": 1.648123,
+            "n": 30,
+            "negative_months": 4,
+            "net_r": -3.0,
+            "return_pct": -1.064766,
+            "signed_price_return_pct": -3.555603,
+            "trades_per_market_day": 1.6667,
+            "wr": 60.0
+          },
+          "2022": {
+            "dd_pct": 3.999031,
+            "n": 87,
+            "negative_months": 6,
+            "net_r": -12.25,
+            "return_pct": -2.409238,
+            "signed_price_return_pct": -8.062126,
+            "trades_per_market_day": 1.8125,
+            "wr": 56.3218
+          },
+          "2023": {
+            "dd_pct": 0.815192,
+            "n": 46,
+            "negative_months": 2,
+            "net_r": 7.75,
+            "return_pct": 1.462494,
+            "signed_price_return_pct": 4.859724,
+            "trades_per_market_day": 1.5862,
+            "wr": 73.913
+          },
+          "2024": {
+            "dd_pct": 0.406456,
+            "n": 29,
+            "negative_months": 5,
+            "net_r": 0.312994,
+            "return_pct": 0.270674,
+            "signed_price_return_pct": 0.910654,
+            "trades_per_market_day": 1.3182,
+            "wr": 68.9655
+          },
+          "2025": {
+            "dd_pct": 0.580202,
+            "n": 42,
+            "negative_months": 2,
+            "net_r": 7.74697,
+            "return_pct": 0.998663,
+            "signed_price_return_pct": 3.327951,
+            "trades_per_market_day": 1.68,
+            "wr": 78.5714
+          },
+          "2026": {
+            "dd_pct": 1.104348,
+            "n": 62,
+            "negative_months": 1,
+            "net_r": 9.660619,
+            "return_pct": 2.142336,
+            "signed_price_return_pct": 7.099372,
+            "trades_per_market_day": 1.6757,
+            "wr": 67.7419
+          }
+        }
+      },
+      "breakout_long_bear_open": {
+        "all": {
+          "dd_pct": 5.68869,
+          "n": 287,
+          "negative_months": 32,
+          "net_r": -1.0,
+          "return_pct": -4.321027,
+          "signed_price_return_pct": -14.54498,
+          "trades_per_market_day": 1.5944,
+          "wr": 63.0662
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.172286,
+            "n": 17,
+            "negative_months": 2,
+            "net_r": 4.5,
+            "return_pct": 0.308727,
+            "signed_price_return_pct": 1.028851,
+            "trades_per_market_day": 1.4167,
+            "wr": 76.4706
+          },
+          "2018": {
+            "dd_pct": 1.213929,
+            "n": 29,
+            "negative_months": 5,
+            "net_r": -3.5,
+            "return_pct": -0.826997,
+            "signed_price_return_pct": -2.755878,
+            "trades_per_market_day": 1.6111,
+            "wr": 55.1724
+          },
+          "2019": {
+            "dd_pct": 0.139058,
+            "n": 14,
+            "negative_months": 1,
+            "net_r": 4.5,
+            "return_pct": 0.695011,
+            "signed_price_return_pct": 2.310935,
+            "trades_per_market_day": 1.2727,
+            "wr": 78.5714
+          },
+          "2020": {
+            "dd_pct": 4.024458,
+            "n": 28,
+            "negative_months": 3,
+            "net_r": -6.5,
+            "return_pct": -3.095863,
+            "signed_price_return_pct": -10.437538,
+            "trades_per_market_day": 1.75,
+            "wr": 50.0
+          },
+          "2021": {
+            "dd_pct": 0.414035,
+            "n": 25,
+            "negative_months": 2,
+            "net_r": 6.5,
+            "return_pct": 1.102713,
+            "signed_price_return_pct": 3.660342,
+            "trades_per_market_day": 1.7857,
+            "wr": 84.0
+          },
+          "2022": {
+            "dd_pct": 1.385956,
+            "n": 58,
+            "negative_months": 4,
+            "net_r": 1.5,
+            "return_pct": 0.283878,
+            "signed_price_return_pct": 0.982065,
+            "trades_per_market_day": 1.6571,
+            "wr": 63.7931
+          },
+          "2023": {
+            "dd_pct": 0.457824,
+            "n": 20,
+            "negative_months": 3,
+            "net_r": -1.0,
+            "return_pct": 0.112427,
+            "signed_price_return_pct": 0.379855,
+            "trades_per_market_day": 1.4286,
+            "wr": 60.0
+          },
+          "2024": {
+            "dd_pct": 0.816558,
+            "n": 29,
+            "negative_months": 4,
+            "net_r": -1.5,
+            "return_pct": -0.268536,
+            "signed_price_return_pct": -0.881187,
+            "trades_per_market_day": 1.7059,
+            "wr": 62.069
+          },
+          "2025": {
+            "dd_pct": 3.802224,
+            "n": 30,
+            "negative_months": 5,
+            "net_r": -9.5,
+            "return_pct": -3.070945,
+            "signed_price_return_pct": -10.36279,
+            "trades_per_market_day": 1.5789,
+            "wr": 43.3333
+          },
+          "2026": {
+            "dd_pct": 1.403214,
+            "n": 37,
+            "negative_months": 3,
+            "net_r": 4.0,
+            "return_pct": 0.453705,
+            "signed_price_return_pct": 1.530365,
+            "trades_per_market_day": 1.5417,
+            "wr": 70.2703
+          }
+        }
+      },
+      "drive_long_bear_open": {
+        "all": {
+          "dd_pct": 3.366855,
+          "n": 269,
+          "negative_months": 28,
+          "net_r": 16.25,
+          "return_pct": 2.572411,
+          "signed_price_return_pct": 8.60557,
+          "trades_per_market_day": 1.345,
+          "wr": 64.3123
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.132044,
+            "n": 15,
+            "negative_months": 1,
+            "net_r": 2.75,
+            "return_pct": 0.265177,
+            "signed_price_return_pct": 0.884172,
+            "trades_per_market_day": 1.3636,
+            "wr": 66.6667
+          },
+          "2018": {
+            "dd_pct": 0.552371,
+            "n": 24,
+            "negative_months": 4,
+            "net_r": -0.5,
+            "return_pct": -0.184488,
+            "signed_price_return_pct": -0.608076,
+            "trades_per_market_day": 1.3333,
+            "wr": 58.3333
+          },
+          "2019": {
+            "dd_pct": 0.75737,
+            "n": 18,
+            "negative_months": 2,
+            "net_r": 1.5,
+            "return_pct": 0.004235,
+            "signed_price_return_pct": 0.018435,
+            "trades_per_market_day": 1.3846,
+            "wr": 66.6667
+          },
+          "2020": {
+            "dd_pct": 1.102639,
+            "n": 18,
+            "negative_months": 2,
+            "net_r": 2.25,
+            "return_pct": -0.275365,
+            "signed_price_return_pct": -0.900429,
+            "trades_per_market_day": 1.6364,
+            "wr": 66.6667
+          },
+          "2021": {
+            "dd_pct": 0.400676,
+            "n": 20,
+            "negative_months": 1,
+            "net_r": 4.25,
+            "return_pct": 0.531406,
+            "signed_price_return_pct": 1.772315,
+            "trades_per_market_day": 1.0526,
+            "wr": 70.0
+          },
+          "2022": {
+            "dd_pct": 0.707041,
+            "n": 65,
+            "negative_months": 4,
+            "net_r": 8.0,
+            "return_pct": 2.109667,
+            "signed_price_return_pct": 6.992474,
+            "trades_per_market_day": 1.5116,
+            "wr": 72.3077
+          },
+          "2023": {
+            "dd_pct": 1.81093,
+            "n": 29,
+            "negative_months": 7,
+            "net_r": -9.5,
+            "return_pct": -1.81093,
+            "signed_price_return_pct": -6.079136,
+            "trades_per_market_day": 1.3182,
+            "wr": 41.3793
+          },
+          "2024": {
+            "dd_pct": 0.831974,
+            "n": 21,
+            "negative_months": 3,
+            "net_r": -1.0,
+            "return_pct": -0.496663,
+            "signed_price_return_pct": -1.640457,
+            "trades_per_market_day": 1.2353,
+            "wr": 61.9048
+          },
+          "2025": {
+            "dd_pct": 1.243011,
+            "n": 32,
+            "negative_months": 3,
+            "net_r": 1.75,
+            "return_pct": 0.830193,
+            "signed_price_return_pct": 2.774266,
+            "trades_per_market_day": 1.28,
+            "wr": 56.25
+          },
+          "2026": {
+            "dd_pct": 0.455386,
+            "n": 27,
+            "negative_months": 1,
+            "net_r": 6.75,
+            "return_pct": 1.625231,
+            "signed_price_return_pct": 5.392007,
+            "trades_per_market_day": 1.2857,
+            "wr": 77.7778
+          }
+        }
+      },
+      "drive_short_bear_open": {
+        "all": {
+          "dd_pct": 6.795969,
+          "n": 953,
+          "negative_months": 34,
+          "net_r": 62.632856,
+          "return_pct": 18.102002,
+          "signed_price_return_pct": 56.190375,
+          "trades_per_market_day": 1.6632,
+          "wr": 53.2004
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 1.26012,
+            "n": 58,
+            "negative_months": 4,
+            "net_r": -6.0,
+            "return_pct": -0.623735,
+            "signed_price_return_pct": -2.076326,
+            "trades_per_market_day": 1.6571,
+            "wr": 44.8276
+          },
+          "2018": {
+            "dd_pct": 1.624943,
+            "n": 116,
+            "negative_months": 3,
+            "net_r": 26.0,
+            "return_pct": 6.503724,
+            "signed_price_return_pct": 21.094896,
+            "trades_per_market_day": 1.6812,
+            "wr": 61.2069
+          },
+          "2019": {
+            "dd_pct": 2.930272,
+            "n": 77,
+            "negative_months": 4,
+            "net_r": -12.096236,
+            "return_pct": -1.53034,
+            "signed_price_return_pct": -5.112323,
+            "trades_per_market_day": 1.7111,
+            "wr": 41.5584
+          },
+          "2020": {
+            "dd_pct": 4.363074,
+            "n": 63,
+            "negative_months": 2,
+            "net_r": -5.0,
+            "return_pct": -2.505262,
+            "signed_price_return_pct": -8.325942,
+            "trades_per_market_day": 1.75,
+            "wr": 46.0317
+          },
+          "2021": {
+            "dd_pct": 1.167789,
+            "n": 80,
+            "negative_months": 2,
+            "net_r": 8.0,
+            "return_pct": 1.38368,
+            "signed_price_return_pct": 4.620059,
+            "trades_per_market_day": 1.6,
+            "wr": 55.0
+          },
+          "2022": {
+            "dd_pct": 1.445722,
+            "n": 201,
+            "negative_months": 1,
+            "net_r": 46.875657,
+            "return_pct": 12.152975,
+            "signed_price_return_pct": 38.422549,
+            "trades_per_market_day": 1.7328,
+            "wr": 61.6915
+          },
+          "2023": {
+            "dd_pct": 2.324154,
+            "n": 79,
+            "negative_months": 3,
+            "net_r": 1.0,
+            "return_pct": -0.114694,
+            "signed_price_return_pct": -0.345035,
+            "trades_per_market_day": 1.6122,
+            "wr": 50.6329
+          },
+          "2024": {
+            "dd_pct": 2.615418,
+            "n": 80,
+            "negative_months": 7,
+            "net_r": -2.0,
+            "return_pct": -0.97733,
+            "signed_price_return_pct": -3.220921,
+            "trades_per_market_day": 1.6327,
+            "wr": 48.75
+          },
+          "2025": {
+            "dd_pct": 1.631827,
+            "n": 92,
+            "negative_months": 4,
+            "net_r": -1.545857,
+            "return_pct": 2.206265,
+            "signed_price_return_pct": 7.356335,
+            "trades_per_market_day": 1.614,
+            "wr": 48.913
+          },
+          "2026": {
+            "dd_pct": 2.531397,
+            "n": 107,
+            "negative_months": 4,
+            "net_r": 7.399291,
+            "return_pct": 1.119188,
+            "signed_price_return_pct": 3.777083,
+            "trades_per_market_day": 1.597,
+            "wr": 53.271
+          }
+        }
+      },
+      "gap_fade_short_bear_open": {
+        "all": {
+          "dd_pct": 8.693904,
+          "n": 473,
+          "negative_months": 42,
+          "net_r": -13.41701,
+          "return_pct": -4.293248,
+          "signed_price_return_pct": -14.310448,
+          "trades_per_market_day": 1.8263,
+          "wr": 48.4144
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.304962,
+            "n": 30,
+            "negative_months": 1,
+            "net_r": 10.0,
+            "return_pct": 0.743951,
+            "signed_price_return_pct": 2.474167,
+            "trades_per_market_day": 1.5789,
+            "wr": 66.6667
+          },
+          "2018": {
+            "dd_pct": 0.889673,
+            "n": 68,
+            "negative_months": 5,
+            "net_r": 8.862831,
+            "return_pct": 1.266233,
+            "signed_price_return_pct": 4.242606,
+            "trades_per_market_day": 1.8889,
+            "wr": 55.8824
+          },
+          "2019": {
+            "dd_pct": 0.919797,
+            "n": 27,
+            "negative_months": 4,
+            "net_r": -4.279841,
+            "return_pct": -0.800378,
+            "signed_price_return_pct": -2.670263,
+            "trades_per_market_day": 1.8,
+            "wr": 40.7407
+          },
+          "2020": {
+            "dd_pct": 5.381291,
+            "n": 36,
+            "negative_months": 3,
+            "net_r": -8.0,
+            "return_pct": -4.067074,
+            "signed_price_return_pct": -13.774952,
+            "trades_per_market_day": 1.8947,
+            "wr": 38.8889
+          },
+          "2021": {
+            "dd_pct": 2.733419,
+            "n": 51,
+            "negative_months": 5,
+            "net_r": -11.0,
+            "return_pct": -1.650358,
+            "signed_price_return_pct": -5.526738,
+            "trades_per_market_day": 1.8889,
+            "wr": 39.2157
+          },
+          "2022": {
+            "dd_pct": 2.345045,
+            "n": 66,
+            "negative_months": 6,
+            "net_r": -4.0,
+            "return_pct": -0.127562,
+            "signed_price_return_pct": -0.375114,
+            "trades_per_market_day": 1.7838,
+            "wr": 46.9697
+          },
+          "2023": {
+            "dd_pct": 0.880272,
+            "n": 37,
+            "negative_months": 3,
+            "net_r": 3.0,
+            "return_pct": 0.668722,
+            "signed_price_return_pct": 2.235979,
+            "trades_per_market_day": 1.6818,
+            "wr": 54.0541
+          },
+          "2024": {
+            "dd_pct": 1.88022,
+            "n": 57,
+            "negative_months": 6,
+            "net_r": -5.0,
+            "return_pct": -0.841908,
+            "signed_price_return_pct": -2.795962,
+            "trades_per_market_day": 1.9655,
+            "wr": 45.614
+          },
+          "2025": {
+            "dd_pct": 1.527531,
+            "n": 47,
+            "negative_months": 4,
+            "net_r": -3.0,
+            "return_pct": -0.492502,
+            "signed_price_return_pct": -1.618875,
+            "trades_per_market_day": 1.88,
+            "wr": 46.8085
+          },
+          "2026": {
+            "dd_pct": 1.490502,
+            "n": 54,
+            "negative_months": 5,
+            "net_r": 0.0,
+            "return_pct": 1.037891,
+            "signed_price_return_pct": 3.498704,
+            "trades_per_market_day": 1.8,
+            "wr": 50.0
+          }
+        }
+      },
+      "reclaim_long_bear_45_90": {
+        "all": {
+          "dd_pct": 3.123932,
+          "n": 384,
+          "negative_months": 33,
+          "net_r": -21.178982,
+          "return_pct": -1.437204,
+          "signed_price_return_pct": -4.741339,
+          "trades_per_market_day": 1.6916,
+          "wr": 75.5208
+        },
+        "by_year": {
+          "2017": {
+            "dd_pct": 0.547061,
+            "n": 29,
+            "negative_months": 4,
+            "net_r": -6.5,
+            "return_pct": -0.453073,
+            "signed_price_return_pct": -1.511982,
+            "trades_per_market_day": 1.45,
+            "wr": 62.069
+          },
+          "2018": {
+            "dd_pct": 0.893358,
+            "n": 38,
+            "negative_months": 5,
+            "net_r": -5.5,
+            "return_pct": -0.597947,
+            "signed_price_return_pct": -1.994189,
+            "trades_per_market_day": 1.7273,
+            "wr": 68.4211
+          },
+          "2019": {
+            "dd_pct": 1.003233,
+            "n": 19,
+            "negative_months": 5,
+            "net_r": -5.25,
+            "return_pct": -0.884246,
+            "signed_price_return_pct": -2.955733,
+            "trades_per_market_day": 1.5833,
+            "wr": 57.8947
+          },
+          "2020": {
+            "dd_pct": 0.519918,
+            "n": 13,
+            "negative_months": 1,
+            "net_r": 2.0,
+            "return_pct": 0.39563,
+            "signed_price_return_pct": 1.322145,
+            "trades_per_market_day": 2.1667,
+            "wr": 92.3077
+          },
+          "2021": {
+            "dd_pct": 0.659513,
+            "n": 49,
+            "negative_months": 4,
+            "net_r": 1.0,
+            "return_pct": 0.351341,
+            "signed_price_return_pct": 1.175323,
+            "trades_per_market_day": 1.75,
+            "wr": 81.6327
+          },
+          "2022": {
+            "dd_pct": 0.810922,
+            "n": 81,
+            "negative_months": 2,
+            "net_r": 6.5,
+            "return_pct": 1.365306,
+            "signed_price_return_pct": 4.540363,
+            "trades_per_market_day": 1.8409,
+            "wr": 86.4198
+          },
+          "2023": {
+            "dd_pct": 1.58478,
+            "n": 34,
+            "negative_months": 5,
+            "net_r": -9.0,
+            "return_pct": -1.316934,
+            "signed_price_return_pct": -4.410153,
+            "trades_per_market_day": 1.7,
+            "wr": 58.8235
+          },
+          "2024": {
+            "dd_pct": 0.417703,
+            "n": 22,
+            "negative_months": 2,
+            "net_r": 0.5,
+            "return_pct": 0.271687,
+            "signed_price_return_pct": 0.906896,
+            "trades_per_market_day": 1.5714,
+            "wr": 81.8182
+          },
+          "2025": {
+            "dd_pct": 1.05111,
+            "n": 40,
+            "negative_months": 2,
+            "net_r": -1.25,
+            "return_pct": -0.149424,
+            "signed_price_return_pct": -0.484577,
+            "trades_per_market_day": 1.4286,
+            "wr": 77.5
+          },
+          "2026": {
+            "dd_pct": 1.709648,
+            "n": 59,
+            "negative_months": 3,
+            "net_r": -3.678982,
+            "return_pct": -0.402539,
+            "signed_price_return_pct": -1.329431,
+            "trades_per_market_day": 1.7879,
+            "wr": 74.5763
+          }
+        }
+      }
+    },
+    "by_year": {
+      "2017": {
+        "dd_pct": 0.608269,
+        "n": 183,
+        "negative_months": 2,
+        "net_r": 9.25,
+        "return_pct": 0.835749,
+        "signed_price_return_pct": 2.794321,
+        "trades_per_market_day": 3.7347,
+        "wr": 61.7486
+      },
+      "2018": {
+        "dd_pct": 3.330906,
+        "n": 313,
+        "negative_months": 3,
+        "net_r": 26.112831,
+        "return_pct": 6.157045,
+        "signed_price_return_pct": 20.105664,
+        "trades_per_market_day": 3.2604,
+        "wr": 60.7029
+      },
+      "2019": {
+        "dd_pct": 5.10698,
+        "n": 186,
+        "negative_months": 5,
+        "net_r": -17.876077,
+        "return_pct": -2.949846,
+        "signed_price_return_pct": -9.922912,
+        "trades_per_market_day": 3.2632,
+        "wr": 50.5376
+      },
+      "2020": {
+        "dd_pct": 15.531196,
+        "n": 183,
+        "negative_months": 4,
+        "net_r": -26.0,
+        "return_pct": -12.734278,
+        "signed_price_return_pct": -45.093649,
+        "trades_per_market_day": 3.5882,
+        "wr": 49.1803
+      },
+      "2021": {
+        "dd_pct": 2.247598,
+        "n": 255,
+        "negative_months": 4,
+        "net_r": 5.75,
+        "return_pct": 0.6189,
+        "signed_price_return_pct": 2.145698,
+        "trades_per_market_day": 3.6957,
+        "wr": 61.5686
+      },
+      "2022": {
+        "dd_pct": 2.490184,
+        "n": 558,
+        "negative_months": 3,
+        "net_r": 46.625657,
+        "return_pct": 13.462533,
+        "signed_price_return_pct": 42.500211,
+        "trades_per_market_day": 3.5769,
+        "wr": 64.1577
+      },
+      "2023": {
+        "dd_pct": 3.843802,
+        "n": 245,
+        "negative_months": 4,
+        "net_r": -7.75,
+        "return_pct": -1.031848,
+        "signed_price_return_pct": -3.358766,
+        "trades_per_market_day": 3.5507,
+        "wr": 56.3265
+      },
+      "2024": {
+        "dd_pct": 2.899545,
+        "n": 238,
+        "negative_months": 6,
+        "net_r": -8.687006,
+        "return_pct": -2.031853,
+        "signed_price_return_pct": -6.720977,
+        "trades_per_market_day": 3.9667,
+        "wr": 56.3025
+      },
+      "2025": {
+        "dd_pct": 3.266775,
+        "n": 283,
+        "negative_months": 5,
+        "net_r": -5.798887,
+        "return_pct": 0.240703,
+        "signed_price_return_pct": 0.99231,
+        "trades_per_market_day": 3.7237,
+        "wr": 57.2438
+      },
+      "2026": {
+        "dd_pct": 2.73543,
+        "n": 346,
+        "negative_months": 3,
+        "net_r": 24.130928,
+        "return_pct": 6.105869,
+        "signed_price_return_pct": 19.968101,
+        "trades_per_market_day": 3.9318,
+        "wr": 62.7168
+      }
+    }
+  },
+  "protocol": {
+    "entry": "next 15m cash-proxy bar after closed causal signal",
+    "history": "2017-2026 cash proxy",
+    "material_gate_pct": 0.5,
+    "money": "3% entry-equity margin, fixed 10x gross",
+    "portfolio": "one symbol open, 3h cooldown, cap2/scan, direction cap4, pause after 3 losses",
+    "router": "robust_dynamic_entry_filtered"
+  },
+  "selector_parity_on_direct_xperp": {
+    "exact_ordered_key_match": true,
+    "scalar": 176,
+    "vector": 176
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_current_router_cross_era_oct11_audit.py": "9103975200716ac6801f3558eb29322dd6d8b87232ff3e82dbd48d0160804a50",
+    "reports\\audit_2026_09_08\\stock_forward_sep30_families.csv": "b88dad2b6aa22fe6f98eec07c0b2e022fb08e22df078c1f5c41dc9b7f122177d",
+    "reports\\audit_2026_09_08\\stock_session_family_market_context_2017_2026.csv": "52dbc6e5fdaa299d1897d58540965cb5cbf98fcfdfeb65f33eee3453bcd6b211"
+  },
+  "status": "CURRENT_ROUTER_CROSS_ERA_REJECTED_FOR_LIVE"
+}
