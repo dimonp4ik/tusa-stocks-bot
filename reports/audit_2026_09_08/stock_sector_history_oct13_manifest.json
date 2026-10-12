@@ -1,0 +1,21 @@
+{
+  "status": "VALIDATED",
+  "requested_count": 65000,
+  "minimum_count": 40000,
+  "symbols": {
+    "XLKUSDT": {
+      "path": "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\XLKUSDT_15min_65000.pkl",
+      "rows": 57895,
+      "start": 1510764300,
+      "end": 1791834300,
+      "sha256": "33c6d4e8bfac806a80f4cd9503ec52cd73503308de3efa0a0bc03c24ec8e0d99"
+    },
+    "XLYUSDT": {
+      "path": "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\XLYUSDT_15min_65000.pkl",
+      "rows": 57603,
+      "start": 1510764300,
+      "end": 1791834300,
+      "sha256": "f2a87b618edd07e77efba37252e9f369a5cdb011fec101a3c7e38b7935f5cb5b"
+    }
+  }
+}

@@ -74,6 +74,12 @@ INSTRUMENT_MAP: dict[str, tuple[str, str]] = {
     "MUUSDT":    (_di.INSTRUMENT_US_MU_US_USD, "equity"),
     "QQQUSDT":   (_di.INSTRUMENT_ETF_CFD_US_QQQ_US_USD, "equity"),
     "SPYUSDT":   (_di.INSTRUMENT_ETF_CFD_US_SPY_US_USD, "equity"),
+    # Research-only sector proxies. They are not part of either live trading
+    # pool; the symbols only let chronological audits use the same cached-feed
+    # validation path as the stock histories above.
+    "XLKUSDT":   (_di.INSTRUMENT_ETF_CFD_US_XLK_US_USD, "equity"),
+    "SMHUSDT":   (_di.INSTRUMENT_ETF_CFD_SMH_US_USD, "equity"),
+    "XLYUSDT":   (_di.INSTRUMENT_ETF_CFD_US_XLY_US_USD, "equity"),
     "XAUUSDT":   (_di.INSTRUMENT_FX_METALS_XAU_USD, "cmd"),
     "XAGUSDT":   (_di.INSTRUMENT_FX_METALS_XAG_USD, "cmd"),
     "CLUSDT":    (_di.INSTRUMENT_CMD_ENERGY_E_LIGHT, "cmd"),  # WTI — NOT CL.US (Colgate!)
