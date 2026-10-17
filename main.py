@@ -1,9 +1,9 @@
-"""Stocks paper-trading bot driven by the frozen X-Perp venue router.
+"""Stocks paper-trading bot driven by frozen X-Perp routes.
 
-Every scan loads the audited stock perpetuals and market context from X-Perp,
-evaluates the deterministic robust profile and publishes new market-entry
-paper signals. No model decides whether a setup is accepted and this
-deployment cannot open an order.
+The default shadow deployment scans the audited 44-instrument native X-Perp
+universe around the clock and publishes deterministic market-entry paper
+signals. No model decides whether a setup is accepted and this deployment
+cannot open an order.
 """
 
 import json
@@ -30,7 +30,8 @@ from config import (
     POST_TP1_STRONG_TRAIL_ATR_MULT, POST_TP1_WEAK_TRAIL_ATR_MULT,
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS, STOCK_VENUE_FILTER_MODE, STOCK_VENUE_FILTER_PROFILE,
-    DEPLOYMENT_MODE,
+    DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
+    NATIVE_XPERP_LOSS_PAUSE_STREAK,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
@@ -39,6 +40,10 @@ from src.stock_venue_router import AUDITED_SYMBOLS, stock_venue_setups
 from src.stock_5m_shadow_router import (
     AUDITED_SYMBOLS as STOCK_5M_SHADOW_SYMBOLS,
     shadow_setup as stock_five_minute_shadow_setup,
+)
+from src.stock_xperp_native_shadow import (
+    AUDITED_SYMBOLS as NATIVE_XPERP_SYMBOLS,
+    native_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
@@ -65,7 +70,7 @@ from src.db import (
     get_unresolved_shadow_exit_variants, mark_shadow_exit_variant_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct,
-    get_today_sl_streak, get_recent_signals,
+    get_today_sl_streak, get_today_loss_streak, get_recent_signals,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -266,7 +271,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("## КОНФИГ НА МОМЕНТ ОТЧЁТА")
         A(f"  MTF_MIN_SCORE={MTF_MIN_SCORE}  TP1_R_MULT={TP1_R_MULT}")
         A(f"  STOP_CLOSE_CONFIRM={STOP_CLOSE_CONFIRM}  BACKSTOP_R={STOP_EXCHANGE_BACKSTOP_R}")
-        A(f"  СТРАТЕГИЯ: {STOCK_VENUE_FILTER_PROFILE} ({STOCK_VENUE_FILTER_MODE})")
+        A(f"  СТРАТЕГИЯ: {_active_strategy_label()} ({STOCK_VENUE_FILTER_MODE})")
         A("  КЛОД: отключён от решений (2026-09-16)")
         A(f"  MAX_SAME_DIRECTION_POSITIONS={MAX_SAME_DIRECTION_POSITIONS}")
 
@@ -407,9 +412,15 @@ def health():
     return f"TUSA Stocks Bot is running ({DEPLOYMENT_MODE}).", 200
 
 
+def _active_strategy_label() -> str:
+    return ("native_xperp_quality_reversal"
+            if NATIVE_XPERP_SHADOW_ENABLED
+            else STOCK_VENUE_FILTER_PROFILE)
+
+
 @app.route("/status")
 def status():
-    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {STOCK_VENUE_FILTER_PROFILE}. "
+    return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
@@ -949,13 +960,25 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _answer_callback(callback_id)
 
     if data == "adm_shadow_status":
+        if NATIVE_XPERP_SHADOW_ENABLED:
+            shadow_text = (
+                "Нативный X-Perp разворот: 44 инструмента, свечи 15m\n"
+                "Порог: |z| ≥ 2, движение ≥ 0.4%, ATR14 ≤ 1%\n"
+                "Рынок: 24/7, вход по текущей цене\n"
+                "Цель: 2% цены, стоп: 1%, максимум 64 свечи\n"
+                f"Пауза: после {NATIVE_XPERP_LOSS_PAUSE_STREAK} закрытых убытков за UTC-день\n"
+            )
+        else:
+            shadow_text = (
+                f"Боевой профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
+                "Теневая проверка: 2 режима на свечах 5m\n"
+                "Вход: по текущей рыночной цене\n"
+            )
         _edit_admin_text(
             chat_id, message_id,
             "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
             f"Режим: *SHADOW / PAPER*\n"
-            f"Боевой профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
-            "Теневая проверка: 2 режима на свечах 5m\n"
-            "Вход: по текущей рыночной цене\n"
+            f"{shadow_text}"
             f"За 15-минутное окно: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
             "Нейросеть: отключена от решения\n"
             "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
@@ -1437,19 +1460,24 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         lines_h = ["🩺 *Проверка сервисов*", ""]
         try:
             inst = get_xperp_instruments()
-            covered = sorted(x for x in AUDITED_SYMBOLS if x[:-4] in set(inst))
+            audited = (NATIVE_XPERP_SYMBOLS if NATIVE_XPERP_SHADOW_ENABLED
+                       else AUDITED_SYMBOLS)
+            covered = sorted(x for x in audited if x[:-4] in set(inst))
             lines_h.append(f"✅ X-Perp: инструментов {len(inst)}, "
-                           f"из нашего списка доступно {len(covered)}/{len(AUDITED_SYMBOLS)}")
-            missing = [x for x in AUDITED_SYMBOLS if x[:-4] not in set(inst)]
+                           f"из нашего списка доступно {len(covered)}/{len(audited)}")
+            missing = [x for x in audited if x[:-4] not in set(inst)]
             if missing:
                 lines_h.append(f"   ⚠️ нет инструмента: {', '.join(x[:-4] for x in missing[:8])}")
         except Exception as exc:
             lines_h.append(f"❌ X-Perp недоступен: {exc}")
         try:
-            qqq = get_klines_xperp("QQQUSDT", limit=5)
-            lines_h.append("✅ Свечи QQQ: получены" if qqq else "❌ Свечи QQQ: пусто")
+            probe_symbol = "SOXSUSDT" if NATIVE_XPERP_SHADOW_ENABLED else "QQQUSDT"
+            probe = get_klines_xperp(probe_symbol, limit=5)
+            label = probe_symbol[:-4]
+            lines_h.append(f"✅ Свечи {label}: получены" if probe
+                           else f"❌ Свечи {label}: пусто")
         except Exception as exc:
-            lines_h.append(f"❌ Свечи QQQ: {exc}")
+            lines_h.append(f"❌ Свечи X-Perp: {exc}")
         try:
             open_n = len(get_open_signals())
             lines_h.append(f"✅ База: открытых paper-сделок {open_n}")
@@ -1462,7 +1490,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         else:
             lines_h.append("⏳ Скан ещё не отработал в этом процессе")
         lines_h.append("")
-        lines_h.append(f"Профиль: `{STOCK_VENUE_FILTER_PROFILE}` ({STOCK_VENUE_FILTER_MODE})")
+        lines_h.append(f"Профиль: `{_active_strategy_label()}` ({STOCK_VENUE_FILTER_MODE})")
         from config import AUTOTRADE_ENABLED as _at_on
         lines_h.append(f"Реальные ордера: {'РАЗРЕШЕНЫ' if _at_on else '*ЗАПРЕЩЕНЫ КОДОМ*'}")
         _edit_admin_text(chat_id, message_id, chr(10).join(lines_h), _kb_settings())
@@ -2475,7 +2503,7 @@ def webhook():
                f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
-               f"🧩 Профиль: `{STOCK_VENUE_FILTER_PROFILE}`\n"
+               f"🧩 Профиль: `{_active_strategy_label()}`\n"
                f"🚫 Реальные ордера отключены")
 
     # /stats — статистика побед/поражений
@@ -2612,6 +2640,14 @@ def _venue_daily_loss_pause() -> bool:
     day_start = int(time.time() // 86400) * 86400
     return (VENUE_LOSS_PAUSE_STREAK > 0
             and get_today_sl_streak(day_start) >= VENUE_LOSS_PAUSE_STREAK)
+
+
+def _native_xperp_daily_loss_pause() -> bool:
+    day_start = int(time.time() // 86400) * 86400
+    return (NATIVE_XPERP_LOSS_PAUSE_STREAK > 0
+            and get_today_loss_streak(
+                day_start, "Native stock X-Perp shadow")
+            >= NATIVE_XPERP_LOSS_PAUSE_STREAK)
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -3323,6 +3359,60 @@ def _stock_venue_analysis(symbol: str, setup: dict) -> dict:
     }
 
 
+def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
+    """Translate one frozen native setup into the paper-signal contract."""
+    price = float(market_price)
+    if not math.isfinite(price) or price <= 0:
+        raise ValueError("invalid native X-Perp market price")
+    direction = str(setup["direction"])
+    signal_bar = float(setup["signal_bar_ts"])
+    z_score = float(setup["cross_z"])
+    atr_fraction = float(setup["atr14_fraction"])
+    return {
+        "symbol": setup["symbol"],
+        "direction": direction,
+        "decision": direction,
+        "confidence": "HIGH",
+        "risk_score": 1,
+        "reason": "Native stock X-Perp shadow cross-sectional reversal",
+        "counter": "A cross-sectional extreme can continue before reverting",
+        "current_price": price,
+        "market_price": price,
+        "atr": price * .01,
+        "fixed_stop_atr": 1.0,
+        "fixed_target_r": 2.0,
+        "entry_source": "MARKET",
+        "strategy_tp1_close_frac": 1.0,
+        "strategy_runner_mode": "single_target",
+        "strategy_bar_seconds": 900,
+        "strategy_entry_bar_ts": signal_bar + 900,
+        "strategy_stop_on_close": False,
+        "strategy_max_bars": int(setup["hold_bars"]),
+        "strategy_expire_at": None,
+        "entry_low": price,
+        "entry_high": price,
+        "mtf_score": 18,
+        "mtf_score_max": 18,
+        "rsi": 50,
+        "volume_ratio": 1.0,
+        "session": "24_7",
+        "swing_trend": "reversal",
+        "signals": [
+            f"Venue module {setup['module']}",
+            f"Cross-sectional z {z_score:+.2f}",
+            f"Two-bar move {100 * float(setup['signal_return']):+.2f}%",
+            f"ATR14 {100 * atr_fraction:.2f}%",
+            f"Universe {int(setup['universe_n'])}",
+            "Fixed price move target 2.00% / stop 1.00%",
+        ],
+        "source": "stock_xperp_native_shadow",
+        "signal_bar_ts": signal_bar,
+        "_quality_rank": float(setup["_quality_rank"]),
+        "_shadow_only": True,
+        "_native_xperp_shadow": True,
+    }
+
+
 def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
                                     open_direction_counts: dict[str, int] | None = None) -> int:
     """Publish at most the historically replayed number of entries per scan."""
@@ -3338,9 +3428,14 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         except Exception as exc:
             log.warning("Stock venue persistent scan count unavailable: %s", exc)
             scan_count = VENUE_MAX_SIGNALS_PER_SCAN
-    source_priority = {"stock_venue_regime": 0, "stock_venue_shadow_5m": 1}
+    source_priority = {
+        "stock_xperp_native_shadow": 0,
+        "stock_venue_regime": 1,
+        "stock_venue_shadow_5m": 2,
+    }
     ordered = sorted(candidates, key=lambda item: (
         source_priority.get(item[0].get("source", "stock_venue_regime"), 1),
+        float(item[0].get("_quality_rank", 0.0)),
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
         if scan_count >= VENUE_MAX_SIGNALS_PER_SCAN:
@@ -3364,6 +3459,78 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         scan_count += 1
         direction_counts[direction] = direction_counts.get(direction, 0) + 1
     return published
+
+
+def _run_native_xperp_shadow_scan() -> None:
+    """Publish only the frozen 44-symbol native route as paper signals."""
+    if not NATIVE_XPERP_SHADOW_ENABLED:
+        return
+    if _native_xperp_daily_loss_pause():
+        log.warning(
+            "Native X-Perp shadow paused after %s consecutive UTC-day losses",
+            NATIVE_XPERP_LOSS_PAUSE_STREAK)
+        return
+    available = set(get_xperp_instruments())
+    targets = sorted(
+        symbol for symbol in NATIVE_XPERP_SYMBOLS
+        if symbol[:-4] in available)
+    if len(targets) < 10:
+        log.warning("Native X-Perp shadow refused: only %s symbols available",
+                    len(targets))
+        return
+
+    fetched = {}
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _fetch(symbol: str):
+        return symbol, get_klines_xperp(symbol, limit=80)
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [pool.submit(_fetch, symbol) for symbol in targets]
+        for future in as_completed(futures):
+            try:
+                symbol, candles = future.result()
+                if candles:
+                    fetched[symbol] = candles
+            except Exception as exc:
+                log.warning("Native X-Perp candle fetch failed: %s", exc)
+
+    now = time.time()
+    setups = native_shadow_setups(fetched, now=now)
+    active_rows = get_open_signals()
+    active = {row["symbol"] for row in active_rows}
+    blocked = {row["symbol"] for row in get_active_symbol_blocks()}
+    open_direction_counts = {
+        direction: sum(row.get("direction") == direction for row in active_rows)
+        for direction in ("LONG", "SHORT")
+    }
+    candidates = []
+    for setup in setups:
+        symbol = setup["symbol"]
+        if symbol in active or symbol in blocked:
+            continue
+        try:
+            market = get_xperp_price(symbol)
+            if market is None:
+                market = float(fetched[symbol]["close"][-1])
+            analysis = _native_xperp_analysis(setup, float(market))
+            setup_id = log_setup_candidate_once(analysis)
+            if not setup_id:
+                continue
+            analysis["_setup_log_id"] = setup_id
+            if _venue_signal_on_cooldown(symbol, analysis["direction"], now):
+                mark_setup_blocked(setup_id, "cooldown")
+                continue
+            candidates.append((analysis, setup_id))
+        except Exception as exc:
+            log.warning("Native X-Perp setup failed for %s: %s", symbol, exc)
+    published = _publish_stock_venue_candidates(
+        candidates, open_direction_counts)
+    _last_scan_stats.update(
+        coins=len(fetched), setups=published, fresh=published, ts=now)
+    log.info(
+        "Native X-Perp shadow scan complete: %s/%s symbols, %s candidates, "
+        "%s paper signals", len(fetched), len(targets), len(candidates), published)
 
 
 def _run_stock_venue_strategy_scan() -> None:
@@ -3489,6 +3656,8 @@ def run_scan():
             # admitting a new batch after stops or while positions are open.
             log.warning("Stock venue scan refused: open-signal reconciliation failed: %s", exc)
             return None
+        if NATIVE_XPERP_SHADOW_ENABLED:
+            return _run_native_xperp_shadow_scan()
         return _run_stock_venue_strategy_scan()
 
 

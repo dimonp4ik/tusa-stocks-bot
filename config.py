@@ -53,6 +53,14 @@ VENUE_LOSS_PAUSE_STREAK = 3
 DEPLOYMENT_MODE = os.getenv("DEPLOYMENT_MODE", "shadow").strip().lower()
 if DEPLOYMENT_MODE not in {"shadow", "live"}:
     DEPLOYMENT_MODE = "shadow"
+# Frozen native cross-sectional candidate.  It is deliberately reachable only
+# in the global shadow deployment, so a stale environment variable cannot turn
+# its short forward sample into real orders.
+NATIVE_XPERP_SHADOW_ENABLED = (
+    DEPLOYMENT_MODE == "shadow"
+    and os.getenv("NATIVE_XPERP_SHADOW_ENABLED", "1") == "1"
+)
+NATIVE_XPERP_LOSS_PAUSE_STREAK = 2
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "30"))  # non-crypto X-Perp pool is ~26 — take all
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
 # Direct X-Perp session modules stay disabled until they collect forward paper

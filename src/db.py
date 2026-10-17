@@ -1866,6 +1866,36 @@ def get_today_sl_streak(day_start_ts: float) -> int:
     return n
 
 
+def get_today_loss_streak(day_start_ts: float,
+                          reason_prefix: str | None = None) -> int:
+    """Consecutive negative realized outcomes, newest first, for one route.
+
+    A negative timed exit is a loss too.  Filtering by the stable reason prefix
+    keeps an independently audited shadow book from inheriting another route's
+    pause state.
+    """
+    query = (
+        "SELECT status, realized_r FROM signals "
+        "WHERE closed_at IS NOT NULL AND closed_at >= ?"
+    )
+    values: list[object] = [day_start_ts]
+    if reason_prefix:
+        query += " AND reason LIKE ?"
+        values.append(f"{reason_prefix}%")
+    query += " ORDER BY closed_at DESC, id DESC"
+    with _conn() as c:
+        rows = c.execute(query, values).fetchall()
+    streak = 0
+    for row in rows:
+        realized = row["realized_r"]
+        lost = ((realized is not None and float(realized) < 0)
+                or (realized is None and row["status"] == "SL_HIT"))
+        if not lost:
+            break
+        streak += 1
+    return streak
+
+
 def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
     """Resolved live Claude-evaluated setups for the SCORECARD block: does his
     risk_score / confidence scale actually separate outcomes. Backtest priors

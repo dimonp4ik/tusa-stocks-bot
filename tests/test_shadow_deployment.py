@@ -15,16 +15,27 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_real_orders_fail_closed(self):
         self.assertEqual(config.DEPLOYMENT_MODE, "shadow")
         self.assertFalse(config.AUTOTRADE_ENABLED)
+        self.assertTrue(config.NATIVE_XPERP_SHADOW_ENABLED)
         # The legacy strategy is not a flag any more - it was deleted on
         # 2026-09-16, so there is nothing left to switch on.
         self.assertFalse(hasattr(config, "LEGACY_STRATEGY_ENABLED"))
         self.assertEqual(config.STOCK_VENUE_FILTER_MODE, "paper")
 
-    def test_scan_dispatches_only_frozen_router(self):
+    def test_native_candidate_cannot_be_enabled_in_live_mode(self):
+        env = {**os.environ, "DEPLOYMENT_MODE": "live",
+               "NATIVE_XPERP_SHADOW_ENABLED": "1"}
+        value = subprocess.check_output(
+            [sys.executable, "-c",
+             "import config; print(config.NATIVE_XPERP_SHADOW_ENABLED)"],
+            env=env, text=True,
+        ).strip()
+        self.assertEqual(value, "False")
+
+    def test_scan_dispatches_only_native_shadow_router(self):
         calls = []
         with patch.object(main, "_check_open_signals",
                           side_effect=lambda: calls.append("reconcile")), \
-             patch.object(main, "_run_stock_venue_strategy_scan",
+             patch.object(main, "_run_native_xperp_shadow_scan",
                           side_effect=lambda: calls.append("scan")) as scan:
             main.run_scan()
         scan.assert_called_once_with()
@@ -33,7 +44,7 @@ class ShadowDeploymentTests(unittest.TestCase):
     def test_scan_fails_closed_when_book_cannot_be_reconciled(self):
         with patch.object(main, "_check_open_signals",
                           side_effect=RuntimeError("feed unavailable")), \
-             patch.object(main, "_run_stock_venue_strategy_scan") as scan:
+             patch.object(main, "_run_native_xperp_shadow_scan") as scan:
             self.assertIsNone(main.run_scan())
         scan.assert_not_called()
 
