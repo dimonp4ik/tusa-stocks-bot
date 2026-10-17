@@ -1,0 +1,3097 @@
+{
+  "development_top20": [
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.921053,
+        "literal_target_hit_rate": 29.3444,
+        "literal_target_hits": 282,
+        "max_non_target_streak": 17,
+        "median_month_pct": 6.552,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 3.1349,
+          "2023-02": 10.9308,
+          "2023-03": 12.573,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 10.1166,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 961,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 77.972,
+        "stops": 547,
+        "timeouts": 132,
+        "trades_per_active_day": 3.955,
+        "trades_per_calendar_day": 2.669
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "mean",
+        "top_k": 2
+      },
+      "score": 58.0767
+    },
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.921053,
+        "literal_target_hit_rate": 29.3444,
+        "literal_target_hits": 282,
+        "max_non_target_streak": 17,
+        "median_month_pct": 6.552,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 3.1349,
+          "2023-02": 10.9308,
+          "2023-03": 12.573,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 10.1166,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 961,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 77.972,
+        "stops": 547,
+        "timeouts": 132,
+        "trades_per_active_day": 3.955,
+        "trades_per_calendar_day": 2.669
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "lcb",
+        "top_k": 2
+      },
+      "score": 58.0767
+    },
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.6479,
+        "literal_target_hit_rate": 29.3996,
+        "literal_target_hits": 284,
+        "max_non_target_streak": 17,
+        "median_month_pct": 6.552,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.5736,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 10.1166,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 966,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 72.4909,
+        "stops": 552,
+        "timeouts": 130,
+        "trades_per_active_day": 3.975,
+        "trades_per_calendar_day": 2.683
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 24,
+        "score_mode": "mean",
+        "top_k": 2
+      },
+      "score": 52.5956
+    },
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.6479,
+        "literal_target_hit_rate": 29.3996,
+        "literal_target_hits": 284,
+        "max_non_target_streak": 17,
+        "median_month_pct": 6.552,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.5736,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 10.1166,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 966,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 72.4909,
+        "stops": 552,
+        "timeouts": 130,
+        "trades_per_active_day": 3.975,
+        "trades_per_calendar_day": 2.683
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 24,
+        "score_mode": "lcb",
+        "top_k": 2
+      },
+      "score": 52.5956
+    },
+    {
+      "development": {
+        "dd_pct": 12.5968,
+        "equivalent_monthly_return_pct": 4.661848,
+        "literal_target_hit_rate": 28.6757,
+        "literal_target_hits": 275,
+        "max_non_target_streak": 17,
+        "median_month_pct": 5.9191,
+        "minimum_month_pct": -9.3128,
+        "monthly_return_pct": {
+          "2023-01": 3.1349,
+          "2023-02": 10.9308,
+          "2023-03": 12.573,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 10.1166,
+          "2023-08": 6.2312,
+          "2023-09": 0.6454,
+          "2023-10": -9.3128,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 959,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 72.767,
+        "stops": 551,
+        "timeouts": 133,
+        "trades_per_active_day": 3.947,
+        "trades_per_calendar_day": 2.664
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "monthly_lcb",
+        "top_k": 2
+      },
+      "score": 51.8718
+    },
+    {
+      "development": {
+        "dd_pct": 12.8749,
+        "equivalent_monthly_return_pct": 4.577629,
+        "literal_target_hit_rate": 28.2132,
+        "literal_target_hits": 270,
+        "max_non_target_streak": 17,
+        "median_month_pct": 5.8514,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 3.1349,
+          "2023-02": 10.9308,
+          "2023-03": 12.573,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 7.7239,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 957,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 71.1061,
+        "stops": 551,
+        "timeouts": 136,
+        "trades_per_active_day": 3.938,
+        "trades_per_calendar_day": 2.658
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "sum",
+        "top_k": 2
+      },
+      "score": 49.79375
+    },
+    {
+      "development": {
+        "dd_pct": 13.137,
+        "equivalent_monthly_return_pct": 4.578052,
+        "literal_target_hit_rate": 28.7657,
+        "literal_target_hits": 275,
+        "max_non_target_streak": 18,
+        "median_month_pct": 5.9294,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 5.7629,
+          "2023-02": 8.4788,
+          "2023-03": 12.8602,
+          "2023-04": 5.17,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 6.7492,
+          "2023-12": 2.6649
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 956,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 71.1144,
+        "stops": 541,
+        "timeouts": 140,
+        "trades_per_active_day": 3.934,
+        "trades_per_calendar_day": 2.656
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "literal",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 6,
+        "score_mode": "mean",
+        "top_k": 2
+      },
+      "score": 49.4089
+    },
+    {
+      "development": {
+        "dd_pct": 12.8749,
+        "equivalent_monthly_return_pct": 4.305367,
+        "literal_target_hit_rate": 28.2744,
+        "literal_target_hits": 272,
+        "max_non_target_streak": 17,
+        "median_month_pct": 5.8514,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.5736,
+          "2023-04": 5.607,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 7.7239,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 962,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 65.8364,
+        "stops": 556,
+        "timeouts": 134,
+        "trades_per_active_day": 3.959,
+        "trades_per_calendar_day": 2.672
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 24,
+        "score_mode": "sum",
+        "top_k": 2
+      },
+      "score": 44.52405
+    },
+    {
+      "development": {
+        "dd_pct": 12.8749,
+        "equivalent_monthly_return_pct": 4.291436,
+        "literal_target_hit_rate": 28.6611,
+        "literal_target_hits": 274,
+        "max_non_target_streak": 17,
+        "median_month_pct": 5.633,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.17,
+          "2023-05": 0.8665,
+          "2023-06": 7.497,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 7.7239,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 956,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 65.5708,
+        "stops": 547,
+        "timeouts": 135,
+        "trades_per_active_day": 3.934,
+        "trades_per_calendar_day": 2.656
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 24,
+        "score_mode": "monthly_lcb",
+        "top_k": 2
+      },
+      "score": 44.25845
+    },
+    {
+      "development": {
+        "dd_pct": 13.137,
+        "equivalent_monthly_return_pct": 4.267496,
+        "literal_target_hit_rate": 28.7223,
+        "literal_target_hits": 272,
+        "max_non_target_streak": 18,
+        "median_month_pct": 6.0271,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.823,
+          "2023-05": 0.5173,
+          "2023-06": 6.3427,
+          "2023-07": 10.1166,
+          "2023-08": 6.2312,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 6.7492,
+          "2023-12": 2.6649
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 947,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 65.1153,
+        "stops": 540,
+        "timeouts": 135,
+        "trades_per_active_day": 3.946,
+        "trades_per_calendar_day": 2.631
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 12,
+        "score_mode": "sum",
+        "top_k": 2
+      },
+      "score": 43.4098
+    },
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.096814,
+        "literal_target_hit_rate": 29.2017,
+        "literal_target_hits": 278,
+        "max_non_target_streak": 17,
+        "median_month_pct": 3.7672,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.17,
+          "2023-05": 0.7343,
+          "2023-06": 1.2368,
+          "2023-07": 10.0675,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 952,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 61.9009,
+        "stops": 539,
+        "timeouts": 135,
+        "trades_per_active_day": 3.95,
+        "trades_per_calendar_day": 2.644
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 18,
+        "score_mode": "sum",
+        "top_k": 2
+      },
+      "score": 42.0056
+    },
+    {
+      "development": {
+        "dd_pct": 11.9302,
+        "equivalent_monthly_return_pct": 4.096814,
+        "literal_target_hit_rate": 29.2017,
+        "literal_target_hits": 278,
+        "max_non_target_streak": 17,
+        "median_month_pct": 3.7672,
+        "minimum_month_pct": -9.3075,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.17,
+          "2023-05": 0.7343,
+          "2023-06": 1.2368,
+          "2023-07": 10.0675,
+          "2023-08": 8.0219,
+          "2023-09": 1.9529,
+          "2023-10": -9.3075,
+          "2023-11": 7.723,
+          "2023-12": 1.8544
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 952,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 61.9009,
+        "stops": 539,
+        "timeouts": 135,
+        "trades_per_active_day": 3.95,
+        "trades_per_calendar_day": 2.644
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 18,
+        "score_mode": "mean",
+        "top_k": 2
+      },
+      "score": 42.0056
+    },
+    {
+      "development": {
+        "dd_pct": 10.1976,
+        "equivalent_monthly_return_pct": 4.116062,
+        "literal_target_hit_rate": 28.2609,
+        "literal_target_hits": 286,
+        "max_non_target_streak": 16,
+        "median_month_pct": 5.5233,
+        "minimum_month_pct": -7.1353,
+        "monthly_return_pct": {
+          "2023-01": 0.7589,
+          "2023-02": 11.9525,
+          "2023-03": 9.5705,
+          "2023-04": 5.7323,
+          "2023-05": 0.8977,
+          "2023-06": 5.3143,
+          "2023-07": 9.6175,
+          "2023-08": 8.4245,
+          "2023-09": -0.0695,
+          "2023-10": -7.1353,
+          "2023-11": 7.6958,
+          "2023-12": -1.6282
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1012,
+        "negative_months": 3,
+        "profit_first_objective_pass": false,
+        "return_pct": 62.2605,
+        "stops": 582,
+        "timeouts": 144,
+        "trades_per_active_day": 4.131,
+        "trades_per_calendar_day": 2.811
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "mean",
+        "top_k": 3
+      },
+      "score": 40.9641
+    },
+    {
+      "development": {
+        "dd_pct": 10.1976,
+        "equivalent_monthly_return_pct": 4.116062,
+        "literal_target_hit_rate": 28.2609,
+        "literal_target_hits": 286,
+        "max_non_target_streak": 16,
+        "median_month_pct": 5.5233,
+        "minimum_month_pct": -7.1353,
+        "monthly_return_pct": {
+          "2023-01": 0.7589,
+          "2023-02": 11.9525,
+          "2023-03": 9.5705,
+          "2023-04": 5.7323,
+          "2023-05": 0.8977,
+          "2023-06": 5.3143,
+          "2023-07": 9.6175,
+          "2023-08": 8.4245,
+          "2023-09": -0.0695,
+          "2023-10": -7.1353,
+          "2023-11": 7.6958,
+          "2023-12": -1.6282
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1012,
+        "negative_months": 3,
+        "profit_first_objective_pass": false,
+        "return_pct": 62.2605,
+        "stops": 582,
+        "timeouts": 144,
+        "trades_per_active_day": 4.131,
+        "trades_per_calendar_day": 2.811
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "lcb",
+        "top_k": 3
+      },
+      "score": 40.9641
+    },
+    {
+      "development": {
+        "dd_pct": 13.137,
+        "equivalent_monthly_return_pct": 4.01945,
+        "literal_target_hit_rate": 28.2292,
+        "literal_target_hits": 271,
+        "max_non_target_streak": 18,
+        "median_month_pct": 5.4665,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 5.7629,
+          "2023-02": 0.3849,
+          "2023-03": 12.8576,
+          "2023-04": 5.17,
+          "2023-05": 0.8665,
+          "2023-06": 8.9359,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 6.7492,
+          "2023-12": 2.6649
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 960,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 60.4629,
+        "stops": 547,
+        "timeouts": 142,
+        "trades_per_active_day": 3.951,
+        "trades_per_calendar_day": 2.667
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "literal",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "literal",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 6,
+        "score_mode": "sum",
+        "top_k": 2
+      },
+      "score": 38.7574
+    },
+    {
+      "development": {
+        "dd_pct": 11.8794,
+        "equivalent_monthly_return_pct": 4.124929,
+        "literal_target_hit_rate": 27.9368,
+        "literal_target_hits": 283,
+        "max_non_target_streak": 21,
+        "median_month_pct": 5.539,
+        "minimum_month_pct": -8.627,
+        "monthly_return_pct": {
+          "2023-01": 5.3457,
+          "2023-02": 8.8899,
+          "2023-03": 11.9049,
+          "2023-04": 5.7324,
+          "2023-05": 0.8977,
+          "2023-06": 5.3143,
+          "2023-07": 9.3459,
+          "2023-08": 6.7522,
+          "2023-09": -0.4021,
+          "2023-10": -8.627,
+          "2023-11": 6.72,
+          "2023-12": -0.658
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1013,
+        "negative_months": 3,
+        "profit_first_objective_pass": false,
+        "return_pct": 62.4264,
+        "stops": 578,
+        "timeouts": 152,
+        "trades_per_active_day": 4.152,
+        "trades_per_calendar_day": 2.814
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "literal",
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 6,
+        "score_mode": "mean",
+        "top_k": 3
+      },
+      "score": 38.6073
+    },
+    {
+      "development": {
+        "dd_pct": 11.9714,
+        "equivalent_monthly_return_pct": 4.019796,
+        "literal_target_hit_rate": 28.3784,
+        "literal_target_hits": 273,
+        "max_non_target_streak": 17,
+        "median_month_pct": 4.666,
+        "minimum_month_pct": -8.9379,
+        "monthly_return_pct": {
+          "2023-01": 5.7629,
+          "2023-02": 0.3849,
+          "2023-03": 12.8576,
+          "2023-04": 5.2846,
+          "2023-05": 3.7395,
+          "2023-06": 11.1611,
+          "2023-07": 9.5445,
+          "2023-08": 6.0959,
+          "2023-09": 0.6454,
+          "2023-10": -8.9379,
+          "2023-11": 4.0473,
+          "2023-12": -0.4719
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 962,
+        "negative_months": 2,
+        "profit_first_objective_pass": false,
+        "return_pct": 60.4693,
+        "stops": 549,
+        "timeouts": 140,
+        "trades_per_active_day": 3.992,
+        "trades_per_calendar_day": 2.672
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "literal",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "literal",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "literal"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 3,
+        "score_mode": "monthly_lcb",
+        "top_k": 2
+      },
+      "score": 38.5122
+    },
+    {
+      "development": {
+        "dd_pct": 10.1759,
+        "equivalent_monthly_return_pct": 3.962916,
+        "literal_target_hit_rate": 27.7778,
+        "literal_target_hits": 280,
+        "max_non_target_streak": 16,
+        "median_month_pct": 5.5233,
+        "minimum_month_pct": -7.1409,
+        "monthly_return_pct": {
+          "2023-01": 0.7589,
+          "2023-02": 11.9525,
+          "2023-03": 9.5705,
+          "2023-04": 5.7323,
+          "2023-05": 0.8977,
+          "2023-06": 5.3143,
+          "2023-07": 9.6175,
+          "2023-08": 6.8883,
+          "2023-09": -0.4021,
+          "2023-10": -7.1409,
+          "2023-11": 7.6958,
+          "2023-12": -1.6282
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 1008,
+        "negative_months": 3,
+        "profit_first_objective_pass": false,
+        "return_pct": 59.4195,
+        "stops": 584,
+        "timeouts": 144,
+        "trades_per_active_day": 4.114,
+        "trades_per_calendar_day": 2.8
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "multisession",
+            "high_move",
+            "literal"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 36,
+        "score_mode": "monthly_lcb",
+        "top_k": 3
+      },
+      "score": 38.15565
+    },
+    {
+      "development": {
+        "dd_pct": 13.137,
+        "equivalent_monthly_return_pct": 3.981723,
+        "literal_target_hit_rate": 28.7846,
+        "literal_target_hits": 270,
+        "max_non_target_streak": 18,
+        "median_month_pct": 4.2439,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.823,
+          "2023-05": 0.5173,
+          "2023-06": 1.2368,
+          "2023-07": 10.0675,
+          "2023-08": 8.0219,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 6.7492,
+          "2023-12": 2.6649
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 938,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 59.7659,
+        "stops": 534,
+        "timeouts": 134,
+        "trades_per_active_day": 3.925,
+        "trades_per_calendar_day": 2.606
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 12,
+        "score_mode": "mean",
+        "top_k": 2
+      },
+      "score": 38.0604
+    },
+    {
+      "development": {
+        "dd_pct": 13.137,
+        "equivalent_monthly_return_pct": 3.981723,
+        "literal_target_hit_rate": 28.7846,
+        "literal_target_hits": 270,
+        "max_non_target_streak": 18,
+        "median_month_pct": 4.2439,
+        "minimum_month_pct": -9.6013,
+        "monthly_return_pct": {
+          "2023-01": 2.3644,
+          "2023-02": 8.3232,
+          "2023-03": 12.8602,
+          "2023-04": 5.823,
+          "2023-05": 0.5173,
+          "2023-06": 1.2368,
+          "2023-07": 10.0675,
+          "2023-08": 8.0219,
+          "2023-09": 0.6454,
+          "2023-10": -9.6013,
+          "2023-11": 6.7492,
+          "2023-12": 2.6649
+        },
+        "months": 12,
+        "months_ge_30pct": 0,
+        "n": 938,
+        "negative_months": 1,
+        "profit_first_objective_pass": false,
+        "return_pct": 59.7659,
+        "stops": 534,
+        "timeouts": 134,
+        "trades_per_active_day": 3.925,
+        "trades_per_calendar_day": 2.606
+      },
+      "plan": [
+        [
+          "2023-01",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-02",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-03",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-04",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-05",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-06",
+          [
+            "multisession",
+            "literal"
+          ]
+        ],
+        [
+          "2023-07",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-08",
+          [
+            "multisession",
+            "high_move"
+          ]
+        ],
+        [
+          "2023-09",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-10",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-11",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ],
+        [
+          "2023-12",
+          [
+            "high_move",
+            "multisession"
+          ]
+        ]
+      ],
+      "policy": {
+        "lookback_months": 12,
+        "score_mode": "lcb",
+        "top_k": 2
+      },
+      "score": 38.0604
+    }
+  ],
+  "eligible_policies": 84,
+  "frozen_before_2024": {
+    "development": {
+      "dd_pct": 11.9302,
+      "equivalent_monthly_return_pct": 4.921053,
+      "literal_target_hit_rate": 29.3444,
+      "literal_target_hits": 282,
+      "max_non_target_streak": 17,
+      "median_month_pct": 6.552,
+      "minimum_month_pct": -9.3075,
+      "monthly_return_pct": {
+        "2023-01": 3.1349,
+        "2023-02": 10.9308,
+        "2023-03": 12.573,
+        "2023-04": 5.607,
+        "2023-05": 0.8665,
+        "2023-06": 7.497,
+        "2023-07": 10.1166,
+        "2023-08": 8.0219,
+        "2023-09": 1.9529,
+        "2023-10": -9.3075,
+        "2023-11": 7.723,
+        "2023-12": 1.8544
+      },
+      "months": 12,
+      "months_ge_30pct": 0,
+      "n": 961,
+      "negative_months": 1,
+      "profit_first_objective_pass": false,
+      "return_pct": 77.972,
+      "stops": 547,
+      "timeouts": 132,
+      "trades_per_active_day": 3.955,
+      "trades_per_calendar_day": 2.669
+    },
+    "plan": [
+      [
+        "2023-01",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-02",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-03",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-04",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-05",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-06",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-07",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-08",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-09",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-10",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-11",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2023-12",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ]
+    ],
+    "policy": {
+      "lookback_months": 36,
+      "score_mode": "mean",
+      "top_k": 2
+    },
+    "score": 58.0767
+  },
+  "limitations": [
+    "Source pickles contain causally gated source selections, not every raw proposal.",
+    "Cash-session data omit overnight X-Perp price discovery.",
+    "Policy selection on one calendar year has selection risk.",
+    "December entry cohorts may realize exits in the following January.",
+    "Gross returns exclude fees at user request."
+  ],
+  "objective_checks": {
+    "2023": false,
+    "2024": false,
+    "2025": false,
+    "2026": false
+  },
+  "policy_count": 84,
+  "protocol": {
+    "entry": "market",
+    "frozen_test": [
+      2024,
+      2025,
+      2026
+    ],
+    "money": "3% current-equity margin, fixed 10x gross",
+    "objective": ">=30% account return in every month; >=3 trades/day; DD <=10%",
+    "orders": "market only",
+    "priority": "account return first; win rate diagnostic only",
+    "rotation_policy_selection": 2023,
+    "selection_uses_only_exits_before_month_start": true,
+    "source_fit": "2017-2021",
+    "source_profile_selection": 2022
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_profit_first_high_move_oct17.pkl": "9223dee0187ad0f8312d3ae239bc7fbffcf2199f13fcabf744616105607d9c6a",
+    "reports\\audit_2026_09_08\\stock_profit_first_literal_runner_oct17.pkl": "06c3df9f3cb294b162512a642fdd19d6ba8ff6e85d0107352a46136282ad531a",
+    "reports\\audit_2026_09_08\\stock_profit_first_multisession_oct17.pkl": "34a223b9e3ef474b75d5f9e734937842bbb9a12459117a9ce512101d0fe4c87f"
+  },
+  "status": "REJECTED_OBJECTIVE",
+  "test_2024_2026": {
+    "2024": {
+      "dd_pct": 6.4162,
+      "equivalent_monthly_return_pct": 3.171275,
+      "literal_target_hit_rate": 29.0021,
+      "literal_target_hits": 279,
+      "max_non_target_streak": 19,
+      "median_month_pct": 3.0591,
+      "minimum_month_pct": -2.0886,
+      "monthly_return_pct": {
+        "2024-01": 2.5943,
+        "2024-02": 2.803,
+        "2024-03": -2.0886,
+        "2024-04": 3.6103,
+        "2024-05": 2.8768,
+        "2024-06": 4.8671,
+        "2024-07": 5.6493,
+        "2024-08": 10.4489,
+        "2024-09": 0.2039,
+        "2024-10": 3.0591,
+        "2024-11": 3.3139,
+        "2024-12": 5.0458,
+        "2025-01": -0.5954
+      },
+      "months": 13,
+      "months_ge_30pct": 0,
+      "n": 962,
+      "negative_months": 2,
+      "profit_first_objective_pass": false,
+      "return_pct": 50.0598,
+      "stops": 566,
+      "timeouts": 117,
+      "trades_per_active_day": 3.992,
+      "trades_per_calendar_day": 2.636
+    },
+    "2025": {
+      "dd_pct": 8.1791,
+      "equivalent_monthly_return_pct": 2.972756,
+      "literal_target_hit_rate": 31.485,
+      "literal_target_hits": 335,
+      "max_non_target_streak": 19,
+      "median_month_pct": 3.6902,
+      "minimum_month_pct": -4.7769,
+      "monthly_return_pct": {
+        "2025-01": 7.902,
+        "2025-02": 5.6844,
+        "2025-03": 8.1761,
+        "2025-04": 6.0245,
+        "2025-05": -4.7767,
+        "2025-06": 7.9705,
+        "2025-07": -4.7769,
+        "2025-08": 3.6902,
+        "2025-09": -0.9607,
+        "2025-10": 3.1082,
+        "2025-11": 6.818,
+        "2025-12": 2.2288,
+        "2026-01": -1.1524
+      },
+      "months": 13,
+      "months_ge_30pct": 0,
+      "n": 1064,
+      "negative_months": 4,
+      "profit_first_objective_pass": false,
+      "return_pct": 46.3492,
+      "stops": 634,
+      "timeouts": 95,
+      "trades_per_active_day": 4.452,
+      "trades_per_calendar_day": 2.923
+    },
+    "2026": {
+      "dd_pct": 9.0567,
+      "equivalent_monthly_return_pct": 1.58325,
+      "literal_target_hit_rate": 27.8388,
+      "literal_target_hits": 228,
+      "max_non_target_streak": 18,
+      "median_month_pct": 2.0736,
+      "minimum_month_pct": -4.3329,
+      "monthly_return_pct": {
+        "2026-01": -3.6359,
+        "2026-02": -1.6982,
+        "2026-03": 1.2506,
+        "2026-04": 2.9527,
+        "2026-05": -4.3329,
+        "2026-06": 2.0736,
+        "2026-07": 6.8632,
+        "2026-08": 8.488,
+        "2026-09": 3.0386
+      },
+      "months": 9,
+      "months_ge_30pct": 0,
+      "n": 819,
+      "negative_months": 3,
+      "profit_first_objective_pass": false,
+      "return_pct": 15.1858,
+      "stops": 520,
+      "timeouts": 71,
+      "trades_per_active_day": 4.762,
+      "trades_per_calendar_day": 3.199
+    }
+  },
+  "test_plans": {
+    "2024": [
+      [
+        "2024-01",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-02",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-03",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-04",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-05",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-06",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-07",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-08",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-09",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-10",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-11",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2024-12",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ]
+    ],
+    "2025": [
+      [
+        "2025-01",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-02",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-03",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-04",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-05",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-06",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-07",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-08",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-09",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-10",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-11",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2025-12",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ]
+    ],
+    "2026": [
+      [
+        "2026-01",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ],
+      [
+        "2026-02",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ],
+      [
+        "2026-03",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ],
+      [
+        "2026-04",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ],
+      [
+        "2026-05",
+        [
+          "high_move",
+          "multisession"
+        ]
+      ],
+      [
+        "2026-06",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2026-07",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2026-08",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ],
+      [
+        "2026-09",
+        [
+          "multisession",
+          "high_move"
+        ]
+      ]
+    ]
+  },
+  "unique_development_plans": 62
+}
