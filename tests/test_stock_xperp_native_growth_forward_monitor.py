@@ -38,3 +38,19 @@ def test_resolver_times_out_only_after_full_hold():
     result = monitor.resolve_row(row(), candle, 2, 1, 4)
     assert result["outcome"] == "TIME"
     assert result["signed_return"] == pytest.approx(0.01)
+
+
+def test_overlap_verifier_counts_new_bars_and_rejects_revision():
+    frozen = candles([100] * 4, [101] * 4, [99] * 4, [100] * 4)
+    current = {
+        key: list(value) + ([3600] if key == "time" else [value[-1]])
+        for key, value in frozen.items()
+    }
+    current["volume"] = [1] * 5
+    frozen["volume"] = [1] * 4
+    stats = monitor.overlap_stats(frozen, current)
+    assert stats["overlap_bars"] == 4
+    assert stats["new_bars_after_frozen_end"] == 1
+    current["close"][1] = 101
+    with pytest.raises(ValueError, match="overlap mismatch"):
+        monitor.overlap_stats(frozen, current)

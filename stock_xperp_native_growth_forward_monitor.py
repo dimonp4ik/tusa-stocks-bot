@@ -27,12 +27,33 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_manifest(path: Path) -> tuple[dict, dict]:
+def overlap_stats(frozen: dict, current: dict) -> dict:
+    old_lookup = {int(value): index for index, value in enumerate(frozen["time"])}
+    new_lookup = {int(value): index for index, value in enumerate(current["time"])}
+    common = sorted(set(old_lookup) & set(new_lookup))
+    if not common:
+        raise ValueError("frozen and current candles do not overlap")
+    for field in ("open", "high", "low", "close", "volume"):
+        old_values = np.asarray(frozen[field], dtype=float)
+        new_values = np.asarray(current[field], dtype=float)
+        left = np.asarray([old_values[old_lookup[stamp]] for stamp in common])
+        right = np.asarray([new_values[new_lookup[stamp]] for stamp in common])
+        if not np.array_equal(left, right):
+            raise ValueError(f"overlap mismatch in {field}")
+    old_last = max(old_lookup)
+    return {
+        "overlap_bars": len(common),
+        "new_bars_after_frozen_end": sum(stamp > old_last for stamp in new_lookup),
+        "frozen_end": old_last, "current_end": max(new_lookup),
+    }
+
+
+def load_manifest(path: Path) -> tuple[dict, dict, dict]:
     frozen = json.loads(parent.MANIFEST.read_text(encoding="utf-8"))
     current = json.loads(path.read_text(encoding="utf-8"))
     if set(current["symbols"]) != set(frozen["symbols"]):
         raise ValueError("current universe differs from the frozen universe")
-    candles, sources = {}, {str(path): digest(path)}
+    candles, sources, overlap = {}, {str(path): digest(path)}, {}
     for symbol, item in current["symbols"].items():
         if symbol in parent.EXCLUDED:
             continue
@@ -44,7 +65,14 @@ def load_manifest(path: Path) -> tuple[dict, dict]:
             raise ValueError(f"source hash mismatch: {symbol}")
         candles[symbol] = pickle.loads(raw)
         sources[str(source)] = hashlib.sha256(raw).hexdigest()
-    return candles, sources
+        frozen_item = frozen["symbols"][symbol]
+        frozen_source = Path(frozen_item["path"])
+        frozen_raw = frozen_source.read_bytes()
+        if hashlib.sha256(frozen_raw).hexdigest() != frozen_item["sha256"]:
+            raise ValueError(f"frozen source hash mismatch: {symbol}")
+        sources[str(frozen_source)] = hashlib.sha256(frozen_raw).hexdigest()
+        overlap[symbol] = overlap_stats(pickle.loads(frozen_raw), candles[symbol])
+    return candles, sources, overlap
 
 
 def resolve_row(row: dict, candle: dict, target_pct: float, stop_pct: float,
@@ -144,7 +172,7 @@ def main() -> None:
         raise FileExistsError("forward output is immutable; choose a new path")
     profile = json.loads(growth.OUT.read_text(encoding="utf-8"))
     parameters = profile["selection"]["selected"]["parameters"]
-    candles, sources = load_manifest(args.manifest)
+    candles, sources, overlap = load_manifest(args.manifest)
     features = parent.feature_rows(candles, int(parameters["lookback_bars"]))
     entries = parent.select_entries(
         features, float(parameters["z_threshold"]),
@@ -168,6 +196,14 @@ def main() -> None:
         "fresh_portfolio_signals": len(fresh),
         "resolved_signals": len(resolved),
         "pending_signals": len(pending),
+        "overlap_verification": {
+            "symbols": len(overlap),
+            "overlap_bars": sum(item["overlap_bars"] for item in overlap.values()),
+            "new_bars_after_frozen_end": sum(
+                item["new_bars_after_frozen_end"] for item in overlap.values()),
+            "mismatches": 0,
+            "by_symbol": overlap,
+        },
         "resolved_metrics_3pct": economics.simulate(resolved, .03),
         "resolved_metrics_5pct": economics.simulate(resolved, .05),
         "fresh": fresh,

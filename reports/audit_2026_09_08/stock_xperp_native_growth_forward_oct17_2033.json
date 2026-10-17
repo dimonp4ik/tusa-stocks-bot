@@ -1,0 +1,654 @@
+{
+  "audit_cutoff": "2026-10-17",
+  "created_at": "2026-10-17T20:37:00.367377+00:00",
+  "fresh": [
+    {
+      "cross_mean": 0.0014069790511429335,
+      "cross_std": 0.003587013122790962,
+      "cross_z": 3.0061897214212197,
+      "direction": "SHORT",
+      "direction_n": -1,
+      "entry": 75.8,
+      "entry_index": 9556,
+      "entry_time": 1792195200,
+      "exit_time": 1792252800,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": 0.4221635883904895,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": 0.012190221031480153,
+      "signed_return": 0.004221635883904895,
+      "stop_pct": 1.0,
+      "symbol": "AAOIUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.0014069790511429335,
+      "cross_std": 0.003587013122790962,
+      "cross_z": 2.499022054826583,
+      "direction": "SHORT",
+      "direction_n": -1,
+      "entry": 94.47,
+      "entry_index": 9918,
+      "entry_time": 1792195200,
+      "exit_time": 1792252800,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": 0.7515613422250378,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": 0.01037100395594992,
+      "signed_return": 0.007515613422250378,
+      "stop_pct": 1.0,
+      "symbol": "SOXLUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.0029242466691107557,
+      "cross_std": 0.003850739766060654,
+      "cross_z": -3.0336727105304147,
+      "direction": "LONG",
+      "direction_n": 1,
+      "entry": 49.0,
+      "entry_index": 3807,
+      "entry_time": 1792196100,
+      "exit_time": 1792253700,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": 0.8775510204081627,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": -0.008757637474541724,
+      "signed_return": 0.008775510204081627,
+      "stop_pct": 1.0,
+      "symbol": "SOXSUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.0017654124260926855,
+      "cross_std": 0.002532514833789182,
+      "cross_z": 2.780181071750107,
+      "direction": "SHORT",
+      "direction_n": -1,
+      "entry": 51.55,
+      "entry_index": 5528,
+      "entry_time": 1792197000,
+      "exit_time": 1792200600,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": -1.0,
+      "outcome": "SL",
+      "outcome_code": -1,
+      "risk_pct": 0.01,
+      "signal_return": 0.008806262230919737,
+      "signed_return": -0.01,
+      "stop_pct": 1.0,
+      "symbol": "AXTIUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.0017654124260926855,
+      "cross_std": 0.002532514833789182,
+      "cross_z": 2.6236943905734065,
+      "direction": "SHORT",
+      "direction_n": -1,
+      "entry": 89.93,
+      "entry_index": 9920,
+      "entry_time": 1792197000,
+      "exit_time": 1792254600,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": 0.7227843878572338,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": 0.008409957389549305,
+      "signed_return": 0.0072278438785723376,
+      "stop_pct": 1.0,
+      "symbol": "INTCUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": -0.0004784430423382795,
+      "cross_std": 0.001962812734752404,
+      "cross_z": -2.160518023549287,
+      "direction": "LONG",
+      "direction_n": 1,
+      "entry": 326.9,
+      "entry_index": 4766,
+      "entry_time": 1792197900,
+      "exit_time": 1792239300,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": -1.0,
+      "outcome": "SL",
+      "outcome_code": -1,
+      "risk_pct": 0.01,
+      "signal_return": -0.004719135332622915,
+      "signed_return": -0.01,
+      "stop_pct": 1.0,
+      "symbol": "WDCUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.0012378525558304715,
+      "cross_std": 0.003151644994431736,
+      "cross_z": -2.432752589284665,
+      "direction": "LONG",
+      "direction_n": 1,
+      "entry": 351.36,
+      "entry_index": 9923,
+      "entry_time": 1792199700,
+      "exit_time": 1792257300,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": -0.16222677595628676,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": -0.0064293199648793875,
+      "signed_return": -0.0016222677595628676,
+      "stop_pct": 1.0,
+      "symbol": "TSLAUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": -0.0006166768013737126,
+      "cross_std": 0.0014042740437281201,
+      "cross_z": -3.1743273344481864,
+      "direction": "LONG",
+      "direction_n": 1,
+      "entry": 137.37,
+      "entry_index": 5535,
+      "entry_time": 1792201500,
+      "exit_time": 1792251900,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": -1.0191453738079725,
+      "outcome": "SL",
+      "outcome_code": -1,
+      "risk_pct": 0.01,
+      "signal_return": -0.005074302283435972,
+      "signed_return": -0.010191453738079725,
+      "stop_pct": 1.0,
+      "symbol": "SKHYUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": 0.00018754654419545188,
+      "cross_std": 0.0012641947694050654,
+      "cross_z": 3.1399412746979496,
+      "direction": "SHORT",
+      "direction_n": -1,
+      "entry": 21.74,
+      "entry_index": 5448,
+      "entry_time": 1792207800,
+      "exit_time": 1792265400,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": -0.0,
+      "outcome": "TIME",
+      "outcome_code": 0,
+      "risk_pct": 0.01,
+      "signal_return": 0.004157043879907674,
+      "signed_return": -0.0,
+      "stop_pct": 1.0,
+      "symbol": "BMNRUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    },
+    {
+      "cross_mean": -0.0012841282817610343,
+      "cross_std": 0.002377409946101976,
+      "cross_z": -3.3673599183122565,
+      "direction": "LONG",
+      "direction_n": 1,
+      "entry": 51.19,
+      "entry_index": 5576,
+      "entry_time": 1792240200,
+      "exit_time": 1792297800,
+      "hold_bars": 64,
+      "module": "native_xperp_growth_profile",
+      "module_priority": 0,
+      "net_r": null,
+      "outcome": "PENDING",
+      "outcome_code": null,
+      "risk_pct": 0.01,
+      "signal_return": -0.00928972324366173,
+      "signed_return": null,
+      "stop_pct": 1.0,
+      "symbol": "AXTIUSDT",
+      "target_pct": 2.0,
+      "universe_n": 44
+    }
+  ],
+  "fresh_portfolio_signals": 10,
+  "fresh_raw_signals": 122,
+  "invariant": "frozen universe and parameters; closed 15-minute feature; next-bar market entry; stop-first OHLC; same causal portfolio gate",
+  "limitations": [
+    "This is an immutable public-data shadow snapshot, not account fills.",
+    "Pending rows remain unresolved until a later immutable snapshot.",
+    "A tiny forward sample cannot establish monthly profitability."
+  ],
+  "orders_possible": false,
+  "overlap_verification": {
+    "by_symbol": {
+      "AAOIUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9588
+      },
+      "AAPLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "AMDUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9500
+      },
+      "AMZNUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "ARMUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5754
+      },
+      "AVGOUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 4884
+      },
+      "AXTIUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5558
+      },
+      "BEUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 4883
+      },
+      "BMNRUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5466
+      },
+      "CBRSUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "COINUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 7862
+      },
+      "CRCLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "CRWVUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5463
+      },
+      "DELLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5657
+      },
+      "DRAMUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "EWYUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "GOOGLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "HOODUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 7864
+      },
+      "INTCUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "KOUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 3837
+      },
+      "LITEUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 6333
+      },
+      "METAUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "MRNAUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 4412
+      },
+      "MRVLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "MSFTUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "MSTRUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "MUUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "NBISUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9588
+      },
+      "NVDAUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "OKTAUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 4796
+      },
+      "PLTRUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 7861
+      },
+      "QCOMUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 7863
+      },
+      "RKLBUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5753
+      },
+      "SAMSUNGUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "SKHYNIXUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "SKHYUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5560
+      },
+      "SNDKUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "SNXXUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 5559
+      },
+      "SOFTBANKUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "SOXLUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "SOXSUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 3838
+      },
+      "SPCXUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "TSLAUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 9950
+      },
+      "WDCUSDT": {
+        "current_end": 1792268100,
+        "frozen_end": 1792223100,
+        "new_bars_after_frozen_end": 50,
+        "overlap_bars": 4795
+      }
+    },
+    "mismatches": 0,
+    "new_bars_after_frozen_end": 2200,
+    "overlap_bars": 351624,
+    "symbols": 44
+  },
+  "parameters": {
+    "hold_bars": 64,
+    "lookback_bars": 2,
+    "minimum_move_pct": 0.4,
+    "score": 16.4173751,
+    "stop_pct": 1.0,
+    "target_pct": 2.0,
+    "z_threshold": 2.0
+  },
+  "pending_signals": 1,
+  "ready_for_live_orders": false,
+  "resolved_metrics_3pct": {
+    "dd_pct": 0.9048,
+    "monthly_return_pct": {
+      "2026-10": -0.1213
+    },
+    "months_ge_30pct": 0,
+    "n": 9,
+    "negative_months": 1,
+    "return_pct": -0.1213
+  },
+  "resolved_metrics_5pct": {
+    "dd_pct": 1.507,
+    "monthly_return_pct": {
+      "2026-10": -0.2011
+    },
+    "months_ge_30pct": 0,
+    "n": 9,
+    "negative_months": 1,
+    "return_pct": -0.2011
+  },
+  "resolved_signals": 9,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_native_growth_forward_monitor.py": "3e3d74477bc200267ab75f7bd64aacddde30863736f41bbb259e381bd095ee97",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAOIUSDT_15min_current.pkl": "7ad9fb4651e4cdfde2a700cd4247655235805bc4f5361356edcbc0aec093f6ce",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAPLUSDT_15min_current.pkl": "bcca54fb8e4193ceecb4c80b1d93b9cd7f34832c792851ca7796186517d2542d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMDUSDT_15min_current.pkl": "10536359924465ba0ae5355c5629292e0dc3778add5142be3168579929af91c1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMZNUSDT_15min_current.pkl": "3983489741c2079b90b28555f008bbe7062f352f83f940887fc03dc12d301a12",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\ARMUSDT_15min_current.pkl": "96c6df328b38e46fecd57bd4afd70f70dd730e7021fcc6a28d47db6d39d6e9e2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AVGOUSDT_15min_current.pkl": "19511681e5beb77b1f52ab44fb92d152bd829debb38d95bc5cbceb493fd3a72b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AXTIUSDT_15min_current.pkl": "cb0fda92191302778b514a6d16d87e295352f071160eaaff1d855c8ca9327dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BEUSDT_15min_current.pkl": "519689e8e11b39e448bfb9d458d90c3c9b71348054c0dc16e4ab37cedec57ec6",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BMNRUSDT_15min_current.pkl": "1601db724d3d53507546a5daefd8bf462770d57b1509d2b866881c44c75bc09c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CBRSUSDT_15min_current.pkl": "f57bbfea3e9fb8be143928dc24952552b0ea1a60239c967589e0515dab057dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\COINUSDT_15min_current.pkl": "4f0b805bdb21cfcad60b1aa93fa784e53af02768905b1a90820f2617e6d00e88",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRCLUSDT_15min_current.pkl": "f5ba420adc973bc5d60f785789b8e00c689fd8e83c838b999bf9b53d8336fb08",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRWVUSDT_15min_current.pkl": "29c92824136a395475e1d9f1edefaa928ea8d19ce3f77f8cec2540a1a7db8d8c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DELLUSDT_15min_current.pkl": "40fa4bc48011f062a680d1f028f73c6eb1cbc779bdb050eb600869c683c86556",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DRAMUSDT_15min_current.pkl": "594dfacf2ad0f62f64de7d7bafe66aabb56ecfaed88d6973a8eccf98264bad3f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\EWYUSDT_15min_current.pkl": "b39d4be6086f6341f485c43ecf961678a67add5cda75d7413e63ec0f2c517a57",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\GOOGLUSDT_15min_current.pkl": "6b6ba3d4f63bfb26e9978d19473edb68484a5f61bc0b6968fedb760d99efffe2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\HOODUSDT_15min_current.pkl": "03d4fb895e32d77788da6169f2bfa34ab5252c7a9abb5b07d15efe05e5f1aed4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\INTCUSDT_15min_current.pkl": "9a3795ce16c9e433a578cbca68c9f2735a58c40d2b2b0ca0737cb3b5dfa686c3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\KOUSDT_15min_current.pkl": "2db4782713e441ce21038bf80cc2d4b6a20b0ff125bd43f38f7008836321c935",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\LITEUSDT_15min_current.pkl": "6825ed79c54df5a106faf528c653cf58f1d9a6d90eb9e409c23fef2a47e3ea6c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\METAUSDT_15min_current.pkl": "637da1d086136ec0f7787cc4c29f8e4a507a8dbf118ba03b03eb97b0a2aa9e78",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRNAUSDT_15min_current.pkl": "54e72f56f3d3432590737cc15c06bbda182b312bd84146571eac52116129a1ae",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRVLUSDT_15min_current.pkl": "31d1cbaedc6f65973b04e56bdc9422358cd3d3adc486c07e3badcc3833b6e453",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSFTUSDT_15min_current.pkl": "e515bc39168b6b2b74c1e14e5ec1e051d976f679ed1401d1edb44dadeef97465",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSTRUSDT_15min_current.pkl": "3a9b914f21db0f10b10b274e19c1c2f921a0dbf577bf959d71076117180b431e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MUUSDT_15min_current.pkl": "b51dfe194f9b43c3eae63409fd6a2c9d24ab48c96ea866f909671bb9d56f8917",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NBISUSDT_15min_current.pkl": "74e2300d4a76f41131960e503930be1b2bfb7b251159116477149c162a8601f7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NVDAUSDT_15min_current.pkl": "c8be37f06d23df2c8b1547e66cf3af8b3ac0c03e6d627bce219cdb93f2945148",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\OKTAUSDT_15min_current.pkl": "b6fb702557d401e751d3e623b4bed25622037355ac65bcf1c2346efd3df33869",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\PLTRUSDT_15min_current.pkl": "e500f53ec1f05a63c6ec0a51c44ac9b34db0391f89b31e7f1fa06dffc56b478e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\QCOMUSDT_15min_current.pkl": "48ee6ab9cbea98de2602cbee4619bf2a60d62bb842e279875ba93f1085e8a20d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\RKLBUSDT_15min_current.pkl": "a02876a1ddc69681552a3d9ff0cd33874f4ac1f71d6f84f25ef487aedb5d07cf",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SAMSUNGUSDT_15min_current.pkl": "b8c8d7e3f9eaf03686e302b1ab3b6624fd1d33490a0dea4398700c1352be2ada",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYNIXUSDT_15min_current.pkl": "51759b100a02e0c3e9594f829df23333ce193e9fe46515fb33fba6e295e0a347",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYUSDT_15min_current.pkl": "2ea85cb8dfba4dc4bee632267937f73fb281994ffdade0c5ecddf5addfa3c70b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNDKUSDT_15min_current.pkl": "1a614308b6c19af18574596c3b36e291e863d561e5e0989358b50a21b7b7b4d7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNXXUSDT_15min_current.pkl": "0b6f0004c8725b6f7be426895544e4e2862d1eeac22ece62f3d3b09242b99163",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOFTBANKUSDT_15min_current.pkl": "05d5dc031a7d4a7a387d904015d1d053bd08f445605d51a7cd1d31140d7a00a5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXLUSDT_15min_current.pkl": "5c8911bda9c3df4bb2d1ce1bb7a2c9671b0ff7336086edced711f1d0c7d44609",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXSUSDT_15min_current.pkl": "ba55293b86038456b01f4c88852089adfa4a36354b86f58d19b6e9036b88e66b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SPCXUSDT_15min_current.pkl": "215e63ab7b5723ccee4a486412c5673d3c89fbc08316a18e5deec06a6940c8c2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\TSLAUSDT_15min_current.pkl": "f32bd866da14d1299fb4de5b9c21b1894d2c6f4ca8cbaeda75d735fc446f8d01",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\WDCUSDT_15min_current.pkl": "f24f71533524b4f21f1da5a394c8c7e20929546234265322da98742d586c6055",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AAOIUSDT_15min_current.pkl": "444bdcd3e9dcac3ad5d0977b3585775b72e896fcf33a63fc2eb21829117da01d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AAPLUSDT_15min_current.pkl": "6451eff55efd0ef716e9646f07736752ac44edb92cadff911d5bf04c1b19caa9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AMDUSDT_15min_current.pkl": "32724acf6714300b168d64d13e0a19f42767cb88ce74f35c7cd72f57b073eb7c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AMZNUSDT_15min_current.pkl": "4df370f59873549fc0dd79902941d5fd97ea3de60189b3a645b85353ff571e05",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\ARMUSDT_15min_current.pkl": "173d6e11d0da55b2a0dd52667a3d0ede3339620524e9d1690083614c891842c1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AVGOUSDT_15min_current.pkl": "a1a9adf36a6782aedfa4feabda8b3e3d32048e3ccb7b442ddc7964d16ee1631f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\AXTIUSDT_15min_current.pkl": "085fc9a8db9eabe38aa6987731a845f6421a0f4a6a314bc6e76977f28928df3e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\BEUSDT_15min_current.pkl": "8c359bcfbe4e9f5a7b193c1faee7ca53ff94a2d41e8cae18e5f2f3d2bcddf66c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\BMNRUSDT_15min_current.pkl": "f27b45f70070aa6d5a85b8b3dd878f1d2efce3dae9efe18afebf2c9c6c84e1b9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\CBRSUSDT_15min_current.pkl": "f4c03ec7f874dcdf839ac75f0b9b4366bde58c7c3129bc0a7ac32a7c4084dff2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\COINUSDT_15min_current.pkl": "3561243b8ddf48d0be90a2daa8881950c9e824e8ec1beb74dd197140f1237516",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\CRCLUSDT_15min_current.pkl": "dc7fe4f3abd551b2294e0d67b3a28c7f8e0aabf129d79d46696c295223387608",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\CRWVUSDT_15min_current.pkl": "a3936d438473fe85d3af37a8428a78c68e38b0e03673cfda570d63c3be9d389a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\DELLUSDT_15min_current.pkl": "215a51e21b7dacb2d1c1ecc946321f1e4227d74dd0aa761c5129bb82d84ea33d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\DRAMUSDT_15min_current.pkl": "64de5ee91af575081e9c5416234f0f1d188d3c6e8a738b02fc69fb59025b7e01",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\EWYUSDT_15min_current.pkl": "329b9521498221e0ae76e819ecf341e40aade9aef20ad6ce0ab171a7450d2982",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\GOOGLUSDT_15min_current.pkl": "69dbdaa634e3db2fdd0dff473d212359d2df257dce9465587cf41a73d3ac5b15",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\HOODUSDT_15min_current.pkl": "f7ada24348b784e95a67d8c0dd0fd258e061304863fea6ca8018605b8df126cc",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\INTCUSDT_15min_current.pkl": "e6509eab82bc6fc249fc8577920b335ad07547a7373bbf74b16e3e6245210224",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\KOUSDT_15min_current.pkl": "6d5b2332429501a6e44d98dbb6d25c6b7fbe55dbf8699c0054201def4bfaf83e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\LITEUSDT_15min_current.pkl": "94681856ccb27d7b6e57e0d59d0bfcf6a89eadca06a9546c95c13814e3f9a9e0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\METAUSDT_15min_current.pkl": "6afecdc033b2e413a3fab3e2e62d6d3f6cb7ba199a8abf16bc84f42ad3e58d90",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\MRNAUSDT_15min_current.pkl": "efd0ea6cde11646f8071e904734bc7324f3be4e2db7785a88290c7c5fc89c474",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\MRVLUSDT_15min_current.pkl": "9954dfc15e38e95595375d909fe4a2c5433bc0d1a8bc0547d76d3357e7a95d60",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\MSFTUSDT_15min_current.pkl": "9de66e58a251b5873f284fc411aabfb3415a43fe31b458753f79d88d7e954bfd",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\MSTRUSDT_15min_current.pkl": "cbcfc197b5261971468cdaaf2b4eab029cf43dd9000e6cf140d972931f1c3a96",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\MUUSDT_15min_current.pkl": "931511ead3f9f9abeb58a4f05805895354573616c0a74a14bf078d9ad088a445",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\NBISUSDT_15min_current.pkl": "d78ee1a5597b84311578bcb56724821bf9918a1e86cbd18f599a57b6a620abe0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\NVDAUSDT_15min_current.pkl": "ef3bfbce537f09fce0487d6fa2fa97fcb878a70f7175e68f3a8ab97504102a5a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\OKTAUSDT_15min_current.pkl": "b7eac3bb7ff053c43b2368e5ad5a7c7610d3135b92d7ab25875fe66aee1c8560",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\PLTRUSDT_15min_current.pkl": "acdd32c95efcc3ba2774ecab801b9e01b2cf24deb9b7c7b6e5046b33b6651307",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\QCOMUSDT_15min_current.pkl": "b6929e198ef494043ecb67cc67d99877214eb2c12c3feb29ae2103e82c437a35",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\RKLBUSDT_15min_current.pkl": "74fca215e106e2fe19c4d0197bf938b7335f5e183f80a2e9652929401b8ef3b9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SAMSUNGUSDT_15min_current.pkl": "833cdb0d64b8a7d9f7e44f984c851c180634ed4a8d1f0ec10346648582a7684a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SKHYNIXUSDT_15min_current.pkl": "a49076f980c0a239949b385010626e51854ef61c5aeba9f7edbd1ec5c0cceabe",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SKHYUSDT_15min_current.pkl": "3adcb421d9b6f08509f71b27bfc8dd1c374d33b27fa660c66ee2cb99bfbc1b10",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SNDKUSDT_15min_current.pkl": "592f191da1c6d76ec10964489f2ed9a250eeea8628c79877a2f0b969562392a1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SNXXUSDT_15min_current.pkl": "99f6626ac235659ff0482b3833e5510f2f20a6401841446a28e86715a7970689",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SOFTBANKUSDT_15min_current.pkl": "b31fbc332d990d7115194afbb5bb23c5dbf88b74236c5a1ed9494eec1905ce29",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SOXLUSDT_15min_current.pkl": "ec982bfdd016ac9930b3fa024f737bea03128583f9d1f0ea13f06df3d2022d42",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SOXSUSDT_15min_current.pkl": "fbf32091a6b0cc047726487b476af28f676859f6500de10cb0c255871411a19d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\SPCXUSDT_15min_current.pkl": "c621ec55e4a3ba46fbefed4512a61d1cca1c7f13a37d69cd24b7e90067bf725b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\TSLAUSDT_15min_current.pkl": "3af20756949c0a96fb1492ad6e1564000c02fc8752b5bbac5ecd39bc74633166",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\WDCUSDT_15min_current.pkl": "35adc6a8018b6812068f569b5a13a9644b7cfa740056173f97c8a6d5c6964d98",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17_2033\\manifest.json": "cd1a173edaef32815a23a3d8b7165551ec12bf24850e9e0759316c1b7fa11bf4",
+    "reports\\audit_2026_09_08\\stock_xperp_native_growth_profile_oct18.csv": "ae74ce9a102cb60f16f8f06e307879ae24cd6b2d8b8bddffcce91e0b716e66b1",
+    "reports\\audit_2026_09_08\\stock_xperp_native_growth_profile_oct18.json": "d314ce18728c78783f4d9b9fc1e04803ace920bd5e2c2d58bbbab144b13ce50c"
+  },
+  "status": "SHADOW_ONLY_FORWARD_SNAPSHOT"
+}
