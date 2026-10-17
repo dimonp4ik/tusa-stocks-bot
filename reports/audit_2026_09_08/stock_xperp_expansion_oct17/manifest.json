@@ -1,0 +1,80 @@
+{
+  "status": "PUBLIC_CURRENT_STOCK_XPERP",
+  "created_at": "2026-10-17T07:45:11.779467+00:00",
+  "bars_requested": 10000,
+  "request_anchor_ms": 1792223171779,
+  "symbols": {
+    "AMDUSDT": {
+      "status": "OK",
+      "instrument": "AMD-USD_UM_XPERP-310711",
+      "bars": 9499,
+      "start": 1783674000,
+      "end": 1792222200,
+      "sha256": "eca7195f6b9560df0b75b132fc4a26d6f54c5c225e01ba3f2093d12a5dd80507",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\AMDUSDT_15min_current.pkl"
+    },
+    "QCOMUSDT": {
+      "status": "OK",
+      "instrument": "QCOM-USD_UM_XPERP-310801",
+      "bars": 7862,
+      "start": 1785147300,
+      "end": 1792222200,
+      "sha256": "532c94352638c04abebd09e8cf4c12cf5ddc73aad825c060548c633abbd5edea",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\QCOMUSDT_15min_current.pkl"
+    },
+    "PLTRUSDT": {
+      "status": "OK",
+      "instrument": "PLTR-USD_UM_XPERP-310801",
+      "bars": 7860,
+      "start": 1785149100,
+      "end": 1792222200,
+      "sha256": "2c9b85c1fd14e89d82470066f98772f369e7aef07de142d8ea3d9d0b0ddb26a9",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\PLTRUSDT_15min_current.pkl"
+    },
+    "DELLUSDT": {
+      "status": "OK",
+      "instrument": "DELL-USD_UM_XPERP-310822",
+      "bars": 5656,
+      "start": 1787132700,
+      "end": 1792222200,
+      "sha256": "22c262bec0ed12302d02868c3020635e63c66ab892ccb37216e332bb14a325ae",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\DELLUSDT_15min_current.pkl"
+    },
+    "AVGOUSDT": {
+      "status": "OK",
+      "instrument": "AVGO-USD_UM_XPERP-310829",
+      "bars": 4883,
+      "start": 1787828400,
+      "end": 1792222200,
+      "sha256": "1cd9ac7fd0f959d588014678b4833e7f7569f3e930e9d9470510fd71bd31581f",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\AVGOUSDT_15min_current.pkl"
+    },
+    "OKTAUSDT": {
+      "status": "OK",
+      "instrument": "OKTA-USD_UM_XPERP-310829",
+      "bars": 4795,
+      "start": 1787907600,
+      "end": 1792222200,
+      "sha256": "3f58bdb4cfb8a483c02bcf64213a9524182e852a923bfc5cc8e78404d2d8817e",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\OKTAUSDT_15min_current.pkl"
+    },
+    "WDCUSDT": {
+      "status": "OK",
+      "instrument": "WDC-USD_UM_XPERP-310829",
+      "bars": 4794,
+      "start": 1787908500,
+      "end": 1792222200,
+      "sha256": "4fe84760f1a214833cda56fe231de4c6d9f89babcf8e7c665ccd598415459c4e",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\WDCUSDT_15min_current.pkl"
+    },
+    "MRNAUSDT": {
+      "status": "OK",
+      "instrument": "MRNA-USD_UM_XPERP-310905",
+      "bars": 4411,
+      "start": 1788253200,
+      "end": 1792222200,
+      "sha256": "33576d8d0bfd1d1ade84b199bd09d6a8849d66a621a68a83b28c2abe1d1dff35",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\MRNAUSDT_15min_current.pkl"
+    }
+  }
+}

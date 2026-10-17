@@ -72,6 +72,16 @@ INSTRUMENT_MAP: dict[str, tuple[str, str]] = {
     "INTCUSDT":  (_di.INSTRUMENT_US_INTC_US_USD, "equity"),
     "MRVLUSDT":  (_di.INSTRUMENT_US_MRVL_US_USD, "equity"),
     "MUUSDT":    (_di.INSTRUMENT_US_MU_US_USD, "equity"),
+    # Additional live OKX stock X-Perps.  Keep ambiguous crypto/stock ticker
+    # collisions (for example SUI, H, BIO, AR, W) out of this map.
+    "AMDUSDT":   (_di.INSTRUMENT_US_AMD_US_USD, "equity"),
+    "QCOMUSDT":  (_di.INSTRUMENT_US_QCOM_US_USD, "equity"),
+    "PLTRUSDT":  (_di.INSTRUMENT_US_PLTR_US_USD, "equity"),
+    "DELLUSDT":  (_di.INSTRUMENT_US_DELL_US_USD, "equity"),
+    "AVGOUSDT":  (_di.INSTRUMENT_US_AVGO_US_USD, "equity"),
+    "OKTAUSDT":  (_di.INSTRUMENT_US_OKTA_US_USD, "equity"),
+    "WDCUSDT":   (_di.INSTRUMENT_US_WDC_US_USD, "equity"),
+    "MRNAUSDT":  (_di.INSTRUMENT_US_MRNA_US_USD, "equity"),
     "QQQUSDT":   (_di.INSTRUMENT_ETF_CFD_US_QQQ_US_USD, "equity"),
     "SPYUSDT":   (_di.INSTRUMENT_ETF_CFD_US_SPY_US_USD, "equity"),
     # Research-only sector proxies. They are not part of either live trading

@@ -1,0 +1,107 @@
+{
+  "status": "PUBLIC_CURRENT_STOCK_XPERP",
+  "created_at": "2026-10-17T07:34:20.852698+00:00",
+  "bars_requested": 12000,
+  "request_anchor_ms": 1792222520852,
+  "symbols": {
+    "AAPLUSDT": {
+      "status": "OK",
+      "instrument": "AAPL-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "988a9aa4b8a018b75f1e34182daa0d2da360e520f668bfb0fdf0420a7bce5ee4",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\AAPLUSDT_15min_current.pkl"
+    },
+    "AMZNUSDT": {
+      "status": "OK",
+      "instrument": "AMZN-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "99a217db6351c487bddde6bc8e523738a7be3413b500ca6ee187bfea507300f6",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\AMZNUSDT_15min_current.pkl"
+    },
+    "GOOGLUSDT": {
+      "status": "OK",
+      "instrument": "GOOGL-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "aef6dbc3742783b495ba4ca9a9207e66b8ef80df36018918f35bc19d84baab55",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\GOOGLUSDT_15min_current.pkl"
+    },
+    "INTCUSDT": {
+      "status": "OK",
+      "instrument": "INTC-USD_UM_XPERP-310627",
+      "bars": 11132,
+      "start": 1782203400,
+      "end": 1792221300,
+      "sha256": "96cba8a251e102767c537e3d22ff4bfb43cac8343c4490b92381f33cedfbc7fa",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\INTCUSDT_15min_current.pkl"
+    },
+    "METAUSDT": {
+      "status": "OK",
+      "instrument": "META-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "4688816c5d2faed9ac9cee9af6efbd83a0a596233317731f6e06d7194005b16f",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\METAUSDT_15min_current.pkl"
+    },
+    "MRVLUSDT": {
+      "status": "OK",
+      "instrument": "MRVL-USD_UM_XPERP-310627",
+      "bars": 11129,
+      "start": 1782206100,
+      "end": 1792221300,
+      "sha256": "2530f3fdf2f47ac0c18fde63832f4a9dfa95e2d6a95d4f13a5a9de5fac9b70d0",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MRVLUSDT_15min_current.pkl"
+    },
+    "MSFTUSDT": {
+      "status": "OK",
+      "instrument": "MSFT-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "7f6968c8e5a4d48f77cee1a1e100c37c029019244bb07fb030b4ef71dc96b684",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MSFTUSDT_15min_current.pkl"
+    },
+    "MUUSDT": {
+      "status": "OK",
+      "instrument": "MU-USD_UM_XPERP-310627",
+      "bars": 11130,
+      "start": 1782205200,
+      "end": 1792221300,
+      "sha256": "c209cc7300d8fa5a47b733e05f34305791f562b54532e80e5ac7a6e8c045d366",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MUUSDT_15min_current.pkl"
+    },
+    "NVDAUSDT": {
+      "status": "OK",
+      "instrument": "NVDA-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "be12bb1f7aa8f352614482c62757e32ea6fb3dbee1933d8b772d9cf7457cea5c",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\NVDAUSDT_15min_current.pkl"
+    },
+    "TSLAUSDT": {
+      "status": "OK",
+      "instrument": "TSLA-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "c6f649967ebb3607e47f45e36a3a424e483a4ad78dcbefaa5fae076b80c44a1b",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\TSLAUSDT_15min_current.pkl"
+    },
+    "QQQUSDT": {
+      "status": "OK",
+      "instrument": "QQQ-USD_UM_XPERP-310613",
+      "bars": 11999,
+      "start": 1781423100,
+      "end": 1792221300,
+      "sha256": "793b17cf66affe07bdc68603c45077e0bb515764f83db80909f2f9574a12fab3",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\QQQUSDT_15min_current.pkl"
+    }
+  }
+}

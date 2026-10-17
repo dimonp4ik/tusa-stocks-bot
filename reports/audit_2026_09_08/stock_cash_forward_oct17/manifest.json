@@ -1,0 +1,85 @@
+{
+  "status": "ISOLATED_PUBLIC_FORWARD_SNAPSHOT",
+  "created_at": "2026-10-17T07:34:20.869962+00:00",
+  "requested_start": "2026-06-01T00:00:00+00:00",
+  "requested_end": "2026-10-17T00:00:00+00:00",
+  "symbols": {
+    "AAPLUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\AAPLUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "8312b2b8dd9a2e112d1fa5d79b0cc67c0dd8e8006f88937e3b748d34931dbbee"
+    },
+    "AMZNUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\AMZNUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "43c2f66db584e097b62540043dc40a9d4e8f8b07221eb45e1b318ed418ba1409"
+    },
+    "GOOGLUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\GOOGLUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "7b5f7057310eb4db6d91ca7598c386d03e3cf505de6cee23894a7986bdd896a2"
+    },
+    "INTCUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\INTCUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "996d0b316a2e875d171fe56b851269016df5d26ccdf4b9b88fd4ccaedf069516"
+    },
+    "METAUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\METAUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "34c37d29351c7eb3173f2c25e013fd3176a411c18e40981bf1a433c063ed421a"
+    },
+    "MRVLUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MRVLUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "3bedb5aa2c71f6ab3e494ca0bb25c49cafdb1f5a37de0c77602c4cf45801a418"
+    },
+    "MSFTUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MSFTUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "b3fac1288ee1d6b880a3bf09d6302b56ceec39e5e0b491e991a7c0e4d1c50251"
+    },
+    "MUUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MUUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "88f7159597613f6ba3e71ebc5d23e6f75ccbcf20d53b5957847273c47932cdbc"
+    },
+    "NVDAUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\NVDAUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "9f6cb35e696093ca1908dcdc5315c633f094272326e8a4d4d8658282685396f7"
+    },
+    "TSLAUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\TSLAUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "2251feefcb8ddd8795899e5c84bbb9ad736c8cfdd347fd2c4d4a27e78704383c"
+    },
+    "QQQUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\QQQUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "76fb4739fc21f6a4c461df81c2f38b53fe67c1fb13f50df89c8866e32676dc90"
+    }
+  }
+}

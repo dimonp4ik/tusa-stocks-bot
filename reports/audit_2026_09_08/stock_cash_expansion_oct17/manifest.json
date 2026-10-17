@@ -1,0 +1,64 @@
+{
+  "status": "ISOLATED_PUBLIC_FORWARD_SNAPSHOT",
+  "created_at": "2026-10-17T07:45:11.816980+00:00",
+  "requested_start": "2026-06-01T00:00:00+00:00",
+  "requested_end": "2026-10-17T00:00:00+00:00",
+  "symbols": {
+    "AMDUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\AMDUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "15ac8f993a07603456b32aa0d548bcb15741b6c8b29a2170b93ca744275fdd58"
+    },
+    "QCOMUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\QCOMUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "950353889f82ba428641732e964d625329c926fcaaf9ce3d36e9d68d1d835970"
+    },
+    "PLTRUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\PLTRUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "3a0dc12193689afc8368ad0310e58613014c7170ebf0a9c049063dacdba3c709"
+    },
+    "DELLUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\DELLUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "1573eacfbb1db01c40058765d8e0d63279ebe67dc6f1a66b1a0823d6fd84d4d5"
+    },
+    "AVGOUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\AVGOUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "84b26abd8bac1fc433b1a9a57453c723a85af32acfe27cfd1165d875b8ca2280"
+    },
+    "OKTAUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\OKTAUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "8723327f2778fc6da886cfae40372a50ecd7bc0b12d0f1c90b50dcea1b4da764"
+    },
+    "WDCUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\WDCUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "33b0eac71202cd4990d2faa7e784ca44b0490eea9ed615db0bb056092c98d2d0"
+    },
+    "MRNAUSDT": {
+      "path": "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\MRNAUSDT_15min_forward.pkl",
+      "rows": 2522,
+      "start": 1780320600,
+      "end": 1792179900,
+      "sha256": "010517dcd59c65b501188c69dfe8562636608e1137e1f488f440c7e32c66418f"
+    }
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "checks": {
+    "combined_fresh_at_least_3_trades_per_day": true,
+    "combined_fresh_return_at_least_30pct": false,
+    "combined_full_improves_original": true,
+    "combined_full_no_negative_months": true,
+    "unseen_universe_fresh_positive": true
+  },
+  "expansion_rows": 749,
+  "limitations": [
+    "New X-Perps have unequal listing dates and short histories.",
+    "The expansion aggregate was negative in September before recovering in October.",
+    "The expanded portfolio still falls far below the 30% monthly objective.",
+    "Gross returns exclude fees at user request."
+  ],
+  "protocol": {
+    "ambiguous_ticker_collisions_excluded": [
+      "ARUSDT",
+      "BIOUSDT",
+      "HUSDT",
+      "MONUSDT",
+      "OUSDT",
+      "REUSDT",
+      "SUIUSDT",
+      "WUSDT",
+      "ZENUSDT"
+    ],
+    "entry": "next 15-minute X-Perp market open",
+    "expansion_symbols": [
+      "AMDUSDT",
+      "QCOMUSDT",
+      "PLTRUSDT",
+      "DELLUSDT",
+      "AVGOUSDT",
+      "OKTAUSDT",
+      "WDCUSDT",
+      "MRNAUSDT"
+    ],
+    "fresh": [
+      "2026-10-07",
+      "2026-10-17"
+    ],
+    "frozen_parent": "reports\\audit_2026_09_08\\stock_xperp_material_barbell_oct18.json",
+    "money": "3% current-equity margin, fixed 10x gross",
+    "orders": "market only",
+    "symbol_selection": "all unambiguous matched stocks; no outcome selection"
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\AAPLUSDT_15min_current.pkl": "988a9aa4b8a018b75f1e34182daa0d2da360e520f668bfb0fdf0420a7bce5ee4",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\AMZNUSDT_15min_current.pkl": "99a217db6351c487bddde6bc8e523738a7be3413b500ca6ee187bfea507300f6",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\GOOGLUSDT_15min_current.pkl": "aef6dbc3742783b495ba4ca9a9207e66b8ef80df36018918f35bc19d84baab55",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\INTCUSDT_15min_current.pkl": "96cba8a251e102767c537e3d22ff4bfb43cac8343c4490b92381f33cedfbc7fa",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\METAUSDT_15min_current.pkl": "4688816c5d2faed9ac9cee9af6efbd83a0a596233317731f6e06d7194005b16f",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MRVLUSDT_15min_current.pkl": "2530f3fdf2f47ac0c18fde63832f4a9dfa95e2d6a95d4f13a5a9de5fac9b70d0",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MSFTUSDT_15min_current.pkl": "7f6968c8e5a4d48f77cee1a1e100c37c029019244bb07fb030b4ef71dc96b684",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\MUUSDT_15min_current.pkl": "c209cc7300d8fa5a47b733e05f34305791f562b54532e80e5ac7a6e8c045d366",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\NVDAUSDT_15min_current.pkl": "be12bb1f7aa8f352614482c62757e32ea6fb3dbee1933d8b772d9cf7457cea5c",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\QQQUSDT_15min_current.pkl": "793b17cf66affe07bdc68603c45077e0bb515764f83db80909f2f9574a12fab3",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\TSLAUSDT_15min_current.pkl": "c6f649967ebb3607e47f45e36a3a424e483a4ad78dcbefaa5fae076b80c44a1b",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_material_universe_transfer_oct18_audit.py": "8f5232e422cdb6aa6249b32ec94220dfff2d89a3a00937f1b45d44a53a3be4a5",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\AMDUSDT_15min_forward.pkl": "15ac8f993a07603456b32aa0d548bcb15741b6c8b29a2170b93ca744275fdd58",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\AVGOUSDT_15min_forward.pkl": "84b26abd8bac1fc433b1a9a57453c723a85af32acfe27cfd1165d875b8ca2280",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\DELLUSDT_15min_forward.pkl": "1573eacfbb1db01c40058765d8e0d63279ebe67dc6f1a66b1a0823d6fd84d4d5",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\MRNAUSDT_15min_forward.pkl": "010517dcd59c65b501188c69dfe8562636608e1137e1f488f440c7e32c66418f",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\OKTAUSDT_15min_forward.pkl": "8723327f2778fc6da886cfae40372a50ecd7bc0b12d0f1c90b50dcea1b4da764",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\PLTRUSDT_15min_forward.pkl": "3a0dc12193689afc8368ad0310e58613014c7170ebf0a9c049063dacdba3c709",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\QCOMUSDT_15min_forward.pkl": "950353889f82ba428641732e964d625329c926fcaaf9ce3d36e9d68d1d835970",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\WDCUSDT_15min_forward.pkl": "33b0eac71202cd4990d2faa7e784ca44b0490eea9ed615db0bb056092c98d2d0",
+    "reports\\audit_2026_09_08\\stock_cash_expansion_oct17\\manifest.json": "06d964686f8e46b4b9913eb5e563776ca1f01e8f2a07a0fe310a0cab83a36b30",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\AAPLUSDT_15min_forward.pkl": "8312b2b8dd9a2e112d1fa5d79b0cc67c0dd8e8006f88937e3b748d34931dbbee",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\AMZNUSDT_15min_forward.pkl": "43c2f66db584e097b62540043dc40a9d4e8f8b07221eb45e1b318ed418ba1409",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\GOOGLUSDT_15min_forward.pkl": "7b5f7057310eb4db6d91ca7598c386d03e3cf505de6cee23894a7986bdd896a2",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\INTCUSDT_15min_forward.pkl": "996d0b316a2e875d171fe56b851269016df5d26ccdf4b9b88fd4ccaedf069516",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\METAUSDT_15min_forward.pkl": "34c37d29351c7eb3173f2c25e013fd3176a411c18e40981bf1a433c063ed421a",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MRVLUSDT_15min_forward.pkl": "3bedb5aa2c71f6ab3e494ca0bb25c49cafdb1f5a37de0c77602c4cf45801a418",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MSFTUSDT_15min_forward.pkl": "b3fac1288ee1d6b880a3bf09d6302b56ceec39e5e0b491e991a7c0e4d1c50251",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\MUUSDT_15min_forward.pkl": "88f7159597613f6ba3e71ebc5d23e6f75ccbcf20d53b5957847273c47932cdbc",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\NVDAUSDT_15min_forward.pkl": "9f6cb35e696093ca1908dcdc5315c633f094272326e8a4d4d8658282685396f7",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\QQQUSDT_15min_forward.pkl": "76fb4739fc21f6a4c461df81c2f38b53fe67c1fb13f50df89c8866e32676dc90",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\TSLAUSDT_15min_forward.pkl": "2251feefcb8ddd8795899e5c84bbb9ad736c8cfdd347fd2c4d4a27e78704383c",
+    "reports\\audit_2026_09_08\\stock_cash_forward_oct17\\manifest.json": "d038f0c730f7adcad08a756092b5e88bc5067a55c7d203c80db2663fd3096865",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\AMDUSDT_15min_current.pkl": "eca7195f6b9560df0b75b132fc4a26d6f54c5c225e01ba3f2093d12a5dd80507",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\AVGOUSDT_15min_current.pkl": "1cd9ac7fd0f959d588014678b4833e7f7569f3e930e9d9470510fd71bd31581f",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\DELLUSDT_15min_current.pkl": "22c262bec0ed12302d02868c3020635e63c66ab892ccb37216e332bb14a325ae",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\MRNAUSDT_15min_current.pkl": "33576d8d0bfd1d1ade84b199bd09d6a8849d66a621a68a83b28c2abe1d1dff35",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\OKTAUSDT_15min_current.pkl": "3f58bdb4cfb8a483c02bcf64213a9524182e852a923bfc5cc8e78404d2d8817e",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\PLTRUSDT_15min_current.pkl": "2c9b85c1fd14e89d82470066f98772f369e7aef07de142d8ea3d9d0b0ddb26a9",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\QCOMUSDT_15min_current.pkl": "532c94352638c04abebd09e8cf4c12cf5ddc73aad825c060548c633abbd5edea",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\WDCUSDT_15min_current.pkl": "4fe84760f1a214833cda56fe231de4c6d9f89babcf8e7c665ccd598415459c4e",
+    "reports\\audit_2026_09_08\\stock_xperp_expansion_oct17\\manifest.json": "15daf83ad812b19847f85c9bdc6a72a5888f8e5efe7743a5db32b465325d344b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct17\\manifest.json": "afd3440a2333591fbc8adad635cb586be16da96f9da4f56f3b2cb23148b28314",
+    "reports\\audit_2026_09_08\\stock_xperp_material_barbell_oct18.csv": "b5bcd82cdf74a8ca9d7ec6bd555d296fa1caa665a956b6d8eeba1dcfc6a5d6dd",
+    "reports\\audit_2026_09_08\\stock_xperp_material_barbell_oct18.json": "0566df00da562ca5bdf04d8544785a30ae1985513b8dc99d3e4b506d412797e5"
+  },
+  "status": "REJECTED_MONTHLY_OBJECTIVE",
+  "values": {
+    "combined_fresh": {
+      "active_days": 8,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 63
+      },
+      "dd_pct": 2.8766,
+      "max_loss_streak": 5,
+      "mean_signed_move_pct": 0.06072,
+      "monthly_return_pct": {
+        "2026-10": 1.1243
+      },
+      "months": 1,
+      "months_ge_30pct": 0,
+      "n": 63,
+      "negative_months": 0,
+      "return_pct": 1.1243,
+      "trades_per_active_day": 7.875,
+      "trades_per_calendar_day": 6.3,
+      "wr": 52.38
+    },
+    "combined_full": {
+      "active_days": 47,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 407
+      },
+      "dd_pct": 3.0809,
+      "max_loss_streak": 5,
+      "mean_signed_move_pct": 0.09235,
+      "monthly_return_pct": {
+        "2026-08": 6.0685,
+        "2026-09": 0.7914,
+        "2026-10": 4.5258
+      },
+      "months": 3,
+      "months_ge_30pct": 0,
+      "n": 407,
+      "negative_months": 0,
+      "return_pct": 11.7463,
+      "trades_per_active_day": 8.66,
+      "trades_per_calendar_day": 5.427,
+      "wr": 55.77
+    },
+    "combined_pre_fresh": {
+      "active_days": 39,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 344
+      },
+      "dd_pct": 3.0809,
+      "max_loss_streak": 5,
+      "mean_signed_move_pct": 0.09814,
+      "monthly_return_pct": {
+        "2026-08": 6.0685,
+        "2026-09": 0.7914,
+        "2026-10": 3.3639
+      },
+      "months": 3,
+      "months_ge_30pct": 0,
+      "n": 344,
+      "negative_months": 0,
+      "return_pct": 10.5042,
+      "trades_per_active_day": 8.821,
+      "trades_per_calendar_day": 5.292,
+      "wr": 56.4
+    },
+    "expansion_fresh": {
+      "active_days": 8,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 47
+      },
+      "dd_pct": 1.6866,
+      "max_loss_streak": 4,
+      "mean_signed_move_pct": 0.10638,
+      "monthly_return_pct": {
+        "2026-10": 1.4978
+      },
+      "months": 1,
+      "months_ge_30pct": 0,
+      "n": 47,
+      "negative_months": 0,
+      "return_pct": 1.4978,
+      "trades_per_active_day": 5.875,
+      "trades_per_calendar_day": 4.7,
+      "wr": 55.32
+    },
+    "expansion_full": {
+      "active_days": 49,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 242
+      },
+      "dd_pct": 8.541,
+      "max_loss_streak": 8,
+      "mean_signed_move_pct": 0.02792,
+      "monthly_return_pct": {
+        "2026-08": 4.349,
+        "2026-09": -3.1316,
+        "2026-10": 0.8288
+      },
+      "months": 3,
+      "months_ge_30pct": 0,
+      "n": 242,
+      "negative_months": 1,
+      "return_pct": 1.919,
+      "trades_per_active_day": 4.939,
+      "trades_per_calendar_day": 3.227,
+      "wr": 53.72
+    },
+    "expansion_pre_fresh": {
+      "active_days": 41,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 195
+      },
+      "dd_pct": 8.1182,
+      "max_loss_streak": 8,
+      "mean_signed_move_pct": 0.00901,
+      "monthly_return_pct": {
+        "2026-08": 4.349,
+        "2026-09": -3.1316,
+        "2026-10": -0.6591
+      },
+      "months": 3,
+      "months_ge_30pct": 0,
+      "n": 195,
+      "negative_months": 2,
+      "return_pct": 0.415,
+      "trades_per_active_day": 4.756,
+      "trades_per_calendar_day": 3.047,
+      "wr": 53.33
+    },
+    "original_full": {
+      "active_days": 53,
+      "by_module_count": {
+        "cash_xperp_material_barbell": 275
+      },
+      "dd_pct": 2.4385,
+      "max_loss_streak": 6,
+      "mean_signed_move_pct": 0.12703,
+      "monthly_return_pct": {
+        "2026-08": 5.1784,
+        "2026-09": 2.432,
+        "2026-10": 2.9289
+      },
+      "months": 3,
+      "months_ge_30pct": 0,
+      "n": 275,
+      "negative_months": 0,
+      "return_pct": 10.8919,
+      "trades_per_active_day": 5.189,
+      "trades_per_calendar_day": 3.667,
+      "wr": 56.73
+    }
+  }
+}
