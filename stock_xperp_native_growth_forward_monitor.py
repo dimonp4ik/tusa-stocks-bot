@@ -21,6 +21,8 @@ from stock_module_cluster_audit import portfolio_gate
 import stock_xperp_native_cross_section_oct18_audit as parent
 import stock_xperp_native_economics_oct18_audit as economics
 import stock_xperp_native_growth_profile_oct18_audit as growth
+import stock_xperp_native_volatility_guard_oct18_audit as volatility
+import stock_xperp_native_quality_guard_oct18_audit as quality
 
 
 def digest(path: Path) -> str:
@@ -164,7 +166,9 @@ def resolve_entries(entries: pd.DataFrame, candles: dict,
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--reference", type=Path, default=growth.ROWS_OUT)
+    parser.add_argument("--reference", type=Path, default=quality.ROWS_OUT)
+    parser.add_argument("--volatility-report", type=Path, default=volatility.OUT)
+    parser.add_argument("--quality-report", type=Path, default=quality.OUT)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     csv_out = args.out.with_suffix(".csv")
@@ -172,16 +176,29 @@ def main() -> None:
         raise FileExistsError("forward output is immutable; choose a new path")
     profile = json.loads(growth.OUT.read_text(encoding="utf-8"))
     parameters = profile["selection"]["selected"]["parameters"]
+    volatility_report = json.loads(
+        args.volatility_report.read_text(encoding="utf-8"))
+    maximum_atr14_fraction = float(
+        volatility_report["selection"]["selected_maximum_atr14_fraction"])
+    quality_report = json.loads(args.quality_report.read_text(encoding="utf-8"))
+    rank_name = str(quality_report["selection"]["selected_ranker"])
+    loss_streak_cap = int(
+        quality_report["selection"]["selected_loss_streak_cap"])
     candles, sources, overlap = load_manifest(args.manifest)
     features = parent.feature_rows(candles, int(parameters["lookback_bars"]))
     entries = parent.select_entries(
         features, float(parameters["z_threshold"]),
         float(parameters["minimum_move_pct"]) / 100)
+    entries = volatility.add_atr14(entries, candles)
+    unfiltered_entries = len(entries)
+    entries = entries[entries.atr14_fraction.le(maximum_atr14_fraction)]
     cutoff = pd.Timestamp(parent.FRESH[1], tz="UTC").timestamp()
     fresh_entries = entries[entries.entry_time.ge(cutoff)]
     fresh_raw = resolve_entries(fresh_entries, candles, parameters)
     reference = pd.read_csv(args.reference).to_dict("records")
-    gated = portfolio_gate(reference + fresh_raw, None)
+    gated = portfolio_gate(
+        reference + fresh_raw, None, rank_key=quality.ranker(rank_name),
+        loss_streak_cap=loss_streak_cap)
     fresh = [row for row in gated if float(row["entry_time"]) >= cutoff]
     resolved = [row for row in fresh if row["outcome"] != "PENDING"]
     pending = [row for row in fresh if row["outcome"] == "PENDING"]
@@ -192,6 +209,10 @@ def main() -> None:
         "orders_possible": False,
         "audit_cutoff": parent.FRESH[1],
         "parameters": parameters,
+        "maximum_atr14_fraction": maximum_atr14_fraction,
+        "ranker": rank_name,
+        "loss_streak_cap": loss_streak_cap,
+        "all_history_unfiltered_signals": unfiltered_entries,
         "fresh_raw_signals": len(fresh_raw),
         "fresh_portfolio_signals": len(fresh),
         "resolved_signals": len(resolved),
@@ -209,12 +230,18 @@ def main() -> None:
         "fresh": fresh,
         "sources": {
             **sources, str(args.reference): digest(args.reference),
+            str(Path(portfolio_gate.__code__.co_filename)):
+                digest(Path(portfolio_gate.__code__.co_filename)),
+            str(args.volatility_report): digest(args.volatility_report),
+            str(args.quality_report): digest(args.quality_report),
             str(growth.OUT): digest(growth.OUT),
             str(Path(__file__)): digest(Path(__file__)),
         },
         "invariant": (
             "frozen universe and parameters; closed 15-minute feature; "
-            "next-bar market entry; stop-first OHLC; same causal portfolio gate"),
+            "closed-bar normalized ATR guard; next-bar market entry; "
+            "stop-first OHLC; frozen simultaneous-signal ranking; causal "
+            "pause after two closed daily stops"),
         "limitations": [
             "This is an immutable public-data shadow snapshot, not account fills.",
             "Pending rows remain unresolved until a later immutable snapshot.",
