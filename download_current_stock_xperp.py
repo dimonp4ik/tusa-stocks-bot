@@ -14,6 +14,18 @@ import requests
 
 
 ENDPOINT = "https://www.okx.com/api/v5/market/history-candles"
+BAR_SECONDS = 15 * 60
+
+
+def snapshot_anchor_ms(now_seconds: float | None = None) -> int:
+    """Return the open time of the currently forming 15-minute candle.
+
+    OKX ``after`` returns candles older than the anchor.  Anchoring at the
+    current interval open therefore includes the same last fully closed bar
+    for every worker, even when the download crosses a candle boundary.
+    """
+    now = time.time() if now_seconds is None else float(now_seconds)
+    return int(now // BAR_SECONDS) * BAR_SECONDS * 1000
 
 
 def get_json(session: requests.Session, url: str, params: dict) -> dict:
@@ -91,7 +103,7 @@ def main() -> None:
     # All symbols must describe the same point-in-time snapshot.  A per-symbol
     # clock could cross a 15-minute close during this sequential download and
     # give later symbols one additional completed bar.
-    request_anchor_ms = int(time.time() * 1000) + 60_000
+    request_anchor_ms = snapshot_anchor_ms()
     report = {"status": "PUBLIC_CURRENT_STOCK_XPERP", "created_at": datetime.now(timezone.utc).isoformat(),
               "bars_requested": args.bars, "request_anchor_ms": request_anchor_ms,
               "symbols": {}}
