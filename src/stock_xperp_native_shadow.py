@@ -29,6 +29,7 @@ MAXIMUM_ATR14_FRACTION = .01
 STOP_FRACTION = .01
 TARGET_FRACTION = .02
 HOLD_BARS = 64
+BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 900
 
 
@@ -59,6 +60,30 @@ def normalized_atr14(candles: dict, index: int) -> float | None:
     atr = sum(values) / len(values)
     value = atr / close[index] if close[index] > 0 else math.nan
     return value if math.isfinite(value) and value >= 0 else None
+
+
+def backing_level(candles: dict, index: int,
+                  direction: str) -> float | None:
+    """Return the prior closed-bar level backing a reversal entry."""
+    if index < BACKING_LEVEL_LOOKBACK_BARS - 1:
+        return None
+    key = "low" if direction == "LONG" else "high"
+    values = _finite_series(candles, key)
+    if values is None or len(values) <= index:
+        return None
+    start = index - BACKING_LEVEL_LOOKBACK_BARS + 1
+    window = values[start:index + 1]
+    level = min(window) if direction == "LONG" else max(window)
+    return level if math.isfinite(level) and level > 0 else None
+
+
+def backing_level_allows_entry(setup: dict, market_price: float) -> bool:
+    """Reject an entry whose market price has crossed its backing level."""
+    price = float(market_price)
+    level = float(setup["backing_level"])
+    if not math.isfinite(price) or price <= 0 or not math.isfinite(level):
+        return False
+    return price >= level if setup["direction"] == "LONG" else price <= level
 
 
 def _latest_rows(candles_by_symbol: dict[str, dict]) -> tuple[int, list[dict]] | None:
@@ -120,6 +145,10 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
                 or atr_fraction > MAXIMUM_ATR14_FRACTION):
             continue
         direction = "SHORT" if move > 0 else "LONG"
+        level = backing_level(
+            row["candles"], row["signal_index"], direction)
+        if level is None:
+            continue
         close = float(row["candles"]["close"][row["signal_index"]])
         output.append({
             "symbol": row["symbol"],
@@ -135,6 +164,8 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "cross_std": deviation,
             "universe_n": len(rows),
             "atr14_fraction": atr_fraction,
+            "backing_level": level,
+            "backing_level_lookback_bars": BACKING_LEVEL_LOOKBACK_BARS,
             "hold_bars": HOLD_BARS,
             "module": "native_xperp_quality_reversal",
             "_quality_rank": -abs(float(z_score)),

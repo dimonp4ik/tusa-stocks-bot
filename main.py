@@ -43,7 +43,7 @@ from src.stock_5m_shadow_router import (
 )
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS as NATIVE_XPERP_SYMBOLS,
-    native_shadow_setups,
+    backing_level_allows_entry, native_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
@@ -964,6 +964,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             shadow_text = (
                 "Нативный X-Perp разворот: 44 инструмента, свечи 15m\n"
                 "Порог: |z| ≥ 2, движение ≥ 0.4%, ATR14 ≤ 1%\n"
+                "Уровень: вход только пока 32-свечная опора не пробита\n"
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% цены, стоп: 1%, максимум 64 свечи\n"
                 f"Пауза: после {NATIVE_XPERP_LOSS_PAUSE_STREAK} закрытых убытков за UTC-день\n"
@@ -3402,6 +3403,8 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
             f"Cross-sectional z {z_score:+.2f}",
             f"Two-bar move {100 * float(setup['signal_return']):+.2f}%",
             f"ATR14 {100 * atr_fraction:.2f}%",
+            (f"Backing level {int(setup['backing_level_lookback_bars'])} bars: "
+             f"{float(setup['backing_level']):.8g}"),
             f"Universe {int(setup['universe_n'])}",
             "Fixed price move target 2.00% / stop 1.00%",
         ],
@@ -3518,6 +3521,9 @@ def _run_native_xperp_shadow_scan() -> None:
             if not setup_id:
                 continue
             analysis["_setup_log_id"] = setup_id
+            if not backing_level_allows_entry(setup, float(market)):
+                mark_setup_blocked(setup_id, "backing_level")
+                continue
             if _venue_signal_on_cooldown(symbol, analysis["direction"], now):
                 mark_setup_blocked(setup_id, "cooldown")
                 continue
