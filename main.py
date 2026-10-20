@@ -31,7 +31,7 @@ from config import (
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS, STOCK_VENUE_FILTER_MODE, STOCK_VENUE_FILTER_PROFILE,
     DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
-    NATIVE_XPERP_LOSS_PAUSE_STREAK,
+    NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_ROLLING_HOUR_CAP,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
@@ -249,6 +249,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         _caps = get_cap_impact_stats(since_ts) or {}
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за 15 мин"),
+                            ("rolling_hour_cap", f"лимит {NATIVE_XPERP_ROLLING_HOUR_CAP} за скользящий час"),
                             ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
@@ -423,6 +424,7 @@ def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
+            f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
             f"Signal cache: {len(_signal_cache)} entries."), 200
 
 
@@ -967,6 +969,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "Уровень: вход только пока 32-свечная опора не пробита\n"
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% цены, стоп: 1%, максимум 64 свечи\n"
+                f"За скользящий час: максимум {NATIVE_XPERP_ROLLING_HOUR_CAP} входа\n"
                 f"Пауза: после {NATIVE_XPERP_LOSS_PAUSE_STREAK} закрытых убытков за UTC-день\n"
             )
         else:
@@ -3422,15 +3425,23 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
     published = 0
     direction_counts = dict(open_direction_counts or {})
     scan_count = 0
+    native_recent_hour_count = 0
     if candidates:
         try:
+            now = time.time()
             scan_bucket = int(time.time() // 900)
+            recent_rows = get_recent_signals(limit=100)
             scan_count = sum(
                 int(float(row.get("opened_at") or 0) // 900) == scan_bucket
-                for row in get_recent_signals(limit=100))
+                for row in recent_rows)
+            native_recent_hour_count = sum(
+                row.get("source") == "stock_xperp_native_shadow"
+                and float(row.get("opened_at") or 0) > now - 3600
+                for row in recent_rows)
         except Exception as exc:
             log.warning("Stock venue persistent scan count unavailable: %s", exc)
             scan_count = VENUE_MAX_SIGNALS_PER_SCAN
+            native_recent_hour_count = NATIVE_XPERP_ROLLING_HOUR_CAP
     source_priority = {
         "stock_xperp_native_shadow": 0,
         "stock_venue_regime": 1,
@@ -3441,6 +3452,11 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         float(item[0].get("_quality_rank", 0.0)),
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
+        native = analysis.get("source") == "stock_xperp_native_shadow"
+        if (native
+                and native_recent_hour_count >= NATIVE_XPERP_ROLLING_HOUR_CAP):
+            mark_setup_blocked(setup_id, "rolling_hour_cap")
+            continue
         if scan_count >= VENUE_MAX_SIGNALS_PER_SCAN:
             # This persistent block prevents the same 15m candle from being
             # offered again by the next five-minute scheduler tick.
@@ -3460,6 +3476,8 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
             link_setup_to_signal(setup_id, signal_id)
         published += 1
         scan_count += 1
+        if native:
+            native_recent_hour_count += 1
         direction_counts[direction] = direction_counts.get(direction, 0) + 1
     return published
 

@@ -61,6 +61,10 @@ NATIVE_XPERP_SHADOW_ENABLED = (
     and os.getenv("NATIVE_XPERP_SHADOW_ENABLED", "1") == "1"
 )
 NATIVE_XPERP_LOSS_PAUSE_STREAK = 2
+# Frozen on July-August, confirmed on September, then checked on the untouched
+# Oct-17+ snapshot.  This limits correlated market bets that arrive on nearby
+# 15-minute bars while preserving the complete-month return objective.
+NATIVE_XPERP_ROLLING_HOUR_CAP = 4
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "30"))  # non-crypto X-Perp pool is ~26 — take all
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
 # Direct X-Perp session modules stay disabled until they collect forward paper

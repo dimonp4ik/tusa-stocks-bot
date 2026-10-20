@@ -1418,7 +1418,8 @@ def get_cap_impact_stats(since_ts: float) -> dict:
     """
     out = {}
     with _conn() as c:
-        for reason in ("dir_cap", "scan_cap", "cooldown", "send_failed"):
+        for reason in ("dir_cap", "scan_cap", "rolling_hour_cap",
+                       "cooldown", "send_failed"):
             rows = c.execute(
                 """SELECT outcome, reached_tp1 FROM setup_log
                    WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
