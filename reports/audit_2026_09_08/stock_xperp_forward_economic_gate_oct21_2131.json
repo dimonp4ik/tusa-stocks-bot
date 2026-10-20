@@ -1,0 +1,74 @@
+{
+  "active_market_days": 4,
+  "actual_return_3pct_margin_pct": 0.0846,
+  "cluster_concentration": {
+    "maximum_entries_rolling_hour": 4,
+    "maximum_entries_same_clock_hour": 4,
+    "maximum_entries_same_timestamp": 2,
+    "top_symbol_counts": {
+      "AAOIUSDT": 2,
+      "AXTIUSDT": 3,
+      "CRWVUSDT": 2,
+      "INTCUSDT": 2,
+      "LITEUSDT": 2,
+      "NBISUSDT": 1,
+      "SKHYUSDT": 3,
+      "SOXLUSDT": 2,
+      "SOXSUSDT": 2,
+      "TSLAUSDT": 2
+    }
+  },
+  "daily": {
+    "2026-10-17": {
+      "dd_pct": 0.9039,
+      "n": 9,
+      "return_pct": 0.2676,
+      "win_rate_pct": 44.4444
+    },
+    "2026-10-18": {
+      "dd_pct": 0.6,
+      "n": 9,
+      "return_pct": 0.0646,
+      "win_rate_pct": 44.4444
+    },
+    "2026-10-19": {
+      "dd_pct": 0.9011,
+      "n": 9,
+      "return_pct": 0.0542,
+      "win_rate_pct": 33.3333
+    },
+    "2026-10-20": {
+      "dd_pct": 0.901,
+      "n": 4,
+      "return_pct": -0.301,
+      "win_rate_pct": 25.0
+    }
+  },
+  "drawdown_pct": 1.1439,
+  "limitations": [
+    "Only four fresh market days are observed.",
+    "Projection is a constant-expectancy diagnostic, not a forecast.",
+    "This is public candle replay, not account fills.",
+    "Gross returns exclude fees at user request."
+  ],
+  "literal_tp_rate_pct": 16.129,
+  "max_loss_streak": 4,
+  "mean_signed_price_return_pct": 0.009234,
+  "negative_market_days": 1,
+  "negative_months": 0,
+  "objective_pass": false,
+  "orders_possible": false,
+  "profitable_exit_rate_pct": 38.7097,
+  "projected_22_market_day_pct": 0.473446,
+  "ready_for_live_orders": false,
+  "required_constant_signed_return_pct_at_3_per_day": 1.327709,
+  "required_constant_signed_return_pct_at_actual_frequency": 0.513326,
+  "resolved_observations": 31,
+  "source_snapshot": "reports\\audit_2026_09_08\\stock_xperp_backing_hour_cap_forward_oct21_2131.json",
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_forward_economic_gate_oct21.py": "9304dad424ceb4e36942052b47337d0b97e217e000ac7cd6da4e9e67529a9ccd",
+    "reports\\audit_2026_09_08\\stock_xperp_backing_hour_cap_forward_oct21_2131.json": "838e442c80982a7e4507a97582339f7e64432dfd85f353886018a41b94c638c4"
+  },
+  "status": "FORWARD_ECONOMIC_GATE_FAIL",
+  "trades_per_market_day": 7.75
+}
