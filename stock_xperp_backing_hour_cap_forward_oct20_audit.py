@@ -1,8 +1,10 @@
 """Untouched Oct-17+ replay of the frozen stock rolling-hour cap."""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -30,6 +32,13 @@ def digest(path: Path) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--out", type=Path, default=OUT)
+    args = parser.parse_args()
+    csv_out = args.out.with_suffix(".csv")
+    if args.out != OUT and (args.out.exists() or csv_out.exists()):
+        raise FileExistsError("forward output is immutable; choose a new path")
     profile = json.loads(growth.OUT.read_text(encoding="utf-8"))
     parameters = profile["selection"]["selected"]["parameters"]
     volatility_report = json.loads(volatility.OUT.read_text(encoding="utf-8"))
@@ -41,7 +50,7 @@ def main() -> None:
     cap_report = json.loads(hour_cap.OUT.read_text(encoding="utf-8"))
     rolling_cap = int(cap_report["selected_rolling_hour_cap"])
 
-    candles, sources, overlap = monitor.load_manifest(MANIFEST)
+    candles, sources, overlap = monitor.load_manifest(args.manifest)
     features = parent.feature_rows(candles, int(parameters["lookback_bars"]))
     entries = parent.select_entries(
         features, float(parameters["z_threshold"]),
@@ -62,6 +71,7 @@ def main() -> None:
     pending = [row for row in fresh if row["outcome"] == "PENDING"]
     result = {
         "status": "ROLLING_HOUR_CAP_FORWARD_SNAPSHOT",
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "ready_for_live_orders": False,
         "orders_possible": False,
         "audit_cutoff": parent.FRESH[1],
@@ -98,8 +108,8 @@ def main() -> None:
             "Gross returns exclude fees at user request.",
         ],
     }
-    OUT.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
-    pd.DataFrame(fresh).to_csv(ROWS_OUT, index=False)
+    args.out.write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
+    pd.DataFrame(fresh).to_csv(csv_out, index=False)
     print(json.dumps({key: result[key] for key in (
         "status", "rolling_hour_cap", "fresh_guarded_raw_signals",
         "fresh_portfolio_signals", "resolved_signals", "pending_signals",
