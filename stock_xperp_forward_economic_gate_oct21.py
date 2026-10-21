@@ -91,7 +91,7 @@ def main() -> None:
         "sources": {str(args.input): digest(args.input),
                     str(Path(__file__).resolve()): digest(Path(__file__).resolve())},
         "limitations": [
-            "Only four fresh market days are observed.",
+            f"Only {days} fresh market days are observed.",
             "Projection is a constant-expectancy diagnostic, not a forecast.",
             "This is public candle replay, not account fills.",
             "Gross returns exclude fees at user request.",
