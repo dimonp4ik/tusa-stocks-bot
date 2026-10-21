@@ -1,0 +1,110 @@
+{
+  "by_family": {
+    "range_reversion": {
+      "rows": 67,
+      "stop_rate_pct": 23.8806,
+      "stops": 16
+    },
+    "trend_pullback": {
+      "rows": 94,
+      "stop_rate_pct": 12.766,
+      "stops": 12
+    }
+  },
+  "causal_stop_rate_lifts": {
+    "failed_breakout": {
+      "present": 0,
+      "stop_rate_lift": 0.0,
+      "stop_rate_pct": 0.0,
+      "stops": 0
+    },
+    "late_session": {
+      "present": 80,
+      "stop_rate_lift": 1.0781,
+      "stop_rate_pct": 18.75,
+      "stops": 15
+    },
+    "opposing_level_288_before_target": {
+      "present": 0,
+      "stop_rate_lift": 0.0,
+      "stop_rate_pct": 0.0,
+      "stops": 0
+    },
+    "opposing_level_72_before_target": {
+      "present": 0,
+      "stop_rate_lift": 0.0,
+      "stop_rate_pct": 0.0,
+      "stops": 0
+    },
+    "opposing_order_block_proxy": {
+      "present": 84,
+      "stop_rate_lift": 0.753,
+      "stop_rate_pct": 13.0952,
+      "stops": 11
+    },
+    "qqq_adverse": {
+      "present": 87,
+      "stop_rate_lift": 0.9914,
+      "stop_rate_pct": 17.2414,
+      "stops": 15
+    }
+  },
+  "decision": "Do not fit a production rule from 28 stops. Continue shadow collection; predeclare any later confirmation rule from these causal diagnostics.",
+  "limitations": [
+    "Only 28 stops exist in the frozen direct X-Perp sample.",
+    "Post-stop paths are diagnostic and were not available at entry.",
+    "No live-order or deployment decision can be supported by this sample."
+  ],
+  "orders_possible": false,
+  "post_stop_path": {
+    "hard_reversal_proxy": {
+      "count": 21,
+      "pct_of_stops": 75.0
+    },
+    "later_target_double_horizon": {
+      "count": 14,
+      "pct_of_stops": 50.0
+    },
+    "later_target_same_session": {
+      "count": 12,
+      "pct_of_stops": 42.8571
+    },
+    "stop_closed_back_inside": {
+      "count": 5,
+      "pct_of_stops": 17.8571
+    }
+  },
+  "protocol": {
+    "causality": "all structural fields use bars closed before entry",
+    "entry": "next five-minute market open",
+    "money": "client-selected margin; baseline 3%, fixed 10x",
+    "no_filter_fitted": true,
+    "orders": "market only",
+    "source": "exact frozen stock 5m selected rows"
+  },
+  "ready_for_live_orders": false,
+  "sample": {
+    "end": "2026-10-01T17:45:00+00:00",
+    "families": {
+      "range_reversion": 67,
+      "trend_pullback": 94
+    },
+    "rows": 161,
+    "start": "2026-08-03T13:35:00+00:00",
+    "stops": 28
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_barbell_runner_oct3_audit.py": "b4e411dde2e9a40a4659d344003db6ac6c301b2c86bda41023f4067a61829d80",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_stop_path_attribution_oct22_audit.py": "924b595538aa76c49f4a57c83e132da94f7a8b4896736ddcaf19571cc2ef3a19",
+    "reports\\audit_2026_09_08\\stock_5m_regime_filter_oct3_rows.csv": "1153d66d0670c2901ea4b451fbb7c4612e04304c707b927414a740677b197e48",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AAPLUSDT_5min_current.pkl": "e11722ed5475cc18c1bfb37d1f39354ad943235f0186dde04f03738817d3f911",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AMZNUSDT_5min_current.pkl": "bc55888b20cc3c10d635126a0efa0acc6aefcc38606e223ee16c6a184e1c949e",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\METAUSDT_5min_current.pkl": "786895fc9cba0bafb1d9f0f4e3be758d5385d3ade69f559fea29d669731ff4e2",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MRVLUSDT_5min_current.pkl": "123b6b09f1601594e2faea57c062d89076d3f4230859e0a2a65488c48803ac7a",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MSFTUSDT_5min_current.pkl": "2c7370adba9b5dee5f8c64448eff253453337159eb5f75ff9d44c60e4f037238",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MUUSDT_5min_current.pkl": "52f4b05bb444a30f163b07bda0cfcf38a2fe8b59f3e715001f704fc68467f4ce",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\NVDAUSDT_5min_current.pkl": "3c10b1d854f848a84c5319a97aa9376a8264f9829979ced2cad103f77ffcf313",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\QQQUSDT_5min_current.pkl": "a23c2a3839f52a93636dd3d6c4da1b0a5ab40fbefe7a147c484e43736980950c"
+  },
+  "status": "DIAGNOSTIC_ONLY_INSUFFICIENT_SAMPLE"
+}
