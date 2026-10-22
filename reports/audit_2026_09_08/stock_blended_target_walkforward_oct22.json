@@ -1,0 +1,59 @@
+{
+  "status": "REJECTED",
+  "protocol": {
+    "configuration_selection_years": [
+      2022,
+      2023
+    ],
+    "acceptance_year": 2024,
+    "hidden_reveal_years": [
+      2025,
+      2026
+    ],
+    "annual_fold": "train through year-2; validate on year-1; trade test year",
+    "target_choices_r": [
+      0.25,
+      0.5,
+      0.75,
+      1.0,
+      1.5,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "route": [
+      "family",
+      "direction",
+      "qqq_regime",
+      "session_bucket"
+    ],
+    "entry": "next 15-minute market open in source replay",
+    "portfolio_gate": "cap2 per scan, 3h symbol-direction cooldown, max4 same direction, pause after 3 losses",
+    "sizing": "client-selected 3% current-equity margin, 10x leverage"
+  },
+  "tested_configurations": 576,
+  "development_qualified": 0,
+  "chosen": null,
+  "development": [],
+  "acceptance_2024": null,
+  "hidden_2025_2026": [],
+  "objective_checks": {
+    "acceptance_pass": false,
+    "hidden_years_pass": false,
+    "each_hidden_year_wr_75_to_95": false,
+    "each_hidden_year_at_least_3_trades_per_day": false,
+    "every_hidden_month_positive": false,
+    "every_hidden_month_ge_30pct": false
+  },
+  "top_development": [],
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_session_family_market_context_2017_2026.csv": "52dbc6e5fdaa299d1897d58540965cb5cbf98fcfdfeb65f33eee3453bcd6b211",
+    "reports\\audit_2026_09_08\\stock_session_family_market_context_high_targets_2017_2026.csv": "61c8ebfb33b407fde7648c63381883cf2d0f900bbc4a31c4f5544b501a92876e"
+  },
+  "limitations": [
+    "Cash-equity candles are structural transfer evidence for stock perpetuals.",
+    "The target and route configuration is selected from a finite grid and requires direct X-Perp forward confirmation.",
+    "Gross outcomes exclude fees at the user's request.",
+    "Historical results cannot guarantee future profit or eliminate losing months."
+  ]
+}
