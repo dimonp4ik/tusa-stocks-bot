@@ -25,6 +25,7 @@ FROZEN_REPORT = ROOT / "stock_liquidity_sweep_macro_rolling_oct22.json"
 INDEX_DIR = ROOT / "stock_index_forward_oct22"
 EXECUTION_DIR = ROOT / "stock_xperp_forward_oct22"
 OUT = ROOT / "stock_liquidity_sweep_cross_venue_oct24.json"
+ROWS_OUT = ROOT / "stock_liquidity_sweep_cross_venue_oct24.pkl"
 REQUIRED_MEAN_PRICE_RETURN_PCT = 1.327709
 
 
@@ -133,6 +134,7 @@ def main() -> None:
         float(spec["stop_pct"]), int(spec["hold_sessions"]))
     direct["quality"] = model.predict_proba(macro.matrix(direct))[:, 1]
     accepted = selected_rows(direct, threshold)
+    accepted.to_pickle(ROWS_OUT)
     market_days = signal_features.session_date.nunique()
     result = economic_summary(accepted, market_days)
 

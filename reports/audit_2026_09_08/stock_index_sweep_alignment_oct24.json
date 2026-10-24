@@ -1,0 +1,466 @@
+{
+  "baseline": {
+    "2026-08": {
+      "dd_pct": 1.4931,
+      "max_loss_streak": 4,
+      "mean_signed_price_return_pct": 0.33118,
+      "n": 64,
+      "negative_months": 0,
+      "return_pct": 6.5151,
+      "trades_per_market_day": 3.048,
+      "wr": 59.38
+    },
+    "2026-09": {
+      "dd_pct": 9.0497,
+      "max_loss_streak": 10,
+      "mean_signed_price_return_pct": -0.276689,
+      "n": 79,
+      "negative_months": 2,
+      "return_pct": -6.3963,
+      "trades_per_market_day": 3.591,
+      "wr": 41.77
+    },
+    "2026-10": {
+      "dd_pct": 2.5738,
+      "max_loss_streak": 5,
+      "mean_signed_price_return_pct": 0.096332,
+      "n": 57,
+      "negative_months": 0,
+      "return_pct": 1.6044,
+      "trades_per_market_day": 3.8,
+      "wr": 57.89
+    }
+  },
+  "chronological_tests": {
+    "2026-09": {
+      "clustered_15m_opens": 8,
+      "dd_pct": 7.5904,
+      "economic_30pct_gate": false,
+      "literal_tp_rate_pct": 42.029,
+      "max_entries_same_15m_open": 2,
+      "max_loss_streak": 6,
+      "mean_signed_move_pct": -0.24022,
+      "mean_signed_price_return_pct": -0.240225,
+      "monthly_return_pct": {
+        "2026-09": -4.8786,
+        "2026-10": -0.0165
+      },
+      "months": 2,
+      "months_ge_30pct": 0,
+      "n": 69,
+      "negative_months": 2,
+      "projected_22_market_day_pct_at_3_trades_day": -4.6467,
+      "projected_22_market_day_pct_at_observed_frequency": -4.8522,
+      "required_mean_price_return_pct_at_3_trades_day": 1.327709,
+      "return_pct": -4.8943,
+      "trades_per_market_day": 3.136,
+      "wr": 43.48
+    },
+    "2026-10": {
+      "clustered_15m_opens": 8,
+      "dd_pct": 1.7899,
+      "economic_30pct_gate": false,
+      "literal_tp_rate_pct": 50.0,
+      "max_entries_same_15m_open": 2,
+      "max_loss_streak": 5,
+      "mean_signed_move_pct": 0.12893,
+      "mean_signed_price_return_pct": 0.128926,
+      "monthly_return_pct": {
+        "2026-10": 1.9165
+      },
+      "months": 1,
+      "months_ge_30pct": 0,
+      "n": 50,
+      "negative_months": 0,
+      "projected_22_market_day_pct_at_3_trades_day": 2.5851,
+      "projected_22_market_day_pct_at_observed_frequency": 2.8761,
+      "required_mean_price_return_pct_at_3_trades_day": 1.327709,
+      "return_pct": 1.9165,
+      "trades_per_market_day": 3.333,
+      "wr": 56.0
+    }
+  },
+  "development_frontier": [
+    {
+      "development": {
+        "dd_pct": 1.1957,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.460056,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 8.1277,
+        "trades_per_market_day": 2.714,
+        "wr": 64.91
+      },
+      "feature": "qqq_trend_dir_atr",
+      "quantile": 0.1,
+      "score": 7.828775,
+      "side": "gte",
+      "threshold": -6.030200648155178
+    },
+    {
+      "development": {
+        "dd_pct": 0.8948,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.425128,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 7.4877,
+        "trades_per_market_day": 2.714,
+        "wr": 63.16
+      },
+      "feature": "daily_ret20_dir",
+      "quantile": 0.1,
+      "score": 7.264,
+      "side": "gte",
+      "threshold": -0.13205113543681923
+    },
+    {
+      "development": {
+        "dd_pct": 0.8927,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.424094,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 7.4668,
+        "trades_per_market_day": 2.714,
+        "wr": 63.16
+      },
+      "feature": "trend_dir_atr",
+      "quantile": 0.1,
+      "score": 7.243625,
+      "side": "gte",
+      "threshold": -7.298700151514183
+    },
+    {
+      "development": {
+        "dd_pct": 1.1957,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.424968,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 7.4857,
+        "trades_per_market_day": 2.714,
+        "wr": 63.16
+      },
+      "feature": "qqq_intraday_dir",
+      "quantile": 0.1,
+      "score": 7.186775,
+      "side": "gte",
+      "threshold": -0.0053098389559833705
+    },
+    {
+      "development": {
+        "dd_pct": 0.8927,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.404325,
+        "n": 58,
+        "negative_months": 0,
+        "return_pct": 7.2387,
+        "trades_per_market_day": 2.762,
+        "wr": 63.79
+      },
+      "feature": "qqq_daily_ret20_dir",
+      "quantile": 0.1,
+      "score": 7.015525,
+      "side": "gte",
+      "threshold": -0.042309097552064356
+    },
+    {
+      "development": {
+        "dd_pct": 1.1957,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.389395,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.8342,
+        "trades_per_market_day": 2.714,
+        "wr": 61.4
+      },
+      "feature": "intraday_dir",
+      "quantile": 0.1,
+      "score": 6.535275,
+      "side": "gte",
+      "threshold": -0.015202791738678455
+    },
+    {
+      "development": {
+        "dd_pct": 1.494,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.389007,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.8269,
+        "trades_per_market_day": 2.714,
+        "wr": 61.4
+      },
+      "feature": "qqq_ret20_dir_atr",
+      "quantile": 0.1,
+      "score": 6.4534,
+      "side": "gte",
+      "threshold": -4.860605088502475
+    },
+    {
+      "development": {
+        "dd_pct": 0.8927,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.351758,
+        "n": 58,
+        "negative_months": 0,
+        "return_pct": 6.265,
+        "trades_per_market_day": 2.762,
+        "wr": 60.34
+      },
+      "feature": "qqq_gap_dir",
+      "quantile": 0.9,
+      "score": 6.041825,
+      "side": "lte",
+      "threshold": 0.008239710907071096
+    },
+    {
+      "development": {
+        "dd_pct": 0.8982,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.354468,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.2017,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "sweep_depth_atr",
+      "quantile": 0.9,
+      "score": 5.97715,
+      "side": "lte",
+      "threshold": 1.0380550944179459
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.344008,
+        "n": 60,
+        "negative_months": 0,
+        "return_pct": 6.3449,
+        "trades_per_market_day": 2.857,
+        "wr": 60.0
+      },
+      "feature": "qqq_daily_ret5_dir",
+      "quantile": 0.1,
+      "score": 5.971625,
+      "side": "gte",
+      "threshold": -0.032154208680403196
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.361411,
+        "n": 57,
+        "negative_months": 1,
+        "return_pct": 6.3287,
+        "trades_per_market_day": 2.714,
+        "wr": 61.4
+      },
+      "feature": "ret20_dir_atr",
+      "quantile": 0.9,
+      "score": 5.955425,
+      "side": "lte",
+      "threshold": 4.281733076581259
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.361268,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.3223,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "volume_ratio",
+      "quantile": 0.1,
+      "score": 5.949025,
+      "side": "gte",
+      "threshold": 0.028568047337278118
+    },
+    {
+      "development": {
+        "dd_pct": 1.1976,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.38988,
+        "n": 53,
+        "negative_months": 0,
+        "return_pct": 6.2067,
+        "trades_per_market_day": 2.524,
+        "wr": 60.38
+      },
+      "feature": "daily_ret5_dir",
+      "quantile": 0.1,
+      "score": 5.9073,
+      "side": "gte",
+      "threshold": -0.08205742767109864
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.346701,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.06,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "qqq_intraday_dir",
+      "quantile": 0.9,
+      "score": 5.686725,
+      "side": "lte",
+      "threshold": 0.006491531282405772
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.345055,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 6.0338,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "qqq_gap_dir",
+      "quantile": 0.1,
+      "score": 5.660525,
+      "side": "gte",
+      "threshold": -0.007482059820515507
+    },
+    {
+      "development": {
+        "dd_pct": 1.193,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.340385,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 5.9433,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "qqq_trend_dir_atr",
+      "quantile": 0.9,
+      "score": 5.64505,
+      "side": "lte",
+      "threshold": 7.2067364321289356
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.342736,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 5.9943,
+        "trades_per_market_day": 2.714,
+        "wr": 59.65
+      },
+      "feature": "daily_ret5_dir",
+      "quantile": 0.9,
+      "score": 5.621025,
+      "side": "lte",
+      "threshold": 0.06538683674181486
+    },
+    {
+      "development": {
+        "dd_pct": 1.4931,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.342697,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 5.9807,
+        "trades_per_market_day": 2.714,
+        "wr": 57.89
+      },
+      "feature": "body_dir_atr",
+      "quantile": 0.1,
+      "score": 5.607425,
+      "side": "gte",
+      "threshold": -0.40944386738161476
+    },
+    {
+      "development": {
+        "dd_pct": 1.1957,
+        "max_loss_streak": 3,
+        "mean_signed_price_return_pct": 0.317118,
+        "n": 58,
+        "negative_months": 0,
+        "return_pct": 5.6285,
+        "trades_per_market_day": 2.762,
+        "wr": 58.62
+      },
+      "feature": "qqq_ret20_dir_atr",
+      "quantile": 0.9,
+      "score": 5.329575,
+      "side": "lte",
+      "threshold": 6.271531100478243
+    },
+    {
+      "development": {
+        "dd_pct": 1.1973,
+        "max_loss_streak": 4,
+        "mean_signed_price_return_pct": 0.31922,
+        "n": 57,
+        "negative_months": 0,
+        "return_pct": 5.5658,
+        "trades_per_market_day": 2.714,
+        "wr": 57.89
+      },
+      "feature": "ret20_dir_atr",
+      "quantile": 0.1,
+      "score": 5.266475,
+      "side": "gte",
+      "threshold": -4.302416145769539
+    }
+  ],
+  "limitations": [
+    "The direct cross-venue sample starts at the end of July.",
+    "Filtering already accepted rows is conservative about fallback entries.",
+    "Gross results exclude fees at user request."
+  ],
+  "objective_pass": false,
+  "order_eligible": false,
+  "protocol": {
+    "development": "August 2026 only",
+    "filter_shape": "one entry-time feature and one threshold",
+    "test_months_used_for_selection": false,
+    "tested_configurations": 32,
+    "tests": [
+      "September 2026",
+      "October 2026 through Oct 22"
+    ]
+  },
+  "ready_for_live_orders": false,
+  "selected_on_august": {
+    "development": {
+      "dd_pct": 1.1957,
+      "max_loss_streak": 3,
+      "mean_signed_price_return_pct": 0.460056,
+      "n": 57,
+      "negative_months": 0,
+      "return_pct": 8.1277,
+      "trades_per_market_day": 2.714,
+      "wr": 64.91
+    },
+    "feature": "qqq_trend_dir_atr",
+    "quantile": 0.1,
+    "score": 7.828775,
+    "side": "gte",
+    "threshold": -6.030200648155178
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_index_sweep_alignment_oct24_audit.py": "2fb4569c56f477df8b0557f6620cf090ad42d521258b61e81ea670affb35e384",
+    "reports\\audit_2026_09_08\\stock_liquidity_sweep_cross_venue_oct24.json": "1a2573959b9eaa85b136d491849810086cc6362eabfcb7fadd32fa81d90f072f",
+    "reports\\audit_2026_09_08\\stock_liquidity_sweep_cross_venue_oct24.pkl": "969c2bb160ef5ac8a90368446fdee7cea2759269fc196c112aa6f29f75dba9ab"
+  },
+  "status": "REJECTED"
+}
