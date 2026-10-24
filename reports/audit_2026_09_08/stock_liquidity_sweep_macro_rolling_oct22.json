@@ -1,0 +1,4793 @@
+{
+  "status": "REJECTED",
+  "protocol": {
+    "setup": "causal confirmed-swing liquidity sweep with prior-day and intraday macro context",
+    "configuration_selection_folds": [
+      2022,
+      2023
+    ],
+    "acceptance_year": 2024,
+    "hidden_years": [
+      2025,
+      2026
+    ],
+    "annual_adaptation": "fit through year-2 and select threshold on year-1",
+    "features": [
+      "sweep_depth_atr",
+      "rejection_atr",
+      "body_dir_atr",
+      "trend_dir_atr",
+      "ret20_dir_atr",
+      "qqq_trend_dir_atr",
+      "qqq_ret20_dir_atr",
+      "volume_ratio",
+      "level_age",
+      "signal_minutes",
+      "daily_ret5_dir",
+      "daily_ret20_dir",
+      "daily_vol20",
+      "gap_dir",
+      "intraday_dir",
+      "qqq_daily_ret5_dir",
+      "qqq_daily_ret20_dir",
+      "qqq_daily_vol20",
+      "qqq_gap_dir",
+      "qqq_intraday_dir"
+    ],
+    "entry": "next 15-minute market open",
+    "orders": "market only",
+    "money": "3% current-equity margin, fixed 10x gross"
+  },
+  "rows": {
+    "history": 37384,
+    "direct": 281
+  },
+  "tested_configurations": 36,
+  "development_qualified": 6,
+  "acceptance_qualified": 2,
+  "frozen_before_hidden": {
+    "spec": {
+      "target_pct": 1.0,
+      "stop_pct": 1.0,
+      "hold_sessions": 2,
+      "model": {
+        "leaves": 15,
+        "leaf": 240,
+        "l2": 5.0
+      }
+    },
+    "score": 10.6772,
+    "development": [
+      {
+        "year": 2022,
+        "train_years": [
+          2017,
+          2018,
+          2019,
+          2020
+        ],
+        "validation_year": 2021,
+        "threshold_selection_pass": true,
+        "chosen_quantile": 0.8,
+        "threshold": 0.556873098241794,
+        "validation": {
+          "n": 369,
+          "wr": 54.47,
+          "return_pct": 10.0331,
+          "dd_pct": 4.4045,
+          "negative_months": 4,
+          "months": 13,
+          "monthly_return_pct": {
+            "2021-01": -3.0274,
+            "2021-02": 2.4593,
+            "2021-03": 0.9867,
+            "2021-04": 0.5817,
+            "2021-05": 0.4752,
+            "2021-06": 1.6301,
+            "2021-07": 3.868,
+            "2021-08": -0.0152,
+            "2021-09": 3.9727,
+            "2021-10": -0.936,
+            "2021-11": -2.027,
+            "2021-12": 1.2769,
+            "2022-01": 0.5981
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 11,
+          "trades_per_market_day": 1.47,
+          "mean_signed_move_pct": 0.08918
+        },
+        "test": {
+          "n": 526,
+          "wr": 50.95,
+          "return_pct": 8.3305,
+          "dd_pct": 6.1489,
+          "negative_months": 6,
+          "months": 13,
+          "monthly_return_pct": {
+            "2022-01": -1.8617,
+            "2022-02": 6.1845,
+            "2022-03": 0.7742,
+            "2022-04": -2.0033,
+            "2022-05": 0.5394,
+            "2022-06": -0.9186,
+            "2022-07": 3.177,
+            "2022-08": 4.8986,
+            "2022-09": -2.4031,
+            "2022-10": -0.2054,
+            "2022-11": 0.8491,
+            "2022-12": 0.2531,
+            "2023-01": -0.849
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 10,
+          "trades_per_market_day": 2.104,
+          "mean_signed_move_pct": 0.05474
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.8,
+            "threshold": 0.556873098241794,
+            "eligible": true,
+            "score": 1.9710499999999993,
+            "validation": {
+              "n": 369,
+              "wr": 54.47,
+              "return_pct": 10.0331,
+              "dd_pct": 4.4045,
+              "negative_months": 4,
+              "months": 13,
+              "monthly_return_pct": {
+                "2021-01": -3.0274,
+                "2021-02": 2.4593,
+                "2021-03": 0.9867,
+                "2021-04": 0.5817,
+                "2021-05": 0.4752,
+                "2021-06": 1.6301,
+                "2021-07": 3.868,
+                "2021-08": -0.0152,
+                "2021-09": 3.9727,
+                "2021-10": -0.936,
+                "2021-11": -2.027,
+                "2021-12": 1.2769,
+                "2022-01": 0.5981
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.47,
+              "mean_signed_move_pct": 0.08918
+            }
+          },
+          {
+            "quantile": 0.7,
+            "threshold": 0.526557821326201,
+            "eligible": true,
+            "score": -0.18995000000000062,
+            "validation": {
+              "n": 484,
+              "wr": 53.31,
+              "return_pct": 11.371,
+              "dd_pct": 6.0627,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2021-01": -0.8128,
+                "2021-02": 5.9555,
+                "2021-03": 3.1136,
+                "2021-04": 1.7487,
+                "2021-05": -0.3002,
+                "2021-06": 1.4538,
+                "2021-07": 1.0227,
+                "2021-08": -0.1961,
+                "2021-09": 3.8647,
+                "2021-10": -1.2171,
+                "2021-11": -0.5485,
+                "2021-12": -3.5202,
+                "2022-01": 0.6055
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.928,
+              "mean_signed_move_pct": 0.07667
+            }
+          },
+          {
+            "quantile": 0.85,
+            "threshold": 0.5774806942850734,
+            "eligible": false,
+            "score": -12.0929,
+            "validation": {
+              "n": 290,
+              "wr": 51.03,
+              "return_pct": -1.2318,
+              "dd_pct": 6.2476,
+              "negative_months": 4,
+              "months": 13,
+              "monthly_return_pct": {
+                "2021-01": -2.7383,
+                "2021-02": 1.8628,
+                "2021-03": 0.0516,
+                "2021-04": -0.9879,
+                "2021-05": 0.2753,
+                "2021-06": 0.4262,
+                "2021-07": 2.004,
+                "2021-08": 0.4037,
+                "2021-09": 1.901,
+                "2021-10": -3.1555,
+                "2021-11": -2.3173,
+                "2021-12": 0.6187,
+                "2022-01": 0.5981
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.155,
+              "mean_signed_move_pct": -0.01151
+            }
+          },
+          {
+            "quantile": 0.9,
+            "threshold": 0.5978114866697903,
+            "eligible": false,
+            "score": -13.49735,
+            "validation": {
+              "n": 212,
+              "wr": 50.47,
+              "return_pct": -1.8435,
+              "dd_pct": 6.1057,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2021-01": -1.7237,
+                "2021-02": 0.7781,
+                "2021-03": -0.546,
+                "2021-04": -0.1912,
+                "2021-05": 1.1891,
+                "2021-06": -0.8074,
+                "2021-07": 2.1163,
+                "2021-08": 0.2964,
+                "2021-09": 0.9914,
+                "2021-10": -2.2369,
+                "2021-11": -3.1966,
+                "2021-12": 1.3138,
+                "2022-01": 0.3
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 9,
+              "trades_per_market_day": 0.845,
+              "mean_signed_move_pct": -0.02627
+            }
+          }
+        ]
+      },
+      {
+        "year": 2023,
+        "train_years": [
+          2017,
+          2018,
+          2019,
+          2020,
+          2021
+        ],
+        "validation_year": 2022,
+        "threshold_selection_pass": true,
+        "chosen_quantile": 0.9,
+        "threshold": 0.6057083731108391,
+        "validation": {
+          "n": 268,
+          "wr": 50.37,
+          "return_pct": 6.0026,
+          "dd_pct": 4.4722,
+          "negative_months": 7,
+          "months": 12,
+          "monthly_return_pct": {
+            "2022-01": -3.26,
+            "2022-02": 9.4232,
+            "2022-03": -0.0135,
+            "2022-04": 0.154,
+            "2022-05": 2.8255,
+            "2022-06": -0.5705,
+            "2022-07": 1.2222,
+            "2022-08": -0.7004,
+            "2022-09": -0.8492,
+            "2022-10": 0.7334,
+            "2022-11": -1.7999,
+            "2022-12": -0.7867
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 11,
+          "trades_per_market_day": 1.072,
+          "mean_signed_move_pct": 0.07992
+        },
+        "test": {
+          "n": 239,
+          "wr": 52.3,
+          "return_pct": 4.5408,
+          "dd_pct": 5.1268,
+          "negative_months": 6,
+          "months": 12,
+          "monthly_return_pct": {
+            "2023-01": -2.1346,
+            "2023-02": 1.4192,
+            "2023-03": 0.6667,
+            "2023-04": 2.75,
+            "2023-05": 3.5782,
+            "2023-06": -2.0414,
+            "2023-07": -2.2948,
+            "2023-08": 2.9018,
+            "2023-09": -0.1417,
+            "2023-10": 1.1953,
+            "2023-11": -1.2094,
+            "2023-12": -0.0099
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 6,
+          "trades_per_market_day": 0.964,
+          "mean_signed_move_pct": 0.0646
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.9,
+            "threshold": 0.6057083731108391,
+            "eligible": true,
+            "score": -3.701999999999999,
+            "validation": {
+              "n": 268,
+              "wr": 50.37,
+              "return_pct": 6.0026,
+              "dd_pct": 4.4722,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2022-01": -3.26,
+                "2022-02": 9.4232,
+                "2022-03": -0.0135,
+                "2022-04": 0.154,
+                "2022-05": 2.8255,
+                "2022-06": -0.5705,
+                "2022-07": 1.2222,
+                "2022-08": -0.7004,
+                "2022-09": -0.8492,
+                "2022-10": 0.7334,
+                "2022-11": -1.7999,
+                "2022-12": -0.7867
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.072,
+              "mean_signed_move_pct": 0.07992
+            }
+          },
+          {
+            "quantile": 0.8,
+            "threshold": 0.5648399582838762,
+            "eligible": true,
+            "score": -7.5386,
+            "validation": {
+              "n": 469,
+              "wr": 50.11,
+              "return_pct": 7.7901,
+              "dd_pct": 8.5532,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2022-01": -1.608,
+                "2022-02": 9.402,
+                "2022-03": 0.395,
+                "2022-04": -1.0464,
+                "2022-05": 2.0374,
+                "2022-06": -0.594,
+                "2022-07": 3.948,
+                "2022-08": 3.6971,
+                "2022-09": -3.2465,
+                "2022-10": 0.2119,
+                "2022-11": -5.1128,
+                "2022-12": 0.862,
+                "2023-01": -0.6486
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.876,
+              "mean_signed_move_pct": 0.05916
+            }
+          },
+          {
+            "quantile": 0.85,
+            "threshold": 0.5837828161068278,
+            "eligible": false,
+            "score": -18.2825,
+            "validation": {
+              "n": 371,
+              "wr": 48.79,
+              "return_pct": -0.402,
+              "dd_pct": 9.2456,
+              "negative_months": 9,
+              "months": 13,
+              "monthly_return_pct": {
+                "2022-01": -3.263,
+                "2022-02": 10.3965,
+                "2022-03": 0.7658,
+                "2022-04": -1.0594,
+                "2022-05": 2.6293,
+                "2022-06": -2.9282,
+                "2022-07": 1.5781,
+                "2022-08": -0.4956,
+                "2022-09": -1.1991,
+                "2022-10": -0.1728,
+                "2022-11": -4.7243,
+                "2022-12": -0.4917,
+                "2023-01": -0.6527
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 1.484,
+              "mean_signed_move_pct": 0.00271
+            }
+          },
+          {
+            "quantile": 0.6,
+            "threshold": 0.513857740192788,
+            "eligible": false,
+            "score": -25.743650000000002,
+            "validation": {
+              "n": 765,
+              "wr": 50.46,
+              "return_pct": -2.9447,
+              "dd_pct": 12.5357,
+              "negative_months": 9,
+              "months": 13,
+              "monthly_return_pct": {
+                "2022-01": -2.2066,
+                "2022-02": -4.1096,
+                "2022-03": -0.8564,
+                "2022-04": -0.3175,
+                "2022-05": 0.3697,
+                "2022-06": -0.2709,
+                "2022-07": 2.8656,
+                "2022-08": 8.1994,
+                "2022-09": -2.6031,
+                "2022-10": 2.1139,
+                "2022-11": -4.2417,
+                "2022-12": -0.6585,
+                "2023-01": -0.6439
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 9,
+              "trades_per_market_day": 3.06,
+              "mean_signed_move_pct": -0.00943
+            }
+          }
+        ]
+      }
+    ],
+    "acceptance_2024": {
+      "year": 2024,
+      "train_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "validation_year": 2023,
+      "threshold_selection_pass": true,
+      "chosen_quantile": 0.85,
+      "threshold": 0.5686256124780649,
+      "validation": {
+        "n": 343,
+        "wr": 49.85,
+        "return_pct": 0.7997,
+        "dd_pct": 4.8329,
+        "negative_months": 7,
+        "months": 12,
+        "monthly_return_pct": {
+          "2023-01": -0.7221,
+          "2023-02": -0.5777,
+          "2023-03": -0.3868,
+          "2023-04": 0.2995,
+          "2023-05": 1.817,
+          "2023-06": -0.9677,
+          "2023-07": -0.4321,
+          "2023-08": 0.8394,
+          "2023-09": -0.0144,
+          "2023-10": 1.8483,
+          "2023-11": -1.3255,
+          "2023-12": 0.4765
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 7,
+        "trades_per_market_day": 1.383,
+        "mean_signed_move_pct": 0.01056
+      },
+      "test": {
+        "n": 315,
+        "wr": 52.06,
+        "return_pct": 12.4838,
+        "dd_pct": 5.2076,
+        "negative_months": 5,
+        "months": 12,
+        "monthly_return_pct": {
+          "2024-01": -0.1496,
+          "2024-02": 0.1407,
+          "2024-03": 0.3729,
+          "2024-04": 4.002,
+          "2024-05": -1.0681,
+          "2024-06": -0.9675,
+          "2024-07": 0.3284,
+          "2024-08": 6.4846,
+          "2024-09": -1.2975,
+          "2024-10": 2.5159,
+          "2024-11": -1.6819,
+          "2024-12": 3.4888
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 9,
+        "trades_per_market_day": 1.265,
+        "mean_signed_move_pct": 0.13132
+      },
+      "threshold_frontier": [
+        {
+          "quantile": 0.85,
+          "threshold": 0.5686256124780649,
+          "eligible": true,
+          "score": -9.451150000000002,
+          "validation": {
+            "n": 343,
+            "wr": 49.85,
+            "return_pct": 0.7997,
+            "dd_pct": 4.8329,
+            "negative_months": 7,
+            "months": 12,
+            "monthly_return_pct": {
+              "2023-01": -0.7221,
+              "2023-02": -0.5777,
+              "2023-03": -0.3868,
+              "2023-04": 0.2995,
+              "2023-05": 1.817,
+              "2023-06": -0.9677,
+              "2023-07": -0.4321,
+              "2023-08": 0.8394,
+              "2023-09": -0.0144,
+              "2023-10": 1.8483,
+              "2023-11": -1.3255,
+              "2023-12": 0.4765
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 1.383,
+            "mean_signed_move_pct": 0.01056
+          }
+        },
+        {
+          "quantile": 0.8,
+          "threshold": 0.5526959643952496,
+          "eligible": true,
+          "score": -12.355350000000001,
+          "validation": {
+            "n": 438,
+            "wr": 50.23,
+            "return_pct": 1.2685,
+            "dd_pct": 7.0841,
+            "negative_months": 7,
+            "months": 13,
+            "monthly_return_pct": {
+              "2023-01": 2.2952,
+              "2023-02": -0.5227,
+              "2023-03": 0.425,
+              "2023-04": 0.4287,
+              "2023-05": 3.1335,
+              "2023-06": -0.85,
+              "2023-07": -0.4238,
+              "2023-08": 0.6055,
+              "2023-09": -2.5978,
+              "2023-10": 0.9146,
+              "2023-11": -1.1728,
+              "2023-12": -0.5429,
+              "2024-01": -0.3009
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 1.766,
+            "mean_signed_move_pct": 0.01235
+          }
+        },
+        {
+          "quantile": 0.4,
+          "threshold": 0.462168790693785,
+          "eligible": false,
+          "score": -15.35435,
+          "validation": {
+            "n": 906,
+            "wr": 50.77,
+            "return_pct": -1.1571,
+            "dd_pct": 7.8033,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2023-01": -0.9245,
+              "2023-02": 0.4266,
+              "2023-03": -5.94,
+              "2023-04": 6.5111,
+              "2023-05": 1.6326,
+              "2023-06": -4.9762,
+              "2023-07": 3.2439,
+              "2023-08": -1.0879,
+              "2023-09": 3.5781,
+              "2023-10": -2.6782,
+              "2023-11": 2.1452,
+              "2023-12": -2.6486,
+              "2024-01": 0.3029
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 3.653,
+            "mean_signed_move_pct": -0.00184
+          }
+        },
+        {
+          "quantile": 0.6,
+          "threshold": 0.5030337513934122,
+          "eligible": false,
+          "score": -17.9387,
+          "validation": {
+            "n": 738,
+            "wr": 51.08,
+            "return_pct": -1.6417,
+            "dd_pct": 9.2052,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2023-01": 2.1123,
+              "2023-02": 0.931,
+              "2023-03": -4.3044,
+              "2023-04": 4.4696,
+              "2023-05": -0.7304,
+              "2023-06": -2.4413,
+              "2023-07": -2.4255,
+              "2023-08": 1.8995,
+              "2023-09": 1.0378,
+              "2023-10": -0.7379,
+              "2023-11": 0.6925,
+              "2023-12": -2.4146,
+              "2024-01": 0.5974
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 2.976,
+            "mean_signed_move_pct": -0.00461
+          }
+        }
+      ]
+    }
+  },
+  "hidden_2025_2026": [
+    {
+      "year": 2025,
+      "train_years": [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "validation_year": 2024,
+      "threshold_selection_pass": true,
+      "chosen_quantile": 0.7,
+      "threshold": 0.5233424772483982,
+      "validation": {
+        "n": 581,
+        "wr": 55.77,
+        "return_pct": 20.8147,
+        "dd_pct": 6.7202,
+        "negative_months": 2,
+        "months": 13,
+        "monthly_return_pct": {
+          "2024-01": -1.9084,
+          "2024-02": 0.2535,
+          "2024-03": -4.0437,
+          "2024-04": 1.7503,
+          "2024-05": 3.6749,
+          "2024-06": 0.0179,
+          "2024-07": 1.4635,
+          "2024-08": 8.6539,
+          "2024-09": 2.2235,
+          "2024-10": 5.8907,
+          "2024-11": 0.7927,
+          "2024-12": 0.2973,
+          "2025-01": 0.5878
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 6,
+        "trades_per_market_day": 2.333,
+        "mean_signed_move_pct": 0.11328
+      },
+      "test": {
+        "n": 523,
+        "wr": 52.77,
+        "return_pct": 13.0733,
+        "dd_pct": 7.3559,
+        "negative_months": 4,
+        "months": 13,
+        "monthly_return_pct": {
+          "2025-01": -2.7393,
+          "2025-02": 1.8951,
+          "2025-03": -1.6405,
+          "2025-04": 3.87,
+          "2025-05": 2.2999,
+          "2025-06": 0.5853,
+          "2025-07": -0.5481,
+          "2025-08": 2.5674,
+          "2025-09": 2.0233,
+          "2025-10": 2.7434,
+          "2025-11": 1.7203,
+          "2025-12": -0.8268,
+          "2026-01": 0.6182
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 8,
+        "trades_per_market_day": 2.117,
+        "mean_signed_move_pct": 0.08216
+      },
+      "threshold_frontier": [
+        {
+          "quantile": 0.7,
+          "threshold": 0.5233424772483982,
+          "eligible": true,
+          "score": 10.292099999999998,
+          "validation": {
+            "n": 581,
+            "wr": 55.77,
+            "return_pct": 20.8147,
+            "dd_pct": 6.7202,
+            "negative_months": 2,
+            "months": 13,
+            "monthly_return_pct": {
+              "2024-01": -1.9084,
+              "2024-02": 0.2535,
+              "2024-03": -4.0437,
+              "2024-04": 1.7503,
+              "2024-05": 3.6749,
+              "2024-06": 0.0179,
+              "2024-07": 1.4635,
+              "2024-08": 8.6539,
+              "2024-09": 2.2235,
+              "2024-10": 5.8907,
+              "2024-11": 0.7927,
+              "2024-12": 0.2973,
+              "2025-01": 0.5878
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 6,
+            "trades_per_market_day": 2.333,
+            "mean_signed_move_pct": 0.11328
+          }
+        },
+        {
+          "quantile": 0.6,
+          "threshold": 0.5038281848458749,
+          "eligible": true,
+          "score": 4.15495,
+          "validation": {
+            "n": 688,
+            "wr": 53.63,
+            "return_pct": 15.1941,
+            "dd_pct": 6.0503,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2024-01": -1.0518,
+              "2024-02": -0.1022,
+              "2024-03": -2.1698,
+              "2024-04": -2.0909,
+              "2024-05": 2.274,
+              "2024-06": 0.0184,
+              "2024-07": -0.3968,
+              "2024-08": 9.1944,
+              "2024-09": 3.201,
+              "2024-10": 4.4045,
+              "2024-11": 0.4374,
+              "2024-12": 0.4634,
+              "2025-01": 0.5878
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 2.763,
+            "mean_signed_move_pct": 0.07244
+          }
+        },
+        {
+          "quantile": 0.5,
+          "threshold": 0.4838329173944131,
+          "eligible": true,
+          "score": 3.23755,
+          "validation": {
+            "n": 771,
+            "wr": 53.18,
+            "return_pct": 15.87,
+            "dd_pct": 7.1095,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2024-01": -0.616,
+              "2024-02": 2.2036,
+              "2024-03": -3.3506,
+              "2024-04": -1.9579,
+              "2024-05": 4.0197,
+              "2024-06": -2.2664,
+              "2024-07": -0.9891,
+              "2024-08": 5.5781,
+              "2024-09": 1.9579,
+              "2024-10": 6.5643,
+              "2024-11": 2.1859,
+              "2024-12": 1.1297,
+              "2025-01": 0.8922
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 3.096,
+            "mean_signed_move_pct": 0.06767
+          }
+        },
+        {
+          "quantile": 0.8,
+          "threshold": 0.5457416779197776,
+          "eligible": true,
+          "score": -3.7044000000000006,
+          "validation": {
+            "n": 434,
+            "wr": 54.15,
+            "return_pct": 12.2248,
+            "dd_pct": 9.3138,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2024-01": -3.9608,
+              "2024-02": 0.7621,
+              "2024-03": -4.5824,
+              "2024-04": 0.3794,
+              "2024-05": 3.2942,
+              "2024-06": -0.1366,
+              "2024-07": -1.4669,
+              "2024-08": 11.6893,
+              "2024-09": 1.7374,
+              "2024-10": 3.3999,
+              "2024-11": -0.5922,
+              "2024-12": 1.7012,
+              "2025-01": 0.2875
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 6,
+            "trades_per_market_day": 1.743,
+            "mean_signed_move_pct": 0.09419
+          }
+        }
+      ]
+    },
+    {
+      "year": 2026,
+      "train_years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "validation_year": 2025,
+      "threshold_selection_pass": true,
+      "chosen_quantile": 0.7,
+      "threshold": 0.5135108614086731,
+      "validation": {
+        "n": 571,
+        "wr": 53.06,
+        "return_pct": 14.4134,
+        "dd_pct": 6.767,
+        "negative_months": 4,
+        "months": 13,
+        "monthly_return_pct": {
+          "2025-01": -2.8525,
+          "2025-02": 0.5422,
+          "2025-03": 0.3359,
+          "2025-04": 5.0934,
+          "2025-05": 3.4948,
+          "2025-06": -3.8445,
+          "2025-07": -2.7485,
+          "2025-08": 5.9729,
+          "2025-09": 4.57,
+          "2025-10": 1.9662,
+          "2025-11": 0.9992,
+          "2025-12": -0.0401,
+          "2026-01": 0.6176
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 11,
+        "trades_per_market_day": 2.312,
+        "mean_signed_move_pct": 0.0818
+      },
+      "test": {
+        "n": 446,
+        "wr": 52.47,
+        "return_pct": 16.7744,
+        "dd_pct": 5.4906,
+        "negative_months": 4,
+        "months": 9,
+        "monthly_return_pct": {
+          "2026-01": 6.9891,
+          "2026-02": -0.5879,
+          "2026-03": -0.5201,
+          "2026-04": 5.969,
+          "2026-05": -1.3213,
+          "2026-06": -0.7302,
+          "2026-07": 1.4272,
+          "2026-08": 3.8049,
+          "2026-09": 0.9815
+        },
+        "months_ge_30pct": 0,
+        "max_loss_streak": 8,
+        "trades_per_market_day": 2.549,
+        "mean_signed_move_pct": 0.12008
+      },
+      "threshold_frontier": [
+        {
+          "quantile": 0.7,
+          "threshold": 0.5135108614086731,
+          "eligible": true,
+          "score": 2.7934999999999985,
+          "validation": {
+            "n": 571,
+            "wr": 53.06,
+            "return_pct": 14.4134,
+            "dd_pct": 6.767,
+            "negative_months": 4,
+            "months": 13,
+            "monthly_return_pct": {
+              "2025-01": -2.8525,
+              "2025-02": 0.5422,
+              "2025-03": 0.3359,
+              "2025-04": 5.0934,
+              "2025-05": 3.4948,
+              "2025-06": -3.8445,
+              "2025-07": -2.7485,
+              "2025-08": 5.9729,
+              "2025-09": 4.57,
+              "2025-10": 1.9662,
+              "2025-11": 0.9992,
+              "2025-12": -0.0401,
+              "2026-01": 0.6176
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 2.312,
+            "mean_signed_move_pct": 0.0818
+          }
+        },
+        {
+          "quantile": 0.8,
+          "threshold": 0.5346906182093061,
+          "eligible": true,
+          "score": 1.95005,
+          "validation": {
+            "n": 420,
+            "wr": 52.14,
+            "return_pct": 9.5878,
+            "dd_pct": 4.1061,
+            "negative_months": 4,
+            "months": 13,
+            "monthly_return_pct": {
+              "2025-01": -1.6606,
+              "2025-02": -0.3765,
+              "2025-03": 1.102,
+              "2025-04": 4.4651,
+              "2025-05": 0.534,
+              "2025-06": 0.0705,
+              "2025-07": -1.0543,
+              "2025-08": 4.9183,
+              "2025-09": 0.3854,
+              "2025-10": 0.8157,
+              "2025-11": -0.2049,
+              "2025-12": 0.0906,
+              "2026-01": 0.3167
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 9,
+            "trades_per_market_day": 1.7,
+            "mean_signed_move_pct": 0.07587
+          }
+        },
+        {
+          "quantile": 0.85,
+          "threshold": 0.5488838032001253,
+          "eligible": true,
+          "score": 1.679799999999999,
+          "validation": {
+            "n": 335,
+            "wr": 52.24,
+            "return_pct": 11.5453,
+            "dd_pct": 5.2586,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2025-01": -0.9319,
+              "2025-02": -0.5804,
+              "2025-03": 0.2056,
+              "2025-04": 2.3571,
+              "2025-05": -0.4825,
+              "2025-06": -1.5338,
+              "2025-07": -1.0442,
+              "2025-08": 5.1927,
+              "2025-09": 2.1438,
+              "2025-10": 0.1595,
+              "2025-11": 0.5163,
+              "2025-12": 4.9366,
+              "2026-01": 0.3122
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 1.356,
+            "mean_signed_move_pct": 0.11249
+          }
+        },
+        {
+          "quantile": 0.3,
+          "threshold": 0.44140498847809795,
+          "eligible": true,
+          "score": 0.8032999999999989,
+          "validation": {
+            "n": 906,
+            "wr": 52.54,
+            "return_pct": 17.5825,
+            "dd_pct": 9.5364,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2025-01": 1.5616,
+              "2025-02": 6.477,
+              "2025-03": -5.4008,
+              "2025-04": -0.3149,
+              "2025-05": 5.7537,
+              "2025-06": -0.8216,
+              "2025-07": -0.2423,
+              "2025-08": 5.113,
+              "2025-09": 2.5072,
+              "2025-10": -2.1329,
+              "2025-11": 6.1712,
+              "2025-12": -1.8642,
+              "2026-01": 0.2996
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 8,
+            "trades_per_market_day": 3.668,
+            "mean_signed_move_pct": 0.06311
+          }
+        }
+      ]
+    }
+  ],
+  "direct_xperp": {
+    "n": 69,
+    "wr": 44.93,
+    "return_pct": -4.0777,
+    "dd_pct": 5.3987,
+    "negative_months": 2,
+    "months": 2,
+    "monthly_return_pct": {
+      "2026-09": -3.2039,
+      "2026-10": -0.9028
+    },
+    "months_ge_30pct": 0,
+    "max_loss_streak": 5,
+    "trades_per_market_day": 2.875,
+    "mean_signed_move_pct": -0.19906
+  },
+  "checks": {
+    "acceptance_positive": true,
+    "test_2025_positive": true,
+    "observed_2026_positive": true,
+    "direct_positive": false,
+    "late_dd_le_8": true,
+    "direct_n_ge_30": true
+  },
+  "top_development": [
+    {
+      "spec": {
+        "target_pct": 1.0,
+        "stop_pct": 1.0,
+        "hold_sessions": 2,
+        "model": {
+          "leaves": 15,
+          "leaf": 240,
+          "l2": 5.0
+        }
+      },
+      "score": 10.6772,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.8,
+          "threshold": 0.556873098241794,
+          "validation": {
+            "n": 369,
+            "wr": 54.47,
+            "return_pct": 10.0331,
+            "dd_pct": 4.4045,
+            "negative_months": 4,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -3.0274,
+              "2021-02": 2.4593,
+              "2021-03": 0.9867,
+              "2021-04": 0.5817,
+              "2021-05": 0.4752,
+              "2021-06": 1.6301,
+              "2021-07": 3.868,
+              "2021-08": -0.0152,
+              "2021-09": 3.9727,
+              "2021-10": -0.936,
+              "2021-11": -2.027,
+              "2021-12": 1.2769,
+              "2022-01": 0.5981
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 1.47,
+            "mean_signed_move_pct": 0.08918
+          },
+          "test": {
+            "n": 526,
+            "wr": 50.95,
+            "return_pct": 8.3305,
+            "dd_pct": 6.1489,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -1.8617,
+              "2022-02": 6.1845,
+              "2022-03": 0.7742,
+              "2022-04": -2.0033,
+              "2022-05": 0.5394,
+              "2022-06": -0.9186,
+              "2022-07": 3.177,
+              "2022-08": 4.8986,
+              "2022-09": -2.4031,
+              "2022-10": -0.2054,
+              "2022-11": 0.8491,
+              "2022-12": 0.2531,
+              "2023-01": -0.849
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 10,
+            "trades_per_market_day": 2.104,
+            "mean_signed_move_pct": 0.05474
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.8,
+              "threshold": 0.556873098241794,
+              "eligible": true,
+              "score": 1.9710499999999993,
+              "validation": {
+                "n": 369,
+                "wr": 54.47,
+                "return_pct": 10.0331,
+                "dd_pct": 4.4045,
+                "negative_months": 4,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -3.0274,
+                  "2021-02": 2.4593,
+                  "2021-03": 0.9867,
+                  "2021-04": 0.5817,
+                  "2021-05": 0.4752,
+                  "2021-06": 1.6301,
+                  "2021-07": 3.868,
+                  "2021-08": -0.0152,
+                  "2021-09": 3.9727,
+                  "2021-10": -0.936,
+                  "2021-11": -2.027,
+                  "2021-12": 1.2769,
+                  "2022-01": 0.5981
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.47,
+                "mean_signed_move_pct": 0.08918
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.526557821326201,
+              "eligible": true,
+              "score": -0.18995000000000062,
+              "validation": {
+                "n": 484,
+                "wr": 53.31,
+                "return_pct": 11.371,
+                "dd_pct": 6.0627,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -0.8128,
+                  "2021-02": 5.9555,
+                  "2021-03": 3.1136,
+                  "2021-04": 1.7487,
+                  "2021-05": -0.3002,
+                  "2021-06": 1.4538,
+                  "2021-07": 1.0227,
+                  "2021-08": -0.1961,
+                  "2021-09": 3.8647,
+                  "2021-10": -1.2171,
+                  "2021-11": -0.5485,
+                  "2021-12": -3.5202,
+                  "2022-01": 0.6055
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.928,
+                "mean_signed_move_pct": 0.07667
+              }
+            },
+            {
+              "quantile": 0.85,
+              "threshold": 0.5774806942850734,
+              "eligible": false,
+              "score": -12.0929,
+              "validation": {
+                "n": 290,
+                "wr": 51.03,
+                "return_pct": -1.2318,
+                "dd_pct": 6.2476,
+                "negative_months": 4,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -2.7383,
+                  "2021-02": 1.8628,
+                  "2021-03": 0.0516,
+                  "2021-04": -0.9879,
+                  "2021-05": 0.2753,
+                  "2021-06": 0.4262,
+                  "2021-07": 2.004,
+                  "2021-08": 0.4037,
+                  "2021-09": 1.901,
+                  "2021-10": -3.1555,
+                  "2021-11": -2.3173,
+                  "2021-12": 0.6187,
+                  "2022-01": 0.5981
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.155,
+                "mean_signed_move_pct": -0.01151
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.5978114866697903,
+              "eligible": false,
+              "score": -13.49735,
+              "validation": {
+                "n": 212,
+                "wr": 50.47,
+                "return_pct": -1.8435,
+                "dd_pct": 6.1057,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.7237,
+                  "2021-02": 0.7781,
+                  "2021-03": -0.546,
+                  "2021-04": -0.1912,
+                  "2021-05": 1.1891,
+                  "2021-06": -0.8074,
+                  "2021-07": 2.1163,
+                  "2021-08": 0.2964,
+                  "2021-09": 0.9914,
+                  "2021-10": -2.2369,
+                  "2021-11": -3.1966,
+                  "2021-12": 1.3138,
+                  "2022-01": 0.3
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 0.845,
+                "mean_signed_move_pct": -0.02627
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.9,
+          "threshold": 0.6057083731108391,
+          "validation": {
+            "n": 268,
+            "wr": 50.37,
+            "return_pct": 6.0026,
+            "dd_pct": 4.4722,
+            "negative_months": 7,
+            "months": 12,
+            "monthly_return_pct": {
+              "2022-01": -3.26,
+              "2022-02": 9.4232,
+              "2022-03": -0.0135,
+              "2022-04": 0.154,
+              "2022-05": 2.8255,
+              "2022-06": -0.5705,
+              "2022-07": 1.2222,
+              "2022-08": -0.7004,
+              "2022-09": -0.8492,
+              "2022-10": 0.7334,
+              "2022-11": -1.7999,
+              "2022-12": -0.7867
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 1.072,
+            "mean_signed_move_pct": 0.07992
+          },
+          "test": {
+            "n": 239,
+            "wr": 52.3,
+            "return_pct": 4.5408,
+            "dd_pct": 5.1268,
+            "negative_months": 6,
+            "months": 12,
+            "monthly_return_pct": {
+              "2023-01": -2.1346,
+              "2023-02": 1.4192,
+              "2023-03": 0.6667,
+              "2023-04": 2.75,
+              "2023-05": 3.5782,
+              "2023-06": -2.0414,
+              "2023-07": -2.2948,
+              "2023-08": 2.9018,
+              "2023-09": -0.1417,
+              "2023-10": 1.1953,
+              "2023-11": -1.2094,
+              "2023-12": -0.0099
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 6,
+            "trades_per_market_day": 0.964,
+            "mean_signed_move_pct": 0.0646
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.9,
+              "threshold": 0.6057083731108391,
+              "eligible": true,
+              "score": -3.701999999999999,
+              "validation": {
+                "n": 268,
+                "wr": 50.37,
+                "return_pct": 6.0026,
+                "dd_pct": 4.4722,
+                "negative_months": 7,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -3.26,
+                  "2022-02": 9.4232,
+                  "2022-03": -0.0135,
+                  "2022-04": 0.154,
+                  "2022-05": 2.8255,
+                  "2022-06": -0.5705,
+                  "2022-07": 1.2222,
+                  "2022-08": -0.7004,
+                  "2022-09": -0.8492,
+                  "2022-10": 0.7334,
+                  "2022-11": -1.7999,
+                  "2022-12": -0.7867
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.072,
+                "mean_signed_move_pct": 0.07992
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.5648399582838762,
+              "eligible": true,
+              "score": -7.5386,
+              "validation": {
+                "n": 469,
+                "wr": 50.11,
+                "return_pct": 7.7901,
+                "dd_pct": 8.5532,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -1.608,
+                  "2022-02": 9.402,
+                  "2022-03": 0.395,
+                  "2022-04": -1.0464,
+                  "2022-05": 2.0374,
+                  "2022-06": -0.594,
+                  "2022-07": 3.948,
+                  "2022-08": 3.6971,
+                  "2022-09": -3.2465,
+                  "2022-10": 0.2119,
+                  "2022-11": -5.1128,
+                  "2022-12": 0.862,
+                  "2023-01": -0.6486
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.876,
+                "mean_signed_move_pct": 0.05916
+              }
+            },
+            {
+              "quantile": 0.85,
+              "threshold": 0.5837828161068278,
+              "eligible": false,
+              "score": -18.2825,
+              "validation": {
+                "n": 371,
+                "wr": 48.79,
+                "return_pct": -0.402,
+                "dd_pct": 9.2456,
+                "negative_months": 9,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -3.263,
+                  "2022-02": 10.3965,
+                  "2022-03": 0.7658,
+                  "2022-04": -1.0594,
+                  "2022-05": 2.6293,
+                  "2022-06": -2.9282,
+                  "2022-07": 1.5781,
+                  "2022-08": -0.4956,
+                  "2022-09": -1.1991,
+                  "2022-10": -0.1728,
+                  "2022-11": -4.7243,
+                  "2022-12": -0.4917,
+                  "2023-01": -0.6527
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.484,
+                "mean_signed_move_pct": 0.00271
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.513857740192788,
+              "eligible": false,
+              "score": -25.743650000000002,
+              "validation": {
+                "n": 765,
+                "wr": 50.46,
+                "return_pct": -2.9447,
+                "dd_pct": 12.5357,
+                "negative_months": 9,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.2066,
+                  "2022-02": -4.1096,
+                  "2022-03": -0.8564,
+                  "2022-04": -0.3175,
+                  "2022-05": 0.3697,
+                  "2022-06": -0.2709,
+                  "2022-07": 2.8656,
+                  "2022-08": 8.1994,
+                  "2022-09": -2.6031,
+                  "2022-10": 2.1139,
+                  "2022-11": -4.2417,
+                  "2022-12": -0.6585,
+                  "2023-01": -0.6439
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 3.06,
+                "mean_signed_move_pct": -0.00943
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": true,
+        "chosen_quantile": 0.85,
+        "threshold": 0.5686256124780649,
+        "validation": {
+          "n": 343,
+          "wr": 49.85,
+          "return_pct": 0.7997,
+          "dd_pct": 4.8329,
+          "negative_months": 7,
+          "months": 12,
+          "monthly_return_pct": {
+            "2023-01": -0.7221,
+            "2023-02": -0.5777,
+            "2023-03": -0.3868,
+            "2023-04": 0.2995,
+            "2023-05": 1.817,
+            "2023-06": -0.9677,
+            "2023-07": -0.4321,
+            "2023-08": 0.8394,
+            "2023-09": -0.0144,
+            "2023-10": 1.8483,
+            "2023-11": -1.3255,
+            "2023-12": 0.4765
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 7,
+          "trades_per_market_day": 1.383,
+          "mean_signed_move_pct": 0.01056
+        },
+        "test": {
+          "n": 315,
+          "wr": 52.06,
+          "return_pct": 12.4838,
+          "dd_pct": 5.2076,
+          "negative_months": 5,
+          "months": 12,
+          "monthly_return_pct": {
+            "2024-01": -0.1496,
+            "2024-02": 0.1407,
+            "2024-03": 0.3729,
+            "2024-04": 4.002,
+            "2024-05": -1.0681,
+            "2024-06": -0.9675,
+            "2024-07": 0.3284,
+            "2024-08": 6.4846,
+            "2024-09": -1.2975,
+            "2024-10": 2.5159,
+            "2024-11": -1.6819,
+            "2024-12": 3.4888
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 9,
+          "trades_per_market_day": 1.265,
+          "mean_signed_move_pct": 0.13132
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.85,
+            "threshold": 0.5686256124780649,
+            "eligible": true,
+            "score": -9.451150000000002,
+            "validation": {
+              "n": 343,
+              "wr": 49.85,
+              "return_pct": 0.7997,
+              "dd_pct": 4.8329,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -0.7221,
+                "2023-02": -0.5777,
+                "2023-03": -0.3868,
+                "2023-04": 0.2995,
+                "2023-05": 1.817,
+                "2023-06": -0.9677,
+                "2023-07": -0.4321,
+                "2023-08": 0.8394,
+                "2023-09": -0.0144,
+                "2023-10": 1.8483,
+                "2023-11": -1.3255,
+                "2023-12": 0.4765
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 7,
+              "trades_per_market_day": 1.383,
+              "mean_signed_move_pct": 0.01056
+            }
+          },
+          {
+            "quantile": 0.8,
+            "threshold": 0.5526959643952496,
+            "eligible": true,
+            "score": -12.355350000000001,
+            "validation": {
+              "n": 438,
+              "wr": 50.23,
+              "return_pct": 1.2685,
+              "dd_pct": 7.0841,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 2.2952,
+                "2023-02": -0.5227,
+                "2023-03": 0.425,
+                "2023-04": 0.4287,
+                "2023-05": 3.1335,
+                "2023-06": -0.85,
+                "2023-07": -0.4238,
+                "2023-08": 0.6055,
+                "2023-09": -2.5978,
+                "2023-10": 0.9146,
+                "2023-11": -1.1728,
+                "2023-12": -0.5429,
+                "2024-01": -0.3009
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 7,
+              "trades_per_market_day": 1.766,
+              "mean_signed_move_pct": 0.01235
+            }
+          },
+          {
+            "quantile": 0.4,
+            "threshold": 0.462168790693785,
+            "eligible": false,
+            "score": -15.35435,
+            "validation": {
+              "n": 906,
+              "wr": 50.77,
+              "return_pct": -1.1571,
+              "dd_pct": 7.8033,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -0.9245,
+                "2023-02": 0.4266,
+                "2023-03": -5.94,
+                "2023-04": 6.5111,
+                "2023-05": 1.6326,
+                "2023-06": -4.9762,
+                "2023-07": 3.2439,
+                "2023-08": -1.0879,
+                "2023-09": 3.5781,
+                "2023-10": -2.6782,
+                "2023-11": 2.1452,
+                "2023-12": -2.6486,
+                "2024-01": 0.3029
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 7,
+              "trades_per_market_day": 3.653,
+              "mean_signed_move_pct": -0.00184
+            }
+          },
+          {
+            "quantile": 0.6,
+            "threshold": 0.5030337513934122,
+            "eligible": false,
+            "score": -17.9387,
+            "validation": {
+              "n": 738,
+              "wr": 51.08,
+              "return_pct": -1.6417,
+              "dd_pct": 9.2052,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 2.1123,
+                "2023-02": 0.931,
+                "2023-03": -4.3044,
+                "2023-04": 4.4696,
+                "2023-05": -0.7304,
+                "2023-06": -2.4413,
+                "2023-07": -2.4255,
+                "2023-08": 1.8995,
+                "2023-09": 1.0378,
+                "2023-10": -0.7379,
+                "2023-11": 0.6925,
+                "2023-12": -2.4146,
+                "2024-01": 0.5974
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 11,
+              "trades_per_market_day": 2.976,
+              "mean_signed_move_pct": -0.00461
+            }
+          }
+        ]
+      }
+    },
+    {
+      "spec": {
+        "target_pct": 0.5,
+        "stop_pct": 1.0,
+        "hold_sessions": 1,
+        "model": {
+          "leaves": 15,
+          "leaf": 120,
+          "l2": 3.0
+        }
+      },
+      "score": 7.9442,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.7107943009204178,
+          "validation": {
+            "n": 346,
+            "wr": 66.76,
+            "return_pct": 2.3459,
+            "dd_pct": 4.4608,
+            "negative_months": 3,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -2.0016,
+              "2021-02": 2.6528,
+              "2021-03": 0.8047,
+              "2021-04": 3.3259,
+              "2021-05": -2.6084,
+              "2021-06": 0.9671,
+              "2021-07": 0.0595,
+              "2021-08": 0.5141,
+              "2021-09": 0.6546,
+              "2021-10": -3.0504,
+              "2021-11": 0.2323,
+              "2021-12": 0.8238,
+              "2022-01": 0.1505
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 8,
+            "trades_per_market_day": 1.378,
+            "mean_signed_move_pct": 0.02398
+          },
+          "test": {
+            "n": 635,
+            "wr": 65.35,
+            "return_pct": 5.3515,
+            "dd_pct": 8.4201,
+            "negative_months": 7,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -2.7821,
+              "2022-02": 5.6899,
+              "2022-03": -1.3444,
+              "2022-04": 1.1936,
+              "2022-05": -1.5488,
+              "2022-06": 2.734,
+              "2022-07": 4.1825,
+              "2022-08": 1.0354,
+              "2022-09": 1.5285,
+              "2022-10": -2.9611,
+              "2022-11": -1.4068,
+              "2022-12": -0.3801,
+              "2023-01": -0.3091
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 8,
+            "trades_per_market_day": 2.54,
+            "mean_signed_move_pct": 0.03108
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.7107943009204178,
+              "eligible": true,
+              "score": -5.1777,
+              "validation": {
+                "n": 346,
+                "wr": 66.76,
+                "return_pct": 2.3459,
+                "dd_pct": 4.4608,
+                "negative_months": 3,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -2.0016,
+                  "2021-02": 2.6528,
+                  "2021-03": 0.8047,
+                  "2021-04": 3.3259,
+                  "2021-05": -2.6084,
+                  "2021-06": 0.9671,
+                  "2021-07": 0.0595,
+                  "2021-08": 0.5141,
+                  "2021-09": 0.6546,
+                  "2021-10": -3.0504,
+                  "2021-11": 0.2323,
+                  "2021-12": 0.8238,
+                  "2022-01": 0.1505
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.378,
+                "mean_signed_move_pct": 0.02398
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.6969484509984721,
+              "eligible": true,
+              "score": -6.7396,
+              "validation": {
+                "n": 431,
+                "wr": 66.36,
+                "return_pct": 0.9809,
+                "dd_pct": 4.5894,
+                "negative_months": 3,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -3.0697,
+                  "2021-02": 1.8133,
+                  "2021-03": 0.1997,
+                  "2021-04": 2.8882,
+                  "2021-05": -2.1895,
+                  "2021-06": 1.5338,
+                  "2021-07": 0.9635,
+                  "2021-08": 1.1264,
+                  "2021-09": 0.3782,
+                  "2021-10": -3.6803,
+                  "2021-11": 0.7215,
+                  "2021-12": 0.3661,
+                  "2022-01": 0.1509
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.717,
+                "mean_signed_move_pct": 0.00907
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.7280234732805935,
+              "eligible": false,
+              "score": -8.406749999999999,
+              "validation": {
+                "n": 243,
+                "wr": 67.08,
+                "return_pct": 0.5086,
+                "dd_pct": 4.7241,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.2932,
+                  "2021-02": 2.7089,
+                  "2021-03": 0.2018,
+                  "2021-04": 1.7549,
+                  "2021-05": -2.9379,
+                  "2021-06": 0.8165,
+                  "2021-07": -0.3894,
+                  "2021-08": -0.7576,
+                  "2021-09": 0.656,
+                  "2021-10": -1.517,
+                  "2021-11": 0.9014,
+                  "2021-12": 0.3424,
+                  "2022-01": 0.15
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 0.968,
+                "mean_signed_move_pct": 0.00872
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.643943042660424,
+              "eligible": true,
+              "score": -12.4874,
+              "validation": {
+                "n": 712,
+                "wr": 66.29,
+                "return_pct": 1.1232,
+                "dd_pct": 7.849,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -2.866,
+                  "2021-02": 3.0496,
+                  "2021-03": 0.6517,
+                  "2021-04": 2.6926,
+                  "2021-05": -2.1478,
+                  "2021-06": 2.0844,
+                  "2021-07": 1.5792,
+                  "2021-08": -1.1052,
+                  "2021-09": 2.1008,
+                  "2021-10": -5.9101,
+                  "2021-11": -0.5376,
+                  "2021-12": 1.6304,
+                  "2022-01": 0.3022
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 2.837,
+                "mean_signed_move_pct": 0.0067
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.7,
+          "threshold": 0.6869217097344659,
+          "validation": {
+            "n": 691,
+            "wr": 67.0,
+            "return_pct": 13.4971,
+            "dd_pct": 6.5391,
+            "negative_months": 7,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -1.1104,
+              "2022-02": 6.8015,
+              "2022-03": -2.9024,
+              "2022-04": 2.7282,
+              "2022-05": 2.7243,
+              "2022-06": -0.113,
+              "2022-07": 3.1584,
+              "2022-08": -0.3446,
+              "2022-09": -1.9289,
+              "2022-10": -0.5762,
+              "2022-11": 0.515,
+              "2022-12": 4.52,
+              "2023-01": -0.2968
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 2.764,
+            "mean_signed_move_pct": 0.06415
+          },
+          "test": {
+            "n": 539,
+            "wr": 65.68,
+            "return_pct": 5.0601,
+            "dd_pct": 4.1675,
+            "negative_months": 5,
+            "months": 12,
+            "monthly_return_pct": {
+              "2023-01": -1.0872,
+              "2023-02": 0.7519,
+              "2023-03": 0.1529,
+              "2023-04": -0.6614,
+              "2023-05": 2.3399,
+              "2023-06": 0.4349,
+              "2023-07": -1.2074,
+              "2023-08": -0.3659,
+              "2023-09": -0.7398,
+              "2023-10": 0.8386,
+              "2023-11": 2.3457,
+              "2023-12": 2.2391
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 6,
+            "trades_per_market_day": 2.173,
+            "mean_signed_move_pct": 0.03242
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.7,
+              "threshold": 0.6869217097344659,
+              "eligible": true,
+              "score": 0.8584499999999996,
+              "validation": {
+                "n": 691,
+                "wr": 67.0,
+                "return_pct": 13.4971,
+                "dd_pct": 6.5391,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -1.1104,
+                  "2022-02": 6.8015,
+                  "2022-03": -2.9024,
+                  "2022-04": 2.7282,
+                  "2022-05": 2.7243,
+                  "2022-06": -0.113,
+                  "2022-07": 3.1584,
+                  "2022-08": -0.3446,
+                  "2022-09": -1.9289,
+                  "2022-10": -0.5762,
+                  "2022-11": 0.515,
+                  "2022-12": 4.52,
+                  "2023-01": -0.2968
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 2.764,
+                "mean_signed_move_pct": 0.06415
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.6674994396715526,
+              "eligible": true,
+              "score": -0.8125499999999996,
+              "validation": {
+                "n": 870,
+                "wr": 67.47,
+                "return_pct": 14.6175,
+                "dd_pct": 8.7365,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -0.3539,
+                  "2022-02": 6.7078,
+                  "2022-03": -2.9219,
+                  "2022-04": 3.0332,
+                  "2022-05": 1.3454,
+                  "2022-06": 3.0871,
+                  "2022-07": 4.3439,
+                  "2022-08": -2.9449,
+                  "2022-09": -1.491,
+                  "2022-10": -3.1684,
+                  "2022-11": 1.2972,
+                  "2022-12": 6.4162,
+                  "2023-01": -0.9388
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 6,
+                "trades_per_market_day": 3.48,
+                "mean_signed_move_pct": 0.0551
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.7108674505439911,
+              "eligible": true,
+              "score": -3.8443999999999994,
+              "validation": {
+                "n": 524,
+                "wr": 65.08,
+                "return_pct": 6.6504,
+                "dd_pct": 5.4304,
+                "negative_months": 6,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -1.551,
+                  "2022-02": 7.5263,
+                  "2022-03": -2.562,
+                  "2022-04": 2.4203,
+                  "2022-05": 1.1977,
+                  "2022-06": -0.9768,
+                  "2022-07": 1.5587,
+                  "2022-08": -0.3981,
+                  "2022-09": -0.9592,
+                  "2022-10": -2.1642,
+                  "2022-11": 1.3841,
+                  "2022-12": 1.379
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 2.096,
+                "mean_signed_move_pct": 0.04465
+              }
+            },
+            {
+              "quantile": 0.85,
+              "threshold": 0.7248194372345743,
+              "eligible": true,
+              "score": -5.221099999999999,
+              "validation": {
+                "n": 407,
+                "wr": 65.36,
+                "return_pct": 5.9794,
+                "dd_pct": 5.5694,
+                "negative_months": 7,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -0.9044,
+                  "2022-02": 7.2226,
+                  "2022-03": -1.9728,
+                  "2022-04": 2.4214,
+                  "2022-05": 0.8961,
+                  "2022-06": -0.0226,
+                  "2022-07": 1.4898,
+                  "2022-08": -1.3819,
+                  "2022-09": -0.9576,
+                  "2022-10": -1.8687,
+                  "2022-11": -0.157,
+                  "2022-12": 1.4008
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.628,
+                "mean_signed_move_pct": 0.05189
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": true,
+        "chosen_quantile": 0.9,
+        "threshold": 0.7208210246151932,
+        "validation": {
+          "n": 278,
+          "wr": 64.39,
+          "return_pct": 0.0724,
+          "dd_pct": 4.1701,
+          "negative_months": 6,
+          "months": 12,
+          "monthly_return_pct": {
+            "2023-01": -2.0376,
+            "2023-02": 1.1021,
+            "2023-03": -1.891,
+            "2023-04": -0.9329,
+            "2023-05": 0.9844,
+            "2023-06": 0.035,
+            "2023-07": -1.0657,
+            "2023-08": 2.348,
+            "2023-09": -0.9022,
+            "2023-10": 0.9755,
+            "2023-11": -0.8328,
+            "2023-12": 2.4179
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 5,
+          "trades_per_market_day": 1.121,
+          "mean_signed_move_pct": 0.00322
+        },
+        "test": {
+          "n": 264,
+          "wr": 65.15,
+          "return_pct": -3.5605,
+          "dd_pct": 4.6573,
+          "negative_months": 6,
+          "months": 12,
+          "monthly_return_pct": {
+            "2024-01": -3.5514,
+            "2024-02": 1.0525,
+            "2024-03": 0.9319,
+            "2024-04": 1.5833,
+            "2024-05": -1.051,
+            "2024-06": 0.2215,
+            "2024-07": -3.0773,
+            "2024-08": 3.1404,
+            "2024-09": -0.6169,
+            "2024-10": 0.8155,
+            "2024-11": -1.4241,
+            "2024-12": -1.4346
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 8,
+          "trades_per_market_day": 1.06,
+          "mean_signed_move_pct": -0.04371
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.9,
+            "threshold": 0.7208210246151932,
+            "eligible": true,
+            "score": -8.538849999999998,
+            "validation": {
+              "n": 278,
+              "wr": 64.39,
+              "return_pct": 0.0724,
+              "dd_pct": 4.1701,
+              "negative_months": 6,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -2.0376,
+                "2023-02": 1.1021,
+                "2023-03": -1.891,
+                "2023-04": -0.9329,
+                "2023-05": 0.9844,
+                "2023-06": 0.035,
+                "2023-07": -1.0657,
+                "2023-08": 2.348,
+                "2023-09": -0.9022,
+                "2023-10": 0.9755,
+                "2023-11": -0.8328,
+                "2023-12": 2.4179
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 5,
+              "trades_per_market_day": 1.121,
+              "mean_signed_move_pct": 0.00322
+            }
+          },
+          {
+            "quantile": 0.5,
+            "threshold": 0.6376474423303291,
+            "eligible": true,
+            "score": -11.241,
+            "validation": {
+              "n": 942,
+              "wr": 66.35,
+              "return_pct": 2.9219,
+              "dd_pct": 8.2176,
+              "negative_months": 5,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 0.5831,
+                "2023-02": 1.9083,
+                "2023-03": -3.4721,
+                "2023-04": 2.2838,
+                "2023-05": 3.4329,
+                "2023-06": -4.5509,
+                "2023-07": -0.2295,
+                "2023-08": 0.6888,
+                "2023-09": -0.761,
+                "2023-10": 0.3586,
+                "2023-11": 2.3246,
+                "2023-12": 0.9245,
+                "2024-01": -0.302
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 6,
+              "trades_per_market_day": 3.798,
+              "mean_signed_move_pct": 0.01162
+            }
+          },
+          {
+            "quantile": 0.4,
+            "threshold": 0.6182570416274226,
+            "eligible": true,
+            "score": -12.52785,
+            "validation": {
+              "n": 1065,
+              "wr": 66.29,
+              "return_pct": 3.7363,
+              "dd_pct": 9.2847,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 2.228,
+                "2023-02": 1.0432,
+                "2023-03": -2.8543,
+                "2023-04": 4.5206,
+                "2023-05": 3.4379,
+                "2023-06": -3.7851,
+                "2023-07": -0.7767,
+                "2023-08": 0.1994,
+                "2023-09": -0.3336,
+                "2023-10": -0.6973,
+                "2023-11": 1.7846,
+                "2023-12": 0.2729,
+                "2024-01": -1.0418
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 6,
+              "trades_per_market_day": 4.294,
+              "mean_signed_move_pct": 0.01273
+            }
+          },
+          {
+            "quantile": 0.85,
+            "threshold": 0.7052533710269927,
+            "eligible": false,
+            "score": -13.11355,
+            "validation": {
+              "n": 392,
+              "wr": 64.03,
+              "return_pct": -2.1318,
+              "dd_pct": 5.4147,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -1.6176,
+                "2023-02": 0.4711,
+                "2023-03": -2.0418,
+                "2023-04": -1.1352,
+                "2023-05": 1.9935,
+                "2023-06": -1.2186,
+                "2023-07": -1.7255,
+                "2023-08": 2.5432,
+                "2023-09": -0.3951,
+                "2023-10": 1.764,
+                "2023-11": -2.7108,
+                "2023-12": 2.1095
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 5,
+              "trades_per_market_day": 1.581,
+              "mean_signed_move_pct": -0.01589
+            }
+          }
+        ]
+      }
+    },
+    {
+      "spec": {
+        "target_pct": 1.0,
+        "stop_pct": 1.0,
+        "hold_sessions": 2,
+        "model": {
+          "leaves": 15,
+          "leaf": 120,
+          "l2": 3.0
+        }
+      },
+      "score": 3.531500000000001,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.8,
+          "threshold": 0.5506611002866804,
+          "validation": {
+            "n": 366,
+            "wr": 52.19,
+            "return_pct": 2.3726,
+            "dd_pct": 5.6364,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -5.0668,
+              "2021-02": 1.9558,
+              "2021-03": 2.7693,
+              "2021-04": 1.835,
+              "2021-05": -1.9429,
+              "2021-06": 0.9447,
+              "2021-07": -0.8789,
+              "2021-08": 0.1009,
+              "2021-09": 3.3728,
+              "2021-10": -0.7749,
+              "2021-11": 0.3154,
+              "2021-12": -0.2927,
+              "2022-01": 0.3009
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 9,
+            "trades_per_market_day": 1.458,
+            "mean_signed_move_pct": 0.02422
+          },
+          "test": {
+            "n": 584,
+            "wr": 49.32,
+            "return_pct": 3.8731,
+            "dd_pct": 8.0946,
+            "negative_months": 7,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -2.5825,
+              "2022-02": 6.4306,
+              "2022-03": 0.9737,
+              "2022-04": -3.0584,
+              "2022-05": 2.0696,
+              "2022-06": -2.5644,
+              "2022-07": 5.4941,
+              "2022-08": 4.3865,
+              "2022-09": -1.1513,
+              "2022-10": -2.1496,
+              "2022-11": 0.0269,
+              "2022-12": -3.1107,
+              "2023-01": -0.3062
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 9,
+            "trades_per_market_day": 2.336,
+            "mean_signed_move_pct": 0.027
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.8,
+              "threshold": 0.5506611002866804,
+              "eligible": true,
+              "score": -8.060099999999998,
+              "validation": {
+                "n": 366,
+                "wr": 52.19,
+                "return_pct": 2.3726,
+                "dd_pct": 5.6364,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -5.0668,
+                  "2021-02": 1.9558,
+                  "2021-03": 2.7693,
+                  "2021-04": 1.835,
+                  "2021-05": -1.9429,
+                  "2021-06": 0.9447,
+                  "2021-07": -0.8789,
+                  "2021-08": 0.1009,
+                  "2021-09": 3.3728,
+                  "2021-10": -0.7749,
+                  "2021-11": 0.3154,
+                  "2021-12": -0.2927,
+                  "2022-01": 0.3009
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 1.458,
+                "mean_signed_move_pct": 0.02422
+              }
+            },
+            {
+              "quantile": 0.85,
+              "threshold": 0.570753422962386,
+              "eligible": true,
+              "score": -9.7528,
+              "validation": {
+                "n": 298,
+                "wr": 51.01,
+                "return_pct": 0.1997,
+                "dd_pct": 5.3084,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -4.7368,
+                  "2021-02": 1.2723,
+                  "2021-03": 2.6293,
+                  "2021-04": 0.1052,
+                  "2021-05": -1.635,
+                  "2021-06": 0.073,
+                  "2021-07": 0.7648,
+                  "2021-08": -0.4949,
+                  "2021-09": 2.0395,
+                  "2021-10": -0.4697,
+                  "2021-11": -0.7678,
+                  "2021-12": 1.3299,
+                  "2022-01": 0.2991
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.187,
+                "mean_signed_move_pct": 0.00485
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.5178272161521296,
+              "eligible": true,
+              "score": -11.08945,
+              "validation": {
+                "n": 498,
+                "wr": 52.01,
+                "return_pct": 2.4562,
+                "dd_pct": 7.7105,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -3.8664,
+                  "2021-02": 1.8399,
+                  "2021-03": 2.9726,
+                  "2021-04": 0.4831,
+                  "2021-05": -2.456,
+                  "2021-06": 2.8021,
+                  "2021-07": -1.2958,
+                  "2021-08": -2.1434,
+                  "2021-09": 2.497,
+                  "2021-10": 0.2286,
+                  "2021-11": 1.7257,
+                  "2021-12": -0.673,
+                  "2022-01": 0.6008
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 1.984,
+                "mean_signed_move_pct": 0.01924
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.5944365163444012,
+              "eligible": false,
+              "score": -12.4722,
+              "validation": {
+                "n": 217,
+                "wr": 49.77,
+                "return_pct": -1.8756,
+                "dd_pct": 5.3962,
+                "negative_months": 6,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2021-01": -3.5672,
+                  "2021-02": -0.7662,
+                  "2021-03": 0.3499,
+                  "2021-04": -0.1948,
+                  "2021-05": 0.0779,
+                  "2021-06": 0.4135,
+                  "2021-07": 1.2045,
+                  "2021-08": -0.0036,
+                  "2021-09": 1.5233,
+                  "2021-10": -0.0782,
+                  "2021-11": -0.9817,
+                  "2021-12": 0.2227
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 0.865,
+                "mean_signed_move_pct": -0.02669
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.5840847902378139,
+          "validation": {
+            "n": 375,
+            "wr": 52.0,
+            "return_pct": 14.7275,
+            "dd_pct": 3.8397,
+            "negative_months": 5,
+            "months": 12,
+            "monthly_return_pct": {
+              "2022-01": -2.3904,
+              "2022-02": 10.5339,
+              "2022-03": 0.7878,
+              "2022-04": -0.6964,
+              "2022-05": 2.1832,
+              "2022-06": -1.2471,
+              "2022-07": 4.1718,
+              "2022-08": 0.8768,
+              "2022-09": -0.6156,
+              "2022-10": 0.034,
+              "2022-11": 1.55,
+              "2022-12": -0.7593
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 1.5,
+            "mean_signed_move_pct": 0.13066
+          },
+          "test": {
+            "n": 264,
+            "wr": 51.89,
+            "return_pct": 4.9931,
+            "dd_pct": 4.9863,
+            "negative_months": 6,
+            "months": 12,
+            "monthly_return_pct": {
+              "2023-01": 0.7206,
+              "2023-02": 1.2602,
+              "2023-03": -1.1786,
+              "2023-04": 2.4058,
+              "2023-05": 3.6582,
+              "2023-06": -0.5415,
+              "2023-07": -1.7126,
+              "2023-08": 2.5686,
+              "2023-09": -0.7515,
+              "2023-10": 1.0804,
+              "2023-11": -1.8614,
+              "2023-12": -0.5877
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 6,
+            "trades_per_market_day": 1.065,
+            "mean_signed_move_pct": 0.06472
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.5840847902378139,
+              "eligible": true,
+              "score": 6.987949999999998,
+              "validation": {
+                "n": 375,
+                "wr": 52.0,
+                "return_pct": 14.7275,
+                "dd_pct": 3.8397,
+                "negative_months": 5,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -2.3904,
+                  "2022-02": 10.5339,
+                  "2022-03": 0.7878,
+                  "2022-04": -0.6964,
+                  "2022-05": 2.1832,
+                  "2022-06": -1.2471,
+                  "2022-07": 4.1718,
+                  "2022-08": 0.8768,
+                  "2022-09": -0.6156,
+                  "2022-10": 0.034,
+                  "2022-11": 1.55,
+                  "2022-12": -0.7593
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 1.5,
+                "mean_signed_move_pct": 0.13066
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.6074351176464925,
+              "eligible": true,
+              "score": 1.0046499999999998,
+              "validation": {
+                "n": 268,
+                "wr": 51.87,
+                "return_pct": 9.0771,
+                "dd_pct": 3.3941,
+                "negative_months": 7,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -1.2542,
+                  "2022-02": 7.8256,
+                  "2022-03": 1.621,
+                  "2022-04": -0.9116,
+                  "2022-05": 2.3966,
+                  "2022-06": -0.7935,
+                  "2022-07": 2.7219,
+                  "2022-08": -0.3635,
+                  "2022-09": -1.0149,
+                  "2022-10": -1.1552,
+                  "2022-11": 0.291,
+                  "2022-12": -0.2772
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 1.072,
+                "mean_signed_move_pct": 0.11457
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.5640935692012183,
+              "eligible": true,
+              "score": -6.2666,
+              "validation": {
+                "n": 479,
+                "wr": 49.9,
+                "return_pct": 6.722,
+                "dd_pct": 6.6584,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.54,
+                  "2022-02": 10.245,
+                  "2022-03": 2.0445,
+                  "2022-04": -1.5745,
+                  "2022-05": 1.5958,
+                  "2022-06": -3.3845,
+                  "2022-07": 4.2257,
+                  "2022-08": 1.6999,
+                  "2022-09": -0.1809,
+                  "2022-10": 0.206,
+                  "2022-11": -3.069,
+                  "2022-12": -1.6512,
+                  "2023-01": -0.3186
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.916,
+                "mean_signed_move_pct": 0.05242
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.5330848872075655,
+              "eligible": false,
+              "score": -21.036550000000002,
+              "validation": {
+                "n": 647,
+                "wr": 49.61,
+                "return_pct": -0.678,
+                "dd_pct": 10.9031,
+                "negative_months": 9,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -1.0389,
+                  "2022-02": 7.2135,
+                  "2022-03": 0.0447,
+                  "2022-04": -3.4196,
+                  "2022-05": 2.1501,
+                  "2022-06": -1.8239,
+                  "2022-07": 5.1199,
+                  "2022-08": -0.9669,
+                  "2022-09": -0.992,
+                  "2022-10": -2.9469,
+                  "2022-11": -2.9242,
+                  "2022-12": -0.2007,
+                  "2023-01": -0.3172
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 2.588,
+                "mean_signed_move_pct": 0.00105
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": false,
+        "chosen_quantile": 0.4,
+        "threshold": 0.4642510081193774,
+        "validation": {
+          "n": 913,
+          "wr": 51.15,
+          "return_pct": -2.4777,
+          "dd_pct": 10.7083,
+          "negative_months": 6,
+          "months": 13,
+          "monthly_return_pct": {
+            "2023-01": 2.8413,
+            "2023-02": 0.4575,
+            "2023-03": -1.3869,
+            "2023-04": 3.0208,
+            "2023-05": 2.6343,
+            "2023-06": -4.705,
+            "2023-07": 2.6522,
+            "2023-08": -1.4557,
+            "2023-09": -2.6939,
+            "2023-10": 0.4901,
+            "2023-11": 0.2484,
+            "2023-12": -3.9035,
+            "2024-01": -0.3027
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 8,
+          "trades_per_market_day": 3.681,
+          "mean_signed_move_pct": -0.00659
+        },
+        "test": {
+          "n": 867,
+          "wr": 52.6,
+          "return_pct": 15.7126,
+          "dd_pct": 9.2216,
+          "negative_months": 4,
+          "months": 13,
+          "monthly_return_pct": {
+            "2024-01": 1.7416,
+            "2024-02": -1.3567,
+            "2024-03": -3.2239,
+            "2024-04": 1.4492,
+            "2024-05": -1.9615,
+            "2024-06": 1.6085,
+            "2024-07": -0.9047,
+            "2024-08": 5.3629,
+            "2024-09": 4.773,
+            "2024-10": 4.3096,
+            "2024-11": 1.6853,
+            "2024-12": 1.2996,
+            "2025-01": 0.2977
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 7,
+          "trades_per_market_day": 3.482,
+          "mean_signed_move_pct": 0.0594
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.4,
+            "threshold": 0.4642510081193774,
+            "eligible": false,
+            "score": -21.028649999999995,
+            "validation": {
+              "n": 913,
+              "wr": 51.15,
+              "return_pct": -2.4777,
+              "dd_pct": 10.7083,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 2.8413,
+                "2023-02": 0.4575,
+                "2023-03": -1.3869,
+                "2023-04": 3.0208,
+                "2023-05": 2.6343,
+                "2023-06": -4.705,
+                "2023-07": 2.6522,
+                "2023-08": -1.4557,
+                "2023-09": -2.6939,
+                "2023-10": 0.4901,
+                "2023-11": 0.2484,
+                "2023-12": -3.9035,
+                "2024-01": -0.3027
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 8,
+              "trades_per_market_day": 3.681,
+              "mean_signed_move_pct": -0.00659
+            }
+          },
+          {
+            "quantile": 0.5,
+            "threshold": 0.4836412462206302,
+            "eligible": false,
+            "score": -27.517249999999997,
+            "validation": {
+              "n": 828,
+              "wr": 50.72,
+              "return_pct": -6.0553,
+              "dd_pct": 11.6461,
+              "negative_months": 9,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -1.0426,
+                "2023-02": 0.4652,
+                "2023-03": -0.0709,
+                "2023-04": 1.789,
+                "2023-05": 0.8022,
+                "2023-06": -1.7516,
+                "2023-07": 1.6675,
+                "2023-08": -0.2529,
+                "2023-09": -1.6167,
+                "2023-10": -0.9727,
+                "2023-11": -0.118,
+                "2023-12": -4.6564,
+                "2024-01": -0.3027
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 8,
+              "trades_per_market_day": 3.339,
+              "mean_signed_move_pct": -0.02236
+            }
+          },
+          {
+            "quantile": 0.3,
+            "threshold": 0.4436287900713325,
+            "eligible": false,
+            "score": -32.823649999999994,
+            "validation": {
+              "n": 961,
+              "wr": 50.16,
+              "return_pct": -8.6567,
+              "dd_pct": 14.4457,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": 1.6199,
+                "2023-02": -0.1262,
+                "2023-03": -9.5131,
+                "2023-04": 3.4282,
+                "2023-05": 2.6374,
+                "2023-06": -5.6289,
+                "2023-07": 0.6829,
+                "2023-08": -1.7328,
+                "2023-09": 1.4846,
+                "2023-10": 0.0922,
+                "2023-11": 0.2743,
+                "2023-12": -0.4349,
+                "2024-01": -1.0501
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 10,
+              "trades_per_market_day": 3.875,
+              "mean_signed_move_pct": -0.02899
+            }
+          },
+          {
+            "quantile": 0.9,
+            "threshold": 0.5817391385784667,
+            "eligible": false,
+            "score": -33.3898,
+            "validation": {
+              "n": 246,
+              "wr": 45.53,
+              "return_pct": -10.8844,
+              "dd_pct": 11.9738,
+              "negative_months": 10,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -2.9322,
+                "2023-02": -0.5843,
+                "2023-03": -1.6742,
+                "2023-04": 0.7632,
+                "2023-05": -1.0851,
+                "2023-06": -1.4432,
+                "2023-07": -1.6231,
+                "2023-08": -0.4936,
+                "2023-09": -0.5305,
+                "2023-10": -0.1497,
+                "2023-11": -1.9895,
+                "2023-12": 0.3345
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 9,
+              "trades_per_market_day": 0.992,
+              "mean_signed_move_pct": -0.15361
+            }
+          }
+        ]
+      }
+    },
+    {
+      "spec": {
+        "target_pct": 1.0,
+        "stop_pct": 0.5,
+        "hold_sessions": 2,
+        "model": {
+          "leaves": 15,
+          "leaf": 120,
+          "l2": 3.0
+        }
+      },
+      "score": 2.8147,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.4191742631119387,
+          "validation": {
+            "n": 347,
+            "wr": 39.48,
+            "return_pct": 9.6444,
+            "dd_pct": 3.2149,
+            "negative_months": 3,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -1.4539,
+              "2021-02": 1.6154,
+              "2021-03": -0.9138,
+              "2021-04": 0.8982,
+              "2021-05": 0.0829,
+              "2021-06": 1.5785,
+              "2021-07": 0.1518,
+              "2021-08": 0.4482,
+              "2021-09": 4.3303,
+              "2021-10": -0.8961,
+              "2021-11": 1.0472,
+              "2021-12": 2.1412,
+              "2022-01": 0.3463
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 17,
+            "trades_per_market_day": 1.382,
+            "mean_signed_move_pct": 0.08973
+          },
+          "test": {
+            "n": 324,
+            "wr": 39.51,
+            "return_pct": 4.3127,
+            "dd_pct": 6.4305,
+            "negative_months": 5,
+            "months": 12,
+            "monthly_return_pct": {
+              "2022-01": 0.9082,
+              "2022-02": 2.4482,
+              "2022-03": 2.0236,
+              "2022-04": -2.0884,
+              "2022-05": 3.0963,
+              "2022-06": 0.2809,
+              "2022-07": -1.6,
+              "2022-08": 2.7136,
+              "2022-09": -0.0926,
+              "2022-10": 2.219,
+              "2022-11": -1.3328,
+              "2022-12": -4.0632
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 12,
+            "trades_per_market_day": 1.296,
+            "mean_signed_move_pct": 0.04533
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.4191742631119387,
+              "eligible": true,
+              "score": 3.716849999999999,
+              "validation": {
+                "n": 347,
+                "wr": 39.48,
+                "return_pct": 9.6444,
+                "dd_pct": 3.2149,
+                "negative_months": 3,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.4539,
+                  "2021-02": 1.6154,
+                  "2021-03": -0.9138,
+                  "2021-04": 0.8982,
+                  "2021-05": 0.0829,
+                  "2021-06": 1.5785,
+                  "2021-07": 0.1518,
+                  "2021-08": 0.4482,
+                  "2021-09": 4.3303,
+                  "2021-10": -0.8961,
+                  "2021-11": 1.0472,
+                  "2021-12": 2.1412,
+                  "2022-01": 0.3463
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 17,
+                "trades_per_market_day": 1.382,
+                "mean_signed_move_pct": 0.08973
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.43865878191729935,
+              "eligible": true,
+              "score": 2.46945,
+              "validation": {
+                "n": 256,
+                "wr": 39.45,
+                "return_pct": 7.2906,
+                "dd_pct": 2.4771,
+                "negative_months": 3,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2021-01": -1.1534,
+                  "2021-02": 2.2252,
+                  "2021-03": -0.154,
+                  "2021-04": 0.7551,
+                  "2021-05": 0.0375,
+                  "2021-06": 1.1831,
+                  "2021-07": 0.9018,
+                  "2021-08": 0.4482,
+                  "2021-09": 2.1918,
+                  "2021-10": -0.3765,
+                  "2021-11": 0.7045,
+                  "2021-12": 0.3472
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 13,
+                "trades_per_market_day": 1.02,
+                "mean_signed_move_pct": 0.09285
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.37443279782096645,
+              "eligible": true,
+              "score": -2.1848,
+              "validation": {
+                "n": 560,
+                "wr": 35.71,
+                "return_pct": 5.6868,
+                "dd_pct": 3.4858,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -0.3926,
+                  "2021-02": 1.1835,
+                  "2021-03": 0.7405,
+                  "2021-04": -0.5983,
+                  "2021-05": 0.2734,
+                  "2021-06": 0.6569,
+                  "2021-07": -0.4049,
+                  "2021-08": 2.1539,
+                  "2021-09": 4.1325,
+                  "2021-10": -0.1514,
+                  "2021-11": -0.0124,
+                  "2021-12": -2.249,
+                  "2022-01": 0.3468
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 12,
+                "trades_per_market_day": 2.231,
+                "mean_signed_move_pct": 0.03411
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.35085905275254886,
+              "eligible": true,
+              "score": -3.8841000000000006,
+              "validation": {
+                "n": 677,
+                "wr": 35.16,
+                "return_pct": 4.8498,
+                "dd_pct": 4.057,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -0.3653,
+                  "2021-02": 1.8119,
+                  "2021-03": 0.1764,
+                  "2021-04": -1.3355,
+                  "2021-05": -0.0604,
+                  "2021-06": 1.6565,
+                  "2021-07": -0.6113,
+                  "2021-08": 0.6576,
+                  "2021-09": 3.7587,
+                  "2021-10": 0.032,
+                  "2021-11": -1.1089,
+                  "2021-12": -0.1018,
+                  "2022-01": 0.3455
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 13,
+                "trades_per_market_day": 2.697,
+                "mean_signed_move_pct": 0.02445
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.38556342715082664,
+          "validation": {
+            "n": 397,
+            "wr": 37.78,
+            "return_pct": 2.7933,
+            "dd_pct": 4.9204,
+            "negative_months": 6,
+            "months": 12,
+            "monthly_return_pct": {
+              "2022-01": 1.299,
+              "2022-02": 1.5477,
+              "2022-03": 1.1093,
+              "2022-04": -1.0985,
+              "2022-05": -0.5199,
+              "2022-06": 1.8092,
+              "2022-07": -0.0786,
+              "2022-08": 1.123,
+              "2022-09": -0.4583,
+              "2022-10": 1.2312,
+              "2022-11": -2.6385,
+              "2022-12": -0.4692
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 1.588,
+            "mean_signed_move_pct": 0.02474
+          },
+          "test": {
+            "n": 555,
+            "wr": 36.04,
+            "return_pct": 3.3261,
+            "dd_pct": 5.0458,
+            "negative_months": 7,
+            "months": 13,
+            "monthly_return_pct": {
+              "2023-01": -2.0956,
+              "2023-02": -0.039,
+              "2023-03": -0.0966,
+              "2023-04": 2.1702,
+              "2023-05": 2.7458,
+              "2023-06": -3.62,
+              "2023-07": 1.0887,
+              "2023-08": -0.5978,
+              "2023-09": 4.1362,
+              "2023-10": -1.1423,
+              "2023-11": 1.7896,
+              "2023-12": -1.1005,
+              "2024-01": 0.3027
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 11,
+            "trades_per_market_day": 2.238,
+            "mean_signed_move_pct": 0.02088
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.38556342715082664,
+              "eligible": true,
+              "score": -7.209499999999999,
+              "validation": {
+                "n": 397,
+                "wr": 37.78,
+                "return_pct": 2.7933,
+                "dd_pct": 4.9204,
+                "negative_months": 6,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": 1.299,
+                  "2022-02": 1.5477,
+                  "2022-03": 1.1093,
+                  "2022-04": -1.0985,
+                  "2022-05": -0.5199,
+                  "2022-06": 1.8092,
+                  "2022-07": -0.0786,
+                  "2022-08": 1.123,
+                  "2022-09": -0.4583,
+                  "2022-10": 1.2312,
+                  "2022-11": -2.6385,
+                  "2022-12": -0.4692
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 11,
+                "trades_per_market_day": 1.588,
+                "mean_signed_move_pct": 0.02474
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.4052168164961045,
+              "eligible": false,
+              "score": -8.9834,
+              "validation": {
+                "n": 274,
+                "wr": 36.13,
+                "return_pct": -0.2,
+                "dd_pct": 4.4298,
+                "negative_months": 5,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": 1.301,
+                  "2022-02": 0.9391,
+                  "2022-03": 1.1042,
+                  "2022-04": 0.1084,
+                  "2022-05": 0.0532,
+                  "2022-06": 0.0451,
+                  "2022-07": -0.3827,
+                  "2022-08": -0.0422,
+                  "2022-09": -0.2658,
+                  "2022-10": 0.6686,
+                  "2022-11": -0.5045,
+                  "2022-12": -3.1505
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 1.096,
+                "mean_signed_move_pct": -0.00086
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.34629079191311796,
+              "eligible": true,
+              "score": -15.3739,
+              "validation": {
+                "n": 669,
+                "wr": 34.83,
+                "return_pct": 2.4139,
+                "dd_pct": 9.7574,
+                "negative_months": 7,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": -0.4519,
+                  "2022-02": 6.9939,
+                  "2022-03": -1.1169,
+                  "2022-04": 0.6245,
+                  "2022-05": -0.3469,
+                  "2022-06": 5.336,
+                  "2022-07": -1.4503,
+                  "2022-08": 1.6736,
+                  "2022-09": -1.9484,
+                  "2022-10": 2.1121,
+                  "2022-11": -5.2511,
+                  "2022-12": -3.1491
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 15,
+                "trades_per_market_day": 2.676,
+                "mean_signed_move_pct": 0.01508
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.36996310386617387,
+              "eligible": true,
+              "score": -16.122,
+              "validation": {
+                "n": 498,
+                "wr": 36.55,
+                "return_pct": 0.1156,
+                "dd_pct": 8.7354,
+                "negative_months": 7,
+                "months": 12,
+                "monthly_return_pct": {
+                  "2022-01": 1.9061,
+                  "2022-02": 1.9721,
+                  "2022-03": 0.8055,
+                  "2022-04": -0.3558,
+                  "2022-05": -0.476,
+                  "2022-06": 4.1827,
+                  "2022-07": -0.8946,
+                  "2022-08": -0.4282,
+                  "2022-09": -2.5826,
+                  "2022-10": 1.8335,
+                  "2022-11": -3.056,
+                  "2022-12": -2.5282
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 12,
+                "trades_per_market_day": 1.992,
+                "mean_signed_move_pct": 0.00263
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": false,
+        "chosen_quantile": 0.8,
+        "threshold": 0.39567476716037675,
+        "validation": {
+          "n": 479,
+          "wr": 35.49,
+          "return_pct": -0.1251,
+          "dd_pct": 5.5392,
+          "negative_months": 7,
+          "months": 13,
+          "monthly_return_pct": {
+            "2023-01": -0.9219,
+            "2023-02": -2.5756,
+            "2023-03": -1.4993,
+            "2023-04": 1.3132,
+            "2023-05": 4.3001,
+            "2023-06": -0.197,
+            "2023-07": 0.1508,
+            "2023-08": 0.0983,
+            "2023-09": 2.8846,
+            "2023-10": -2.7395,
+            "2023-11": -0.7751,
+            "2023-12": -0.2345,
+            "2024-01": 0.3018
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 13,
+          "trades_per_market_day": 1.931,
+          "mean_signed_move_pct": 0.00091
+        },
+        "test": {
+          "n": 453,
+          "wr": 36.87,
+          "return_pct": 7.998,
+          "dd_pct": 6.1999,
+          "negative_months": 5,
+          "months": 12,
+          "monthly_return_pct": {
+            "2024-01": -1.1241,
+            "2024-02": -0.4806,
+            "2024-03": 0.263,
+            "2024-04": 3.4538,
+            "2024-05": 0.2651,
+            "2024-06": -0.2923,
+            "2024-07": 1.3183,
+            "2024-08": 2.6675,
+            "2024-09": -3.2815,
+            "2024-10": 2.5946,
+            "2024-11": 2.7994,
+            "2024-12": -0.2516
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 13,
+          "trades_per_market_day": 1.819,
+          "mean_signed_move_pct": 0.05925
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.8,
+            "threshold": 0.39567476716037675,
+            "eligible": false,
+            "score": -11.578999999999999,
+            "validation": {
+              "n": 479,
+              "wr": 35.49,
+              "return_pct": -0.1251,
+              "dd_pct": 5.5392,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -0.9219,
+                "2023-02": -2.5756,
+                "2023-03": -1.4993,
+                "2023-04": 1.3132,
+                "2023-05": 4.3001,
+                "2023-06": -0.197,
+                "2023-07": 0.1508,
+                "2023-08": 0.0983,
+                "2023-09": 2.8846,
+                "2023-10": -2.7395,
+                "2023-11": -0.7751,
+                "2023-12": -0.2345,
+                "2024-01": 0.3018
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 13,
+              "trades_per_market_day": 1.931,
+              "mean_signed_move_pct": 0.00091
+            }
+          },
+          {
+            "quantile": 0.85,
+            "threshold": 0.41051140143437603,
+            "eligible": false,
+            "score": -13.0412,
+            "validation": {
+              "n": 397,
+              "wr": 36.52,
+              "return_pct": -1.6152,
+              "dd_pct": 4.8608,
+              "negative_months": 9,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -0.4569,
+                "2023-02": -2.5793,
+                "2023-03": -0.9039,
+                "2023-04": 2.2999,
+                "2023-05": 2.6928,
+                "2023-06": -0.2046,
+                "2023-07": -1.1099,
+                "2023-08": -1.989,
+                "2023-09": 3.6448,
+                "2023-10": -1.9254,
+                "2023-11": -0.9481,
+                "2023-12": -0.2335,
+                "2024-01": 0.3009
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 14,
+              "trades_per_market_day": 1.601,
+              "mean_signed_move_pct": -0.01168
+            }
+          },
+          {
+            "quantile": 0.9,
+            "threshold": 0.4293519140980592,
+            "eligible": false,
+            "score": -13.3238,
+            "validation": {
+              "n": 274,
+              "wr": 37.96,
+              "return_pct": -2.602,
+              "dd_pct": 5.0676,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -0.191,
+                "2023-02": -3.0672,
+                "2023-03": -1.4751,
+                "2023-04": 0.7323,
+                "2023-05": 1.7778,
+                "2023-06": 0.5218,
+                "2023-07": -0.7676,
+                "2023-08": -0.2828,
+                "2023-09": 1.8193,
+                "2023-10": -1.4895,
+                "2023-11": -0.4419,
+                "2023-12": 0.3388
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 8,
+              "trades_per_market_day": 1.105,
+              "mean_signed_move_pct": -0.02985
+            }
+          },
+          {
+            "quantile": 0.5,
+            "threshold": 0.3385671749566765,
+            "eligible": false,
+            "score": -19.3597,
+            "validation": {
+              "n": 878,
+              "wr": 33.6,
+              "return_pct": -4.1918,
+              "dd_pct": 8.0026,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -4.9581,
+                "2023-02": -0.7064,
+                "2023-03": -2.3682,
+                "2023-04": 4.0289,
+                "2023-05": 1.0994,
+                "2023-06": -1.0103,
+                "2023-07": 3.4586,
+                "2023-08": 0.1008,
+                "2023-09": 1.22,
+                "2023-10": -1.2991,
+                "2023-11": -2.7452,
+                "2023-12": -0.7387
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 22,
+              "trades_per_market_day": 3.54,
+              "mean_signed_move_pct": -0.01496
+            }
+          }
+        ]
+      }
+    },
+    {
+      "spec": {
+        "target_pct": 0.5,
+        "stop_pct": 1.0,
+        "hold_sessions": 1,
+        "model": {
+          "leaves": 15,
+          "leaf": 240,
+          "l2": 5.0
+        }
+      },
+      "score": 2.5191,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.9,
+          "threshold": 0.733302817356965,
+          "validation": {
+            "n": 257,
+            "wr": 70.04,
+            "return_pct": 7.5043,
+            "dd_pct": 2.348,
+            "negative_months": 2,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -1.2893,
+              "2021-02": 0.6061,
+              "2021-03": 0.3507,
+              "2021-04": 1.4125,
+              "2021-05": 1.1714,
+              "2021-06": 1.481,
+              "2021-07": 0.932,
+              "2021-08": 1.2075,
+              "2021-09": 0.3556,
+              "2021-10": -1.2786,
+              "2021-11": 1.4437,
+              "2021-12": 0.7651,
+              "2022-01": 0.1505
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 4,
+            "trades_per_market_day": 1.024,
+            "mean_signed_move_pct": 0.09514
+          },
+          "test": {
+            "n": 459,
+            "wr": 65.36,
+            "return_pct": 0.6406,
+            "dd_pct": 4.9069,
+            "negative_months": 8,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -2.5045,
+              "2022-02": 1.2095,
+              "2022-03": -1.3444,
+              "2022-04": -0.2283,
+              "2022-05": -0.5169,
+              "2022-06": 1.9783,
+              "2022-07": 1.917,
+              "2022-08": 1.1618,
+              "2022-09": -0.2789,
+              "2022-10": -2.6443,
+              "2022-11": -1.7013,
+              "2022-12": 4.1277,
+              "2023-01": -0.3091
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 8,
+            "trades_per_market_day": 1.836,
+            "mean_signed_move_pct": 0.00615
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.9,
+              "threshold": 0.733302817356965,
+              "eligible": true,
+              "score": 3.6827,
+              "validation": {
+                "n": 257,
+                "wr": 70.04,
+                "return_pct": 7.5043,
+                "dd_pct": 2.348,
+                "negative_months": 2,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.2893,
+                  "2021-02": 0.6061,
+                  "2021-03": 0.3507,
+                  "2021-04": 1.4125,
+                  "2021-05": 1.1714,
+                  "2021-06": 1.481,
+                  "2021-07": 0.932,
+                  "2021-08": 1.2075,
+                  "2021-09": 0.3556,
+                  "2021-10": -1.2786,
+                  "2021-11": 1.4437,
+                  "2021-12": 0.7651,
+                  "2022-01": 0.1505
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 4,
+                "trades_per_market_day": 1.024,
+                "mean_signed_move_pct": 0.09514
+              }
+            },
+            {
+              "quantile": 0.85,
+              "threshold": 0.7154662115609796,
+              "eligible": true,
+              "score": -9.5783,
+              "validation": {
+                "n": 351,
+                "wr": 68.09,
+                "return_pct": 1.0229,
+                "dd_pct": 5.5214,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -0.9607,
+                  "2021-02": 1.4815,
+                  "2021-03": -1.0678,
+                  "2021-04": 2.7591,
+                  "2021-05": -2.4774,
+                  "2021-06": 2.7676,
+                  "2021-07": -1.2916,
+                  "2021-08": 1.706,
+                  "2021-09": -0.7177,
+                  "2021-10": -3.1989,
+                  "2021-11": 1.2686,
+                  "2021-12": 0.8147,
+                  "2022-01": 0.1509
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 5,
+                "trades_per_market_day": 1.398,
+                "mean_signed_move_pct": 0.01155
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.6470638832284428,
+              "eligible": true,
+              "score": -12.7621,
+              "validation": {
+                "n": 707,
+                "wr": 66.76,
+                "return_pct": 1.2287,
+                "dd_pct": 8.1056,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -2.0431,
+                  "2021-02": 3.074,
+                  "2021-03": 1.0577,
+                  "2021-04": 3.1301,
+                  "2021-05": -3.4586,
+                  "2021-06": 2.165,
+                  "2021-07": -0.8677,
+                  "2021-08": 2.2942,
+                  "2021-09": 2.3748,
+                  "2021-10": -5.7246,
+                  "2021-11": -1.5391,
+                  "2021-12": 1.0578,
+                  "2022-01": 0.1515
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 6,
+                "trades_per_market_day": 2.817,
+                "mean_signed_move_pct": 0.00725
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.6996448293572074,
+              "eligible": false,
+              "score": -21.0329,
+              "validation": {
+                "n": 434,
+                "wr": 66.13,
+                "return_pct": -4.4053,
+                "dd_pct": 9.1926,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -2.2111,
+                  "2021-02": 2.2717,
+                  "2021-03": -0.3135,
+                  "2021-04": 2.2678,
+                  "2021-05": -3.2508,
+                  "2021-06": 2.7703,
+                  "2021-07": -1.4261,
+                  "2021-08": -0.2757,
+                  "2021-09": -0.107,
+                  "2021-10": -4.3387,
+                  "2021-11": 0.0247,
+                  "2021-12": 0.2077,
+                  "2022-01": 0.1509
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.729,
+                "mean_signed_move_pct": -0.03269
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.724235429139118,
+          "validation": {
+            "n": 395,
+            "wr": 64.05,
+            "return_pct": 1.3074,
+            "dd_pct": 5.6347,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -3.4514,
+              "2022-02": 9.5463,
+              "2022-03": -3.5784,
+              "2022-04": 1.3517,
+              "2022-05": 0.7445,
+              "2022-06": -0.2669,
+              "2022-07": 1.255,
+              "2022-08": -2.7826,
+              "2022-09": -1.6369,
+              "2022-10": 0.0845,
+              "2022-11": 0.1446,
+              "2022-12": 1.1746,
+              "2023-01": -0.6488
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 9,
+            "trades_per_market_day": 1.58,
+            "mean_signed_move_pct": 0.01472
+          },
+          "test": {
+            "n": 293,
+            "wr": 67.92,
+            "return_pct": 7.8816,
+            "dd_pct": 2.3774,
+            "negative_months": 4,
+            "months": 12,
+            "monthly_return_pct": {
+              "2023-01": 1.9929,
+              "2023-02": 0.5342,
+              "2023-03": -0.2326,
+              "2023-04": 0.033,
+              "2023-05": 2.5012,
+              "2023-06": -1.0607,
+              "2023-07": -0.5785,
+              "2023-08": 0.879,
+              "2023-09": -0.9038,
+              "2023-10": 2.1235,
+              "2023-11": 1.0268,
+              "2023-12": 1.3755
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 3,
+            "trades_per_market_day": 1.181,
+            "mean_signed_move_pct": 0.08777
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.724235429139118,
+              "eligible": true,
+              "score": -9.504150000000001,
+              "validation": {
+                "n": 395,
+                "wr": 64.05,
+                "return_pct": 1.3074,
+                "dd_pct": 5.6347,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -3.4514,
+                  "2022-02": 9.5463,
+                  "2022-03": -3.5784,
+                  "2022-04": 1.3517,
+                  "2022-05": 0.7445,
+                  "2022-06": -0.2669,
+                  "2022-07": 1.255,
+                  "2022-08": -2.7826,
+                  "2022-09": -1.6369,
+                  "2022-10": 0.0845,
+                  "2022-11": 0.1446,
+                  "2022-12": 1.1746,
+                  "2023-01": -0.6488
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 1.58,
+                "mean_signed_move_pct": 0.01472
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.6658152967660985,
+              "eligible": true,
+              "score": -10.80785,
+              "validation": {
+                "n": 873,
+                "wr": 67.01,
+                "return_pct": 6.6434,
+                "dd_pct": 10.0809,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.5916,
+                  "2022-02": 9.7968,
+                  "2022-03": -1.2644,
+                  "2022-04": 2.0307,
+                  "2022-05": 1.037,
+                  "2022-06": 2.8516,
+                  "2022-07": 5.3895,
+                  "2022-08": -1.4569,
+                  "2022-09": -2.6149,
+                  "2022-10": -5.8205,
+                  "2022-11": 0.5216,
+                  "2022-12": 0.1276,
+                  "2023-01": -0.6503
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 3.492,
+                "mean_signed_move_pct": 0.02745
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.7119486847998011,
+              "eligible": true,
+              "score": -14.205200000000001,
+              "validation": {
+                "n": 502,
+                "wr": 63.75,
+                "return_pct": 0.0039,
+                "dd_pct": 7.5644,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.8721,
+                  "2022-02": 9.2156,
+                  "2022-03": -2.3962,
+                  "2022-04": 1.504,
+                  "2022-05": 0.2887,
+                  "2022-06": 0.4174,
+                  "2022-07": 0.9483,
+                  "2022-08": -3.428,
+                  "2022-09": -1.3959,
+                  "2022-10": -0.5178,
+                  "2022-11": 0.9158,
+                  "2022-12": -1.4504,
+                  "2023-01": -0.6488
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 2.008,
+                "mean_signed_move_pct": 0.00314
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.6881490993958548,
+              "eligible": true,
+              "score": -17.24825,
+              "validation": {
+                "n": 711,
+                "wr": 66.1,
+                "return_pct": 2.3927,
+                "dd_pct": 11.2013,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.882,
+                  "2022-02": 9.3319,
+                  "2022-03": -1.2148,
+                  "2022-04": 1.4009,
+                  "2022-05": 0.2812,
+                  "2022-06": 3.1594,
+                  "2022-07": 2.5465,
+                  "2022-08": -2.803,
+                  "2022-09": -2.6157,
+                  "2022-10": -3.5313,
+                  "2022-11": -0.3795,
+                  "2022-12": 0.7066,
+                  "2023-01": -0.9388
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 2.844,
+                "mean_signed_move_pct": 0.01436
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": false,
+        "chosen_quantile": 0.8,
+        "threshold": 0.6939024243866008,
+        "validation": {
+          "n": 492,
+          "wr": 65.85,
+          "return_pct": -3.628,
+          "dd_pct": 8.9315,
+          "negative_months": 7,
+          "months": 12,
+          "monthly_return_pct": {
+            "2023-01": -2.1427,
+            "2023-02": 3.2758,
+            "2023-03": -2.4265,
+            "2023-04": -1.7755,
+            "2023-05": 2.8274,
+            "2023-06": -1.523,
+            "2023-07": -1.0444,
+            "2023-08": -2.2545,
+            "2023-09": 1.1884,
+            "2023-10": 0.7453,
+            "2023-11": -2.9647,
+            "2023-12": 2.6929
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 8,
+          "trades_per_market_day": 1.984,
+          "mean_signed_move_pct": -0.02292
+        },
+        "test": {
+          "n": 489,
+          "wr": 68.1,
+          "return_pct": 12.057,
+          "dd_pct": 4.4344,
+          "negative_months": 5,
+          "months": 13,
+          "monthly_return_pct": {
+            "2024-01": -2.8848,
+            "2024-02": 0.4519,
+            "2024-03": -0.1533,
+            "2024-04": -0.5943,
+            "2024-05": -0.8277,
+            "2024-06": 0.9794,
+            "2024-07": 0.6272,
+            "2024-08": 5.097,
+            "2024-09": 2.3282,
+            "2024-10": 2.954,
+            "2024-11": -0.908,
+            "2024-12": 4.4384,
+            "2025-01": 0.2264
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 5,
+          "trades_per_market_day": 1.964,
+          "mean_signed_move_pct": 0.08006
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.8,
+            "threshold": 0.6939024243866008,
+            "eligible": false,
+            "score": -19.86675,
+            "validation": {
+              "n": 492,
+              "wr": 65.85,
+              "return_pct": -3.628,
+              "dd_pct": 8.9315,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -2.1427,
+                "2023-02": 3.2758,
+                "2023-03": -2.4265,
+                "2023-04": -1.7755,
+                "2023-05": 2.8274,
+                "2023-06": -1.523,
+                "2023-07": -1.0444,
+                "2023-08": -2.2545,
+                "2023-09": 1.1884,
+                "2023-10": 0.7453,
+                "2023-11": -2.9647,
+                "2023-12": 2.6929
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 8,
+              "trades_per_market_day": 1.984,
+              "mean_signed_move_pct": -0.02292
+            }
+          },
+          {
+            "quantile": 0.4,
+            "threshold": 0.6160882209208106,
+            "eligible": false,
+            "score": -20.9683,
+            "validation": {
+              "n": 1061,
+              "wr": 65.88,
+              "return_pct": -5.5888,
+              "dd_pct": 8.6922,
+              "negative_months": 6,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -4.5201,
+                "2023-02": 0.4325,
+                "2023-03": -3.5758,
+                "2023-04": 2.3141,
+                "2023-05": 2.2099,
+                "2023-06": -2.8113,
+                "2023-07": 1.2157,
+                "2023-08": -2.365,
+                "2023-09": 1.7913,
+                "2023-10": -0.6241,
+                "2023-11": 0.3016,
+                "2023-12": 0.501,
+                "2024-01": -0.3027
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 9,
+              "trades_per_market_day": 4.278,
+              "mean_signed_move_pct": -0.01669
+            }
+          },
+          {
+            "quantile": 0.6,
+            "threshold": 0.6548579440017961,
+            "eligible": false,
+            "score": -21.64245,
+            "validation": {
+              "n": 833,
+              "wr": 66.39,
+              "return_pct": -4.201,
+              "dd_pct": 9.7369,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -1.7244,
+                "2023-02": 3.1967,
+                "2023-03": -3.6127,
+                "2023-04": -0.5465,
+                "2023-05": 3.2868,
+                "2023-06": -3.0822,
+                "2023-07": -2.179,
+                "2023-08": -2.3897,
+                "2023-09": 1.653,
+                "2023-10": 1.1159,
+                "2023-11": 0.1544,
+                "2023-12": 0.4477,
+                "2024-01": -0.3027
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 6,
+              "trades_per_market_day": 3.359,
+              "mean_signed_move_pct": -0.01567
+            }
+          },
+          {
+            "quantile": 0.9,
+            "threshold": 0.722306628655416,
+            "eligible": false,
+            "score": -23.305249999999997,
+            "validation": {
+              "n": 272,
+              "wr": 60.66,
+              "return_pct": -7.1301,
+              "dd_pct": 8.8545,
+              "negative_months": 7,
+              "months": 12,
+              "monthly_return_pct": {
+                "2023-01": -1.7433,
+                "2023-02": 1.4674,
+                "2023-03": -2.2359,
+                "2023-04": -0.4272,
+                "2023-05": 0.6484,
+                "2023-06": -1.1842,
+                "2023-07": -1.4098,
+                "2023-08": 0.003,
+                "2023-09": -1.9475,
+                "2023-10": 1.0788,
+                "2023-11": -2.1334,
+                "2023-12": 0.6082
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 5,
+              "trades_per_market_day": 1.097,
+              "mean_signed_move_pct": -0.08895
+            }
+          }
+        ]
+      }
+    },
+    {
+      "spec": {
+        "target_pct": 0.5,
+        "stop_pct": 1.0,
+        "hold_sessions": 2,
+        "model": {
+          "leaves": 7,
+          "leaf": 80,
+          "l2": 2.0
+        }
+      },
+      "score": -2.363599999999998,
+      "development": [
+        {
+          "year": 2022,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020
+          ],
+          "validation_year": 2021,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.85,
+          "threshold": 0.7012473623192924,
+          "validation": {
+            "n": 351,
+            "wr": 70.09,
+            "return_pct": 10.134,
+            "dd_pct": 2.5529,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2021-01": -1.1635,
+              "2021-02": 2.3325,
+              "2021-03": 0.7896,
+              "2021-04": 1.4407,
+              "2021-05": 1.2347,
+              "2021-06": 1.4539,
+              "2021-07": -0.1876,
+              "2021-08": 0.3668,
+              "2021-09": 1.0069,
+              "2021-10": -1.1488,
+              "2021-11": 4.2073,
+              "2021-12": -0.365,
+              "2022-01": -0.1502
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 8,
+            "trades_per_market_day": 1.398,
+            "mean_signed_move_pct": 0.09281
+          },
+          "test": {
+            "n": 521,
+            "wr": 63.34,
+            "return_pct": 1.9937,
+            "dd_pct": 6.1309,
+            "negative_months": 6,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -0.9698,
+              "2022-02": 4.7305,
+              "2022-03": -3.556,
+              "2022-04": 3.0387,
+              "2022-05": 1.7045,
+              "2022-06": -2.1118,
+              "2022-07": 0.6087,
+              "2022-08": 2.4234,
+              "2022-09": -1.8672,
+              "2022-10": -3.4265,
+              "2022-11": 0.5392,
+              "2022-12": 2.1793,
+              "2023-01": -0.921
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 9,
+            "trades_per_market_day": 2.084,
+            "mean_signed_move_pct": 0.01575
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.85,
+              "threshold": 0.7012473623192924,
+              "eligible": true,
+              "score": 4.50555,
+              "validation": {
+                "n": 351,
+                "wr": 70.09,
+                "return_pct": 10.134,
+                "dd_pct": 2.5529,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.1635,
+                  "2021-02": 2.3325,
+                  "2021-03": 0.7896,
+                  "2021-04": 1.4407,
+                  "2021-05": 1.2347,
+                  "2021-06": 1.4539,
+                  "2021-07": -0.1876,
+                  "2021-08": 0.3668,
+                  "2021-09": 1.0069,
+                  "2021-10": -1.1488,
+                  "2021-11": 4.2073,
+                  "2021-12": -0.365,
+                  "2022-01": -0.1502
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 8,
+                "trades_per_market_day": 1.398,
+                "mean_signed_move_pct": 0.09281
+              }
+            },
+            {
+              "quantile": 0.8,
+              "threshold": 0.6926019558889758,
+              "eligible": true,
+              "score": 1.1945,
+              "validation": {
+                "n": 433,
+                "wr": 70.21,
+                "return_pct": 10.385,
+                "dd_pct": 4.9284,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -0.5647,
+                  "2021-02": 3.9657,
+                  "2021-03": 1.2438,
+                  "2021-04": 2.4712,
+                  "2021-05": 0.3298,
+                  "2021-06": 1.8176,
+                  "2021-07": -2.0799,
+                  "2021-08": -0.3634,
+                  "2021-09": 1.6617,
+                  "2021-10": -1.9591,
+                  "2021-11": 3.9263,
+                  "2021-12": -0.3047,
+                  "2022-01": 0.0
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 6,
+                "trades_per_market_day": 1.725,
+                "mean_signed_move_pct": 0.0775
+              }
+            },
+            {
+              "quantile": 0.9,
+              "threshold": 0.7141158814552901,
+              "eligible": true,
+              "score": -4.82285,
+              "validation": {
+                "n": 256,
+                "wr": 66.41,
+                "return_pct": 0.6876,
+                "dd_pct": 2.4497,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -1.8133,
+                  "2021-02": 1.8732,
+                  "2021-03": 0.0393,
+                  "2021-04": 0.0165,
+                  "2021-05": 0.902,
+                  "2021-06": 0.5105,
+                  "2021-07": 0.2615,
+                  "2021-08": -0.084,
+                  "2021-09": -0.3214,
+                  "2021-10": -0.0,
+                  "2021-11": 1.2277,
+                  "2021-12": -2.0088,
+                  "2022-01": 0.1502
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 1.02,
+                "mean_signed_move_pct": 0.00989
+              }
+            },
+            {
+              "quantile": 0.3,
+              "threshold": 0.6129360250743632,
+              "eligible": true,
+              "score": -8.9352,
+              "validation": {
+                "n": 967,
+                "wr": 67.32,
+                "return_pct": 3.296,
+                "dd_pct": 7.2696,
+                "negative_months": 4,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2021-01": -5.7298,
+                  "2021-02": 2.5016,
+                  "2021-03": 3.0223,
+                  "2021-04": 2.2019,
+                  "2021-05": -4.7536,
+                  "2021-06": 2.3632,
+                  "2021-07": 0.0169,
+                  "2021-08": 1.5092,
+                  "2021-09": 5.4928,
+                  "2021-10": -4.4145,
+                  "2021-11": 0.811,
+                  "2021-12": 0.9022,
+                  "2022-01": -0.0014
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 10,
+                "trades_per_market_day": 3.853,
+                "mean_signed_move_pct": 0.01247
+              }
+            }
+          ]
+        },
+        {
+          "year": 2023,
+          "train_years": [
+            2017,
+            2018,
+            2019,
+            2020,
+            2021
+          ],
+          "validation_year": 2022,
+          "threshold_selection_pass": true,
+          "chosen_quantile": 0.5,
+          "threshold": 0.6537900770674121,
+          "validation": {
+            "n": 987,
+            "wr": 67.48,
+            "return_pct": 12.2891,
+            "dd_pct": 9.702,
+            "negative_months": 5,
+            "months": 13,
+            "monthly_return_pct": {
+              "2022-01": -1.719,
+              "2022-02": 7.9299,
+              "2022-03": -4.828,
+              "2022-04": 1.9535,
+              "2022-05": 2.4131,
+              "2022-06": 2.3548,
+              "2022-07": 6.7389,
+              "2022-08": 1.1744,
+              "2022-09": -1.9866,
+              "2022-10": -5.329,
+              "2022-11": 2.1213,
+              "2022-12": 2.5994,
+              "2023-01": -0.8724
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 3.948,
+            "mean_signed_move_pct": 0.04179
+          },
+          "test": {
+            "n": 924,
+            "wr": 66.88,
+            "return_pct": 6.0766,
+            "dd_pct": 8.2904,
+            "negative_months": 8,
+            "months": 13,
+            "monthly_return_pct": {
+              "2023-01": -0.0211,
+              "2023-02": 3.97,
+              "2023-03": -1.8495,
+              "2023-04": 5.3545,
+              "2023-05": 5.1161,
+              "2023-06": -2.3248,
+              "2023-07": -2.0165,
+              "2023-08": -1.2361,
+              "2023-09": 1.5392,
+              "2023-10": -1.1097,
+              "2023-11": 2.4192,
+              "2023-12": -2.3958,
+              "2024-01": -1.0501
+            },
+            "months_ge_30pct": 0,
+            "max_loss_streak": 7,
+            "trades_per_market_day": 3.726,
+            "mean_signed_move_pct": 0.02292
+          },
+          "threshold_frontier": [
+            {
+              "quantile": 0.5,
+              "threshold": 0.6537900770674121,
+              "eligible": true,
+              "score": -4.089100000000001,
+              "validation": {
+                "n": 987,
+                "wr": 67.48,
+                "return_pct": 12.2891,
+                "dd_pct": 9.702,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -1.719,
+                  "2022-02": 7.9299,
+                  "2022-03": -4.828,
+                  "2022-04": 1.9535,
+                  "2022-05": 2.4131,
+                  "2022-06": 2.3548,
+                  "2022-07": 6.7389,
+                  "2022-08": 1.1744,
+                  "2022-09": -1.9866,
+                  "2022-10": -5.329,
+                  "2022-11": 2.1213,
+                  "2022-12": 2.5994,
+                  "2023-01": -0.8724
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 3.948,
+                "mean_signed_move_pct": 0.04179
+              }
+            },
+            {
+              "quantile": 0.6,
+              "threshold": 0.6697894081666201,
+              "eligible": true,
+              "score": -4.315050000000001,
+              "validation": {
+                "n": 840,
+                "wr": 66.67,
+                "return_pct": 9.1368,
+                "dd_pct": 7.7457,
+                "negative_months": 5,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -2.0058,
+                  "2022-02": 6.9473,
+                  "2022-03": -5.0714,
+                  "2022-04": 1.8021,
+                  "2022-05": 1.654,
+                  "2022-06": 0.775,
+                  "2022-07": 6.6417,
+                  "2022-08": 0.902,
+                  "2022-09": -0.7904,
+                  "2022-10": -3.3668,
+                  "2022-11": 0.3601,
+                  "2022-12": 2.4963,
+                  "2023-01": -0.8724
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 7,
+                "trades_per_market_day": 3.36,
+                "mean_signed_move_pct": 0.03769
+              }
+            },
+            {
+              "quantile": 0.7,
+              "threshold": 0.6847741724915933,
+              "eligible": true,
+              "score": -6.1113,
+              "validation": {
+                "n": 691,
+                "wr": 65.99,
+                "return_pct": 6.939,
+                "dd_pct": 6.8068,
+                "negative_months": 7,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -0.8131,
+                  "2022-02": 6.4682,
+                  "2022-03": -4.0642,
+                  "2022-04": 1.3426,
+                  "2022-05": 0.7464,
+                  "2022-06": -0.7737,
+                  "2022-07": 5.8909,
+                  "2022-08": 2.1276,
+                  "2022-09": -1.0542,
+                  "2022-10": -2.7169,
+                  "2022-11": -0.5594,
+                  "2022-12": 1.5487,
+                  "2023-01": -0.8805
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 6,
+                "trades_per_market_day": 2.764,
+                "mean_signed_move_pct": 0.03573
+              }
+            },
+            {
+              "quantile": 0.4,
+              "threshold": 0.6390220884208072,
+              "eligible": true,
+              "score": -10.61485,
+              "validation": {
+                "n": 1108,
+                "wr": 66.7,
+                "return_pct": 7.2895,
+                "dd_pct": 10.3809,
+                "negative_months": 6,
+                "months": 13,
+                "monthly_return_pct": {
+                  "2022-01": -1.8693,
+                  "2022-02": 6.8124,
+                  "2022-03": -4.8778,
+                  "2022-04": 2.877,
+                  "2022-05": 3.3383,
+                  "2022-06": 2.0875,
+                  "2022-07": 5.2726,
+                  "2022-08": 0.5274,
+                  "2022-09": -1.8302,
+                  "2022-10": -5.0312,
+                  "2022-11": 3.3173,
+                  "2022-12": -1.8422,
+                  "2023-01": -0.9077
+                },
+                "months_ge_30pct": 0,
+                "max_loss_streak": 9,
+                "trades_per_market_day": 4.432,
+                "mean_signed_move_pct": 0.02379
+              }
+            }
+          ]
+        }
+      ],
+      "acceptance_2024": {
+        "year": 2024,
+        "train_years": [
+          2018,
+          2019,
+          2020,
+          2021,
+          2022
+        ],
+        "validation_year": 2023,
+        "threshold_selection_pass": true,
+        "chosen_quantile": 0.8,
+        "threshold": 0.6977134629201397,
+        "validation": {
+          "n": 471,
+          "wr": 65.18,
+          "return_pct": 2.1973,
+          "dd_pct": 5.7504,
+          "negative_months": 7,
+          "months": 13,
+          "monthly_return_pct": {
+            "2023-01": -1.222,
+            "2023-02": 1.98,
+            "2023-03": -0.395,
+            "2023-04": 1.0837,
+            "2023-05": 3.6495,
+            "2023-06": -2.5082,
+            "2023-07": -2.1228,
+            "2023-08": 2.243,
+            "2023-09": -0.5013,
+            "2023-10": -0.6542,
+            "2023-11": 1.0418,
+            "2023-12": 0.0674,
+            "2024-01": -0.3009
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 5,
+          "trades_per_market_day": 1.899,
+          "mean_signed_move_pct": 0.01739
+        },
+        "test": {
+          "n": 493,
+          "wr": 68.76,
+          "return_pct": 5.4539,
+          "dd_pct": 3.2464,
+          "negative_months": 4,
+          "months": 13,
+          "monthly_return_pct": {
+            "2024-01": -1.0096,
+            "2024-02": 1.8328,
+            "2024-03": 1.3913,
+            "2024-04": 0.218,
+            "2024-05": 0.4647,
+            "2024-06": 0.4224,
+            "2024-07": -0.0476,
+            "2024-08": 2.0178,
+            "2024-09": 0.1133,
+            "2024-10": 0.9926,
+            "2024-11": -0.3956,
+            "2024-12": -1.0046,
+            "2025-01": 0.38
+          },
+          "months_ge_30pct": 0,
+          "max_loss_streak": 7,
+          "trades_per_market_day": 1.98,
+          "mean_signed_move_pct": 0.03715
+        },
+        "threshold_frontier": [
+          {
+            "quantile": 0.8,
+            "threshold": 0.6977134629201397,
+            "eligible": true,
+            "score": -9.2765,
+            "validation": {
+              "n": 471,
+              "wr": 65.18,
+              "return_pct": 2.1973,
+              "dd_pct": 5.7504,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -1.222,
+                "2023-02": 1.98,
+                "2023-03": -0.395,
+                "2023-04": 1.0837,
+                "2023-05": 3.6495,
+                "2023-06": -2.5082,
+                "2023-07": -2.1228,
+                "2023-08": 2.243,
+                "2023-09": -0.5013,
+                "2023-10": -0.6542,
+                "2023-11": 1.0418,
+                "2023-12": 0.0674,
+                "2024-01": -0.3009
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 5,
+              "trades_per_market_day": 1.899,
+              "mean_signed_move_pct": 0.01739
+            }
+          },
+          {
+            "quantile": 0.7,
+            "threshold": 0.6849260099529672,
+            "eligible": true,
+            "score": -9.31645,
+            "validation": {
+              "n": 655,
+              "wr": 67.18,
+              "return_pct": 4.1508,
+              "dd_pct": 7.0927,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -1.8,
+                "2023-02": 3.9004,
+                "2023-03": -0.0491,
+                "2023-04": -0.3557,
+                "2023-05": 3.8708,
+                "2023-06": -3.0805,
+                "2023-07": -2.5038,
+                "2023-08": 1.0427,
+                "2023-09": 1.6936,
+                "2023-10": -1.4597,
+                "2023-11": 1.2183,
+                "2023-12": 2.1991,
+                "2024-01": -0.3027
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 5,
+              "trades_per_market_day": 2.641,
+              "mean_signed_move_pct": 0.0226
+            }
+          },
+          {
+            "quantile": 0.3,
+            "threshold": 0.6320151652678988,
+            "eligible": true,
+            "score": -12.80975,
+            "validation": {
+              "n": 1125,
+              "wr": 65.6,
+              "return_pct": 1.4269,
+              "dd_pct": 7.5951,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -4.3846,
+                "2023-02": 2.8271,
+                "2023-03": -4.8277,
+                "2023-04": 8.0959,
+                "2023-05": 3.9565,
+                "2023-06": -3.0327,
+                "2023-07": 0.0205,
+                "2023-08": -2.5805,
+                "2023-09": 4.1203,
+                "2023-10": -1.3766,
+                "2023-11": 1.5231,
+                "2023-12": -1.0439,
+                "2024-01": -1.0391
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 8,
+              "trades_per_market_day": 4.536,
+              "mean_signed_move_pct": 0.00593
+            }
+          },
+          {
+            "quantile": 0.85,
+            "threshold": 0.705985144019474,
+            "eligible": false,
+            "score": -18.98405,
+            "validation": {
+              "n": 376,
+              "wr": 63.03,
+              "return_pct": -4.3503,
+              "dd_pct": 7.8427,
+              "negative_months": 7,
+              "months": 13,
+              "monthly_return_pct": {
+                "2023-01": -1.6686,
+                "2023-02": 0.1459,
+                "2023-03": -0.5863,
+                "2023-04": 0.362,
+                "2023-05": 3.457,
+                "2023-06": -2.5055,
+                "2023-07": -1.9088,
+                "2023-08": 1.2342,
+                "2023-09": -1.847,
+                "2023-10": 0.0799,
+                "2023-11": -1.3476,
+                "2023-12": 0.5986,
+                "2024-01": -0.3
+              },
+              "months_ge_30pct": 0,
+              "max_loss_streak": 4,
+              "trades_per_market_day": 1.516,
+              "mean_signed_move_pct": -0.03716
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AAPLUSDT_5min_current.pkl": "e11722ed5475cc18c1bfb37d1f39354ad943235f0186dde04f03738817d3f911",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\AMZNUSDT_5min_current.pkl": "bc55888b20cc3c10d635126a0efa0acc6aefcc38606e223ee16c6a184e1c949e",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\METAUSDT_5min_current.pkl": "786895fc9cba0bafb1d9f0f4e3be758d5385d3ade69f559fea29d669731ff4e2",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MRVLUSDT_5min_current.pkl": "123b6b09f1601594e2faea57c062d89076d3f4230859e0a2a65488c48803ac7a",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MSFTUSDT_5min_current.pkl": "2c7370adba9b5dee5f8c64448eff253453337159eb5f75ff9d44c60e4f037238",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\MUUSDT_5min_current.pkl": "52f4b05bb444a30f163b07bda0cfcf38a2fe8b59f3e715001f704fc68467f4ce",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\NVDAUSDT_5min_current.pkl": "3c10b1d854f848a84c5319a97aa9376a8264f9829979ced2cad103f77ffcf313",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct3\\QQQUSDT_5min_current.pkl": "a23c2a3839f52a93636dd3d6c4da1b0a5ab40fbefe7a147c484e43736980950c"
+  },
+  "limitations": [
+    "Cash candles are structural transfer evidence for stock perpetuals.",
+    "The bounded model and threshold grid creates selection risk.",
+    "Annual adaptation cannot react before a regime change appears in completed outcomes.",
+    "Historical results cannot guarantee future profit or eliminate losing months."
+  ]
+}

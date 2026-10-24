@@ -1,0 +1,78 @@
+{
+  "status": "PUBLIC_OKX_INDEX",
+  "start": "2026-07-01",
+  "symbols": {
+    "AAPLUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "3606f548f2ad0e59ab2d34c10a72245a980afbf4fda4749538cb9772c2c7f3b0"
+    },
+    "AMZNUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "ee5a9fe239041c54bfabc1bb65e917623a2d83944be2a6aa957983122ca711e1"
+    },
+    "METAUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "d5b7434d11e0ffefa9c5400b3edab523a157531ce8c44621fc9bd34a3d366496"
+    },
+    "MRVLUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "2e5a1c663f41e65fa4817ecbf04bd4848032693af01d15b051134a5bfcc1edaf"
+    },
+    "MSFTUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "65cc77d3c935737879d0e14bcd879dff5f452f4125ae54add67e6bf53b3080e9"
+    },
+    "MUUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "1ec5b3075a398e6b11fd4897c9299acca77430a3997fe13dd20f437402e4b17e"
+    },
+    "NVDAUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "694d7ad40664b741aeaa70ea80caa66a979a0b6b550bf62cbccaebf6744e5eba"
+    },
+    "QQQUSDT": {
+      "bars": 10836,
+      "range": [
+        1782864000,
+        1792615500
+      ],
+      "matched_fraction": 1.0,
+      "sha256": "ee97b017cf08dcd656f28f74f9251517a93be24e5b12f4d77822e993671dcdc9"
+    }
+  }
+}
