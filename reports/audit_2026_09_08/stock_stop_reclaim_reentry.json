@@ -1,0 +1,213 @@
+{
+  "development_baseline": {
+    "dd_pct": 17.091132,
+    "literal_target_hit_rate": 48.3607,
+    "max_loss_streak": 11,
+    "mean_signed_price_return_pct": -0.079327,
+    "median_month_pct": 0.000526,
+    "minimum_month_pct": -13.699136,
+    "months": 24,
+    "months_ge_30pct": 0,
+    "n": 366,
+    "negative_months": 12,
+    "projected_22_market_day_pct": -1.168851,
+    "return_3pct_margin_pct": -8.480882,
+    "trades_per_market_day": 2.2454,
+    "wr": 48.3607
+  },
+  "development_frontier": [
+    {
+      "development": {
+        "dd_pct": 17.21035,
+        "literal_target_hit_rate": 43.7788,
+        "max_loss_streak": 14,
+        "mean_signed_price_return_pct": -0.059298,
+        "median_month_pct": -0.000884,
+        "minimum_month_pct": -13.982848,
+        "months": 24,
+        "months_ge_30pct": 0,
+        "n": 434,
+        "negative_months": 13,
+        "projected_22_market_day_pct": -1.036718,
+        "return_3pct_margin_pct": -7.58208,
+        "trades_per_market_day": 2.6626,
+        "wr": 43.7788
+      },
+      "development_pass": false,
+      "recovery_rows": 68,
+      "rule": "wick_inside_next_bar"
+    },
+    {
+      "development": {
+        "dd_pct": 17.500301,
+        "literal_target_hit_rate": 50.2262,
+        "max_loss_streak": 12,
+        "mean_signed_price_return_pct": -0.076973,
+        "median_month_pct": 0.145921,
+        "minimum_month_pct": -13.742985,
+        "months": 24,
+        "months_ge_30pct": 0,
+        "n": 442,
+        "negative_months": 11,
+        "projected_22_market_day_pct": -1.312328,
+        "return_3pct_margin_pct": -9.874471,
+        "trades_per_market_day": 2.6,
+        "wr": 49.095
+      },
+      "development_pass": false,
+      "recovery_rows": 76,
+      "rule": "entry_reclaim"
+    },
+    {
+      "development": {
+        "dd_pct": 16.668468,
+        "literal_target_hit_rate": 49.4764,
+        "max_loss_streak": 11,
+        "mean_signed_price_return_pct": -0.061446,
+        "median_month_pct": 0.000526,
+        "minimum_month_pct": -13.472367,
+        "months": 24,
+        "months_ge_30pct": 0,
+        "n": 382,
+        "negative_months": 12,
+        "projected_22_market_day_pct": -0.946002,
+        "return_3pct_margin_pct": -6.948531,
+        "trades_per_market_day": 2.3436,
+        "wr": 49.4764
+      },
+      "development_pass": true,
+      "recovery_rows": 16,
+      "rule": "entry_reclaim_no_structure_conflict"
+    },
+    {
+      "development": {
+        "dd_pct": 17.186979,
+        "literal_target_hit_rate": 50.2347,
+        "max_loss_streak": 12,
+        "mean_signed_price_return_pct": -0.078074,
+        "median_month_pct": 0.067983,
+        "minimum_month_pct": -13.603546,
+        "months": 24,
+        "months_ge_30pct": 0,
+        "n": 426,
+        "negative_months": 11,
+        "projected_22_market_day_pct": -1.290648,
+        "return_3pct_margin_pct": -9.663237,
+        "trades_per_market_day": 2.5207,
+        "wr": 49.061
+      },
+      "development_pass": false,
+      "recovery_rows": 60,
+      "rule": "entry_reclaim_index_aligned"
+    }
+  ],
+  "economic_objective_pass": false,
+  "frozen_before_validation": {
+    "development": {
+      "dd_pct": 16.668468,
+      "literal_target_hit_rate": 49.4764,
+      "max_loss_streak": 11,
+      "mean_signed_price_return_pct": -0.061446,
+      "median_month_pct": 0.000526,
+      "minimum_month_pct": -13.472367,
+      "months": 24,
+      "months_ge_30pct": 0,
+      "n": 382,
+      "negative_months": 12,
+      "projected_22_market_day_pct": -0.946002,
+      "return_3pct_margin_pct": -6.948531,
+      "trades_per_market_day": 2.3436,
+      "wr": 49.4764
+    },
+    "development_pass": true,
+    "recovery_rows": 16,
+    "rule": "entry_reclaim_no_structure_conflict"
+  },
+  "limitations": [
+    "Cash-proxy candles are not X-Perp fills.",
+    "A recovery trade increases trade count after an already realized stop.",
+    "Gross results exclude fees at user request."
+  ],
+  "order_eligible": false,
+  "protocol": {
+    "confirmation": "closed 15m reclaim; next-bar market entry",
+    "development": [
+      2018,
+      2019,
+      2020
+    ],
+    "later_years_revealed_after_failure": false,
+    "maximum_reentries_per_stop": 1,
+    "original_stop_honored": true,
+    "recovery_hold_bars": 52,
+    "target_move_bounds_pct": [
+      0.5,
+      2.0
+    ],
+    "test_if_validation_passes": [
+      2023,
+      2024
+    ],
+    "validation": [
+      2021,
+      2022
+    ]
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AAPLUSDT_15min_65000.pkl": "efd86c403c8d270a1bd9a2d53a6cf968239b81874a0c8f535ece878a8d06aabb",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\AMZNUSDT_15min_65000.pkl": "023eff87649ac11055aae72a6aaf1fdc48433ead0552bfa87c64aa3a7bd03b1a",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\GOOGLUSDT_15min_65000.pkl": "f6a5c30afc82dbc78bc0bf3e4ca5f3aeedb9dde298ae03e2e94c1beef926035d",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\INTCUSDT_15min_65000.pkl": "66050f5e1431062b4c84c40186adab0a76136e97e61779a5ed6757113a372429",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\METAUSDT_15min_65000.pkl": "f52f099ff72aba30eab22390d308f319ad0818236dd0d97ae1fa4a0b3fc873ee",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MRVLUSDT_15min_65000.pkl": "f843b111a5a45344d1de5ec4cbc6a9914d0a62dbbc1395ce56a06ebcecdb4f0e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MSFTUSDT_15min_65000.pkl": "316acaee3b18187053dc27397c90bb710ddb775e79fab9de57fc003847bea85e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\MUUSDT_15min_65000.pkl": "b6d3000e1caeb8e6aa249f52a19624fdf246a6d1a97e97bb38fdbd094ff79992",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\NVDAUSDT_15min_65000.pkl": "98266cb60bff8f80f81a10af2daf932f69d571900363c7a56f5894872cc5b35e",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\QQQUSDT_15min_65000.pkl": "2a286266d443b78761d81d1df47a92e6ee9deda7774dd3154f21fa07e65231ff",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\SPYUSDT_15min_65000.pkl": "a0a6eb03ab9a14436058552f7bc0408284480bf13c6d68362c8637d97cfafd98",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\backtest_cache_duka\\TSLAUSDT_15min_65000.pkl": "367fc3f3841e03e98a9d05320884e0fed27273109df03306bc15971051deb262",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_stop_reclaim_reentry_audit.py": "25429315e1bbaeb4a252cb1ab53074c694f4f4b3299d5c31015c56ebad8949c9",
+    "reports\\audit_2026_09_08\\stock_extended_history_manifest.json": "0c06da01ffd6a9138a030f40290689edfa89f7e61a4df053a26506745a92b7e2",
+    "reports\\audit_2026_09_08\\stock_stop_path_cross_era_oct12.json": "b11d5bfe12d1a1aa74e83673aff58c61559b892519625d30c34942f1cd861328",
+    "reports\\audit_2026_09_08\\stock_stop_path_cross_era_oct12_rows.csv": "a17bbb539181c7d9caa8d221e55aa1af9ab565c1e8a63fb49c06bdb46050f3a4"
+  },
+  "status": "REJECTED_VALIDATION",
+  "test": null,
+  "validation": {
+    "baseline": {
+      "dd_pct": 2.758116,
+      "literal_target_hit_rate": 55.0351,
+      "max_loss_streak": 6,
+      "mean_signed_price_return_pct": 0.090852,
+      "median_month_pct": 0.469265,
+      "minimum_month_pct": -0.980602,
+      "months": 19,
+      "months_ge_30pct": 0,
+      "n": 427,
+      "negative_months": 5,
+      "projected_22_market_day_pct": 1.363734,
+      "return_3pct_margin_pct": 12.197308,
+      "trades_per_market_day": 2.2593,
+      "wr": 55.2693
+    },
+    "combined": {
+      "dd_pct": 2.720032,
+      "literal_target_hit_rate": 55.4054,
+      "max_loss_streak": 6,
+      "mean_signed_price_return_pct": 0.090204,
+      "median_month_pct": 0.469265,
+      "minimum_month_pct": -1.491048,
+      "months": 19,
+      "months_ge_30pct": 0,
+      "n": 444,
+      "negative_months": 5,
+      "projected_22_market_day_pct": 1.393383,
+      "return_3pct_margin_pct": 12.616379,
+      "trades_per_market_day": 2.3246,
+      "wr": 55.4054
+    },
+    "passes": false,
+    "recovery_rows": 17
+  }
+}
