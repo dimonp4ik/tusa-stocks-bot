@@ -1,0 +1,2 @@
+module,family,direction,source_atr,stop_atr_mult,target_r,volume_ratio,signal_minutes,signal_bar_ts,qqq_trend_dir_atr,symbol,entry_time,entry_price,risk_pct,first_target_move_pct,module_priority,net_r,exit_time,outcome,runner_target_r,lock_fraction,_barbell,literal_target_hit,signed_price_return
+shadow_stock_5m_range_reversion_short,range_reversion,SHORT,7.8642857142857405,1.5,0.5,0.3113207547169811,65,1792074900,0.49455344585093186,MUUSDT,1792075200,895.87,0.013167567360698103,0.6583783680349051,100,-1.0,1792075800,SL,1.0,0.7,True,False,-0.013167567360698103
