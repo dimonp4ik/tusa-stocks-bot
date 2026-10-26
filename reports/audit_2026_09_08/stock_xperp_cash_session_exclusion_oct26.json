@@ -1,0 +1,311 @@
+{
+  "checks": {
+    "enough_validation_occurrences": false,
+    "improves_august": true,
+    "improves_july": true,
+    "new_forward_available": false,
+    "positive_july_august_september_at_3pct": true,
+    "september_remains_positive": true
+  },
+  "created_at": "2026-10-26T08:53:22.778937+00:00",
+  "limitations": [
+    "The October slices were already observed before this audit and are diagnostic only.",
+    "The exact cash session occurred too rarely in admitted rows to validate the hypothesis.",
+    "Post-filtering is conservative: it does not backfill later trades that a removed loss might have unpaused.",
+    "Native X-Perp history begins in July 2026.",
+    "Gross returns exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "periods": {
+    "confirmation_2026_09": {
+      "baseline_3pct": {
+        "dd_pct": 3.2054,
+        "mean_signed_move_pct": 0.251267,
+        "monthly_return_pct": {
+          "2026-09": 23.4156
+        },
+        "months_ge_30pct": 0,
+        "n": 283,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.523,
+        "return_pct": 23.4156,
+        "trades_per_active_day": 9.4333
+      },
+      "baseline_5pct": {
+        "dd_pct": 5.3172,
+        "mean_signed_move_pct": 0.251267,
+        "monthly_return_pct": {
+          "2026-09": 41.5431
+        },
+        "months_ge_30pct": 1,
+        "n": 283,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.523,
+        "return_pct": 41.5431,
+        "trades_per_active_day": 9.4333
+      },
+      "filtered_3pct": {
+        "dd_pct": 3.2054,
+        "mean_signed_move_pct": 0.251267,
+        "monthly_return_pct": {
+          "2026-09": 23.4156
+        },
+        "months_ge_30pct": 0,
+        "n": 283,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.523,
+        "return_pct": 23.4156,
+        "trades_per_active_day": 9.4333
+      },
+      "filtered_5pct": {
+        "dd_pct": 5.3172,
+        "mean_signed_move_pct": 0.251267,
+        "monthly_return_pct": {
+          "2026-09": 41.5431
+        },
+        "months_ge_30pct": 1,
+        "n": 283,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.523,
+        "return_pct": 41.5431,
+        "trades_per_active_day": 9.4333
+      },
+      "removed_cash_session_rows": 0
+    },
+    "development_2026_07": {
+      "baseline_3pct": {
+        "dd_pct": 2.3187,
+        "mean_signed_move_pct": 0.297267,
+        "monthly_return_pct": {
+          "2026-07": 20.9857
+        },
+        "months_ge_30pct": 0,
+        "n": 218,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.0367,
+        "return_pct": 20.9857,
+        "trades_per_active_day": 8.0741
+      },
+      "baseline_5pct": {
+        "dd_pct": 3.8381,
+        "mean_signed_move_pct": 0.297267,
+        "monthly_return_pct": {
+          "2026-07": 36.7981
+        },
+        "months_ge_30pct": 1,
+        "n": 218,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.0367,
+        "return_pct": 36.7981,
+        "trades_per_active_day": 8.0741
+      },
+      "filtered_3pct": {
+        "dd_pct": 2.3187,
+        "mean_signed_move_pct": 0.336629,
+        "monthly_return_pct": {
+          "2026-07": 23.7354
+        },
+        "months_ge_30pct": 0,
+        "n": 215,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.6512,
+        "return_pct": 23.7354,
+        "trades_per_active_day": 7.963
+      },
+      "filtered_5pct": {
+        "dd_pct": 3.8381,
+        "mean_signed_move_pct": 0.336629,
+        "monthly_return_pct": {
+          "2026-07": 41.985
+        },
+        "months_ge_30pct": 1,
+        "n": 215,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.6512,
+        "return_pct": 41.985,
+        "trades_per_active_day": 7.963
+      },
+      "removed_cash_session_rows": 3
+    },
+    "observed_oct17_oct26": {
+      "baseline_3pct": {
+        "dd_pct": 3.2128,
+        "mean_signed_move_pct": 0.058315,
+        "monthly_return_pct": {
+          "2026-10": 1.3225
+        },
+        "months_ge_30pct": 0,
+        "n": 78,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 39.7436,
+        "return_pct": 1.3225,
+        "trades_per_active_day": 7.8
+      },
+      "baseline_5pct": {
+        "dd_pct": 5.3144,
+        "mean_signed_move_pct": 0.058315,
+        "monthly_return_pct": {
+          "2026-10": 2.157
+        },
+        "months_ge_30pct": 0,
+        "n": 78,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 39.7436,
+        "return_pct": 2.157,
+        "trades_per_active_day": 7.8
+      },
+      "filtered_3pct": {
+        "dd_pct": 3.2128,
+        "mean_signed_move_pct": 0.058315,
+        "monthly_return_pct": {
+          "2026-10": 1.3225
+        },
+        "months_ge_30pct": 0,
+        "n": 78,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 39.7436,
+        "return_pct": 1.3225,
+        "trades_per_active_day": 7.8
+      },
+      "filtered_5pct": {
+        "dd_pct": 5.3144,
+        "mean_signed_move_pct": 0.058315,
+        "monthly_return_pct": {
+          "2026-10": 2.157
+        },
+        "months_ge_30pct": 0,
+        "n": 78,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 39.7436,
+        "return_pct": 2.157,
+        "trades_per_active_day": 7.8
+      },
+      "removed_cash_session_rows": 0
+    },
+    "observed_oct1_oct16": {
+      "baseline_3pct": {
+        "dd_pct": 3.1969,
+        "mean_signed_move_pct": 0.141818,
+        "monthly_return_pct": {
+          "2026-10": 5.8203
+        },
+        "months_ge_30pct": 0,
+        "n": 138,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.2029,
+        "return_pct": 5.8203,
+        "trades_per_active_day": 8.625
+      },
+      "baseline_5pct": {
+        "dd_pct": 5.3502,
+        "mean_signed_move_pct": 0.141818,
+        "monthly_return_pct": {
+          "2026-10": 9.6287
+        },
+        "months_ge_30pct": 0,
+        "n": 138,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.2029,
+        "return_pct": 9.6287,
+        "trades_per_active_day": 8.625
+      },
+      "filtered_3pct": {
+        "dd_pct": 3.1969,
+        "mean_signed_move_pct": 0.141818,
+        "monthly_return_pct": {
+          "2026-10": 5.8203
+        },
+        "months_ge_30pct": 0,
+        "n": 138,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.2029,
+        "return_pct": 5.8203,
+        "trades_per_active_day": 8.625
+      },
+      "filtered_5pct": {
+        "dd_pct": 5.3502,
+        "mean_signed_move_pct": 0.141818,
+        "monthly_return_pct": {
+          "2026-10": 9.6287
+        },
+        "months_ge_30pct": 0,
+        "n": 138,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.2029,
+        "return_pct": 9.6287,
+        "trades_per_active_day": 8.625
+      },
+      "removed_cash_session_rows": 0
+    },
+    "validation_2026_08": {
+      "baseline_3pct": {
+        "dd_pct": 3.0917,
+        "mean_signed_move_pct": 0.266475,
+        "monthly_return_pct": {
+          "2026-08": 24.7059
+        },
+        "months_ge_30pct": 0,
+        "n": 280,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.1429,
+        "return_pct": 24.7059,
+        "trades_per_active_day": 9.0323
+      },
+      "baseline_5pct": {
+        "dd_pct": 5.0956,
+        "mean_signed_move_pct": 0.266475,
+        "monthly_return_pct": {
+          "2026-08": 44.0004
+        },
+        "months_ge_30pct": 1,
+        "n": 280,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.1429,
+        "return_pct": 44.0004,
+        "trades_per_active_day": 9.0323
+      },
+      "filtered_3pct": {
+        "dd_pct": 2.7991,
+        "mean_signed_move_pct": 0.271014,
+        "monthly_return_pct": {
+          "2026-08": 25.0825
+        },
+        "months_ge_30pct": 0,
+        "n": 279,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.3118,
+        "return_pct": 25.0825,
+        "trades_per_active_day": 9.0
+      },
+      "filtered_5pct": {
+        "dd_pct": 4.6158,
+        "mean_signed_move_pct": 0.271014,
+        "monthly_return_pct": {
+          "2026-08": 44.7284
+        },
+        "months_ge_30pct": 1,
+        "n": 279,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.3118,
+        "return_pct": 44.7284,
+        "trades_per_active_day": 9.0
+      },
+      "removed_cash_session_rows": 1
+    }
+  },
+  "protocol": {
+    "application": "conservative post-filter of already portfolio-admitted rows",
+    "chronology": "July development, August validation, September confirmation; October already observed and diagnostic",
+    "entry": "unchanged next-15m market entry outside the excluded session",
+    "money": "client-selected 3% or 5% current-equity margin; fixed 10x",
+    "orders": "market only",
+    "rule": "reject weekday entries from 09:30 inclusive to 16:00 exclusive America/New_York"
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_cash_session_exclusion_oct26_audit.py": "9fcb05f5b4d935978852a4002d21ce2fe180dd6411309528814632a08f97cfe4",
+    "reports\\audit_2026_09_08\\stock_xperp_backing_hour_cap_forward_oct26.csv": "5a078240016bb594078498aa6e116bd875293f8adb229cdbf6fa84846d83f69b",
+    "reports\\audit_2026_09_08\\stock_xperp_backing_level_guard_oct20.csv": "fadcd7d3e6b7f7bf94ba5a2d5e68d9805dd8deba4fa3e2f024f1b2d41eaf679f"
+  },
+  "status": "REJECTED_INSUFFICIENT_OCCURRENCES"
+}
