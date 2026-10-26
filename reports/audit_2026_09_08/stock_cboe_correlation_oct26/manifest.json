@@ -1,0 +1,38 @@
+{
+  "causal_availability": "A completed Cboe correlation close may gate only a strictly later stock session; same-session use is forbidden.",
+  "data_path": "reports\\audit_2026_09_08\\stock_cboe_correlation_oct26\\correlation_daily.csv",
+  "data_sha256": "4f0ed64367b84469f53ea38901cbcd175789ab27e5bb06591e5dbcc966566c4b",
+  "downloaded_at_utc": "2026-10-26T03:38:23.228541+00:00",
+  "end": "2026-10-23T00:00:00+00:00",
+  "provider": "Cboe Global Markets",
+  "quality": {
+    "duplicates": 0,
+    "missing_values": 0,
+    "monotonic_dates": true
+  },
+  "rows": 5220,
+  "sources": {
+    "COR1M": {
+      "duplicates_removed": 0,
+      "path": "reports\\audit_2026_09_08\\stock_cboe_correlation_oct26\\COR1M_History.csv",
+      "rows": 5235,
+      "sha256": "8e5fcd8805bf71d4f05af12bddc2d5628c89e5043eaf324eae26599ec569c54d",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/COR1M_History.csv"
+    },
+    "COR3M": {
+      "duplicates_removed": 0,
+      "path": "reports\\audit_2026_09_08\\stock_cboe_correlation_oct26\\COR3M_History.csv",
+      "rows": 5220,
+      "sha256": "98fc85a0b46bcebd3cd56e6b0acdcd5a473c18c15b94da45049917cd38543e78",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/COR3M_History.csv"
+    },
+    "COR6M": {
+      "duplicates_removed": 0,
+      "path": "reports\\audit_2026_09_08\\stock_cboe_correlation_oct26\\COR6M_History.csv",
+      "rows": 5235,
+      "sha256": "621dc4acb158a12cdce4025131704f0ebc8a3c8ecf0bfc5ecbf56b313aa2d44d",
+      "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/COR6M_History.csv"
+    }
+  },
+  "start": "2006-01-03T00:00:00+00:00"
+}
