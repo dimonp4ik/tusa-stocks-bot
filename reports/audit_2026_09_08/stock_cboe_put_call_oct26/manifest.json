@@ -1,0 +1,17 @@
+{
+  "causal_availability": "A completed Cboe ratio may gate only a strictly later stock session; same-session use is forbidden.",
+  "data_path": "reports\\audit_2026_09_08\\stock_cboe_put_call_oct26\\put_call_daily.csv",
+  "data_sha256": "40c07757b11e69da1a10f2cbb3698571a6be5f95ec7d387c403e857378160292",
+  "downloaded_at_utc": "2026-10-26T03:33:27.790568+00:00",
+  "end": "2026-09-14",
+  "provider": "Cboe Global Markets",
+  "quality": {
+    "duplicates": 0,
+    "missing_values": 0,
+    "monotonic_dates": true,
+    "nonnegative_ratios": true
+  },
+  "rows": 1727,
+  "source_url_template": "https://www.cboe.com/markets/us/options/market-statistics/daily?dt={date}",
+  "start": "2019-10-07"
+}
