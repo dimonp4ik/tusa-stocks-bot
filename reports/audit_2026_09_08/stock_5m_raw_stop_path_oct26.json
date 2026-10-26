@@ -1,0 +1,889 @@
+{
+  "decision": "Do not fit a runtime filter from 45 one-sided raw events. Use the attribution only to predeclare a rule for genuinely new outcomes.",
+  "geometries": {
+    "tp_0.5_sl_0.5": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.998,
+          "stop_rate_pct": 35.4839,
+          "stops": 11
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.7031,
+          "stop_rate_pct": 25.0,
+          "stops": 3
+        },
+        "opposing_level_288_before_target": {
+          "present": 4,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "opposing_level_72_before_target": {
+          "present": 7,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.2891,
+          "stop_rate_pct": 45.8333,
+          "stops": 11
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 0.7875,
+          "stop_rate_pct": 28.0,
+          "stops": 7
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 11
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 1.4026,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.031147,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 0.7658,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 42.2222,
+        "max_loss_streak": 6,
+        "mean_signed_price_return_pct": 0.031147,
+        "monthly_return_pct": {
+          "2026-10": 0.417
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 16,
+          "TIMEOUT": 10,
+          "TP": 19
+        },
+        "profitable_exit_rate_pct": 53.3333,
+        "return_pct": 0.417,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 6,
+          "pct_of_stops": 37.5
+        },
+        "later_target_double_horizon": {
+          "count": 3,
+          "pct_of_stops": 18.75
+        },
+        "later_target_same_session": {
+          "count": 1,
+          "pct_of_stops": 6.25
+        },
+        "stop_closed_back_inside": {
+          "count": 4,
+          "pct_of_stops": 25.0
+        }
+      }
+    },
+    "tp_0.5_sl_1": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 1.1613,
+          "stop_rate_pct": 12.9032,
+          "stops": 4
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.75,
+          "stop_rate_pct": 8.3333,
+          "stops": 1
+        },
+        "opposing_level_288_before_target": {
+          "present": 4,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "opposing_level_72_before_target": {
+          "present": 7,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.125,
+          "stop_rate_pct": 12.5,
+          "stops": 3
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 1.08,
+          "stop_rate_pct": 12.0,
+          "stops": 3
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 4
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 1.6761,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.028713,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 0.7021,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 44.4444,
+        "max_loss_streak": 6,
+        "mean_signed_price_return_pct": 0.028713,
+        "monthly_return_pct": {
+          "2026-10": 0.3823
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 5,
+          "TIMEOUT": 20,
+          "TP": 20
+        },
+        "profitable_exit_rate_pct": 57.7778,
+        "return_pct": 0.3823,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 1,
+          "pct_of_stops": 20.0
+        },
+        "later_target_double_horizon": {
+          "count": 1,
+          "pct_of_stops": 20.0
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 3,
+          "pct_of_stops": 60.0
+        }
+      }
+    },
+    "tp_1.5_sl_0.5": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9932,
+          "stop_rate_pct": 41.9355,
+          "stops": 13
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.7895,
+          "stop_rate_pct": 33.3333,
+          "stops": 4
+        },
+        "opposing_level_288_before_target": {
+          "present": 23,
+          "stop_rate_lift": 0.8238,
+          "stop_rate_pct": 34.7826,
+          "stops": 8
+        },
+        "opposing_level_72_before_target": {
+          "present": 29,
+          "stop_rate_lift": 0.735,
+          "stop_rate_pct": 31.0345,
+          "stops": 9
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.2829,
+          "stop_rate_pct": 54.1667,
+          "stops": 13
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 0.8526,
+          "stop_rate_pct": 36.0,
+          "stops": 9
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 13
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 1.7892,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.077866,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 1.9283,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 11.1111,
+        "max_loss_streak": 11,
+        "mean_signed_price_return_pct": 0.077866,
+        "monthly_return_pct": {
+          "2026-10": 1.0472
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 19,
+          "TIMEOUT": 21,
+          "TP": 5
+        },
+        "profitable_exit_rate_pct": 42.2222,
+        "return_pct": 1.0472,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 8,
+          "pct_of_stops": 42.1053
+        },
+        "later_target_double_horizon": {
+          "count": 4,
+          "pct_of_stops": 21.0526
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 4,
+          "pct_of_stops": 21.0526
+        }
+      }
+    },
+    "tp_1.5_sl_1": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9677,
+          "stop_rate_pct": 12.9032,
+          "stops": 4
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.625,
+          "stop_rate_pct": 8.3333,
+          "stops": 1
+        },
+        "opposing_level_288_before_target": {
+          "present": 23,
+          "stop_rate_lift": 0.9783,
+          "stop_rate_pct": 13.0435,
+          "stops": 3
+        },
+        "opposing_level_72_before_target": {
+          "present": 29,
+          "stop_rate_lift": 0.7759,
+          "stop_rate_pct": 10.3448,
+          "stops": 3
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.25,
+          "stop_rate_pct": 16.6667,
+          "stops": 4
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 1.2,
+          "stop_rate_pct": 16.0,
+          "stops": 4
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 4
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 2.3617,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.06264,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 1.541,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 11.1111,
+        "max_loss_streak": 11,
+        "mean_signed_price_return_pct": 0.06264,
+        "monthly_return_pct": {
+          "2026-10": 0.8376
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 6,
+          "TIMEOUT": 34,
+          "TP": 5
+        },
+        "profitable_exit_rate_pct": 46.6667,
+        "return_pct": 0.8376,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_double_horizon": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 3,
+          "pct_of_stops": 50.0
+        }
+      }
+    },
+    "tp_1_sl_0.5": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9677,
+          "stop_rate_pct": 38.7097,
+          "stops": 12
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.625,
+          "stop_rate_pct": 25.0,
+          "stops": 3
+        },
+        "opposing_level_288_before_target": {
+          "present": 11,
+          "stop_rate_lift": 0.4545,
+          "stop_rate_pct": 18.1818,
+          "stops": 2
+        },
+        "opposing_level_72_before_target": {
+          "present": 18,
+          "stop_rate_lift": 0.6944,
+          "stop_rate_pct": 27.7778,
+          "stops": 5
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.3542,
+          "stop_rate_pct": 54.1667,
+          "stops": 13
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 0.9,
+          "stop_rate_pct": 36.0,
+          "stops": 9
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 12
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 1.7499,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.070286,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 1.741,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 17.7778,
+        "max_loss_streak": 10,
+        "mean_signed_price_return_pct": 0.070286,
+        "monthly_return_pct": {
+          "2026-10": 0.9459
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 18,
+          "TIMEOUT": 19,
+          "TP": 8
+        },
+        "profitable_exit_rate_pct": 44.4444,
+        "return_pct": 0.9459,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 7,
+          "pct_of_stops": 38.8889
+        },
+        "later_target_double_horizon": {
+          "count": 4,
+          "pct_of_stops": 22.2222
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 4,
+          "pct_of_stops": 22.2222
+        }
+      }
+    },
+    "tp_1_sl_1": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9677,
+          "stop_rate_pct": 12.9032,
+          "stops": 4
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.625,
+          "stop_rate_pct": 8.3333,
+          "stops": 1
+        },
+        "opposing_level_288_before_target": {
+          "present": 11,
+          "stop_rate_lift": 0.6818,
+          "stop_rate_pct": 9.0909,
+          "stops": 1
+        },
+        "opposing_level_72_before_target": {
+          "present": 18,
+          "stop_rate_lift": 0.4167,
+          "stop_rate_pct": 5.5556,
+          "stops": 1
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.25,
+          "stop_rate_pct": 16.6667,
+          "stops": 4
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 1.2,
+          "stop_rate_pct": 16.0,
+          "stops": 4
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 4
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 2.2596,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.062741,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 1.5476,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 17.7778,
+        "max_loss_streak": 10,
+        "mean_signed_price_return_pct": 0.062741,
+        "monthly_return_pct": {
+          "2026-10": 0.8412
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 6,
+          "TIMEOUT": 31,
+          "TP": 8
+        },
+        "profitable_exit_rate_pct": 48.8889,
+        "return_pct": 0.8412,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_double_horizon": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 3,
+          "pct_of_stops": 50.0
+        }
+      }
+    },
+    "tp_2_sl_0.5": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9932,
+          "stop_rate_pct": 41.9355,
+          "stops": 13
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.7895,
+          "stop_rate_pct": 33.3333,
+          "stops": 4
+        },
+        "opposing_level_288_before_target": {
+          "present": 32,
+          "stop_rate_lift": 0.9622,
+          "stop_rate_pct": 40.625,
+          "stops": 13
+        },
+        "opposing_level_72_before_target": {
+          "present": 37,
+          "stop_rate_lift": 0.8962,
+          "stop_rate_pct": 37.8378,
+          "stops": 14
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.2829,
+          "stop_rate_pct": 54.1667,
+          "stops": 13
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 0.8526,
+          "stop_rate_pct": 36.0,
+          "stops": 9
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 13
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 1.6426,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.109196,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 2.7171,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 8.8889,
+        "max_loss_streak": 11,
+        "mean_signed_price_return_pct": 0.109196,
+        "monthly_return_pct": {
+          "2026-10": 1.473
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 19,
+          "TIMEOUT": 22,
+          "TP": 4
+        },
+        "profitable_exit_rate_pct": 42.2222,
+        "return_pct": 1.473,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 8,
+          "pct_of_stops": 42.1053
+        },
+        "later_target_double_horizon": {
+          "count": 3,
+          "pct_of_stops": 15.7895
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 4,
+          "pct_of_stops": 21.0526
+        }
+      }
+    },
+    "tp_2_sl_1": {
+      "causal_stop_rate_lifts": {
+        "clustered_same_direction_hour": {
+          "present": 31,
+          "stop_rate_lift": 0.9677,
+          "stop_rate_pct": 12.9032,
+          "stops": 4
+        },
+        "failed_breakout": {
+          "present": 1,
+          "stop_rate_lift": 0.0,
+          "stop_rate_pct": 0.0,
+          "stops": 0
+        },
+        "late_session": {
+          "present": 12,
+          "stop_rate_lift": 0.625,
+          "stop_rate_pct": 8.3333,
+          "stops": 1
+        },
+        "opposing_level_288_before_target": {
+          "present": 32,
+          "stop_rate_lift": 0.7031,
+          "stop_rate_pct": 9.375,
+          "stops": 3
+        },
+        "opposing_level_72_before_target": {
+          "present": 37,
+          "stop_rate_lift": 0.6081,
+          "stop_rate_pct": 8.1081,
+          "stops": 3
+        },
+        "opposing_order_block_proxy": {
+          "present": 24,
+          "stop_rate_lift": 1.25,
+          "stop_rate_pct": 16.6667,
+          "stops": 4
+        },
+        "qqq_adverse": {
+          "present": 25,
+          "stop_rate_lift": 1.2,
+          "stop_rate_pct": 16.0,
+          "stops": 4
+        }
+      },
+      "clustered": {
+        "max_same_direction_hour": 5,
+        "rows": 31,
+        "stops": 4
+      },
+      "metrics_margin_3pct": {
+        "dd_pct": 2.2159,
+        "economic_gate": {
+          "frequency_pass": true,
+          "interpretation": "diagnostic projection from observed geometric trade return; not a forecast",
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "market_days_per_month": 22,
+          "mean_signed_price_return_pct": 0.09397,
+          "monthly_target_pct": 30.0,
+          "n": 45,
+          "observed_trades_per_day": 3.75,
+          "passes": false,
+          "projected_monthly_return_pct": 2.3267,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_day": 3,
+          "return_pass": false
+        },
+        "literal_tp_rate_pct": 8.8889,
+        "max_loss_streak": 11,
+        "mean_signed_price_return_pct": 0.09397,
+        "monthly_return_pct": {
+          "2026-10": 1.2625
+        },
+        "n": 45,
+        "negative_months": 0,
+        "outcomes": {
+          "SL": 6,
+          "TIMEOUT": 35,
+          "TP": 4
+        },
+        "profitable_exit_rate_pct": 46.6667,
+        "return_pct": 1.2625,
+        "trades_per_market_day": 3.75
+      },
+      "post_stop_path": {
+        "hard_reversal_proxy": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_double_horizon": {
+          "count": 1,
+          "pct_of_stops": 16.6667
+        },
+        "later_target_same_session": {
+          "count": 0,
+          "pct_of_stops": 0.0
+        },
+        "stop_closed_back_inside": {
+          "count": 3,
+          "pct_of_stops": 50.0
+        }
+      }
+    }
+  },
+  "limitations": [
+    "All 45 fresh raw proposals are shorts and cannot validate long logic.",
+    "The raw proposals failed the production 0.5% material-target gate.",
+    "Post-stop paths are diagnostic and unavailable at entry time.",
+    "A single October interval cannot establish a stable filter."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "entry": "next 5m market-open proxy",
+    "exit": "cash-session close; stop first on OHLC ties",
+    "material_gate_changed": false,
+    "money": "3% current-equity margin, fixed 10x",
+    "no_filter_fitted": true,
+    "orders": "market only",
+    "source": "all causal raw runtime proposals after material freeze",
+    "stop_pct": [
+      0.5,
+      1.0
+    ],
+    "target_pct": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ]
+  },
+  "ready_for_live_orders": false,
+  "sample": {
+    "directions": {
+      "SHORT": 45
+    },
+    "end": "2026-10-23T15:25:00+00:00",
+    "families": {
+      "range_reversion": 22,
+      "trend_pullback": 23
+    },
+    "raw_events": 45,
+    "start": "2026-10-06T13:35:00+00:00"
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_5m_raw_stop_path_oct26_audit.py": "6699767abae749bd2579fe76453e1b804356e069599685049c5b15922723185b",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\AAPLUSDT_5min_current.pkl": "23e2eb9fce726b5de4b98457460d4600c6c68931fa6eded6429b3c8b2dfbbde0",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\AMZNUSDT_5min_current.pkl": "7045be45d27270b2420551df5d9104cbce1445ad83b1fdeaeffe1f1cd78bc1fb",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\METAUSDT_5min_current.pkl": "5f8539100f009b01d3d49baa9c5972b30ee5715c347e91585d2440c7874ad1eb",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\MRVLUSDT_5min_current.pkl": "92cbdf6383d44344fb45c5aa7a1d269491bab029ba2e9cb0f0f7a71c3d38e22a",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\MSFTUSDT_5min_current.pkl": "de5a83e9d5ce44f1fad2facdf6f101e80c0d11c705521291b56e2df05eef542f",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\MUUSDT_5min_current.pkl": "5244aed7ecee7dd8c2cef9afd47338f2156600913ab370a9ad53e9fea0849bf2",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\NVDAUSDT_5min_current.pkl": "3dae0e88c353e3333a5c51925c7f4543c59e5adb0fa74c7611044ff816f91098",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\QQQUSDT_5min_current.pkl": "269026e89edbfd74fe2ab50338b20d2d22badbf8c3182d09420fd00f86507549",
+    "reports\\audit_2026_09_08\\stock_xperp_5m_oct25_forward\\manifest.json": "c6fe02afffda5cf90e9208cb6458c11f4b883b3ee01bc89d18aa64062c770bf6"
+  },
+  "status": "DIAGNOSTIC_ONLY_INSUFFICIENT_SAMPLE"
+}
