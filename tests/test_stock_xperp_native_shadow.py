@@ -9,7 +9,8 @@ import main
 from src import db
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
-    backing_level_allows_entry, native_shadow_setups, normalized_atr14,
+    LONG_MIN_BASKET_TREND, backing_level_allows_entry, basket_trend,
+    native_shadow_setups, normalized_atr14,
 )
 from src.telegram_notifier import bracket_for_analysis
 
@@ -49,6 +50,7 @@ def test_native_route_uses_closed_cross_section_and_has_no_size():
     assert setup["universe_n"] == 20
     assert setup["backing_level_lookback_bars"] == BACKING_LEVEL_LOOKBACK_BARS
     assert setup["cross_z"] > 2
+    assert setup["basket_trend_16"] >= LONG_MIN_BASKET_TREND
     assert "size" not in setup
     assert "size_mult" not in setup
 
@@ -72,6 +74,22 @@ def test_native_route_rejects_high_atr_and_stale_signal():
 def test_normalized_atr_uses_fourteen_closed_bars():
     value = normalized_atr14(candles(), 39)
     assert value == pytest.approx(.001)
+
+
+def test_basket_trend_detects_broad_decline_from_closed_bars_only():
+    symbols = sorted(AUDITED_SYMBOLS)[:20]
+    values = [100.0 * (.999 ** index) for index in range(40)]
+    data = {}
+    for symbol in symbols:
+        data[symbol] = {
+            "time": [index * 900 for index in range(40)],
+            "open": list(values), "high": [x + .05 for x in values],
+            "low": [x - .05 for x in values], "close": list(values),
+            "volume": [1000.0] * 40,
+        }
+    value = basket_trend(data, 39 * 900)
+    assert value is not None
+    assert value < LONG_MIN_BASKET_TREND
 
 
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():

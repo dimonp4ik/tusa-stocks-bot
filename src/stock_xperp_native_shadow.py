@@ -31,6 +31,8 @@ TARGET_FRACTION = .02
 HOLD_BARS = 64
 BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 900
+BASKET_TREND_BARS = 16
+LONG_MIN_BASKET_TREND = -0.015011398860976374
 
 
 def _finite_series(candles: dict, key: str) -> list[float] | None:
@@ -116,6 +118,38 @@ def _latest_rows(candles_by_symbol: dict[str, dict]) -> tuple[int, list[dict]] |
     return max(usable, key=lambda item: item[0]) if usable else None
 
 
+def basket_trend(candles_by_symbol: dict[str, dict], signal_time: int) -> float | None:
+    """Sum 16 causal two-bar cross-sectional means ending at signal time."""
+    means = []
+    for offset in range(BASKET_TREND_BARS):
+        wanted = int(signal_time) - 900 * offset
+        moves = []
+        for symbol in AUDITED_SYMBOLS & set(candles_by_symbol):
+            candles = candles_by_symbol[symbol]
+            times = candles.get("time") or []
+            close = _finite_series(candles, "close")
+            if close is None or len(times) != len(close):
+                continue
+            index = len(times) - 1 - offset
+            if index < LOOKBACK_BARS:
+                continue
+            try:
+                if (int(times[index]) != wanted
+                        or int(times[index]) - int(times[index - LOOKBACK_BARS])
+                        != 900 * LOOKBACK_BARS):
+                    continue
+            except (TypeError, ValueError):
+                continue
+            move = close[index] / close[index - LOOKBACK_BARS] - 1
+            if math.isfinite(move):
+                moves.append(move)
+        if len(moves) < MINIMUM_UNIVERSE:
+            return None
+        means.append(statistics.fmean(moves))
+    value = sum(means)
+    return value if math.isfinite(value) else None
+
+
 def native_shadow_setups(candles_by_symbol: dict[str, dict],
                          now: float | None = None) -> list[dict]:
     """Return all qualifying rows in causal quality order for portfolio gating."""
@@ -134,6 +168,9 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
     deviation = statistics.stdev(moves)
     if not math.isfinite(deviation) or deviation <= 0:
         return []
+    trend = basket_trend(candles_by_symbol, signal_time)
+    if trend is None:
+        return []
     output = []
     for row in rows:
         move = float(row["signal_return"])
@@ -145,6 +182,8 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
                 or atr_fraction > MAXIMUM_ATR14_FRACTION):
             continue
         direction = "SHORT" if move > 0 else "LONG"
+        if direction == "LONG" and trend < LONG_MIN_BASKET_TREND:
+            continue
         level = backing_level(
             row["candles"], row["signal_index"], direction)
         if level is None:
@@ -166,6 +205,7 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "atr14_fraction": atr_fraction,
             "backing_level": level,
             "backing_level_lookback_bars": BACKING_LEVEL_LOOKBACK_BARS,
+            "basket_trend_16": trend,
             "hold_bars": HOLD_BARS,
             "module": "native_xperp_quality_reversal",
             "_quality_rank": -abs(float(z_score)),
