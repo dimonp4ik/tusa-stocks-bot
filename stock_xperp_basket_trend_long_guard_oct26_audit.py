@@ -9,9 +9,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from stock_module_cluster_audit import portfolio_gate
+import stock_cash_xperp_leadlag_oct6_audit as resolver
+import stock_xperp_backing_level_guard_oct20_audit as backing
 import stock_xperp_native_cross_section_oct18_audit as parent
 import stock_xperp_native_economics_oct18_audit as economics
 import stock_xperp_native_growth_forward_monitor as monitor
+import stock_xperp_native_quality_guard_oct18_audit as quality
+import stock_xperp_native_volatility_guard_oct18_audit as volatility
 
 
 ROOT = Path("reports/audit_2026_09_08")
@@ -36,17 +41,26 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def add_context(frame: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str]]:
+def prepare() -> tuple[pd.DataFrame, dict[str, str]]:
     candles, sources, _ = monitor.load_manifest(MANIFEST)
     features = parent.feature_rows(candles, 2)
+    entries = parent.select_entries(features, 2.0, .004)
+    entries = volatility.add_atr14(entries, candles)
+    entries = entries[entries.atr14_fraction.le(.01)]
+    entries = backing.guarded(backing.add_backing_distance(
+        entries, candles, 32))
     context = features.groupby("entry_time", as_index=False).cross_mean.first()
     context.sort_values("entry_time", inplace=True)
     context.rename(columns={"cross_mean": "basket_bar_return"}, inplace=True)
     for horizon in HORIZONS:
         context[f"basket_trend_{horizon}"] = context.basket_bar_return.rolling(
             horizon, min_periods=horizon).sum()
-    return frame.merge(context, on="entry_time", how="left",
-                       validate="many_to_one"), sources
+    entries = entries.merge(context, on="entry_time", how="left",
+                            validate="many_to_one")
+    resolved = resolver.add_outcomes(entries, candles, 2.0, 1.0, 64)
+    resolved["module"] = "native_xperp_basket_trend_guard"
+    resolved["module_priority"] = 0
+    return resolved, sources
 
 
 def bounds(frame: pd.DataFrame, period: tuple[str, str]) -> pd.DataFrame:
@@ -73,6 +87,13 @@ def metrics(frame: pd.DataFrame, margin: float) -> dict:
     return value
 
 
+def gated(frame: pd.DataFrame) -> pd.DataFrame:
+    rows = portfolio_gate(
+        frame.to_dict("records"), None, rolling_hour_cap=4,
+        rank_key=quality.ranker("z_high"), loss_streak_cap=2)
+    return pd.DataFrame(rows, columns=frame.columns)
+
+
 def evaluate(frame: pd.DataFrame) -> dict:
     return {name: {"margin_3pct": metrics(bounds(frame, span), .03),
                    "margin_5pct": metrics(bounds(frame, span), .05)}
@@ -80,9 +101,7 @@ def evaluate(frame: pd.DataFrame) -> dict:
 
 
 def main() -> None:
-    raw = pd.concat([pd.read_csv(REFERENCE), pd.read_csv(FORWARD)],
-                    ignore_index=True)
-    full, sources = add_context(raw)
+    full, sources = prepare()
     selection = pd.concat([
         bounds(full, PERIODS["selection_july"]),
         bounds(full, PERIODS["selection_august"])])
@@ -91,7 +110,7 @@ def main() -> None:
         alignment = selection.direction_n * selection[f"basket_trend_{horizon}"]
         for quantile in QUANTILES:
             threshold = float(alignment.quantile(quantile))
-            filtered = apply(full, horizon, side, threshold)
+            filtered = gated(apply(full, horizon, side, threshold))
             values = evaluate(filtered)
             july = values["selection_july"]["margin_3pct"]
             august = values["selection_august"]["margin_3pct"]
@@ -115,6 +134,7 @@ def main() -> None:
     observed_pass = fresh["return_pct"] > 0 and fresh["dd_pct"] <= 3
     selected["_rows"].to_csv(ROWS_OUT, index=False)
     public = {key: value for key, value in selected.items() if not key.startswith("_")}
+    baseline = gated(full)
     report = {
         "status": ("SHADOW_CANDIDATE_REQUIRES_GENUINELY_NEW_FORWARD"
                    if validation_pass and observed_pass else "REJECTED"),
@@ -130,14 +150,14 @@ def main() -> None:
         "grid": {"horizons": list(HORIZONS), "quantiles": list(QUANTILES),
                  "guarded_sides": list(SIDES), "candidates": len(candidates),
                  "eligible": len(eligible)},
-        "baseline": evaluate(full), "selected": public,
+        "baseline": evaluate(baseline), "selected": public,
         "validation_pass": validation_pass, "observed_oct17_oct26_pass": observed_pass,
         "sources": {**sources, str(MANIFEST): digest(MANIFEST),
                     str(REFERENCE): digest(REFERENCE), str(FORWARD): digest(FORWARD),
                     str(Path(__file__).resolve()): digest(Path(__file__).resolve())},
         "limitations": [
             "October was already observed before this audit and cannot activate live orders.",
-            "The audit conservatively post-filters portfolio-admitted rows.",
+            "The filter runs before the exact portfolio and loss-pause gate, matching runtime order.",
             "Native history begins in July 2026.",
             "Gross returns exclude fees at user request.",
         ],

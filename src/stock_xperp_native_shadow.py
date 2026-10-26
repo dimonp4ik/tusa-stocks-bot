@@ -31,8 +31,8 @@ TARGET_FRACTION = .02
 HOLD_BARS = 64
 BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 900
-BASKET_TREND_BARS = 16
-LONG_MIN_BASKET_TREND = -0.015011398860976374
+BASKET_TREND_BARS = 96
+LONG_MIN_BASKET_TREND = -0.005626823134606253
 
 
 def _finite_series(candles: dict, key: str) -> list[float] | None:
@@ -119,7 +119,7 @@ def _latest_rows(candles_by_symbol: dict[str, dict]) -> tuple[int, list[dict]] |
 
 
 def basket_trend(candles_by_symbol: dict[str, dict], signal_time: int) -> float | None:
-    """Sum 16 causal two-bar cross-sectional means ending at signal time."""
+    """Sum 96 causal two-bar cross-sectional means ending at signal time."""
     means = []
     for offset in range(BASKET_TREND_BARS):
         wanted = int(signal_time) - 900 * offset
@@ -205,7 +205,7 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "atr14_fraction": atr_fraction,
             "backing_level": level,
             "backing_level_lookback_bars": BACKING_LEVEL_LOOKBACK_BARS,
-            "basket_trend_16": trend,
+            "basket_trend_96": trend,
             "hold_bars": HOLD_BARS,
             "module": "native_xperp_quality_reversal",
             "_quality_rank": -abs(float(z_score)),

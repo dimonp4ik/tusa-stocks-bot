@@ -16,7 +16,7 @@ from src.telegram_notifier import bracket_for_analysis
 
 
 def candles(last_close: float = 100.0, wide: bool = False,
-            end: int = 39) -> dict:
+            end: int = 119) -> dict:
     times = [index * 900 for index in range(end + 1)]
     close = [100.0] * (end + 1)
     close[-1] = last_close
@@ -41,7 +41,7 @@ def universe(positive: float = 102.0, negative: float | None = None) -> dict:
 
 
 def test_native_route_uses_closed_cross_section_and_has_no_size():
-    setups = native_shadow_setups(universe(), now=39 * 900 + 901)
+    setups = native_shadow_setups(universe(), now=119 * 900 + 901)
     assert len(setups) == 1
     setup = setups[0]
     assert setup["direction"] == "SHORT"
@@ -50,14 +50,14 @@ def test_native_route_uses_closed_cross_section_and_has_no_size():
     assert setup["universe_n"] == 20
     assert setup["backing_level_lookback_bars"] == BACKING_LEVEL_LOOKBACK_BARS
     assert setup["cross_z"] > 2
-    assert setup["basket_trend_16"] >= LONG_MIN_BASKET_TREND
+    assert setup["basket_trend_96"] >= LONG_MIN_BASKET_TREND
     assert "size" not in setup
     assert "size_mult" not in setup
 
 
 def test_native_route_ranks_larger_extreme_first():
     setups = native_shadow_setups(
-        universe(positive=103.0, negative=98.0), now=39 * 900 + 901)
+        universe(positive=103.0, negative=98.0), now=119 * 900 + 901)
     assert len(setups) == 2
     assert abs(setups[0]["cross_z"]) > abs(setups[1]["cross_z"])
     assert [row["direction"] for row in setups] == ["SHORT", "LONG"]
@@ -67,33 +67,33 @@ def test_native_route_rejects_high_atr_and_stale_signal():
     data = universe()
     first = sorted(data)[0]
     data[first] = candles(102.0, wide=True)
-    assert native_shadow_setups(data, now=39 * 900 + 901) == []
-    assert native_shadow_setups(universe(), now=39 * 900 + 1801) == []
+    assert native_shadow_setups(data, now=119 * 900 + 901) == []
+    assert native_shadow_setups(universe(), now=119 * 900 + 1801) == []
 
 
 def test_normalized_atr_uses_fourteen_closed_bars():
-    value = normalized_atr14(candles(), 39)
+    value = normalized_atr14(candles(), 119)
     assert value == pytest.approx(.001)
 
 
 def test_basket_trend_detects_broad_decline_from_closed_bars_only():
     symbols = sorted(AUDITED_SYMBOLS)[:20]
-    values = [100.0 * (.999 ** index) for index in range(40)]
+    values = [100.0 * (.999 ** index) for index in range(120)]
     data = {}
     for symbol in symbols:
         data[symbol] = {
-            "time": [index * 900 for index in range(40)],
+            "time": [index * 900 for index in range(120)],
             "open": list(values), "high": [x + .05 for x in values],
             "low": [x - .05 for x in values], "close": list(values),
-            "volume": [1000.0] * 40,
+            "volume": [1000.0] * 120,
         }
-    value = basket_trend(data, 39 * 900)
+    value = basket_trend(data, 119 * 900)
     assert value is not None
     assert value < LONG_MIN_BASKET_TREND
 
 
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():
-    setup = native_shadow_setups(universe(), now=39 * 900 + 901)[0]
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     analysis = main._native_xperp_analysis(setup, 100.0)
     assert analysis["entry_source"] == "MARKET"
     assert analysis["_shadow_only"] is True
@@ -106,7 +106,7 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
 
 def test_native_scan_publishes_only_paper_candidate_contract():
     symbols = sorted(AUDITED_SYMBOLS)[:10]
-    setup = native_shadow_setups(universe(), now=39 * 900 + 901)[0]
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
             patch.object(main, "get_xperp_instruments",
                          return_value={symbol[:-4]: "id" for symbol in symbols}), \
@@ -130,7 +130,7 @@ def test_native_scan_publishes_only_paper_candidate_contract():
 
 
 def test_backing_level_blocks_crossed_short_resistance():
-    setup = native_shadow_setups(universe(), now=39 * 900 + 901)[0]
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     assert setup["direction"] == "SHORT"
     assert backing_level_allows_entry(setup, setup["backing_level"])
     assert not backing_level_allows_entry(
@@ -139,7 +139,7 @@ def test_backing_level_blocks_crossed_short_resistance():
 
 def test_native_scan_records_but_does_not_publish_crossed_level():
     symbols = sorted(AUDITED_SYMBOLS)[:10]
-    setup = native_shadow_setups(universe(), now=39 * 900 + 901)[0]
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     crossed = setup["backing_level"] + .01
     with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
             patch.object(main, "get_xperp_instruments",

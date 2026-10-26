@@ -30,118 +30,118 @@
     },
     "observed_oct1_oct16": {
       "margin_3pct": {
-        "dd_pct": 3.1969,
-        "mean_signed_move_pct": 0.141818,
+        "dd_pct": 2.7471,
+        "mean_signed_move_pct": 0.213151,
         "monthly_return_pct": {
-          "2026-10": 5.8203
+          "2026-10": 8.719
         },
         "months_ge_30pct": 0,
-        "n": 138,
+        "n": 134,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.2029,
-        "return_pct": 5.8203,
-        "trades_per_active_day": 8.625
+        "profitable_exit_rate_pct": 46.2687,
+        "return_pct": 8.719,
+        "trades_per_active_day": 8.375
       },
       "margin_5pct": {
-        "dd_pct": 5.3502,
-        "mean_signed_move_pct": 0.141818,
+        "dd_pct": 4.5419,
+        "mean_signed_move_pct": 0.213151,
         "monthly_return_pct": {
-          "2026-10": 9.6287
+          "2026-10": 14.6877
         },
         "months_ge_30pct": 0,
-        "n": 138,
+        "n": 134,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.2029,
-        "return_pct": 9.6287,
-        "trades_per_active_day": 8.625
+        "profitable_exit_rate_pct": 46.2687,
+        "return_pct": 14.6877,
+        "trades_per_active_day": 8.375
       }
     },
     "selection_august": {
       "margin_3pct": {
-        "dd_pct": 3.0917,
-        "mean_signed_move_pct": 0.266475,
+        "dd_pct": 4.6574,
+        "mean_signed_move_pct": 0.241688,
         "monthly_return_pct": {
-          "2026-08": 24.7059
+          "2026-08": 20.9648
         },
         "months_ge_30pct": 0,
-        "n": 280,
+        "n": 266,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 47.1429,
-        "return_pct": 24.7059,
-        "trades_per_active_day": 9.0323
+        "profitable_exit_rate_pct": 46.9925,
+        "return_pct": 20.9648,
+        "trades_per_active_day": 8.5806
       },
       "margin_5pct": {
-        "dd_pct": 5.0956,
-        "mean_signed_move_pct": 0.266475,
+        "dd_pct": 7.6599,
+        "mean_signed_move_pct": 0.241688,
         "monthly_return_pct": {
-          "2026-08": 44.0004
+          "2026-08": 36.9499
         },
         "months_ge_30pct": 1,
-        "n": 280,
+        "n": 266,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 47.1429,
-        "return_pct": 44.0004,
-        "trades_per_active_day": 9.0323
+        "profitable_exit_rate_pct": 46.9925,
+        "return_pct": 36.9499,
+        "trades_per_active_day": 8.5806
       }
     },
     "selection_july": {
       "margin_3pct": {
-        "dd_pct": 2.3187,
-        "mean_signed_move_pct": 0.297267,
+        "dd_pct": 4.0146,
+        "mean_signed_move_pct": 0.273405,
         "monthly_return_pct": {
-          "2026-07": 20.9857
+          "2026-07": 22.2712
         },
         "months_ge_30pct": 0,
-        "n": 218,
+        "n": 251,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.0367,
-        "return_pct": 20.9857,
-        "trades_per_active_day": 8.0741
+        "profitable_exit_rate_pct": 44.6215,
+        "return_pct": 22.2712,
+        "trades_per_active_day": 8.0968
       },
       "margin_5pct": {
-        "dd_pct": 3.8381,
-        "mean_signed_move_pct": 0.297267,
+        "dd_pct": 6.6468,
+        "mean_signed_move_pct": 0.273405,
         "monthly_return_pct": {
-          "2026-07": 36.7981
+          "2026-07": 39.0923
         },
         "months_ge_30pct": 1,
-        "n": 218,
+        "n": 251,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.0367,
-        "return_pct": 36.7981,
-        "trades_per_active_day": 8.0741
+        "profitable_exit_rate_pct": 44.6215,
+        "return_pct": 39.0923,
+        "trades_per_active_day": 8.0968
       }
     },
     "validation_september": {
       "margin_3pct": {
-        "dd_pct": 3.2054,
-        "mean_signed_move_pct": 0.251267,
+        "dd_pct": 2.7843,
+        "mean_signed_move_pct": 0.280643,
         "monthly_return_pct": {
-          "2026-09": 23.4156
+          "2026-09": 26.1997
         },
         "months_ge_30pct": 0,
-        "n": 283,
+        "n": 280,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.523,
-        "return_pct": 23.4156,
-        "trades_per_active_day": 9.4333
+        "profitable_exit_rate_pct": 45.3571,
+        "return_pct": 26.1997,
+        "trades_per_active_day": 9.3333
       },
       "margin_5pct": {
-        "dd_pct": 5.3172,
-        "mean_signed_move_pct": 0.251267,
+        "dd_pct": 4.606,
+        "mean_signed_move_pct": 0.280643,
         "monthly_return_pct": {
-          "2026-09": 41.5431
+          "2026-09": 46.8893
         },
         "months_ge_30pct": 1,
-        "n": 283,
+        "n": 280,
         "negative_months": 0,
-        "profitable_exit_rate_pct": 44.523,
-        "return_pct": 41.5431,
-        "trades_per_active_day": 9.4333
+        "profitable_exit_rate_pct": 45.3571,
+        "return_pct": 46.8893,
+        "trades_per_active_day": 9.3333
       }
     }
   },
-  "created_at": "2026-10-26T08:58:11.528602+00:00",
+  "created_at": "2026-10-26T09:03:17.215345+00:00",
   "grid": {
     "candidates": 64,
     "eligible": 64,
@@ -168,7 +168,7 @@
   },
   "limitations": [
     "October was already observed before this audit and cannot activate live orders.",
-    "The audit conservatively post-filters portfolio-admitted rows.",
+    "The filter runs before the exact portfolio and loss-pause gate, matching runtime order.",
     "Native history begins in July 2026.",
     "Gross returns exclude fees at user request."
   ],
@@ -189,155 +189,155 @@
   "ready_for_live_orders": false,
   "selected": {
     "guarded_side": "LONG",
-    "horizon_bars": 16,
-    "minimum_alignment": -0.015011398860976374,
-    "selection_quantile": 0.2,
-    "selection_score": 21.169800000000002,
+    "horizon_bars": 96,
+    "minimum_alignment": -0.005626823134606253,
+    "selection_quantile": 0.5,
+    "selection_score": 22.148049999999998,
     "values": {
       "observed_oct17_oct26": {
         "margin_3pct": {
-          "dd_pct": 1.7361,
-          "mean_signed_move_pct": 0.139152,
+          "dd_pct": 2.0318,
+          "mean_signed_move_pct": 0.275258,
           "monthly_return_pct": {
-            "2026-10": 2.9187
+            "2026-10": 5.6171
           },
           "months_ge_30pct": 0,
-          "n": 70,
+          "n": 67,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 42.8571,
-          "return_pct": 2.9187,
-          "trades_per_active_day": 7.0
+          "profitable_exit_rate_pct": 46.2687,
+          "return_pct": 5.6171,
+          "trades_per_active_day": 6.7
         },
         "margin_5pct": {
-          "dd_pct": 2.8851,
-          "mean_signed_move_pct": 0.139152,
+          "dd_pct": 3.3731,
+          "mean_signed_move_pct": 0.275258,
           "monthly_return_pct": {
-            "2026-10": 4.8599
+            "2026-10": 9.455
           },
           "months_ge_30pct": 0,
-          "n": 70,
+          "n": 67,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 42.8571,
-          "return_pct": 4.8599,
-          "trades_per_active_day": 7.0
+          "profitable_exit_rate_pct": 46.2687,
+          "return_pct": 9.455,
+          "trades_per_active_day": 6.7
         }
       },
       "observed_oct1_oct16": {
         "margin_3pct": {
-          "dd_pct": 3.1969,
-          "mean_signed_move_pct": 0.210013,
+          "dd_pct": 2.6878,
+          "mean_signed_move_pct": 0.198586,
           "monthly_return_pct": {
-            "2026-10": 8.1627
+            "2026-10": 8.0581
           },
           "months_ge_30pct": 0,
-          "n": 128,
+          "n": 133,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 46.875,
-          "return_pct": 8.1627,
-          "trades_per_active_day": 8.0
+          "profitable_exit_rate_pct": 45.8647,
+          "return_pct": 8.0581,
+          "trades_per_active_day": 8.3125
         },
         "margin_5pct": {
-          "dd_pct": 5.3502,
-          "mean_signed_move_pct": 0.210013,
+          "dd_pct": 4.4479,
+          "mean_signed_move_pct": 0.198586,
           "monthly_return_pct": {
-            "2026-10": 13.6986
+            "2026-10": 13.5715
           },
           "months_ge_30pct": 0,
-          "n": 128,
+          "n": 133,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 46.875,
-          "return_pct": 13.6986,
-          "trades_per_active_day": 8.0
+          "profitable_exit_rate_pct": 45.8647,
+          "return_pct": 13.5715,
+          "trades_per_active_day": 8.3125
         }
       },
       "selection_august": {
         "margin_3pct": {
-          "dd_pct": 2.7666,
-          "mean_signed_move_pct": 0.265604,
+          "dd_pct": 3.2831,
+          "mean_signed_move_pct": 0.279061,
           "monthly_return_pct": {
-            "2026-08": 22.5531
+            "2026-08": 23.8007
           },
           "months_ge_30pct": 0,
           "n": 259,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 47.4903,
-          "return_pct": 22.5531,
+          "profitable_exit_rate_pct": 47.1042,
+          "return_pct": 23.8007,
           "trades_per_active_day": 8.3548
         },
         "margin_5pct": {
-          "dd_pct": 4.5449,
-          "mean_signed_move_pct": 0.265604,
+          "dd_pct": 5.4322,
+          "mean_signed_move_pct": 0.279061,
           "monthly_return_pct": {
-            "2026-08": 39.8894
+            "2026-08": 42.219
           },
           "months_ge_30pct": 1,
           "n": 259,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 47.4903,
-          "return_pct": 39.8894,
+          "profitable_exit_rate_pct": 47.1042,
+          "return_pct": 42.219,
           "trades_per_active_day": 8.3548
         }
       },
       "selection_july": {
         "margin_3pct": {
-          "dd_pct": 2.3219,
-          "mean_signed_move_pct": 0.385691,
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.378547,
           "monthly_return_pct": {
-            "2026-07": 23.7535
-          },
-          "months_ge_30pct": 0,
-          "n": 186,
-          "negative_months": 0,
-          "profitable_exit_rate_pct": 47.3118,
-          "return_pct": 23.7535,
-          "trades_per_active_day": 7.1538
-        },
-        "margin_5pct": {
-          "dd_pct": 3.8469,
-          "mean_signed_move_pct": 0.385691,
-          "monthly_return_pct": {
-            "2026-07": 42.3203
+            "2026-07": 31.3702
           },
           "months_ge_30pct": 1,
-          "n": 186,
+          "n": 245,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 47.3118,
-          "return_pct": 42.3203,
-          "trades_per_active_day": 7.1538
+          "profitable_exit_rate_pct": 46.9388,
+          "return_pct": 31.3702,
+          "trades_per_active_day": 7.9032
+        },
+        "margin_5pct": {
+          "dd_pct": 5.4927,
+          "mean_signed_move_pct": 0.378547,
+          "monthly_return_pct": {
+            "2026-07": 56.6556
+          },
+          "months_ge_30pct": 1,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9388,
+          "return_pct": 56.6556,
+          "trades_per_active_day": 7.9032
         }
       },
       "validation_september": {
         "margin_3pct": {
-          "dd_pct": 3.2054,
-          "mean_signed_move_pct": 0.257411,
+          "dd_pct": 2.5831,
+          "mean_signed_move_pct": 0.28186,
           "monthly_return_pct": {
-            "2026-09": 23.6816
+            "2026-09": 22.8547
           },
           "months_ge_30pct": 0,
-          "n": 279,
+          "n": 247,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 44.8029,
-          "return_pct": 23.6816,
-          "trades_per_active_day": 9.3
+          "profitable_exit_rate_pct": 45.3441,
+          "return_pct": 22.8547,
+          "trades_per_active_day": 8.2333
         },
         "margin_5pct": {
-          "dd_pct": 5.3172,
-          "mean_signed_move_pct": 0.257411,
+          "dd_pct": 4.2834,
+          "mean_signed_move_pct": 0.28186,
           "monthly_return_pct": {
-            "2026-09": 42.0559
+            "2026-09": 40.4601
           },
           "months_ge_30pct": 1,
-          "n": 279,
+          "n": 247,
           "negative_months": 0,
-          "profitable_exit_rate_pct": 44.8029,
-          "return_pct": 42.0559,
-          "trades_per_active_day": 9.3
+          "profitable_exit_rate_pct": 45.3441,
+          "return_pct": 40.4601,
+          "trades_per_active_day": 8.2333
         }
       }
     }
   },
   "sources": {
-    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_basket_trend_long_guard_oct26_audit.py": "6b1527e1043207852e0bf1035ef70617ef901ad68a9e5033305935576f3a3882",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_basket_trend_long_guard_oct26_audit.py": "0ebe21347baa1ff0768be8e12b54d2dba84992f2cb3a998b0a55ac78f0708da2",
     "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAOIUSDT_15min_current.pkl": "7ad9fb4651e4cdfde2a700cd4247655235805bc4f5361356edcbc0aec093f6ce",
     "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAPLUSDT_15min_current.pkl": "bcca54fb8e4193ceecb4c80b1d93b9cd7f34832c792851ca7796186517d2542d",
     "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMDUSDT_15min_current.pkl": "10536359924465ba0ae5355c5629292e0dc3778add5142be3168579929af91c1",

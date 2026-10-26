@@ -967,7 +967,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "Нативный X-Perp разворот: 44 инструмента, свечи 15m\n"
                 "Порог: |z| ≥ 2, движение ≥ 0.4%, ATR14 ≤ 1%\n"
                 "Уровень: вход только пока 32-свечная опора не пробита\n"
-                "LONG: тренд корзины за 16 точек не ниже −1.501%\n"
+                "LONG: тренд корзины за 96 точек не ниже −0.563%\n"
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% цены, стоп: 1%, максимум 64 свечи\n"
                 f"За скользящий час: максимум {NATIVE_XPERP_ROLLING_HOUR_CAP} входа\n"
@@ -3407,7 +3407,7 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
             f"Cross-sectional z {z_score:+.2f}",
             f"Two-bar move {100 * float(setup['signal_return']):+.2f}%",
             f"ATR14 {100 * atr_fraction:.2f}%",
-            f"Basket trend 16 {100 * float(setup['basket_trend_16']):+.2f}%",
+            f"Basket trend 96 {100 * float(setup['basket_trend_96']):+.2f}%",
             (f"Backing level {int(setup['backing_level_lookback_bars'])} bars: "
              f"{float(setup['backing_level']):.8g}"),
             f"Universe {int(setup['universe_n'])}",
