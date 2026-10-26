@@ -1,0 +1,1332 @@
+{
+  "baseline": {
+    "periods": {
+      "observed_oct17_oct26": {
+        "dd_pct": 2.0318,
+        "mean_signed_move_pct": 0.275258,
+        "n": 67,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 46.2687,
+        "return_pct": 5.6171,
+        "trades_per_active_day": 6.7
+      },
+      "observed_oct1_oct16": {
+        "dd_pct": 2.6878,
+        "mean_signed_move_pct": 0.198586,
+        "n": 133,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 45.8647,
+        "return_pct": 8.0581,
+        "trades_per_active_day": 8.3125
+      },
+      "selection_august": {
+        "dd_pct": 3.2831,
+        "mean_signed_move_pct": 0.279061,
+        "n": 259,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.1042,
+        "return_pct": 23.8007,
+        "trades_per_active_day": 8.3548
+      },
+      "selection_july": {
+        "dd_pct": 3.3053,
+        "mean_signed_move_pct": 0.378547,
+        "n": 245,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 46.9388,
+        "return_pct": 31.3702,
+        "trades_per_active_day": 7.9032
+      },
+      "validation_september": {
+        "dd_pct": 2.5831,
+        "mean_signed_move_pct": 0.28186,
+        "n": 247,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 45.3441,
+        "return_pct": 22.8547,
+        "trades_per_active_day": 8.2333
+      }
+    },
+    "selection_score": 22.14805
+  },
+  "created_at": "2026-10-26T22:43:17.233470+00:00",
+  "grid": {
+    "eligible": 79,
+    "lookbacks": [
+      1,
+      4,
+      8
+    ],
+    "move_thresholds": [
+      0.4,
+      0.6,
+      0.8
+    ],
+    "sides": [
+      "BOTH",
+      "LONG",
+      "SHORT"
+    ],
+    "tested": 81,
+    "z_thresholds": [
+      1.5,
+      2.0,
+      2.5
+    ]
+  },
+  "limitations": [
+    "Native X-Perp history begins in 2026.",
+    "October was already observed and cannot activate this candidate.",
+    "Gross results exclude fees at user request."
+  ],
+  "october_diagnostic_improves_baseline": false,
+  "protocol": {
+    "already_observed_diagnostic": "2026-10-01..26",
+    "base": "frozen 2-bar z>=2 move>=0.4% reversal route",
+    "candidate": "one additional 1/4/8-bar reversal geometry",
+    "common_rails": "ATR<=1%, backing32, basket96 long guard, rolling-hour cap4, loss pause2",
+    "entry": "next 15-minute market open",
+    "hold_bars": 64,
+    "orders": "market only",
+    "retune_on_validation_or_october": false,
+    "selection": [
+      "2026-07",
+      "2026-08"
+    ],
+    "stop_pct": 1.0,
+    "target_pct": 2.0,
+    "validation": "2026-09"
+  },
+  "ready_for_live_orders": false,
+  "robust_improvement": false,
+  "selected_before_september": {
+    "lookback_bars": 1,
+    "minimum_move_pct": 0.8,
+    "periods": {
+      "observed_oct17_oct26": {
+        "dd_pct": 3.2081,
+        "mean_signed_move_pct": 0.238294,
+        "n": 69,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.9275,
+        "return_pct": 4.9734,
+        "trades_per_active_day": 6.9
+      },
+      "observed_oct1_oct16": {
+        "dd_pct": 2.8501,
+        "mean_signed_move_pct": 0.250079,
+        "n": 137,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.4453,
+        "return_pct": 10.5976,
+        "trades_per_active_day": 8.5625
+      },
+      "selection_august": {
+        "dd_pct": 3.5753,
+        "mean_signed_move_pct": 0.296311,
+        "n": 258,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 47.6744,
+        "return_pct": 25.3677,
+        "trades_per_active_day": 8.3226
+      },
+      "selection_july": {
+        "dd_pct": 3.3053,
+        "mean_signed_move_pct": 0.437969,
+        "n": 251,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 48.2072,
+        "return_pct": 38.2403,
+        "trades_per_active_day": 8.0968
+      },
+      "validation_september": {
+        "dd_pct": 2.4476,
+        "mean_signed_move_pct": 0.238898,
+        "n": 252,
+        "negative_months": 0,
+        "profitable_exit_rate_pct": 44.0476,
+        "return_pct": 19.4596,
+        "trades_per_active_day": 8.4
+      }
+    },
+    "selection_score": 23.58005,
+    "side": "LONG",
+    "z_threshold": 2.0
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_multi_horizon_complement_oct26_audit.py": "328f43bf5830420921e62c25905948d19dd23850e8f8c956480a5af51cc00924",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAOIUSDT_15min_current.pkl": "7ad9fb4651e4cdfde2a700cd4247655235805bc4f5361356edcbc0aec093f6ce",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAPLUSDT_15min_current.pkl": "bcca54fb8e4193ceecb4c80b1d93b9cd7f34832c792851ca7796186517d2542d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMDUSDT_15min_current.pkl": "10536359924465ba0ae5355c5629292e0dc3778add5142be3168579929af91c1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMZNUSDT_15min_current.pkl": "3983489741c2079b90b28555f008bbe7062f352f83f940887fc03dc12d301a12",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\ARMUSDT_15min_current.pkl": "96c6df328b38e46fecd57bd4afd70f70dd730e7021fcc6a28d47db6d39d6e9e2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AVGOUSDT_15min_current.pkl": "19511681e5beb77b1f52ab44fb92d152bd829debb38d95bc5cbceb493fd3a72b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AXTIUSDT_15min_current.pkl": "cb0fda92191302778b514a6d16d87e295352f071160eaaff1d855c8ca9327dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BEUSDT_15min_current.pkl": "519689e8e11b39e448bfb9d458d90c3c9b71348054c0dc16e4ab37cedec57ec6",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BMNRUSDT_15min_current.pkl": "1601db724d3d53507546a5daefd8bf462770d57b1509d2b866881c44c75bc09c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CBRSUSDT_15min_current.pkl": "f57bbfea3e9fb8be143928dc24952552b0ea1a60239c967589e0515dab057dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\COINUSDT_15min_current.pkl": "4f0b805bdb21cfcad60b1aa93fa784e53af02768905b1a90820f2617e6d00e88",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRCLUSDT_15min_current.pkl": "f5ba420adc973bc5d60f785789b8e00c689fd8e83c838b999bf9b53d8336fb08",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRWVUSDT_15min_current.pkl": "29c92824136a395475e1d9f1edefaa928ea8d19ce3f77f8cec2540a1a7db8d8c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DELLUSDT_15min_current.pkl": "40fa4bc48011f062a680d1f028f73c6eb1cbc779bdb050eb600869c683c86556",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DRAMUSDT_15min_current.pkl": "594dfacf2ad0f62f64de7d7bafe66aabb56ecfaed88d6973a8eccf98264bad3f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\EWYUSDT_15min_current.pkl": "b39d4be6086f6341f485c43ecf961678a67add5cda75d7413e63ec0f2c517a57",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\GOOGLUSDT_15min_current.pkl": "6b6ba3d4f63bfb26e9978d19473edb68484a5f61bc0b6968fedb760d99efffe2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\HOODUSDT_15min_current.pkl": "03d4fb895e32d77788da6169f2bfa34ab5252c7a9abb5b07d15efe05e5f1aed4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\INTCUSDT_15min_current.pkl": "9a3795ce16c9e433a578cbca68c9f2735a58c40d2b2b0ca0737cb3b5dfa686c3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\KOUSDT_15min_current.pkl": "2db4782713e441ce21038bf80cc2d4b6a20b0ff125bd43f38f7008836321c935",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\LITEUSDT_15min_current.pkl": "6825ed79c54df5a106faf528c653cf58f1d9a6d90eb9e409c23fef2a47e3ea6c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\METAUSDT_15min_current.pkl": "637da1d086136ec0f7787cc4c29f8e4a507a8dbf118ba03b03eb97b0a2aa9e78",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRNAUSDT_15min_current.pkl": "54e72f56f3d3432590737cc15c06bbda182b312bd84146571eac52116129a1ae",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRVLUSDT_15min_current.pkl": "31d1cbaedc6f65973b04e56bdc9422358cd3d3adc486c07e3badcc3833b6e453",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSFTUSDT_15min_current.pkl": "e515bc39168b6b2b74c1e14e5ec1e051d976f679ed1401d1edb44dadeef97465",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSTRUSDT_15min_current.pkl": "3a9b914f21db0f10b10b274e19c1c2f921a0dbf577bf959d71076117180b431e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MUUSDT_15min_current.pkl": "b51dfe194f9b43c3eae63409fd6a2c9d24ab48c96ea866f909671bb9d56f8917",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NBISUSDT_15min_current.pkl": "74e2300d4a76f41131960e503930be1b2bfb7b251159116477149c162a8601f7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NVDAUSDT_15min_current.pkl": "c8be37f06d23df2c8b1547e66cf3af8b3ac0c03e6d627bce219cdb93f2945148",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\OKTAUSDT_15min_current.pkl": "b6fb702557d401e751d3e623b4bed25622037355ac65bcf1c2346efd3df33869",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\PLTRUSDT_15min_current.pkl": "e500f53ec1f05a63c6ec0a51c44ac9b34db0391f89b31e7f1fa06dffc56b478e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\QCOMUSDT_15min_current.pkl": "48ee6ab9cbea98de2602cbee4619bf2a60d62bb842e279875ba93f1085e8a20d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\RKLBUSDT_15min_current.pkl": "a02876a1ddc69681552a3d9ff0cd33874f4ac1f71d6f84f25ef487aedb5d07cf",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SAMSUNGUSDT_15min_current.pkl": "b8c8d7e3f9eaf03686e302b1ab3b6624fd1d33490a0dea4398700c1352be2ada",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYNIXUSDT_15min_current.pkl": "51759b100a02e0c3e9594f829df23333ce193e9fe46515fb33fba6e295e0a347",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYUSDT_15min_current.pkl": "2ea85cb8dfba4dc4bee632267937f73fb281994ffdade0c5ecddf5addfa3c70b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNDKUSDT_15min_current.pkl": "1a614308b6c19af18574596c3b36e291e863d561e5e0989358b50a21b7b7b4d7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNXXUSDT_15min_current.pkl": "0b6f0004c8725b6f7be426895544e4e2862d1eeac22ece62f3d3b09242b99163",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOFTBANKUSDT_15min_current.pkl": "05d5dc031a7d4a7a387d904015d1d053bd08f445605d51a7cd1d31140d7a00a5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXLUSDT_15min_current.pkl": "5c8911bda9c3df4bb2d1ce1bb7a2c9671b0ff7336086edced711f1d0c7d44609",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXSUSDT_15min_current.pkl": "ba55293b86038456b01f4c88852089adfa4a36354b86f58d19b6e9036b88e66b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SPCXUSDT_15min_current.pkl": "215e63ab7b5723ccee4a486412c5673d3c89fbc08316a18e5deec06a6940c8c2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\TSLAUSDT_15min_current.pkl": "f32bd866da14d1299fb4de5b9c21b1894d2c6f4ca8cbaeda75d735fc446f8d01",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\WDCUSDT_15min_current.pkl": "f24f71533524b4f21f1da5a394c8c7e20929546234265322da98742d586c6055",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AAOIUSDT_15min_current.pkl": "66149b2fc2f49236b64def0924f03e30df90b2e23841116f82f70ffa4d542cfa",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AAPLUSDT_15min_current.pkl": "a3e5eb8b2e68821d87c3d53bbc220269f65c31fb7d7c1d0620411d7f75e62669",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AMDUSDT_15min_current.pkl": "1a67bfc4ec7531e367addb4159c8aed65a98eb366d7e593d2a3e2486cbe266b6",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AMZNUSDT_15min_current.pkl": "c512327707ef164464e1f8cc00298e14342f92f063e9a166c1b252453a0c3c07",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\ARMUSDT_15min_current.pkl": "78273e24b28b5e7405c64373c2a16bbfef44f560a271e796e487abd616c8cbec",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AVGOUSDT_15min_current.pkl": "5d37920d12f60c23a6fae29ae138be67744d8ae7d0cdf4b7e98a02c09b88e9cf",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AXTIUSDT_15min_current.pkl": "39c2f297dc1e3a476876a2332e7def34c7188de3184638c13048e9614a34149e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BEUSDT_15min_current.pkl": "4279b1981fcfcc9aa941785d1ed630b2041c8f8cf33db4f89db79aef93158bf9",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BMNRUSDT_15min_current.pkl": "5197c092c6025143fc222d747f23c52b78f5b94023b07c5862517bb5efd39680",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CBRSUSDT_15min_current.pkl": "e9e587e6bc6443ce5cde1d2aadf0719d425d2cfe77d1b19ee313d2f8b160687e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\COINUSDT_15min_current.pkl": "360dfdc34e0830d4203c3cb74b69195dd0da37ecfeea43f3c6ca5c13a870669a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CRCLUSDT_15min_current.pkl": "7398dc34d1e55a98c5238fdcdac26166c2c6cd2b1e0784db3777ceab1102b860",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CRWVUSDT_15min_current.pkl": "3297e9ac49657e1ddef42cd508a5025c75af37b59b4c9f57cd36c339b5cfe47e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\DELLUSDT_15min_current.pkl": "0e085c100975e624ce2d2a1ec61a5ce514c8f35d5a801956b75006778b62a3f1",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\DRAMUSDT_15min_current.pkl": "6f048a011dffba551281d4abb6b4c4fdfb65bc3fb6f5dec9bb7be6df34e94e5b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\EWYUSDT_15min_current.pkl": "68838f03c3b881b8f91f78966cee6b43a2407d6ac232e5a26c26ea3a7cf0734b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\GOOGLUSDT_15min_current.pkl": "1d233b42e46ec91dc2578b274580d40308288c1d674505a3d9798137e4fd6a8c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\HOODUSDT_15min_current.pkl": "dd0c839249b93050c8038231631c14041892a4a01337f775a356ae3f358e7fe4",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\INTCUSDT_15min_current.pkl": "5a17d27590bfd813368421f9997014d39648d5515bebe050c7db1b84d777d0ef",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\KOUSDT_15min_current.pkl": "38c1292a43b35b5fb8370b4ce80986946e61932a0c6f3908fac0a9f4968f9e9b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\LITEUSDT_15min_current.pkl": "c200a3285c39571a63c0a94c3fc90a59c3c4d137724a1e99432693e6009a4543",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\METAUSDT_15min_current.pkl": "b4b4c9639252cc814bf0931dfdd635315c80fe89f97b4046e3a61a356a4f5285",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRNAUSDT_15min_current.pkl": "78ed58f17365ab60b275cce65e43555d005519bb4277d050557fafbaa5073296",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRVLUSDT_15min_current.pkl": "b63a7dbab3bef91412e114a18be0bbd89013e2982ab9ba232a0ad44507b13683",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MSFTUSDT_15min_current.pkl": "6527716dff7dcfb4f14b84b8c3b795655348e0d89c17f6603cd24ceb3bffbee6",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MSTRUSDT_15min_current.pkl": "dabf3dd995a36c6f27fccfb83d11b333419172e2c982525f237e99adb7b9a28c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MUUSDT_15min_current.pkl": "5c1ae522cefbd0413cd003ca34a326da18d6825d6613b7b9a13581a5daf132e0",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\NBISUSDT_15min_current.pkl": "825b2bf053aa35bd08e63b136ab542cf8ef8e227d63fa3478d27a97a4c21db96",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\NVDAUSDT_15min_current.pkl": "c88e48bd14effeebfb5e194a192c053fb30e85ca01279e77609d9ec4b6753069",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\OKTAUSDT_15min_current.pkl": "2f6f3e43a2e1c76f48c18063467a74c6c908b662777c8c3ccbacdc97b0227525",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\PLTRUSDT_15min_current.pkl": "05a398add3ce3f9f13f97b7348c4395426f6079078648e75383a1c70c2b8610d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\QCOMUSDT_15min_current.pkl": "d9a3c77e4141391f4b933ceebf5c251cfa8439ed52bc4d75d28f293de57965e8",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\RKLBUSDT_15min_current.pkl": "71359228cb2d03d7b4329c2b8724adb2c3da44463dd437c80198172f96da2308",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SAMSUNGUSDT_15min_current.pkl": "f4f89f1c8e07b72a6745a97b5decff292bf3530be6ba951b8380a5831e59e3aa",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYNIXUSDT_15min_current.pkl": "7772693601591838460b2de5a4989508452b227a7605b7944715bec6f5376d40",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYUSDT_15min_current.pkl": "e31f95882aa1c27107e647de308163d571dd78a4f546267f2d0a4e95e5c44a6f",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SNDKUSDT_15min_current.pkl": "085835dfb9dd566819ef2ed79abad9ba8a9fccf4bf7c0942d35c67eca723f32c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SNXXUSDT_15min_current.pkl": "2923e197908066f4581d1771f4d1c246db327f9acc43eb6452fe4e2f31baee28",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOFTBANKUSDT_15min_current.pkl": "304e2cd166902942427331b2304afe1bc7b3654f8a8e9db3fcec4183f377f6bc",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXLUSDT_15min_current.pkl": "c59fd19af8677988dbcc276a170ba59d3d70f761ae3366dc2bdbdcd339fac38a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXSUSDT_15min_current.pkl": "69c2a39abf44fa1bf8d47c5f11029f404695366eecef2fa2443d1672a8e137c7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SPCXUSDT_15min_current.pkl": "7afc30da3e8ff2b7e454250cd8162b100995b08102b9e8a90c45ca4683800d28",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\TSLAUSDT_15min_current.pkl": "1f7adc26853cab1246c093319e5277cdfb2f649174e134c8d0b0f5132f25f04f",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\WDCUSDT_15min_current.pkl": "764f3d10fbec3428b60b12aa1692a63dc012c64e6deb8e497bcef72234f0c94c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\manifest.json": "65e22ccdff1c533f3bfbbf638f20d60a273575820d0359b2a1ec5a36f53432a2"
+  },
+  "status": "REJECTED_NO_ROBUST_IMPROVEMENT",
+  "top20": [
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 3.2081,
+          "mean_signed_move_pct": 0.238294,
+          "n": 69,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.9275,
+          "return_pct": 4.9734,
+          "trades_per_active_day": 6.9
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.250079,
+          "n": 137,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4453,
+          "return_pct": 10.5976,
+          "trades_per_active_day": 8.5625
+        },
+        "selection_august": {
+          "dd_pct": 3.5753,
+          "mean_signed_move_pct": 0.296311,
+          "n": 258,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.6744,
+          "return_pct": 25.3677,
+          "trades_per_active_day": 8.3226
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.437969,
+          "n": 251,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.2072,
+          "return_pct": 38.2403,
+          "trades_per_active_day": 8.0968
+        },
+        "validation_september": {
+          "dd_pct": 2.4476,
+          "mean_signed_move_pct": 0.238898,
+          "n": 252,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.0476,
+          "return_pct": 19.4596,
+          "trades_per_active_day": 8.4
+        }
+      },
+      "selection_score": 23.58005,
+      "side": "LONG",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.3264,
+          "mean_signed_move_pct": 0.256504,
+          "n": 68,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.5882,
+          "return_pct": 5.2995,
+          "trades_per_active_day": 6.8
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.250079,
+          "n": 137,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4453,
+          "return_pct": 10.5976,
+          "trades_per_active_day": 8.5625
+        },
+        "selection_august": {
+          "dd_pct": 3.5753,
+          "mean_signed_move_pct": 0.288538,
+          "n": 260,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.3077,
+          "return_pct": 24.8369,
+          "trades_per_active_day": 8.3871
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.416812,
+          "n": 246,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.9675,
+          "return_pct": 35.2618,
+          "trades_per_active_day": 7.9355
+        },
+        "validation_september": {
+          "dd_pct": 2.4476,
+          "mean_signed_move_pct": 0.238898,
+          "n": 252,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.0476,
+          "return_pct": 19.4573,
+          "trades_per_active_day": 8.4
+        }
+      },
+      "selection_score": 23.04925,
+      "side": "LONG",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.3264,
+          "mean_signed_move_pct": 0.256504,
+          "n": 68,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.5882,
+          "return_pct": 5.2995,
+          "trades_per_active_day": 6.8
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.206011,
+          "n": 137,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.9854,
+          "return_pct": 8.6433,
+          "trades_per_active_day": 8.5625
+        },
+        "selection_august": {
+          "dd_pct": 3.5753,
+          "mean_signed_move_pct": 0.287433,
+          "n": 257,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.0817,
+          "return_pct": 24.4048,
+          "trades_per_active_day": 8.2903
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.41035,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.7551,
+          "return_pct": 34.4741,
+          "trades_per_active_day": 7.9032
+        },
+        "validation_september": {
+          "dd_pct": 2.7267,
+          "mean_signed_move_pct": 0.241339,
+          "n": 254,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.0945,
+          "return_pct": 19.8572,
+          "trades_per_active_day": 8.4667
+        }
+      },
+      "selection_score": 22.61715,
+      "side": "LONG",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.0318,
+          "mean_signed_move_pct": 0.254068,
+          "n": 69,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.3768,
+          "return_pct": 5.33,
+          "trades_per_active_day": 6.9
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.972,
+          "mean_signed_move_pct": 0.251313,
+          "n": 138,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.1014,
+          "return_pct": 10.744,
+          "trades_per_active_day": 9.2
+        },
+        "selection_august": {
+          "dd_pct": 3.0976,
+          "mean_signed_move_pct": 0.282529,
+          "n": 259,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4903,
+          "return_pct": 24.1533,
+          "trades_per_active_day": 8.3548
+        },
+        "selection_july": {
+          "dd_pct": 3.7695,
+          "mean_signed_move_pct": 0.313828,
+          "n": 247,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.749,
+          "return_pct": 25.556,
+          "trades_per_active_day": 7.9677
+        },
+        "validation_september": {
+          "dd_pct": 4.1712,
+          "mean_signed_move_pct": 0.16329,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.8571,
+          "return_pct": 12.4747,
+          "trades_per_active_day": 8.1667
+        }
+      },
+      "selection_score": 22.26855,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.0318,
+          "mean_signed_move_pct": 0.254068,
+          "n": 69,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.3768,
+          "return_pct": 5.33,
+          "trades_per_active_day": 6.9
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.972,
+          "mean_signed_move_pct": 0.231306,
+          "n": 133,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.6165,
+          "return_pct": 9.4652,
+          "trades_per_active_day": 8.8667
+        },
+        "selection_august": {
+          "dd_pct": 3.0976,
+          "mean_signed_move_pct": 0.282474,
+          "n": 259,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4903,
+          "return_pct": 24.1479,
+          "trades_per_active_day": 8.3548
+        },
+        "selection_july": {
+          "dd_pct": 3.7695,
+          "mean_signed_move_pct": 0.306974,
+          "n": 246,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.5285,
+          "return_pct": 24.8072,
+          "trades_per_active_day": 7.9355
+        },
+        "validation_september": {
+          "dd_pct": 3.768,
+          "mean_signed_move_pct": 0.179052,
+          "n": 244,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.623,
+          "return_pct": 13.7254,
+          "trades_per_active_day": 8.1333
+        }
+      },
+      "selection_score": 22.26315,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.917,
+          "mean_signed_move_pct": 0.251083,
+          "n": 66,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9697,
+          "return_pct": 5.0487,
+          "trades_per_active_day": 6.6
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.4909,
+          "mean_signed_move_pct": 0.127566,
+          "n": 134,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.5373,
+          "return_pct": 5.1118,
+          "trades_per_active_day": 8.375
+        },
+        "selection_august": {
+          "dd_pct": 3.7281,
+          "mean_signed_move_pct": 0.260409,
+          "n": 276,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4638,
+          "return_pct": 23.6082,
+          "trades_per_active_day": 8.9032
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.406999,
+          "n": 244,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.7213,
+          "return_pct": 33.8217,
+          "trades_per_active_day": 7.871
+        },
+        "validation_september": {
+          "dd_pct": 3.9583,
+          "mean_signed_move_pct": 0.214042,
+          "n": 232,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.8276,
+          "return_pct": 15.7737,
+          "trades_per_active_day": 7.7333
+        }
+      },
+      "selection_score": 21.74415,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.0318,
+          "mean_signed_move_pct": 0.137031,
+          "n": 70,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.8571,
+          "return_pct": 2.8458,
+          "trades_per_active_day": 7.0
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 3.3614,
+          "mean_signed_move_pct": 0.147687,
+          "n": 134,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.0299,
+          "return_pct": 5.9422,
+          "trades_per_active_day": 8.375
+        },
+        "selection_august": {
+          "dd_pct": 3.0976,
+          "mean_signed_move_pct": 0.275744,
+          "n": 260,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.3077,
+          "return_pct": 23.6047,
+          "trades_per_active_day": 8.3871
+        },
+        "selection_july": {
+          "dd_pct": 4.2669,
+          "mean_signed_move_pct": 0.292993,
+          "n": 247,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.5344,
+          "return_pct": 23.6341,
+          "trades_per_active_day": 7.9677
+        },
+        "validation_september": {
+          "dd_pct": 3.8806,
+          "mean_signed_move_pct": 0.186782,
+          "n": 238,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.8571,
+          "return_pct": 13.9949,
+          "trades_per_active_day": 7.9333
+        }
+      },
+      "selection_score": 21.47125,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.3679,
+          "mean_signed_move_pct": 0.183642,
+          "n": 87,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.8276,
+          "return_pct": 4.8113,
+          "trades_per_active_day": 8.7
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8774,
+          "mean_signed_move_pct": 0.18348,
+          "n": 131,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.0382,
+          "return_pct": 7.2863,
+          "trades_per_active_day": 8.1875
+        },
+        "selection_august": {
+          "dd_pct": 3.9586,
+          "mean_signed_move_pct": 0.261349,
+          "n": 266,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9925,
+          "return_pct": 22.8174,
+          "trades_per_active_day": 8.5806
+        },
+        "selection_july": {
+          "dd_pct": 3.6997,
+          "mean_signed_move_pct": 0.313576,
+          "n": 243,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.679,
+          "return_pct": 25.0225,
+          "trades_per_active_day": 7.8387
+        },
+        "validation_september": {
+          "dd_pct": 5.0799,
+          "mean_signed_move_pct": 0.167915,
+          "n": 240,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.0833,
+          "return_pct": 12.5686,
+          "trades_per_active_day": 8.0
+        }
+      },
+      "selection_score": 20.8381,
+      "side": "SHORT",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.8356,
+          "mean_signed_move_pct": 0.194146,
+          "n": 64,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.3125,
+          "return_pct": 3.7118,
+          "trades_per_active_day": 6.4
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.4064,
+          "mean_signed_move_pct": 0.100422,
+          "n": 134,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.5373,
+          "return_pct": 3.996,
+          "trades_per_active_day": 8.375
+        },
+        "selection_august": {
+          "dd_pct": 4.2245,
+          "mean_signed_move_pct": 0.266652,
+          "n": 262,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.8015,
+          "return_pct": 22.9332,
+          "trades_per_active_day": 8.4516
+        },
+        "selection_july": {
+          "dd_pct": 2.8799,
+          "mean_signed_move_pct": 0.460671,
+          "n": 256,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.0469,
+          "return_pct": 41.3552,
+          "trades_per_active_day": 8.2581
+        },
+        "validation_september": {
+          "dd_pct": 3.6839,
+          "mean_signed_move_pct": 0.12063,
+          "n": 242,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 40.9091,
+          "return_pct": 8.9096,
+          "trades_per_active_day": 8.0667
+        }
+      },
+      "selection_score": 20.82095,
+      "side": "SHORT",
+      "z_threshold": 1.5
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.917,
+          "mean_signed_move_pct": 0.251083,
+          "n": 66,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9697,
+          "return_pct": 5.0487,
+          "trades_per_active_day": 6.6
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.4255,
+          "mean_signed_move_pct": 0.143153,
+          "n": 131,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.7481,
+          "return_pct": 5.6338,
+          "trades_per_active_day": 8.7333
+        },
+        "selection_august": {
+          "dd_pct": 3.7281,
+          "mean_signed_move_pct": 0.254952,
+          "n": 268,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.6418,
+          "return_pct": 22.3304,
+          "trades_per_active_day": 8.6452
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.404068,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.5306,
+          "return_pct": 33.7004,
+          "trades_per_active_day": 7.9032
+        },
+        "validation_september": {
+          "dd_pct": 3.9583,
+          "mean_signed_move_pct": 0.175429,
+          "n": 229,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.7948,
+          "return_pct": 12.533,
+          "trades_per_active_day": 7.6333
+        }
+      },
+      "selection_score": 20.46635,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.476,
+          "mean_signed_move_pct": 0.152198,
+          "n": 66,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.9394,
+          "return_pct": 2.9759,
+          "trades_per_active_day": 6.6
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.3531,
+          "mean_signed_move_pct": 0.104906,
+          "n": 131,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 41.9847,
+          "return_pct": 4.0859,
+          "trades_per_active_day": 8.7333
+        },
+        "selection_august": {
+          "dd_pct": 4.7995,
+          "mean_signed_move_pct": 0.244498,
+          "n": 280,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.0,
+          "return_pct": 22.3768,
+          "trades_per_active_day": 9.0323
+        },
+        "selection_july": {
+          "dd_pct": 2.7836,
+          "mean_signed_move_pct": 0.429836,
+          "n": 248,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.7742,
+          "return_pct": 36.7172,
+          "trades_per_active_day": 8.0
+        },
+        "validation_september": {
+          "dd_pct": 3.597,
+          "mean_signed_move_pct": 0.167015,
+          "n": 249,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.1687,
+          "return_pct": 12.9871,
+          "trades_per_active_day": 8.3
+        }
+      },
+      "selection_score": 19.97705,
+      "side": "SHORT",
+      "z_threshold": 1.5
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.4947,
+          "mean_signed_move_pct": 0.304726,
+          "n": 78,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4359,
+          "return_pct": 7.2918,
+          "trades_per_active_day": 7.8
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.3685,
+          "mean_signed_move_pct": 0.288492,
+          "n": 135,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.8889,
+          "return_pct": 12.1551,
+          "trades_per_active_day": 9.0
+        },
+        "selection_august": {
+          "dd_pct": 3.9586,
+          "mean_signed_move_pct": 0.2534,
+          "n": 260,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.5385,
+          "return_pct": 21.4761,
+          "trades_per_active_day": 8.3871
+        },
+        "selection_july": {
+          "dd_pct": 3.6062,
+          "mean_signed_move_pct": 0.330217,
+          "n": 242,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.281,
+          "return_pct": 26.4253,
+          "trades_per_active_day": 7.8065
+        },
+        "validation_september": {
+          "dd_pct": 4.174,
+          "mean_signed_move_pct": 0.16325,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.8571,
+          "return_pct": 12.4674,
+          "trades_per_active_day": 8.1667
+        }
+      },
+      "selection_score": 19.4968,
+      "side": "SHORT",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.6123,
+          "mean_signed_move_pct": 0.186336,
+          "n": 70,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.2857,
+          "return_pct": 3.8987,
+          "trades_per_active_day": 7.7778
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.200535,
+          "n": 137,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.9854,
+          "return_pct": 8.4032,
+          "trades_per_active_day": 8.5625
+        },
+        "selection_august": {
+          "dd_pct": 3.7576,
+          "mean_signed_move_pct": 0.261361,
+          "n": 248,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.371,
+          "return_pct": 21.12,
+          "trades_per_active_day": 8.0
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.401427,
+          "n": 239,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.2803,
+          "return_pct": 32.6358,
+          "trades_per_active_day": 7.7097
+        },
+        "validation_september": {
+          "dd_pct": 2.7267,
+          "mean_signed_move_pct": 0.240197,
+          "n": 248,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.3548,
+          "return_pct": 19.2889,
+          "trades_per_active_day": 8.2667
+        }
+      },
+      "selection_score": 19.2412,
+      "side": "LONG",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.7696,
+          "mean_signed_move_pct": 0.13146,
+          "n": 64,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.75,
+          "return_pct": 2.4736,
+          "trades_per_active_day": 6.4
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.2133,
+          "mean_signed_move_pct": 0.08478,
+          "n": 131,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 41.2214,
+          "return_pct": 3.2621,
+          "trades_per_active_day": 8.7333
+        },
+        "selection_august": {
+          "dd_pct": 4.2245,
+          "mean_signed_move_pct": 0.243724,
+          "n": 268,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.1493,
+          "return_pct": 21.2735,
+          "trades_per_active_day": 8.6452
+        },
+        "selection_july": {
+          "dd_pct": 2.8939,
+          "mean_signed_move_pct": 0.453349,
+          "n": 254,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.6378,
+          "return_pct": 40.1844,
+          "trades_per_active_day": 8.1935
+        },
+        "validation_september": {
+          "dd_pct": 4.1214,
+          "mean_signed_move_pct": 0.145679,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.449,
+          "return_pct": 10.997,
+          "trades_per_active_day": 8.1667
+        }
+      },
+      "selection_score": 19.16125,
+      "side": "SHORT",
+      "z_threshold": 1.5
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.4,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.344,
+          "mean_signed_move_pct": 0.210924,
+          "n": 67,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.7761,
+          "return_pct": 4.2539,
+          "trades_per_active_day": 6.7
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.5177,
+          "mean_signed_move_pct": 0.082789,
+          "n": 138,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.029,
+          "return_pct": 3.3782,
+          "trades_per_active_day": 8.625
+        },
+        "selection_august": {
+          "dd_pct": 3.9207,
+          "mean_signed_move_pct": 0.253902,
+          "n": 261,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.3602,
+          "return_pct": 21.6032,
+          "trades_per_active_day": 8.4194
+        },
+        "selection_july": {
+          "dd_pct": 5.0751,
+          "mean_signed_move_pct": 0.351334,
+          "n": 247,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.5344,
+          "return_pct": 28.7964,
+          "trades_per_active_day": 7.9677
+        },
+        "validation_september": {
+          "dd_pct": 3.597,
+          "mean_signed_move_pct": 0.20151,
+          "n": 249,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.5783,
+          "return_pct": 15.9465,
+          "trades_per_active_day": 8.3
+        }
+      },
+      "selection_score": 19.06565,
+      "side": "SHORT",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 4,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.4947,
+          "mean_signed_move_pct": 0.322374,
+          "n": 77,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.0519,
+          "return_pct": 7.6314,
+          "trades_per_active_day": 7.7
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.5016,
+          "mean_signed_move_pct": 0.241572,
+          "n": 130,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9231,
+          "return_pct": 9.6747,
+          "trades_per_active_day": 8.6667
+        },
+        "selection_august": {
+          "dd_pct": 3.9586,
+          "mean_signed_move_pct": 0.24587,
+          "n": 259,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.332,
+          "return_pct": 20.6827,
+          "trades_per_active_day": 8.3548
+        },
+        "selection_july": {
+          "dd_pct": 3.6062,
+          "mean_signed_move_pct": 0.304825,
+          "n": 240,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.4167,
+          "return_pct": 23.9322,
+          "trades_per_active_day": 7.7419
+        },
+        "validation_september": {
+          "dd_pct": 3.768,
+          "mean_signed_move_pct": 0.179052,
+          "n": 244,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.623,
+          "return_pct": 13.7213,
+          "trades_per_active_day": 8.1333
+        }
+      },
+      "selection_score": 18.7034,
+      "side": "SHORT",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.6,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 2.344,
+          "mean_signed_move_pct": 0.151045,
+          "n": 67,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.2836,
+          "return_pct": 3.0092,
+          "trades_per_active_day": 6.7
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.4255,
+          "mean_signed_move_pct": 0.103173,
+          "n": 134,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 41.791,
+          "return_pct": 4.1228,
+          "trades_per_active_day": 8.9333
+        },
+        "selection_august": {
+          "dd_pct": 3.9207,
+          "mean_signed_move_pct": 0.242615,
+          "n": 262,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.1832,
+          "return_pct": 20.6333,
+          "trades_per_active_day": 8.4516
+        },
+        "selection_july": {
+          "dd_pct": 4.8767,
+          "mean_signed_move_pct": 0.362581,
+          "n": 243,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.4444,
+          "return_pct": 29.3036,
+          "trades_per_active_day": 7.8387
+        },
+        "validation_september": {
+          "dd_pct": 3.597,
+          "mean_signed_move_pct": 0.154054,
+          "n": 243,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 42.7984,
+          "return_pct": 11.6118,
+          "trades_per_active_day": 8.1
+        }
+      },
+      "selection_score": 18.19495,
+      "side": "SHORT",
+      "z_threshold": 2.0
+    },
+    {
+      "lookback_bars": 8,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 1.917,
+          "mean_signed_move_pct": 0.212807,
+          "n": 68,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.5882,
+          "return_pct": 4.3902,
+          "trades_per_active_day": 6.8
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.4255,
+          "mean_signed_move_pct": 0.201967,
+          "n": 138,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.9275,
+          "return_pct": 8.5355,
+          "trades_per_active_day": 9.2
+        },
+        "selection_august": {
+          "dd_pct": 3.7281,
+          "mean_signed_move_pct": 0.228065,
+          "n": 269,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.3532,
+          "return_pct": 19.8007,
+          "trades_per_active_day": 8.6774
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.411193,
+          "n": 245,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.9388,
+          "return_pct": 34.403,
+          "trades_per_active_day": 7.9032
+        },
+        "validation_september": {
+          "dd_pct": 3.9583,
+          "mean_signed_move_pct": 0.201255,
+          "n": 231,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 43.29,
+          "return_pct": 14.6744,
+          "trades_per_active_day": 7.7
+        }
+      },
+      "selection_score": 17.93665,
+      "side": "SHORT",
+      "z_threshold": 2.5
+    },
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 3.2081,
+          "mean_signed_move_pct": 0.231175,
+          "n": 70,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.2857,
+          "return_pct": 4.8922,
+          "trades_per_active_day": 7.0
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.250079,
+          "n": 137,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.4453,
+          "return_pct": 10.5976,
+          "trades_per_active_day": 8.5625
+        },
+        "selection_august": {
+          "dd_pct": 3.5753,
+          "mean_signed_move_pct": 0.233806,
+          "n": 260,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.7692,
+          "return_pct": 19.6629,
+          "trades_per_active_day": 8.3871
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.389371,
+          "n": 246,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.1545,
+          "return_pct": 32.5586,
+          "trades_per_active_day": 7.9355
+        },
+        "validation_september": {
+          "dd_pct": 2.4476,
+          "mean_signed_move_pct": 0.250753,
+          "n": 255,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.7059,
+          "return_pct": 20.8102,
+          "trades_per_active_day": 8.5
+        }
+      },
+      "selection_score": 17.87525,
+      "side": "LONG",
+      "z_threshold": 1.5
+    },
+    {
+      "lookback_bars": 1,
+      "minimum_move_pct": 0.8,
+      "periods": {
+        "observed_oct17_oct26": {
+          "dd_pct": 3.0552,
+          "mean_signed_move_pct": 0.27612,
+          "n": 80,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 46.25,
+          "return_pct": 6.7422,
+          "trades_per_active_day": 8.0
+        },
+        "observed_oct1_oct16": {
+          "dd_pct": 2.8501,
+          "mean_signed_move_pct": 0.266224,
+          "n": 140,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 47.8571,
+          "return_pct": 11.5472,
+          "trades_per_active_day": 8.75
+        },
+        "selection_august": {
+          "dd_pct": 3.958,
+          "mean_signed_move_pct": 0.238485,
+          "n": 255,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 45.8824,
+          "return_pct": 19.6988,
+          "trades_per_active_day": 8.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.3053,
+          "mean_signed_move_pct": 0.46139,
+          "n": 238,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 48.3193,
+          "return_pct": 38.1048,
+          "trades_per_active_day": 7.6774
+        },
+        "validation_september": {
+          "dd_pct": 2.4476,
+          "mean_signed_move_pct": 0.25294,
+          "n": 255,
+          "negative_months": 0,
+          "profitable_exit_rate_pct": 44.3137,
+          "return_pct": 21.0048,
+          "trades_per_active_day": 8.5
+        }
+      },
+      "selection_score": 17.7198,
+      "side": "BOTH",
+      "z_threshold": 2.0
+    }
+  ],
+  "validation_improves_baseline": false
+}
