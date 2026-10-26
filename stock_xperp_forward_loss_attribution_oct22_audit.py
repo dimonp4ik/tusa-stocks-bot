@@ -1,6 +1,7 @@
 """Attribute frozen stock X-Perp forward stops without fitting a new rule."""
 from __future__ import annotations
 
+import argparse
 from collections import Counter
 import hashlib
 import json
@@ -93,12 +94,21 @@ def rate(rows: list[dict], key: str) -> float:
 def main() -> None:
     import pandas as pd
 
-    report = json.loads(FORWARD.read_text(encoding="utf-8"))
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--forward", type=Path, default=FORWARD)
+    parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--out", type=Path, default=OUT)
+    args = parser.parse_args()
+    csv_out = args.out.with_suffix(".csv")
+    if args.out != OUT and (args.out.exists() or csv_out.exists()):
+        raise FileExistsError("attribution outputs are immutable")
+    report = json.loads(args.forward.read_text(encoding="utf-8"))
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     stop_rows = [row for row in report["fresh"] if row["outcome"] == "SL"]
     required_symbols = {str(row["symbol"]) for row in stop_rows}
     candles = {}
-    sources = {str(FORWARD): digest(FORWARD), str(MANIFEST): digest(MANIFEST)}
+    sources = {str(args.forward): digest(args.forward),
+               str(args.manifest): digest(args.manifest)}
     for symbol, item in manifest["symbols"].items():
         if symbol not in required_symbols:
             continue
@@ -160,9 +170,9 @@ def main() -> None:
             "another_1r_adverse_pct": rate(
                 rows, "another_1r_adverse_after_stop"),
         }
-    OUT.write_text(json.dumps(result, indent=2, sort_keys=True),
-                   encoding="utf-8")
-    pd.DataFrame(stops).to_csv(ROWS_OUT, index=False)
+    args.out.write_text(json.dumps(result, indent=2, sort_keys=True),
+                        encoding="utf-8")
+    pd.DataFrame(stops).to_csv(csv_out, index=False)
     print(json.dumps(result, indent=2), flush=True)
 
 

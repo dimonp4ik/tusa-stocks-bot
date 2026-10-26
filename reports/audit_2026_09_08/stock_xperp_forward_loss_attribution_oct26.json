@@ -1,0 +1,101 @@
+{
+  "by_entry_day": {
+    "2026-10-17": {
+      "another_1r_adverse_pct": 0.0,
+      "stops": 3,
+      "target_after_stop_pct": 0.0
+    },
+    "2026-10-18": {
+      "another_1r_adverse_pct": 25.0,
+      "stops": 4,
+      "target_after_stop_pct": 50.0
+    },
+    "2026-10-19": {
+      "another_1r_adverse_pct": 83.3333,
+      "stops": 6,
+      "target_after_stop_pct": 33.3333
+    },
+    "2026-10-20": {
+      "another_1r_adverse_pct": 100.0,
+      "stops": 3,
+      "target_after_stop_pct": 66.6667
+    },
+    "2026-10-21": {
+      "another_1r_adverse_pct": 66.6667,
+      "stops": 3,
+      "target_after_stop_pct": 100.0
+    },
+    "2026-10-22": {
+      "another_1r_adverse_pct": 100.0,
+      "stops": 7,
+      "target_after_stop_pct": 0.0
+    },
+    "2026-10-23": {
+      "another_1r_adverse_pct": 100.0,
+      "stops": 2,
+      "target_after_stop_pct": 100.0
+    },
+    "2026-10-24": {
+      "another_1r_adverse_pct": 50.0,
+      "stops": 6,
+      "target_after_stop_pct": 16.6667
+    },
+    "2026-10-25": {
+      "another_1r_adverse_pct": 50.0,
+      "stops": 8,
+      "target_after_stop_pct": 25.0
+    }
+  },
+  "limitations": [
+    "Only 42 independent forward stops are available.",
+    "Public OHLC cannot order movements within one candle.",
+    "Post-stop paths diagnose failure; they do not validate a filter."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "ambiguity": "stop bar excluded from recovery tests",
+    "post_stop_window": "remaining frozen 64-bar horizon",
+    "purpose": "diagnosis only; no threshold or runtime fitting",
+    "sample": "all literal stops in the frozen Oct-17+ forward route"
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_forward_loss_attribution_oct22_audit.py": "7e65e3300b3163243a7aa85c9dc1ded2dcda464cd86c09bb3bb5860dee893f31",
+    "reports\\audit_2026_09_08\\stock_xperp_backing_hour_cap_forward_oct26.json": "ecb3d2777b79a55bdc5f1f324a69bc9f186df0df7783f0afddf6cae98ea9c777",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AAOIUSDT_15min_current.pkl": "66149b2fc2f49236b64def0924f03e30df90b2e23841116f82f70ffa4d542cfa",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\ARMUSDT_15min_current.pkl": "78273e24b28b5e7405c64373c2a16bbfef44f560a271e796e487abd616c8cbec",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AXTIUSDT_15min_current.pkl": "39c2f297dc1e3a476876a2332e7def34c7188de3184638c13048e9614a34149e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BEUSDT_15min_current.pkl": "4279b1981fcfcc9aa941785d1ed630b2041c8f8cf33db4f89db79aef93158bf9",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BMNRUSDT_15min_current.pkl": "5197c092c6025143fc222d747f23c52b78f5b94023b07c5862517bb5efd39680",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CRWVUSDT_15min_current.pkl": "3297e9ac49657e1ddef42cd508a5025c75af37b59b4c9f57cd36c339b5cfe47e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\EWYUSDT_15min_current.pkl": "68838f03c3b881b8f91f78966cee6b43a2407d6ac232e5a26c26ea3a7cf0734b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\INTCUSDT_15min_current.pkl": "5a17d27590bfd813368421f9997014d39648d5515bebe050c7db1b84d777d0ef",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\LITEUSDT_15min_current.pkl": "c200a3285c39571a63c0a94c3fc90a59c3c4d137724a1e99432693e6009a4543",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRNAUSDT_15min_current.pkl": "78ed58f17365ab60b275cce65e43555d005519bb4277d050557fafbaa5073296",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRVLUSDT_15min_current.pkl": "b63a7dbab3bef91412e114a18be0bbd89013e2982ab9ba232a0ad44507b13683",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MSTRUSDT_15min_current.pkl": "dabf3dd995a36c6f27fccfb83d11b333419172e2c982525f237e99adb7b9a28c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\NBISUSDT_15min_current.pkl": "825b2bf053aa35bd08e63b136ab542cf8ef8e227d63fa3478d27a97a4c21db96",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\OKTAUSDT_15min_current.pkl": "2f6f3e43a2e1c76f48c18063467a74c6c908b662777c8c3ccbacdc97b0227525",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYNIXUSDT_15min_current.pkl": "7772693601591838460b2de5a4989508452b227a7605b7944715bec6f5376d40",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYUSDT_15min_current.pkl": "e31f95882aa1c27107e647de308163d571dd78a4f546267f2d0a4e95e5c44a6f",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SNXXUSDT_15min_current.pkl": "2923e197908066f4581d1771f4d1c246db327f9acc43eb6452fe4e2f31baee28",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXLUSDT_15min_current.pkl": "c59fd19af8677988dbcc276a170ba59d3d70f761ae3366dc2bdbdcd339fac38a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXSUSDT_15min_current.pkl": "69c2a39abf44fa1bf8d47c5f11029f404695366eecef2fa2443d1672a8e137c7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\TSLAUSDT_15min_current.pkl": "1f7adc26853cab1246c093319e5277cdfb2f649174e134c8d0b0f5132f25f04f",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\WDCUSDT_15min_current.pkl": "764f3d10fbec3428b60b12aa1692a63dc012c64e6deb8e497bcef72234f0c94c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\manifest.json": "65e22ccdff1c533f3bfbbf638f20d60a273575820d0359b2a1ec5a36f53432a2"
+  },
+  "status": "FORWARD_STOP_PATH_ATTRIBUTION_ONLY",
+  "summary": {
+    "another_1r_adverse_after_stop_pct": 64.2857,
+    "backing_inside_stop_distance_pct": 61.9048,
+    "direction_count": {
+      "LONG": 25,
+      "SHORT": 17
+    },
+    "entry_reclaimed_after_stop_pct": 66.6667,
+    "mean_horizon_signed_return_pct": -1.44859,
+    "original_target_hit_after_stop_pct": 33.3333,
+    "stops": 42
+  }
+}
