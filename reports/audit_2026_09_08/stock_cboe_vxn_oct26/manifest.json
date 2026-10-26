@@ -1,0 +1,21 @@
+{
+  "causal_availability": "A VXN close may gate only a strictly later stock session; same-session attachment is forbidden.",
+  "data_path": "reports\\audit_2026_09_08\\stock_cboe_vxn_oct26\\vxn_daily.pkl",
+  "data_sha256": "b974668b63a5fa2873dc80ba8660d88f9257d07bef97cb3cfb2a7074a7e12a50",
+  "downloaded_at_utc": "2026-10-26T03:22:32.253409+00:00",
+  "end": "2026-10-23T00:00:00+00:00",
+  "quality": {
+    "duplicates_removed": 0,
+    "monotonic_dates": true,
+    "positive_ohlc": true,
+    "valid_ohlc_envelope": true
+  },
+  "rows": 4307,
+  "source": {
+    "path": "reports\\audit_2026_09_08\\stock_cboe_vxn_oct26\\VXN_History.csv",
+    "provider": "Cboe Global Markets",
+    "sha256": "c7b976f81f5fb84c4fb1b7f35f38457c049b5d79235353747651c1f4dca06b0b",
+    "url": "https://cdn.cboe.com/api/global/us_indices/daily_prices/VXN_History.csv"
+  },
+  "start": "2009-09-14T00:00:00+00:00"
+}
