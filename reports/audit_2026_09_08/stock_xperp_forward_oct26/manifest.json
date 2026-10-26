@@ -1,0 +1,425 @@
+{
+  "status": "PUBLIC_CURRENT_STOCK_XPERP",
+  "created_at": "2026-10-26T07:48:06.856763+00:00",
+  "bars_requested": 12000,
+  "request_anchor_ms": 1793000700000,
+  "symbols": {
+    "AAOIUSDT": {
+      "status": "OK",
+      "instrument": "AAOI-USD_UM_XPERP-310711",
+      "bars": 10451,
+      "start": 1783594800,
+      "end": 1792999800,
+      "sha256": "66149b2fc2f49236b64def0924f03e30df90b2e23841116f82f70ffa4d542cfa",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AAOIUSDT_15min_current.pkl"
+    },
+    "AAPLUSDT": {
+      "status": "OK",
+      "instrument": "AAPL-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "a3e5eb8b2e68821d87c3d53bbc220269f65c31fb7d7c1d0620411d7f75e62669",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AAPLUSDT_15min_current.pkl"
+    },
+    "AMDUSDT": {
+      "status": "OK",
+      "instrument": "AMD-USD_UM_XPERP-310711",
+      "bars": 10363,
+      "start": 1783674000,
+      "end": 1792999800,
+      "sha256": "1a67bfc4ec7531e367addb4159c8aed65a98eb366d7e593d2a3e2486cbe266b6",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AMDUSDT_15min_current.pkl"
+    },
+    "AMZNUSDT": {
+      "status": "OK",
+      "instrument": "AMZN-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "c512327707ef164464e1f8cc00298e14342f92f063e9a166c1b252453a0c3c07",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AMZNUSDT_15min_current.pkl"
+    },
+    "ARMUSDT": {
+      "status": "OK",
+      "instrument": "ARM-USD_UM_XPERP-310822",
+      "bars": 6617,
+      "start": 1787045400,
+      "end": 1792999800,
+      "sha256": "78273e24b28b5e7405c64373c2a16bbfef44f560a271e796e487abd616c8cbec",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\ARMUSDT_15min_current.pkl"
+    },
+    "AVGOUSDT": {
+      "status": "OK",
+      "instrument": "AVGO-USD_UM_XPERP-310829",
+      "bars": 5747,
+      "start": 1787828400,
+      "end": 1792999800,
+      "sha256": "5d37920d12f60c23a6fae29ae138be67744d8ae7d0cdf4b7e98a02c09b88e9cf",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AVGOUSDT_15min_current.pkl"
+    },
+    "AXTIUSDT": {
+      "status": "OK",
+      "instrument": "AXTI-USD_UM_XPERP-310822",
+      "bars": 6421,
+      "start": 1787221800,
+      "end": 1792999800,
+      "sha256": "39c2f297dc1e3a476876a2332e7def34c7188de3184638c13048e9614a34149e",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\AXTIUSDT_15min_current.pkl"
+    },
+    "BEUSDT": {
+      "status": "OK",
+      "instrument": "BE-USD_UM_XPERP-310829",
+      "bars": 5746,
+      "start": 1787829300,
+      "end": 1792999800,
+      "sha256": "4279b1981fcfcc9aa941785d1ed630b2041c8f8cf33db4f89db79aef93158bf9",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BEUSDT_15min_current.pkl"
+    },
+    "BMNRUSDT": {
+      "status": "OK",
+      "instrument": "BMNR-USD_UM_XPERP-310822",
+      "bars": 6329,
+      "start": 1787304600,
+      "end": 1792999800,
+      "sha256": "5197c092c6025143fc222d747f23c52b78f5b94023b07c5862517bb5efd39680",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\BMNRUSDT_15min_current.pkl"
+    },
+    "CBRSUSDT": {
+      "status": "OK",
+      "instrument": "CBRS-USD_UM_XPERP-310704",
+      "bars": 11130,
+      "start": 1782983700,
+      "end": 1792999800,
+      "sha256": "e9e587e6bc6443ce5cde1d2aadf0719d425d2cfe77d1b19ee313d2f8b160687e",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CBRSUSDT_15min_current.pkl"
+    },
+    "COINUSDT": {
+      "status": "OK",
+      "instrument": "COIN-USD_UM_XPERP-310801",
+      "bars": 8725,
+      "start": 1785148200,
+      "end": 1792999800,
+      "sha256": "360dfdc34e0830d4203c3cb74b69195dd0da37ecfeea43f3c6ca5c13a870669a",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\COINUSDT_15min_current.pkl"
+    },
+    "CRCLUSDT": {
+      "status": "OK",
+      "instrument": "CRCL-USD_UM_XPERP-310704",
+      "bars": 11130,
+      "start": 1782983700,
+      "end": 1792999800,
+      "sha256": "7398dc34d1e55a98c5238fdcdac26166c2c6cd2b1e0784db3777ceab1102b860",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CRCLUSDT_15min_current.pkl"
+    },
+    "CRWVUSDT": {
+      "status": "OK",
+      "instrument": "CRWV-USD_UM_XPERP-310822",
+      "bars": 6326,
+      "start": 1787307300,
+      "end": 1792999800,
+      "sha256": "3297e9ac49657e1ddef42cd508a5025c75af37b59b4c9f57cd36c339b5cfe47e",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\CRWVUSDT_15min_current.pkl"
+    },
+    "DELLUSDT": {
+      "status": "OK",
+      "instrument": "DELL-USD_UM_XPERP-310822",
+      "bars": 6520,
+      "start": 1787132700,
+      "end": 1792999800,
+      "sha256": "0e085c100975e624ce2d2a1ec61a5ce514c8f35d5a801956b75006778b62a3f1",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\DELLUSDT_15min_current.pkl"
+    },
+    "DRAMUSDT": {
+      "status": "OK",
+      "instrument": "DRAM-USD_UM_XPERP-310627",
+      "bars": 11803,
+      "start": 1782378000,
+      "end": 1792999800,
+      "sha256": "6f048a011dffba551281d4abb6b4c4fdfb65bc3fb6f5dec9bb7be6df34e94e5b",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\DRAMUSDT_15min_current.pkl"
+    },
+    "EWYUSDT": {
+      "status": "OK",
+      "instrument": "EWY-USD_UM_XPERP-310704",
+      "bars": 11512,
+      "start": 1782639900,
+      "end": 1792999800,
+      "sha256": "68838f03c3b881b8f91f78966cee6b43a2407d6ac232e5a26c26ea3a7cf0734b",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\EWYUSDT_15min_current.pkl"
+    },
+    "GOOGLUSDT": {
+      "status": "OK",
+      "instrument": "GOOGL-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "1d233b42e46ec91dc2578b274580d40308288c1d674505a3d9798137e4fd6a8c",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\GOOGLUSDT_15min_current.pkl"
+    },
+    "HOODUSDT": {
+      "status": "OK",
+      "instrument": "HOOD-USD_UM_XPERP-310801",
+      "bars": 8727,
+      "start": 1785146400,
+      "end": 1792999800,
+      "sha256": "dd0c839249b93050c8038231631c14041892a4a01337f775a356ae3f358e7fe4",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\HOODUSDT_15min_current.pkl"
+    },
+    "INTCUSDT": {
+      "status": "OK",
+      "instrument": "INTC-USD_UM_XPERP-310627",
+      "bars": 11997,
+      "start": 1782203400,
+      "end": 1792999800,
+      "sha256": "5a17d27590bfd813368421f9997014d39648d5515bebe050c7db1b84d777d0ef",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\INTCUSDT_15min_current.pkl"
+    },
+    "KOUSDT": {
+      "status": "OK",
+      "instrument": "KO-USD_UM_XPERP-310912",
+      "bars": 4700,
+      "start": 1788770700,
+      "end": 1792999800,
+      "sha256": "38c1292a43b35b5fb8370b4ce80986946e61932a0c6f3908fac0a9f4968f9e9b",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\KOUSDT_15min_current.pkl"
+    },
+    "LITEUSDT": {
+      "status": "OK",
+      "instrument": "LITE-USD_UM_XPERP-310815",
+      "bars": 7196,
+      "start": 1786524300,
+      "end": 1792999800,
+      "sha256": "c200a3285c39571a63c0a94c3fc90a59c3c4d137724a1e99432693e6009a4543",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\LITEUSDT_15min_current.pkl"
+    },
+    "METAUSDT": {
+      "status": "OK",
+      "instrument": "META-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "b4b4c9639252cc814bf0931dfdd635315c80fe89f97b4046e3a61a356a4f5285",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\METAUSDT_15min_current.pkl"
+    },
+    "MRNAUSDT": {
+      "status": "OK",
+      "instrument": "MRNA-USD_UM_XPERP-310905",
+      "bars": 5275,
+      "start": 1788253200,
+      "end": 1792999800,
+      "sha256": "78ed58f17365ab60b275cce65e43555d005519bb4277d050557fafbaa5073296",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRNAUSDT_15min_current.pkl"
+    },
+    "MRVLUSDT": {
+      "status": "OK",
+      "instrument": "MRVL-USD_UM_XPERP-310627",
+      "bars": 11994,
+      "start": 1782206100,
+      "end": 1792999800,
+      "sha256": "b63a7dbab3bef91412e114a18be0bbd89013e2982ab9ba232a0ad44507b13683",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MRVLUSDT_15min_current.pkl"
+    },
+    "MSFTUSDT": {
+      "status": "OK",
+      "instrument": "MSFT-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "6527716dff7dcfb4f14b84b8c3b795655348e0d89c17f6603cd24ceb3bffbee6",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MSFTUSDT_15min_current.pkl"
+    },
+    "MSTRUSDT": {
+      "status": "OK",
+      "instrument": "MSTR-USD_UM_XPERP-310704",
+      "bars": 11509,
+      "start": 1782642600,
+      "end": 1792999800,
+      "sha256": "dabf3dd995a36c6f27fccfb83d11b333419172e2c982525f237e99adb7b9a28c",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MSTRUSDT_15min_current.pkl"
+    },
+    "MUUSDT": {
+      "status": "OK",
+      "instrument": "MU-USD_UM_XPERP-310627",
+      "bars": 11995,
+      "start": 1782205200,
+      "end": 1792999800,
+      "sha256": "5c1ae522cefbd0413cd003ca34a326da18d6825d6613b7b9a13581a5daf132e0",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\MUUSDT_15min_current.pkl"
+    },
+    "NBISUSDT": {
+      "status": "OK",
+      "instrument": "NBIS-USD_UM_XPERP-310711",
+      "bars": 10451,
+      "start": 1783594800,
+      "end": 1792999800,
+      "sha256": "825b2bf053aa35bd08e63b136ab542cf8ef8e227d63fa3478d27a97a4c21db96",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\NBISUSDT_15min_current.pkl"
+    },
+    "NVDAUSDT": {
+      "status": "OK",
+      "instrument": "NVDA-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "c88e48bd14effeebfb5e194a192c053fb30e85ca01279e77609d9ec4b6753069",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\NVDAUSDT_15min_current.pkl"
+    },
+    "OKTAUSDT": {
+      "status": "OK",
+      "instrument": "OKTA-USD_UM_XPERP-310829",
+      "bars": 5659,
+      "start": 1787907600,
+      "end": 1792999800,
+      "sha256": "2f6f3e43a2e1c76f48c18063467a74c6c908b662777c8c3ccbacdc97b0227525",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\OKTAUSDT_15min_current.pkl"
+    },
+    "PLTRUSDT": {
+      "status": "OK",
+      "instrument": "PLTR-USD_UM_XPERP-310801",
+      "bars": 8724,
+      "start": 1785149100,
+      "end": 1792999800,
+      "sha256": "05a398add3ce3f9f13f97b7348c4395426f6079078648e75383a1c70c2b8610d",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\PLTRUSDT_15min_current.pkl"
+    },
+    "QCOMUSDT": {
+      "status": "OK",
+      "instrument": "QCOM-USD_UM_XPERP-310801",
+      "bars": 8726,
+      "start": 1785147300,
+      "end": 1792999800,
+      "sha256": "d9a3c77e4141391f4b933ceebf5c251cfa8439ed52bc4d75d28f293de57965e8",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\QCOMUSDT_15min_current.pkl"
+    },
+    "QQQUSDT": {
+      "status": "OK",
+      "instrument": "QQQ-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "a44346f61b871f4fc143ddced702fffaed9849c58d842dac67f72b7b629389af",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\QQQUSDT_15min_current.pkl"
+    },
+    "RKLBUSDT": {
+      "status": "OK",
+      "instrument": "RKLB-USD_UM_XPERP-310822",
+      "bars": 6616,
+      "start": 1787046300,
+      "end": 1792999800,
+      "sha256": "71359228cb2d03d7b4329c2b8724adb2c3da44463dd437c80198172f96da2308",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\RKLBUSDT_15min_current.pkl"
+    },
+    "SAMSUNGUSDT": {
+      "status": "OK",
+      "instrument": "SAMSUNG-USD_UM_XPERP-310704",
+      "bars": 11513,
+      "start": 1782639000,
+      "end": 1792999800,
+      "sha256": "f4f89f1c8e07b72a6745a97b5decff292bf3530be6ba951b8380a5831e59e3aa",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SAMSUNGUSDT_15min_current.pkl"
+    },
+    "SKHYNIXUSDT": {
+      "status": "OK",
+      "instrument": "SKHYNIX-USD_UM_XPERP-310704",
+      "bars": 11514,
+      "start": 1782638100,
+      "end": 1792999800,
+      "sha256": "7772693601591838460b2de5a4989508452b227a7605b7944715bec6f5376d40",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYNIXUSDT_15min_current.pkl"
+    },
+    "SKHYUSDT": {
+      "status": "OK",
+      "instrument": "SKHY-USD_UM_XPERP-310822",
+      "bars": 6423,
+      "start": 1787220000,
+      "end": 1792999800,
+      "sha256": "e31f95882aa1c27107e647de308163d571dd78a4f546267f2d0a4e95e5c44a6f",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SKHYUSDT_15min_current.pkl"
+    },
+    "SNDKUSDT": {
+      "status": "OK",
+      "instrument": "SNDK-USD_UM_XPERP-310627",
+      "bars": 11997,
+      "start": 1782203400,
+      "end": 1792999800,
+      "sha256": "085835dfb9dd566819ef2ed79abad9ba8a9fccf4bf7c0942d35c67eca723f32c",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SNDKUSDT_15min_current.pkl"
+    },
+    "SNXXUSDT": {
+      "status": "OK",
+      "instrument": "SNXX-USD_UM_XPERP-310822",
+      "bars": 6422,
+      "start": 1787220900,
+      "end": 1792999800,
+      "sha256": "2923e197908066f4581d1771f4d1c246db327f9acc43eb6452fe4e2f31baee28",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SNXXUSDT_15min_current.pkl"
+    },
+    "SOFTBANKUSDT": {
+      "status": "OK",
+      "instrument": "SOFTBANK-USD_UM_XPERP-310704",
+      "bars": 11036,
+      "start": 1783068300,
+      "end": 1792999800,
+      "sha256": "304e2cd166902942427331b2304afe1bc7b3654f8a8e9db3fcec4183f377f6bc",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOFTBANKUSDT_15min_current.pkl"
+    },
+    "SOXLUSDT": {
+      "status": "OK",
+      "instrument": "SOXL-USD_UM_XPERP-310627",
+      "bars": 11994,
+      "start": 1782206100,
+      "end": 1792999800,
+      "sha256": "c59fd19af8677988dbcc276a170ba59d3d70f761ae3366dc2bdbdcd339fac38a",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXLUSDT_15min_current.pkl"
+    },
+    "SOXSUSDT": {
+      "status": "OK",
+      "instrument": "SOXS-USD_UM_XPERP-310912",
+      "bars": 4701,
+      "start": 1788769800,
+      "end": 1792999800,
+      "sha256": "69c2a39abf44fa1bf8d47c5f11029f404695366eecef2fa2443d1672a8e137c7",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SOXSUSDT_15min_current.pkl"
+    },
+    "SPCXUSDT": {
+      "status": "OK",
+      "instrument": "SPCX-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "7afc30da3e8ff2b7e454250cd8162b100995b08102b9e8a90c45ca4683800d28",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SPCXUSDT_15min_current.pkl"
+    },
+    "SPYUSDT": {
+      "status": "OK",
+      "instrument": "SPY-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "2a6807f0c72dd389765b86a1cafc7ea08fceee246d1194ce43f42c09b1d79b48",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\SPYUSDT_15min_current.pkl"
+    },
+    "TEST002USDT": {
+      "status": "NO_INSTRUMENT"
+    },
+    "TSLAUSDT": {
+      "status": "OK",
+      "instrument": "TSLA-USD_UM_XPERP-310613",
+      "bars": 12000,
+      "start": 1782200700,
+      "end": 1792999800,
+      "sha256": "1f7adc26853cab1246c093319e5277cdfb2f649174e134c8d0b0f5132f25f04f",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\TSLAUSDT_15min_current.pkl"
+    },
+    "WDCUSDT": {
+      "status": "OK",
+      "instrument": "WDC-USD_UM_XPERP-310829",
+      "bars": 5658,
+      "start": 1787908500,
+      "end": 1792999800,
+      "sha256": "764f3d10fbec3428b60b12aa1692a63dc012c64e6deb8e497bcef72234f0c94c",
+      "path": "reports\\audit_2026_09_08\\stock_xperp_forward_oct26\\WDCUSDT_15min_current.pkl"
+    }
+  }
+}
