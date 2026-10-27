@@ -1,0 +1,692 @@
+{
+  "accepted": false,
+  "baseline_same_snapshot": {
+    "august": {
+      "margin_3pct": {
+        "dd_pct": 3.2831,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.279061,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 9.6525,
+        "literal_tp_rate_pct": 34.3629,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.279061,
+        "monthly_return_pct": {
+          "2026-08": 23.8007
+        },
+        "months_ge_30pct": 0,
+        "n": 259,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 47.1042,
+        "projected_22_active_day_pct": 16.3599,
+        "projected_30_calendar_day_pct": 22.951,
+        "resolved": 259,
+        "return_pct": 23.8007,
+        "trades_per_active_day": 8.3548
+      },
+      "margin_5pct": {
+        "dd_pct": 5.4322,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.279061,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 9.6525,
+        "literal_tp_rate_pct": 34.3629,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.279061,
+        "monthly_return_pct": {
+          "2026-08": 42.219
+        },
+        "months_ge_30pct": 1,
+        "n": 259,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 47.1042,
+        "projected_22_active_day_pct": 28.3957,
+        "projected_30_calendar_day_pct": 40.6124,
+        "resolved": 259,
+        "return_pct": 42.219,
+        "trades_per_active_day": 8.3548
+      }
+    },
+    "july": {
+      "margin_3pct": {
+        "dd_pct": 3.3053,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.378547,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 13.4694,
+        "literal_tp_rate_pct": 38.7755,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.378547,
+        "monthly_return_pct": {
+          "2026-07": 31.3702
+        },
+        "months_ge_30pct": 1,
+        "n": 245,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.9388,
+        "projected_22_active_day_pct": 21.3653,
+        "projected_30_calendar_day_pct": 30.219,
+        "resolved": 245,
+        "return_pct": 31.3702,
+        "trades_per_active_day": 7.9032
+      },
+      "margin_5pct": {
+        "dd_pct": 5.4927,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.378547,
+          "passes": true,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": true
+        },
+        "largest_symbol_share_pct": 13.4694,
+        "literal_tp_rate_pct": 38.7755,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.378547,
+        "monthly_return_pct": {
+          "2026-07": 56.6556
+        },
+        "months_ge_30pct": 1,
+        "n": 245,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.9388,
+        "projected_22_active_day_pct": 37.5146,
+        "projected_30_calendar_day_pct": 54.4036,
+        "resolved": 245,
+        "return_pct": 56.6556,
+        "trades_per_active_day": 7.9032
+      }
+    },
+    "october": {
+      "margin_3pct": {
+        "dd_pct": 2.6878,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.224271,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 12.0,
+        "literal_tp_rate_pct": 33.0,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.224271,
+        "monthly_return_pct": {
+          "2026-10": 14.1278
+        },
+        "months_ge_30pct": 0,
+        "n": 200,
+        "negative_months": 0,
+        "observed_calendar_days": 26,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.0,
+        "projected_22_active_day_pct": 11.8309,
+        "projected_30_calendar_day_pct": 16.4718,
+        "resolved": 200,
+        "return_pct": 14.1278,
+        "trades_per_active_day": 7.6923
+      },
+      "margin_5pct": {
+        "dd_pct": 4.4479,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.224271,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 12.0,
+        "literal_tp_rate_pct": 33.0,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.224271,
+        "monthly_return_pct": {
+          "2026-10": 24.3098
+        },
+        "months_ge_30pct": 0,
+        "n": 200,
+        "negative_months": 0,
+        "observed_calendar_days": 26,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.0,
+        "projected_22_active_day_pct": 20.2171,
+        "projected_30_calendar_day_pct": 28.5419,
+        "resolved": 200,
+        "return_pct": 24.3098,
+        "trades_per_active_day": 7.6923
+      }
+    },
+    "september": {
+      "margin_3pct": {
+        "dd_pct": 2.5831,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.28186,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 10.9312,
+        "literal_tp_rate_pct": 35.6275,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.28186,
+        "monthly_return_pct": {
+          "2026-09": 22.8547
+        },
+        "months_ge_30pct": 0,
+        "n": 247,
+        "negative_months": 0,
+        "observed_calendar_days": 30,
+        "pending": 0,
+        "profitable_exit_rate_pct": 45.3441,
+        "projected_22_active_day_pct": 16.2931,
+        "projected_30_calendar_day_pct": 22.8547,
+        "resolved": 247,
+        "return_pct": 22.8547,
+        "trades_per_active_day": 8.2333
+      },
+      "margin_5pct": {
+        "dd_pct": 4.2834,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.28186,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 10.9312,
+        "literal_tp_rate_pct": 35.6275,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.28186,
+        "monthly_return_pct": {
+          "2026-09": 40.4601
+        },
+        "months_ge_30pct": 1,
+        "n": 247,
+        "negative_months": 0,
+        "observed_calendar_days": 30,
+        "pending": 0,
+        "profitable_exit_rate_pct": 45.3441,
+        "projected_22_active_day_pct": 28.2938,
+        "projected_30_calendar_day_pct": 40.4601,
+        "resolved": 247,
+        "return_pct": 40.4601,
+        "trades_per_active_day": 8.2333
+      }
+    }
+  },
+  "comparisons": {
+    "august": {
+      "dd_delta_pct": 0.0,
+      "improves": false,
+      "return_delta_pct": 0.0,
+      "trade_delta": 0
+    },
+    "july": {
+      "dd_delta_pct": 0.0,
+      "improves": false,
+      "return_delta_pct": 0.0,
+      "trade_delta": 0
+    },
+    "october": {
+      "dd_delta_pct": 1.4468,
+      "improves": false,
+      "return_delta_pct": -5.499,
+      "trade_delta": 10
+    },
+    "september": {
+      "dd_delta_pct": 0.8445,
+      "improves": true,
+      "return_delta_pct": 0.7115,
+      "trade_delta": 2
+    }
+  },
+  "created_at": "2026-10-26T23:42:29.316771+00:00",
+  "expanded_same_snapshot": {
+    "august": {
+      "margin_3pct": {
+        "dd_pct": 3.2831,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.279061,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 9.6525,
+        "literal_tp_rate_pct": 34.3629,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.279061,
+        "monthly_return_pct": {
+          "2026-08": 23.8007
+        },
+        "months_ge_30pct": 0,
+        "n": 259,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 47.1042,
+        "projected_22_active_day_pct": 16.3599,
+        "projected_30_calendar_day_pct": 22.951,
+        "resolved": 259,
+        "return_pct": 23.8007,
+        "trades_per_active_day": 8.3548
+      },
+      "margin_5pct": {
+        "dd_pct": 5.4322,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.279061,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 9.6525,
+        "literal_tp_rate_pct": 34.3629,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 7,
+        "mean_signed_move_pct": 0.279061,
+        "monthly_return_pct": {
+          "2026-08": 42.219
+        },
+        "months_ge_30pct": 1,
+        "n": 259,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 47.1042,
+        "projected_22_active_day_pct": 28.3957,
+        "projected_30_calendar_day_pct": 40.6124,
+        "resolved": 259,
+        "return_pct": 42.219,
+        "trades_per_active_day": 8.3548
+      }
+    },
+    "july": {
+      "margin_3pct": {
+        "dd_pct": 3.3053,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.378547,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 13.4694,
+        "literal_tp_rate_pct": 38.7755,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.378547,
+        "monthly_return_pct": {
+          "2026-07": 31.3702
+        },
+        "months_ge_30pct": 1,
+        "n": 245,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.9388,
+        "projected_22_active_day_pct": 21.3653,
+        "projected_30_calendar_day_pct": 30.219,
+        "resolved": 245,
+        "return_pct": 31.3702,
+        "trades_per_active_day": 7.9032
+      },
+      "margin_5pct": {
+        "dd_pct": 5.4927,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.378547,
+          "passes": true,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": true
+        },
+        "largest_symbol_share_pct": 13.4694,
+        "literal_tp_rate_pct": 38.7755,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.378547,
+        "monthly_return_pct": {
+          "2026-07": 56.6556
+        },
+        "months_ge_30pct": 1,
+        "n": 245,
+        "negative_months": 0,
+        "observed_calendar_days": 31,
+        "pending": 0,
+        "profitable_exit_rate_pct": 46.9388,
+        "projected_22_active_day_pct": 37.5146,
+        "projected_30_calendar_day_pct": 54.4036,
+        "resolved": 245,
+        "return_pct": 56.6556,
+        "trades_per_active_day": 7.9032
+      }
+    },
+    "october": {
+      "margin_3pct": {
+        "dd_pct": 4.1346,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.136254,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 8.0952,
+        "literal_tp_rate_pct": 30.9524,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 11,
+        "mean_signed_move_pct": 0.136254,
+        "monthly_return_pct": {
+          "2026-10": 8.6288
+        },
+        "months_ge_30pct": 0,
+        "n": 210,
+        "negative_months": 0,
+        "observed_calendar_days": 26,
+        "pending": 0,
+        "profitable_exit_rate_pct": 42.8571,
+        "projected_22_active_day_pct": 7.5552,
+        "projected_30_calendar_day_pct": 10.0208,
+        "resolved": 210,
+        "return_pct": 8.6288,
+        "trades_per_active_day": 8.4
+      },
+      "margin_5pct": {
+        "dd_pct": 6.828,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.136254,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 8.0952,
+        "literal_tp_rate_pct": 30.9524,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 11,
+        "mean_signed_move_pct": 0.136254,
+        "monthly_return_pct": {
+          "2026-10": 14.4042
+        },
+        "months_ge_30pct": 0,
+        "n": 210,
+        "negative_months": 0,
+        "observed_calendar_days": 26,
+        "pending": 0,
+        "profitable_exit_rate_pct": 42.8571,
+        "projected_22_active_day_pct": 12.5716,
+        "projected_30_calendar_day_pct": 16.7974,
+        "resolved": 210,
+        "return_pct": 14.4042,
+        "trades_per_active_day": 8.4
+      }
+    },
+    "september": {
+      "margin_3pct": {
+        "dd_pct": 3.4276,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.03,
+          "observed_mean_signed_price_return_pct": 0.287161,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 10.8434,
+        "literal_tp_rate_pct": 34.9398,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.287161,
+        "monthly_return_pct": {
+          "2026-09": 23.5662
+        },
+        "months_ge_30pct": 0,
+        "n": 249,
+        "negative_months": 0,
+        "observed_calendar_days": 30,
+        "pending": 0,
+        "profitable_exit_rate_pct": 45.7831,
+        "projected_22_active_day_pct": 16.7866,
+        "projected_30_calendar_day_pct": 23.5662,
+        "resolved": 249,
+        "return_pct": 23.5662,
+        "trades_per_active_day": 8.3
+      },
+      "margin_5pct": {
+        "dd_pct": 5.6825,
+        "economic_gate": {
+          "frequency_pass": true,
+          "leverage": 10.0,
+          "margin_fraction": 0.05,
+          "observed_mean_signed_price_return_pct": 0.287161,
+          "passes": false,
+          "required_constant_signed_price_return_pct": 1.327709,
+          "required_trades_per_market_day": 3.0,
+          "return_pass": false
+        },
+        "largest_symbol_share_pct": 10.8434,
+        "literal_tp_rate_pct": 34.9398,
+        "max_entries_same_clock_hour": 4,
+        "max_entries_same_timestamp": 2,
+        "max_loss_streak": 8,
+        "mean_signed_move_pct": 0.287161,
+        "monthly_return_pct": {
+          "2026-09": 41.836
+        },
+        "months_ge_30pct": 1,
+        "n": 249,
+        "negative_months": 0,
+        "observed_calendar_days": 30,
+        "pending": 0,
+        "profitable_exit_rate_pct": 45.7831,
+        "projected_22_active_day_pct": 29.2142,
+        "projected_30_calendar_day_pct": 41.836,
+        "resolved": 249,
+        "return_pct": 41.836,
+        "trades_per_active_day": 8.3
+      }
+    }
+  },
+  "integrity": {
+    "baseline_symbols": 44,
+    "expanded_symbols": 78,
+    "new_symbols": 34,
+    "same_snapshot_old_universe_overlap": {
+      "overlap_bars": 411447,
+      "passes": true,
+      "symbols": 44,
+      "value_mismatches": 0
+    }
+  },
+  "limitations": [
+    "The expanded universe is evaluated on already observed July-October history.",
+    "A passing result would still require genuinely new forward outcomes.",
+    "Public OHLC cannot reproduce latency or order-book slippage.",
+    "Gross returns exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "entry_and_exit": "frozen next-15m market entry; 2% target / 1% stop / 64 bars",
+    "excluded_controls": [
+      "QQQUSDT",
+      "SPYUSDT"
+    ],
+    "filters": "frozen ATR, backing level, long basket trend and portfolio rails",
+    "money": "client-selected 3% or 5% current-equity margin; fixed 10x",
+    "selection_uses_outcomes": false,
+    "universe_rule": "all currently live OKX instCategory=3 X-Perp futures"
+  },
+  "ready_for_live_orders": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_expanded_universe_oct27_audit.py": "75087462c467f11ecb22875ebd78c3ea879bef280833c5e893b40fef90c7aa1b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AAOIUSDT_15min_current.pkl": "7b8980f1287ec8fc1dda48757d1a4aba818cf78b3cfef8b72bae460526e46b71",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AAPLUSDT_15min_current.pkl": "f40262befe2091b670aa39a63bfeecb9c3b3fa55155763a0fe1ba5b2279115fd",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\ADBEUSDT_15min_current.pkl": "3f4326f151be72e60c7b0f7052cfccd87004d661ac4f1ca606bfb563994568dd",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AMATUSDT_15min_current.pkl": "999002299d96f00ab3fe4c1b415121b088b5739b6044f79dae00ca73dd970fa7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AMDUSDT_15min_current.pkl": "6d851e39849332f83eff85e911c48cda7fb1031e22171fe4d3c83715186554c3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AMZNUSDT_15min_current.pkl": "e9b41585ed1cc20e460428fc3e439a3dad49a38ed096e5744547662a0dc5280f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\APPUSDT_15min_current.pkl": "4ca1312bcd0dbfd08a8e837be226ec0d53eb9a691be29600d43f04037511102a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\ARMUSDT_15min_current.pkl": "334dbb12ef78b76eedbee1e1a28a8674095047a12ab179f30055612d8ae67fa9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\ASTSUSDT_15min_current.pkl": "a53f1160db56c5ad3d6464ca8d0887cc5a68dfb7ed55ab67388edfab45f26b09",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AVGOUSDT_15min_current.pkl": "f0c97a95d46c6e4b6b3126fcae000436d4a88f954bd5193bcd4fcd952438fc1e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\AXTIUSDT_15min_current.pkl": "1dc6cb1b9fc26e34a41b91e4e393a6802ed18a23f636a76cb8ab5e395c5cc383",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\BEUSDT_15min_current.pkl": "9232c20240b7f0cb8b561c98690a99cf5634851f7da28fa789d456cef80e7a5a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\BMNRUSDT_15min_current.pkl": "1eef0db606640c9b4650bfab42abcc58bbcfcb00fe6ea6abe29ae505f2b75296",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\BSPUSDT_15min_current.pkl": "668233c687f648421c07652a7135bdbc0e8e3203133faf455c40fb11a4dff707",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\CBRSUSDT_15min_current.pkl": "103c7395c3df4afb88b3a70930534cc11aa93327fe9f6501dc996c1646eae1c8",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\COHRUSDT_15min_current.pkl": "ea18f39118a7314c9d26c02a5942986d6cbf2f8328075cfd0193e62f51e5b47e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\COINUSDT_15min_current.pkl": "1cbea157d91d099cbec3975153e3873dd90b4486586a9554fa5d59cc43b1cda8",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\CRCLUSDT_15min_current.pkl": "565eceebc9e7c8c1da5d4f3c6c881395470943215d7a3f0451bf0e1e15a46c82",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\CRDOUSDT_15min_current.pkl": "5b8b23f0933014e47d8d89828161e61d1b48b7624e4d5d8b26fa7a547e2dea66",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\CRWVUSDT_15min_current.pkl": "bb30d848bf1d9fafcd32a9597ba31b9ca733105062c62df66b952917637a959c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\CXMTUSDT_15min_current.pkl": "19350d98602b5437c10f9a7bae0f32f09495ea0c57d39671834eb757adc1b3c4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\DELLUSDT_15min_current.pkl": "cbfc9fc1f8283d05f1e77f7f44b9818159274467b555949ade263ca1d04d6bf4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\DRAMUSDT_15min_current.pkl": "6310bbf5f07f3b7ec9426b6f10114310b3367d303c8e68ef7ab666d0aadb9a04",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\EWYUSDT_15min_current.pkl": "1fee2139ac4d5bce35381b7671e73f9fdc26ddd15194ef89eee28ad6a5a4a7ce",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\EWZUSDT_15min_current.pkl": "fcce9d17116cc45651446d5c4d1c32c18ebf9e0a5b01be0e8a520aa6dae4e9ef",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\FLNCUSDT_15min_current.pkl": "60570ab7c567f94921c0c6780281c95d118c9813412570ac204ae58b0d6032ee",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\GEVUSDT_15min_current.pkl": "aaf4dc8b386ce30e1cd17280321677946a98dd6724d72ce6295992c4f9f7a4fd",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\GLWUSDT_15min_current.pkl": "8e4a51beee7396931987399d77720595c78b85dc3729a5012183810cc8f2a279",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\GOOGLUSDT_15min_current.pkl": "d4ab4fa8873d6dabfa4ec9af86782ce5f3af5cf50ae218dbbdf2670ae660ab84",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\HOODUSDT_15min_current.pkl": "c92caf0dff6a457553c41f75ef36f273c6bcc296a44bd44d9b893e1b73dd5b0a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\IBMUSDT_15min_current.pkl": "3151d52f3f5899fddb957d202b8a9909449f3055695368acbc4b1072ae1b88ee",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\INTCUSDT_15min_current.pkl": "d1d5dac2ea5a4a1b28dcc29278bd8637a6ec31e0cec7744f5530f9b0a5196d26",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\IONQUSDT_15min_current.pkl": "fb8e5cfdd5e30b0a54ef63cffff35df3f77ea32941d67c4b4ca8d1280873a18d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\IRENUSDT_15min_current.pkl": "d37a53026c3aa4789afa6676588da588c5a06b5264b58b362686a8d11efb1bb3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\KORUUSDT_15min_current.pkl": "15d6c9ad7e1b1a7bd21612131e1449dc0ae173856d1fad283107b904c2b19dc5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\KOUSDT_15min_current.pkl": "acda8bf70a46932701faf7465969891c38fff0bdf9249047980818f15dc1566a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\LITEUSDT_15min_current.pkl": "be752b590c760afe77e4cf08947ba51326ea4d0a331b91aa00f264865d80c6c2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\LLYUSDT_15min_current.pkl": "d24d325e5cb72a9d437a146b489540b879c73d72e25a8b244bf2a19834cd56ad",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\METAUSDT_15min_current.pkl": "77ac073ea25eb2843b151a6ac3f1c5a2cdc9d20f1d9c0b7f5d238bdc324d0ef0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MINIMAXUSDT_15min_current.pkl": "5c1f2193e920b98665d336e7e0706f351cc13b889411681db7a124ba1ee03808",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MRNAUSDT_15min_current.pkl": "8818267d6183c5db10be892fab4560f093ccaff0784d2f0730fa9375263f4e6e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MRVLUSDT_15min_current.pkl": "9187d83f2acaadf2e3d3ad9b14e8de9e64d30db8a8c8bc3cbbaeb7b39611a117",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MSFTUSDT_15min_current.pkl": "e3484f110e3719787ad7f2b8f8150b81be6f36b5118733f35ef4e7dd1b15fe13",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MSTRUSDT_15min_current.pkl": "bf7caf80e3fb49b0cc64c101b0ca6eb3f6c00849998533b2c7bcc5e457c80a9e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MUUSDT_15min_current.pkl": "db3b15773a80b3e7e170ff2c56bc367e3f713e94e6323987c8088603102a23e0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\MUUUSDT_15min_current.pkl": "006e2eba999d62698d0292733b181e77a5fef35859d8ee85901eb4f44e19804d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\NBISUSDT_15min_current.pkl": "aaceddc8587e38f176ffb3d3e44e8ca48a670da2d101290e21a7fc73b33ba6f0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\NFLXUSDT_15min_current.pkl": "7c0a0e1b4a155cb95bd59695a2e33b47c4537854c0e1eee48ffec58f23de5b66",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\NOWUSDT_15min_current.pkl": "c1c8dc57794e4276b486c6e259405650b34efe1f936961c9c2ab06e131aa0ae5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\NVDAUSDT_15min_current.pkl": "01b562f1e1953df2e11a0698b4bd5a9c4a84805c14dae638b291805a3a5087b0",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\OKTAUSDT_15min_current.pkl": "42f388a87d7c46d37ef11e44348c5511126319e428fc4069f62daca986da8918",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\ORCLUSDT_15min_current.pkl": "5f58baf1272f94b3bbc4bf058e0a1e20cba03e82df361759aa6579b0f240305a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\PANWUSDT_15min_current.pkl": "89c784417ff72160af9c48995397ceb0c6c02d91f7ca4dd1dd57988346dc2a48",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\PENGUSDT_15min_current.pkl": "7e0a3857dbfbd5ff49d1500ff1f8bef5521c1ae619ca5c8335622a14027fec26",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\PLTRUSDT_15min_current.pkl": "9b54f421b466b830047ee3b9d6fc147e68adb43859d8a74693892dc408c12bf5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\PURRUSDT_15min_current.pkl": "9c06c0e147f26a9cde93f220dd9ffc59749e1d86f72fbae48b1c29580b7227d9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\QCOMUSDT_15min_current.pkl": "c88585fecc38917df3d4874a0a4c40aefecdd08e9ba86f977f868d0ec71e65e6",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\RKLBUSDT_15min_current.pkl": "039264608319b300d62e1ae8bdac6e77286aa37a371d42f8be2c80ebb4f3ca68",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SAMSUNGUSDT_15min_current.pkl": "803e980949e4d1e553478c2ef13898d4792a3c0821450c4527dc334e50f1c489",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SKDDUSDT_15min_current.pkl": "f110e50d64d04ad8c81c8f115e996638a4d5359220ec69f3d2d66670e3085122",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SKHYNIXUSDT_15min_current.pkl": "2a305f438ec63abcba11b095f012badfa3dc9841a7c78a856ee11402f77148fa",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SKHYUSDT_15min_current.pkl": "74df462c11d035076d7e944f0006dd57bc8eb12c8204e427f4c11dc0f8b5388a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SMCIUSDT_15min_current.pkl": "4ba3e7cd8d5d96f532f28fd437a6677544019251d372254e8e0cd80463e5cfaa",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SNDKUSDT_15min_current.pkl": "805601a7b22cbdb988608dd6d294585affd2e9568bd832952d69dd9b67543d85",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SNXXUSDT_15min_current.pkl": "2b987b1ec23ce479e5a948d1ecb069ed281153ccb252107d5b9ac54f6a2764d1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SOFTBANKUSDT_15min_current.pkl": "08d96ccd468418cd92c60a690362f1d1b7fe0ab864cea027a77f064285a8bf0a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SOXLUSDT_15min_current.pkl": "c5c2555b685556302445b3c9abd2bbc7251353c82e85fe945d3e93335c5cc13a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SOXSUSDT_15min_current.pkl": "18a4c45e65826b50aaa916a1d3f2e6f085d3bb238c045f41e852650939c1c822",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\SPCXUSDT_15min_current.pkl": "6b71ef7bad5a6ecd9f211a995d277a58e40c3c818f63253bebc1e47f9185c82d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\TQQQUSDT_15min_current.pkl": "fdccac339be3e3fd4be5cce8c469ba63d672cf42d900be06c7d69d7479b39d96",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\TSLAUSDT_15min_current.pkl": "8901f09dcc4a957b8047bd1c37fb0bf99b769df7e7dc431132e9006ac0a23dfc",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\TSMUSDT_15min_current.pkl": "18c0e59871cdc60ddaa07463ed6f64c11e5e5e5c8086afa01546984ab0a0736f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\UNITREEUSDT_15min_current.pkl": "9949249e1bf5916cbf7503a6fc27fd21daf203bdf9da19338f1976a264f99b0f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\US100USDT_15min_current.pkl": "f2f10acb6861f2d8fc35debf905d51076c17dd23df33e577b89c0219c70b55b3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\USARUSDT_15min_current.pkl": "40855339d93a9022d4c4dc6b405a139772e5909f32001f373516a0dc6f6b1215",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\WDCUSDT_15min_current.pkl": "74b8cf7b7a791170cbcc72dd4ba8106251c960b5fd18231d495050526500ff90",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\XIAOMIUSDT_15min_current.pkl": "049d2ea1424cba971e448aaa40fb462e7037b8e894c808764c09c4978a9bd56a",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\ZHIPUUSDT_15min_current.pkl": "d82993a3e7e5e105669af7a2abe53da61d36d2ae57746f5bdbb89def0a0a92c4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_live_equity_oct27\\manifest.json": "b9df56dc67fcbd4ce4bf99251a13d500ebac59ceff372c12c4e82fe150621157",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct27\\manifest.json": "3cde914ef390262f745f86da215b87f7aabab64478b01590c67f324505bf17d8"
+  },
+  "status": "REJECTED_NO_ROBUST_IMPROVEMENT"
+}
