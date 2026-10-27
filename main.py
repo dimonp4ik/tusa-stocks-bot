@@ -2805,6 +2805,7 @@ def _check_open_signals():
 
             new_status   = None
             realized_r   = None
+            crossed_tp1_before_close = False
             runner_trail_atr_mult = None   # frozen at TP1 candle, reused next cycles
             runner_activation_bar_ts = None
             live_trail_stop = None         # current trail level → autotrade SL amend
@@ -2874,16 +2875,26 @@ def _check_open_signals():
                     _is_confirmed = bool(_conf_flags[i])
                 else:
                     _is_confirmed = i < len(df["close"]) - 1
-                if stop_close_confirm:
-                    _sl_breached = _is_confirmed and (
-                        close <= sl if direction == "LONG" else close >= sl
-                    )
-                else:
-                    _sl_breached = low <= sl if direction == "LONG" else high >= sl
-                # Exit price is the real close when confirmed on a close —
-                # booking it at the SL level would understate the loss. Matters
-                # more here than on crypto: a gap can close far past the level.
-                _sl_exit_px = close if stop_close_confirm else sl
+                # A close-confirmed strategy still has a real exchange disaster
+                # stop. Replay that backstop before any target so one wide bar
+                # cannot be booked as TP2 after the exchange would have exited.
+                _hard_stop = sl
+                _hard_stop_breached = False
+                if stop_close_confirm and risk > 0:
+                    _backstop_r = max(1.0, float(STOP_EXCHANGE_BACKSTOP_R))
+                    _hard_stop = (entry - risk * _backstop_r
+                                  if direction == "LONG"
+                                  else entry + risk * _backstop_r)
+                    _hard_stop_breached = (
+                        low <= _hard_stop if direction == "LONG"
+                        else high >= _hard_stop)
+                _close_stop_breached = stop_close_confirm and _is_confirmed and (
+                    close <= sl if direction == "LONG" else close >= sl)
+                _sl_breached = (_hard_stop_breached or _close_stop_breached
+                                if stop_close_confirm else
+                                (low <= sl if direction == "LONG" else high >= sl))
+                _sl_exit_px = (_hard_stop if _hard_stop_breached else
+                               close if stop_close_confirm else sl)
                 _sl_r = -1.0
                 if stop_close_confirm and risk > 0:
                     _sl_r = round(
@@ -2895,6 +2906,11 @@ def _check_open_signals():
                     if direction == "LONG":
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if high >= tp2:
+                            crossed_tp1_before_close = True
+                            runner_trail_atr_mult = _post_tp1_trail_mult(
+                                direction, entry, tp1, tp2, high, low, close)
+                            if fixed_be_runner:
+                                runner_activation_bar_ts = float(df["time"][i])
                             realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if high >= tp1:
@@ -2905,6 +2921,11 @@ def _check_open_signals():
                     else:
                         if _sl_breached:          realized_r = _sl_r; new_status, exit_px = "SL_HIT", _sl_exit_px;  break
                         if low <= tp2:
+                            crossed_tp1_before_close = True
+                            runner_trail_atr_mult = _post_tp1_trail_mult(
+                                direction, entry, tp1, tp2, high, low, close)
+                            if fixed_be_runner:
+                                runner_activation_bar_ts = float(df["time"][i])
                             realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                             new_status, exit_px = "TP2_HIT", tp2; break
                         if low <= tp1:
@@ -3002,15 +3023,34 @@ def _check_open_signals():
                 _deep_ok = _deep_feed_breached(sig["symbol"], sl, direction,
                                                monitor_from, candle_lim,
                                                stop_close_confirm, bar_seconds)
-                if _REQ_DEEP and _deep_ok is False:
+                if (_REQ_DEEP and _deep_ok is False
+                        and not (stop_close_confirm and _hard_stop_breached)):
                     log.info(f"  #{sig['id']} {sig['symbol']} — стоп только на X-Perp, "
                              f"глубокий фид не подтверждает, держим")
                     new_status = None
             if new_status == 'SL_HIT' and stop_close_confirm:
-                exit_px = latest_quote
+                if not _hard_stop_breached:
+                    exit_px = latest_quote
                 realized_r = marked_r(direction=direction, entry=entry,
                     exit_price=exit_px, sl=sl, tp1=tp1)
             if new_status:
+                # TP2 necessarily crosses TP1. Persist and announce the
+                # intermediate transition even when both first appear in one
+                # poll, then close on TP2 below.
+                if crossed_tp1_before_close and status == "OPEN":
+                    update_signal_status(
+                        sig["id"], "TP1_PARTIAL", tp1,
+                        runner_trail_atr_mult=runner_trail_atr_mult,
+                        runner_activation_bar_ts=runner_activation_bar_ts)
+                    log.info(f"  Signal #{sig['id']} {sig['symbol']} → TP1_PARTIAL (same poll as TP2)")
+                    try:
+                        send_signal_update(sig, "TP1_PARTIAL", tp1)
+                    except Exception as _e:
+                        log.warning(f"  TP1 update notification failed #{sig['id']}: {_e}")
+                    try:
+                        autotrader.mirror_transition(sig, "TP1_PARTIAL", tp1)
+                    except Exception as _ae:
+                        log.warning(f"  Autotrade TP1 mirror failed #{sig['id']}: {_ae}")
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult,
                                      runner_activation_bar_ts=runner_activation_bar_ts)
