@@ -2774,7 +2774,9 @@ def _check_open_signals():
             direction = sig["direction"]
             entry     = float(sig["entry_price"])
             tp1, tp2, sl = float(sig["tp1"]), float(sig["tp2"]), float(sig["sl"])
-            fixed_be_runner = str(sig.get("strategy_runner_mode") or "").lower() == "fixed_be"
+            runner_mode = str(sig.get("strategy_runner_mode") or "").lower()
+            fixed_be_runner = runner_mode == "fixed_be"
+            single_target = runner_mode == "single_target"
 
             # Inspect only candles that opened after signal time (OPEN)
             # or after TP1 was recorded (TP1_PARTIAL) to avoid pre-entry moves
@@ -3037,7 +3039,8 @@ def _check_open_signals():
                 # TP2 necessarily crosses TP1. Persist and announce the
                 # intermediate transition even when both first appear in one
                 # poll, then close on TP2 below.
-                if crossed_tp1_before_close and status == "OPEN":
+                if (crossed_tp1_before_close and status == "OPEN"
+                        and not single_target):
                     update_signal_status(
                         sig["id"], "TP1_PARTIAL", tp1,
                         runner_trail_atr_mult=runner_trail_atr_mult,

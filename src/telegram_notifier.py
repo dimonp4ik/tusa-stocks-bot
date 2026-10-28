@@ -389,7 +389,9 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
     sign = "+" if lev_profit >= 0 else ""
     strategy_frac = sig.get("strategy_tp1_close_frac")
-    fixed_be_runner = str(sig.get("strategy_runner_mode") or "").lower() == "fixed_be"
+    runner_mode = str(sig.get("strategy_runner_mode") or "").lower()
+    fixed_be_runner = runner_mode == "fixed_be"
+    single_target = runner_mode == "single_target"
     lock_pct = (round(100 * float(strategy_frac))
                 if strategy_frac is not None else 0)
     runner_pct = 100 - lock_pct
@@ -416,7 +418,8 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             )
     elif new_status == "TP2_HIT":
         icon  = "🎯"
-        title = "TP2 ДОСТИГНУТ"
+        title = ("ЦЕЛЬ ДОСТИГНУТА" if single_target
+                 else "TP2 ДОСТИГНУТ")
         closed_text = (f"Закрыт остаток {runner_pct}%"
                        if fixed_be_runner and strategy_frac is not None
                        else "Закрыто 100%")

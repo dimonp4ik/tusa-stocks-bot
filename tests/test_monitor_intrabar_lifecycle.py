@@ -2,6 +2,7 @@ from unittest.mock import patch
 from types import SimpleNamespace
 
 import main
+from src import telegram_notifier as notifier
 
 
 def signal(**overrides):
@@ -76,3 +77,27 @@ def test_exchange_backstop_wins_over_tp2_inside_same_candle():
     assert [item.args[1] for item in update.call_args_list] == ["SL_HIT"]
     assert update.call_args.args[2] == 98.5
     assert [item.args[1] for item in notify.call_args_list] == ["SL_HIT"]
+
+
+def test_single_target_does_not_invent_intermediate_tp1_transition():
+    update, notify, mirror = run_monitor(
+        signal(tp1=102.0, tp2=102.0, strategy_runner_mode="single_target",
+               strategy_tp1_close_frac=1.0),
+        candle(high=102.4, low=99.5, close=102.2))
+
+    assert [item.args[1] for item in update.call_args_list] == ["TP2_HIT"]
+    assert [item.args[1] for item in notify.call_args_list] == ["TP2_HIT"]
+    assert [item.args[1] for item in mirror.call_args_list] == ["TP2_HIT"]
+
+
+def test_single_target_update_uses_single_target_wording():
+    sent = []
+    row = signal(tp1=102.0, tp2=102.0,
+                 strategy_runner_mode="single_target",
+                 strategy_tp1_close_frac=1.0)
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "TP2_HIT", 102.0)
+
+    assert "ЦЕЛЬ ДОСТИГНУТА" in sent[0]
+    assert "TP2 ДОСТИГНУТ" not in sent[0]
