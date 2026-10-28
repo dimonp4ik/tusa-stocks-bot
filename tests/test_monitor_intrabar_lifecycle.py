@@ -101,3 +101,13 @@ def test_single_target_update_uses_single_target_wording():
 
     assert "ЦЕЛЬ ДОСТИГНУТА" in sent[0]
     assert "TP2 ДОСТИГНУТ" not in sent[0]
+
+
+def test_fixed_runner_update_reports_its_actual_strategy_interval():
+    sent = []
+    row = signal(strategy_bar_seconds=300)
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "TP1_PARTIAL", 101.0)
+
+    assert "следующей 5m свечи" in sent[0]

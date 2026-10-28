@@ -395,6 +395,9 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     lock_pct = (round(100 * float(strategy_frac))
                 if strategy_frac is not None else 0)
     runner_pct = 100 - lock_pct
+    bar_seconds = int(sig.get("strategy_bar_seconds") or 900)
+    bar_label = {300: "5m", 900: "15m", 3600: "1h"}.get(
+        bar_seconds, f"{bar_seconds // 60}m")
 
     if new_status == "TP1_PARTIAL":
         icon  = "✅"
@@ -404,7 +407,7 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
                 f"Цена дошла до `{_format_price(exit_price)}`\n"
                 f"Движение: `{sign}{move_pct:.2f}%`  (x{lev}: `{sign}{lev_profit:.0f}%`)\n"
                 f"✅ Зафиксировано {lock_pct}% позиции\n"
-                f"🛡 Остаток {runner_pct}% защищён безубытком от следующей 5m свечи\n"
+                f"🛡 Остаток {runner_pct}% защищён безубытком от следующей {bar_label} свечи\n"
                 f"Цель остатка: TP2 `{_format_price(tp2)}`"
             )
         else:
