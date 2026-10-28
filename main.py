@@ -777,6 +777,7 @@ _DEAL_STATUS_ICON = {
     "OPEN": "🟢", "TP1_PARTIAL": "🟡", "TP2_HIT": "✅",
     "BREAKEVEN": "⚖️", "SL_HIT": "❌", "EXPIRED": "⏱",
     "TP1_EXPIRED": "⏱", "TP1_HIT": "✅", "TP1_TRAIL": "✅",
+    "TP1_STOP": "🟠",
 }
 
 
@@ -2971,6 +2972,12 @@ def _check_open_signals():
                                                and float(df["time"][i]) <= activation_ts)
                         if direction == "LONG":
                             if same_activation_bar:
+                                if low <= sl:
+                                    realized_r = blended_r(
+                                        tp1_close_frac, tp1_r,
+                                        runner_frac, -1.0)
+                                    new_status, exit_px = "TP1_STOP", sl
+                                    break
                                 if high >= tp2:
                                     realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                     new_status, exit_px = "TP2_HIT", tp2; break
@@ -2983,6 +2990,12 @@ def _check_open_signals():
                                 new_status, exit_px = "TP2_HIT", tp2; break
                         else:
                             if same_activation_bar:
+                                if high >= sl:
+                                    realized_r = blended_r(
+                                        tp1_close_frac, tp1_r,
+                                        runner_frac, -1.0)
+                                    new_status, exit_px = "TP1_STOP", sl
+                                    break
                                 if low <= tp2:
                                     realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                     new_status, exit_px = "TP2_HIT", tp2; break

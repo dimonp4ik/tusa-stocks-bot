@@ -63,11 +63,12 @@ _STATUS_RU = {
     "BREAKEVEN":   "безубыток — позиция закрыта",
     "EXPIRED":     "сигнал истёк — позиция закрыта",
     "TP1_EXPIRED": "истёк после TP1 — позиция закрыта",
+    "TP1_STOP":    "остаток закрылся по исходному стопу после TP1",
 }
 
 # Statuses that require closing whatever is still open on the exchange.
 _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
-                   "EXPIRED", "TP1_EXPIRED")
+                   "EXPIRED", "TP1_EXPIRED", "TP1_STOP")
 
 # A position younger than this is never declared closed from a zero size read —
 # /account/positions can lag a fresh market fill. One monitor cycle is 60s, so

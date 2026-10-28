@@ -10,6 +10,7 @@ Lifecycle:
   SL_HIT       -> initial stop hit before TP1
   EXPIRED      -> no TP1/SL within 24h
   TP1_EXPIRED  -> TP1 hit, then rest expired before TP2/BE
+  TP1_STOP     -> TP1 banked, remainder hit the original stop in that bar
 """
 
 import sqlite3
@@ -28,8 +29,8 @@ from config import (
 )
 
 ACTIVE_STATUSES = ("OPEN", "TP1_PARTIAL")
-FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
-TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
+FINAL_STATUSES  = ("TP2_HIT", "BREAKEVEN", "SL_HIT", "EXPIRED", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL", "TP1_STOP")
+TP1_STATUSES    = ("TP1_PARTIAL", "TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL", "TP1_STOP")
 PROFIT_STATUSES = ("TP2_HIT", "BREAKEVEN", "TP1_EXPIRED", "TP1_HIT", "TP1_TRAIL")
 
 
@@ -1575,6 +1576,7 @@ _SIGNAL_STATUS_TO_OUTCOME = {
     "TP1_TRAIL":   ("TP1", 1, 0),
     "BREAKEVEN":   ("TP1", 1, 0),
     "TP1_EXPIRED": ("TP1", 1, 0),
+    "TP1_STOP":    ("TP1", 1, 0),
     "EXPIRED":     ("EXPIRED", 0, 0),
 }
 

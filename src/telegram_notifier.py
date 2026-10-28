@@ -373,6 +373,7 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     symbol    = sig["symbol"]
     direction = sig["direction"]
     entry     = float(sig["entry_price"])
+    tp1       = float(sig["tp1"])
     tp2       = float(sig["tp2"])
     sl        = float(sig["sl"])
 
@@ -456,6 +457,17 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
         body  = (
             f"TP1 был взят, TP2 не достигнут до окончания стратегии\n"
             f"Цена: `{_format_price(exit_price)}`"
+        )
+    elif new_status == "TP1_STOP":
+        icon = "🟠"
+        title = "ОСТАТОК ЗАКРЫТ ПО СТОПУ"
+        risk = abs(entry - sl)
+        tp1_r = abs(tp1 - entry) / risk if risk > 0 else 0.0
+        blended = lock_pct / 100 * tp1_r - runner_pct / 100
+        body = (
+            f"TP1 был взят: зафиксировано {lock_pct}% позиции\n"
+            f"Остаток {runner_pct}% дошёл до исходного стопа в той же свече\n"
+            f"Итог модели: `{blended:+.3f}R`"
         )
     elif new_status == "TP1_TRAIL":
         icon  = "🎯"

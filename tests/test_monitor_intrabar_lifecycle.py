@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 import main
 from src import telegram_notifier as notifier
+from src import db
 
 
 def signal(**overrides):
@@ -111,3 +112,45 @@ def test_fixed_runner_update_reports_its_actual_strategy_interval():
         assert notifier.send_signal_update(row, "TP1_PARTIAL", 101.0)
 
     assert "следующей 5m свечи" in sent[0]
+
+
+def test_original_stop_after_observed_tp1_wins_over_same_bar_tp2():
+    row = signal(
+        status="TP1_PARTIAL", tp1=100.5, tp2=102.0, sl=99.0,
+        strategy_tp1_close_frac=.05, runner_activation_bar_ts=1000.0,
+        tp1_hit_at=1050.0)
+    update, notify, mirror = run_monitor(
+        row, candle(high=102.4, low=98.8, close=99.2))
+
+    assert [item.args[1] for item in update.call_args_list] == ["TP1_STOP"]
+    assert update.call_args.kwargs["realized_r"] == -.925
+    assert [item.args[1] for item in notify.call_args_list] == ["TP1_STOP"]
+    assert [item.args[1] for item in mirror.call_args_list] == ["TP1_STOP"]
+    assert "TP1_STOP" in db.FINAL_STATUSES
+    assert "TP1_STOP" in db.TP1_STATUSES
+    assert "TP1_STOP" not in db.PROFIT_STATUSES
+
+
+def test_short_runner_uses_the_same_post_tp1_stop_ordering():
+    row = signal(
+        direction="SHORT", status="TP1_PARTIAL", tp1=99.5, tp2=98.0,
+        sl=101.0, strategy_tp1_close_frac=.05,
+        runner_activation_bar_ts=1000.0, tp1_hit_at=1050.0)
+    update, notify, mirror = run_monitor(
+        row, candle(high=101.2, low=97.6, close=100.8))
+
+    assert update.call_args.args[1] == "TP1_STOP"
+    assert update.call_args.kwargs["realized_r"] == -.925
+    assert notify.call_args.args[1] == "TP1_STOP"
+    assert mirror.call_args.args[1] == "TP1_STOP"
+
+
+def test_tp1_stop_notification_reports_blended_result():
+    sent = []
+    row = signal(tp1=100.5, strategy_tp1_close_frac=.05)
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "TP1_STOP", 99.0)
+
+    assert "ОСТАТОК ЗАКРЫТ ПО СТОПУ" in sent[0]
+    assert "-0.925R" in sent[0]
