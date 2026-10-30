@@ -46,7 +46,7 @@ def test_native_route_uses_closed_cross_section_and_has_no_size():
     assert len(setups) == 1
     setup = setups[0]
     assert setup["direction"] == "SHORT"
-    assert setup["target_r"] == 2.0
+    assert setup["target_r"] == 2.5
     assert setup["hold_bars"] == HOLD_BARS
     assert setup["universe_n"] == 20
     assert setup["backing_level_lookback_bars"] == BACKING_LEVEL_LOOKBACK_BARS
@@ -123,7 +123,7 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
                for value in analysis["signals"])
     assert any("Basket trend 16" in value for value in analysis["signals"])
     assert "size" not in analysis
-    assert bracket_for_analysis(analysis, 100.0) == (98.0, 98.0, 101.0)
+    assert bracket_for_analysis(analysis, 100.0) == (97.5, 97.5, 101.0)
 
 
 def test_native_scan_publishes_only_paper_candidate_contract():
