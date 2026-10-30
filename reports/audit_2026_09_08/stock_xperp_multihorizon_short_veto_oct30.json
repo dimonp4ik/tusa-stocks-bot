@@ -1,0 +1,906 @@
+{
+  "baseline": {
+    "confirmation_old_october": {
+      "dd_pct": 2.3607,
+      "literal_tp_rate_pct": 30.7339,
+      "max_loss_streak": 7,
+      "pending": 0,
+      "resolved": 218,
+      "return_pct": 26.6957,
+      "trades_per_active_day": 7.7857
+    },
+    "selection_august": {
+      "dd_pct": 3.7247,
+      "literal_tp_rate_pct": 26.7857,
+      "max_loss_streak": 8,
+      "pending": 0,
+      "resolved": 224,
+      "return_pct": 23.6995,
+      "trades_per_active_day": 7.2258
+    },
+    "selection_july": {
+      "dd_pct": 4.4752,
+      "literal_tp_rate_pct": 36.3248,
+      "max_loss_streak": 9,
+      "pending": 0,
+      "resolved": 234,
+      "return_pct": 46.555,
+      "trades_per_active_day": 7.5484
+    },
+    "test_september": {
+      "dd_pct": 2.4471,
+      "literal_tp_rate_pct": 30.303,
+      "max_loss_streak": 8,
+      "pending": 0,
+      "resolved": 231,
+      "return_pct": 29.7981,
+      "trades_per_active_day": 7.9655
+    },
+    "visible_post_hypothesis_slice": {
+      "dd_pct": 1.1973,
+      "literal_tp_rate_pct": 20.0,
+      "max_loss_streak": 4,
+      "pending": 0,
+      "resolved": 5,
+      "return_pct": -0.5973,
+      "trades_per_active_day": 5.0
+    }
+  },
+  "confirmation_pass": false,
+  "created_at": "2026-10-30T08:43:22.119964+00:00",
+  "hypothesis": {
+    "entry": "unchanged next-15-minute market open",
+    "motivation_contamination": "filter family was formulated after the five latest outcomes were visible",
+    "orders": "market only",
+    "position_fraction": "client setting",
+    "rule": "veto SHORT when closed basket trends at 32, 64 and 96 bars are all below selected thresholds"
+  },
+  "limitations": [
+    "Venue-native stock X-Perp history begins in late June 2026.",
+    "The visible latest slice has only five resolved trades.",
+    "Gross returns exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "protocol": {
+    "confirmation": "2026-10 through previous snapshot",
+    "grid_size": 27,
+    "latest_slice": "diagnostic only; prohibited from acceptance decision",
+    "selection": [
+      "2026-07",
+      "2026-08"
+    ],
+    "test": "2026-09"
+  },
+  "ready_for_live_orders": false,
+  "rejection_reasons": [
+    "The selected rule lowers return and raises drawdown on the older October confirmation prefix.",
+    "The hypothesis was created after seeing the latest five outcomes.",
+    "It removes the latest profitable trade together with the four losses."
+  ],
+  "runtime_change_allowed": false,
+  "selected_deltas": {
+    "confirmation_old_october": {
+      "baseline": {
+        "dd_pct": 2.3607,
+        "literal_tp_rate_pct": 30.7339,
+        "max_loss_streak": 7,
+        "pending": 0,
+        "resolved": 218,
+        "return_pct": 26.6957,
+        "trades_per_active_day": 7.7857
+      },
+      "candidate": {
+        "dd_pct": 2.4122,
+        "literal_tp_rate_pct": 30.6306,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 222,
+        "return_pct": 26.2585,
+        "trades_per_active_day": 7.9286
+      },
+      "dd_delta_pp": 0.0515,
+      "return_delta_pp": -0.4372
+    },
+    "selection_august": {
+      "baseline": {
+        "dd_pct": 3.7247,
+        "literal_tp_rate_pct": 26.7857,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 224,
+        "return_pct": 23.6995,
+        "trades_per_active_day": 7.2258
+      },
+      "candidate": {
+        "dd_pct": 3.7247,
+        "literal_tp_rate_pct": 26.7857,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 224,
+        "return_pct": 23.6995,
+        "trades_per_active_day": 7.2258
+      },
+      "dd_delta_pp": 0.0,
+      "return_delta_pp": 0.0
+    },
+    "selection_july": {
+      "baseline": {
+        "dd_pct": 4.4752,
+        "literal_tp_rate_pct": 36.3248,
+        "max_loss_streak": 9,
+        "pending": 0,
+        "resolved": 234,
+        "return_pct": 46.555,
+        "trades_per_active_day": 7.5484
+      },
+      "candidate": {
+        "dd_pct": 4.4752,
+        "literal_tp_rate_pct": 37.1795,
+        "max_loss_streak": 9,
+        "pending": 0,
+        "resolved": 234,
+        "return_pct": 53.6715,
+        "trades_per_active_day": 7.5484
+      },
+      "dd_delta_pp": 0.0,
+      "return_delta_pp": 7.1165
+    },
+    "test_september": {
+      "baseline": {
+        "dd_pct": 2.4471,
+        "literal_tp_rate_pct": 30.303,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 231,
+        "return_pct": 29.7981,
+        "trades_per_active_day": 7.9655
+      },
+      "candidate": {
+        "dd_pct": 2.4471,
+        "literal_tp_rate_pct": 30.303,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 231,
+        "return_pct": 29.7981,
+        "trades_per_active_day": 7.9655
+      },
+      "dd_delta_pp": 0.0,
+      "return_delta_pp": 0.0
+    },
+    "visible_post_hypothesis_slice": {
+      "baseline": {
+        "dd_pct": 1.1973,
+        "literal_tp_rate_pct": 20.0,
+        "max_loss_streak": 4,
+        "pending": 0,
+        "resolved": 5,
+        "return_pct": -0.5973,
+        "trades_per_active_day": 5.0
+      },
+      "candidate": {
+        "dd_pct": 0.0,
+        "literal_tp_rate_pct": 0.0,
+        "max_loss_streak": 0,
+        "pending": 0,
+        "resolved": 0,
+        "return_pct": 0.0,
+        "trades_per_active_day": 0.0
+      },
+      "dd_delta_pp": -1.1973,
+      "return_delta_pp": 0.5973
+    }
+  },
+  "selected_on_july_august": {
+    "config": {
+      "basket_32_at_most": -0.02,
+      "basket_64_at_most": -0.06,
+      "basket_96_at_most": -0.06
+    },
+    "selection_return_gain_pp": 7.1165,
+    "values": {
+      "confirmation_old_october": {
+        "dd_pct": 2.4122,
+        "literal_tp_rate_pct": 30.6306,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 222,
+        "return_pct": 26.2585,
+        "trades_per_active_day": 7.9286
+      },
+      "selection_august": {
+        "dd_pct": 3.7247,
+        "literal_tp_rate_pct": 26.7857,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 224,
+        "return_pct": 23.6995,
+        "trades_per_active_day": 7.2258
+      },
+      "selection_july": {
+        "dd_pct": 4.4752,
+        "literal_tp_rate_pct": 37.1795,
+        "max_loss_streak": 9,
+        "pending": 0,
+        "resolved": 234,
+        "return_pct": 53.6715,
+        "trades_per_active_day": 7.5484
+      },
+      "test_september": {
+        "dd_pct": 2.4471,
+        "literal_tp_rate_pct": 30.303,
+        "max_loss_streak": 8,
+        "pending": 0,
+        "resolved": 231,
+        "return_pct": 29.7981,
+        "trades_per_active_day": 7.9655
+      },
+      "visible_post_hypothesis_slice": {
+        "dd_pct": 0.0,
+        "literal_tp_rate_pct": 0.0,
+        "max_loss_streak": 0,
+        "pending": 0,
+        "resolved": 0,
+        "return_pct": 0.0,
+        "trades_per_active_day": 0.0
+      }
+    },
+    "vetoed_raw_candidates": 318
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_multihorizon_short_veto_oct30_audit.py": "244ae7d1cd3413ac8558d1b8f57872753d655912a1bf5f04bfd9d264bc9ea3d3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAOIUSDT_15min_current.pkl": "7ad9fb4651e4cdfde2a700cd4247655235805bc4f5361356edcbc0aec093f6ce",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAPLUSDT_15min_current.pkl": "bcca54fb8e4193ceecb4c80b1d93b9cd7f34832c792851ca7796186517d2542d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMDUSDT_15min_current.pkl": "10536359924465ba0ae5355c5629292e0dc3778add5142be3168579929af91c1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMZNUSDT_15min_current.pkl": "3983489741c2079b90b28555f008bbe7062f352f83f940887fc03dc12d301a12",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\ARMUSDT_15min_current.pkl": "96c6df328b38e46fecd57bd4afd70f70dd730e7021fcc6a28d47db6d39d6e9e2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AVGOUSDT_15min_current.pkl": "19511681e5beb77b1f52ab44fb92d152bd829debb38d95bc5cbceb493fd3a72b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AXTIUSDT_15min_current.pkl": "cb0fda92191302778b514a6d16d87e295352f071160eaaff1d855c8ca9327dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BEUSDT_15min_current.pkl": "519689e8e11b39e448bfb9d458d90c3c9b71348054c0dc16e4ab37cedec57ec6",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BMNRUSDT_15min_current.pkl": "1601db724d3d53507546a5daefd8bf462770d57b1509d2b866881c44c75bc09c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CBRSUSDT_15min_current.pkl": "f57bbfea3e9fb8be143928dc24952552b0ea1a60239c967589e0515dab057dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\COINUSDT_15min_current.pkl": "4f0b805bdb21cfcad60b1aa93fa784e53af02768905b1a90820f2617e6d00e88",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRCLUSDT_15min_current.pkl": "f5ba420adc973bc5d60f785789b8e00c689fd8e83c838b999bf9b53d8336fb08",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRWVUSDT_15min_current.pkl": "29c92824136a395475e1d9f1edefaa928ea8d19ce3f77f8cec2540a1a7db8d8c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DELLUSDT_15min_current.pkl": "40fa4bc48011f062a680d1f028f73c6eb1cbc779bdb050eb600869c683c86556",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DRAMUSDT_15min_current.pkl": "594dfacf2ad0f62f64de7d7bafe66aabb56ecfaed88d6973a8eccf98264bad3f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\EWYUSDT_15min_current.pkl": "b39d4be6086f6341f485c43ecf961678a67add5cda75d7413e63ec0f2c517a57",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\GOOGLUSDT_15min_current.pkl": "6b6ba3d4f63bfb26e9978d19473edb68484a5f61bc0b6968fedb760d99efffe2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\HOODUSDT_15min_current.pkl": "03d4fb895e32d77788da6169f2bfa34ab5252c7a9abb5b07d15efe05e5f1aed4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\INTCUSDT_15min_current.pkl": "9a3795ce16c9e433a578cbca68c9f2735a58c40d2b2b0ca0737cb3b5dfa686c3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\KOUSDT_15min_current.pkl": "2db4782713e441ce21038bf80cc2d4b6a20b0ff125bd43f38f7008836321c935",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\LITEUSDT_15min_current.pkl": "6825ed79c54df5a106faf528c653cf58f1d9a6d90eb9e409c23fef2a47e3ea6c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\METAUSDT_15min_current.pkl": "637da1d086136ec0f7787cc4c29f8e4a507a8dbf118ba03b03eb97b0a2aa9e78",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRNAUSDT_15min_current.pkl": "54e72f56f3d3432590737cc15c06bbda182b312bd84146571eac52116129a1ae",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRVLUSDT_15min_current.pkl": "31d1cbaedc6f65973b04e56bdc9422358cd3d3adc486c07e3badcc3833b6e453",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSFTUSDT_15min_current.pkl": "e515bc39168b6b2b74c1e14e5ec1e051d976f679ed1401d1edb44dadeef97465",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSTRUSDT_15min_current.pkl": "3a9b914f21db0f10b10b274e19c1c2f921a0dbf577bf959d71076117180b431e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MUUSDT_15min_current.pkl": "b51dfe194f9b43c3eae63409fd6a2c9d24ab48c96ea866f909671bb9d56f8917",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NBISUSDT_15min_current.pkl": "74e2300d4a76f41131960e503930be1b2bfb7b251159116477149c162a8601f7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NVDAUSDT_15min_current.pkl": "c8be37f06d23df2c8b1547e66cf3af8b3ac0c03e6d627bce219cdb93f2945148",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\OKTAUSDT_15min_current.pkl": "b6fb702557d401e751d3e623b4bed25622037355ac65bcf1c2346efd3df33869",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\PLTRUSDT_15min_current.pkl": "e500f53ec1f05a63c6ec0a51c44ac9b34db0391f89b31e7f1fa06dffc56b478e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\QCOMUSDT_15min_current.pkl": "48ee6ab9cbea98de2602cbee4619bf2a60d62bb842e279875ba93f1085e8a20d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\RKLBUSDT_15min_current.pkl": "a02876a1ddc69681552a3d9ff0cd33874f4ac1f71d6f84f25ef487aedb5d07cf",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SAMSUNGUSDT_15min_current.pkl": "b8c8d7e3f9eaf03686e302b1ab3b6624fd1d33490a0dea4398700c1352be2ada",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYNIXUSDT_15min_current.pkl": "51759b100a02e0c3e9594f829df23333ce193e9fe46515fb33fba6e295e0a347",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYUSDT_15min_current.pkl": "2ea85cb8dfba4dc4bee632267937f73fb281994ffdade0c5ecddf5addfa3c70b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNDKUSDT_15min_current.pkl": "1a614308b6c19af18574596c3b36e291e863d561e5e0989358b50a21b7b7b4d7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNXXUSDT_15min_current.pkl": "0b6f0004c8725b6f7be426895544e4e2862d1eeac22ece62f3d3b09242b99163",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOFTBANKUSDT_15min_current.pkl": "05d5dc031a7d4a7a387d904015d1d053bd08f445605d51a7cd1d31140d7a00a5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXLUSDT_15min_current.pkl": "5c8911bda9c3df4bb2d1ce1bb7a2c9671b0ff7336086edced711f1d0c7d44609",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXSUSDT_15min_current.pkl": "ba55293b86038456b01f4c88852089adfa4a36354b86f58d19b6e9036b88e66b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SPCXUSDT_15min_current.pkl": "215e63ab7b5723ccee4a486412c5673d3c89fbc08316a18e5deec06a6940c8c2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\TSLAUSDT_15min_current.pkl": "f32bd866da14d1299fb4de5b9c21b1894d2c6f4ca8cbaeda75d735fc446f8d01",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\WDCUSDT_15min_current.pkl": "f24f71533524b4f21f1da5a394c8c7e20929546234265322da98742d586c6055",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30\\manifest.json": "83d7b406ffd0940230f14af0f5a4e534e524023e5fed0c507a424b6d4fce21af",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AAOIUSDT_15min_current.pkl": "142a97b662111c90bdfff578f0dcbe2796ac6d49471a24181b4dc7ac39652292",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AAPLUSDT_15min_current.pkl": "01e56cb425c201bd63f47b8b3eaf3483b2c55c437e5aec2b764f363ca9651a17",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AMDUSDT_15min_current.pkl": "6225f1dc22139a6f176cd84065fb832f6964987107b80e16758bba0f3bdad084",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AMZNUSDT_15min_current.pkl": "910734b89e40e53b40ac01830caa51937e958eca7912bb6bf4d49652fc5dbb1e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\ARMUSDT_15min_current.pkl": "bedd2b45fdb06f0ebfd42401c9465c845f097f32e9cbffc1ae77605511ad02d4",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AVGOUSDT_15min_current.pkl": "c0b5902f0a76c29737696295072c7a98fd5c49fa7948b752b84887a33aa54410",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\AXTIUSDT_15min_current.pkl": "38062c8d5620eb8919acba0bbcb469ef526f8bc442dad3fbfec6744a8457975e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\BEUSDT_15min_current.pkl": "7da824dc1cc6f0bc3aba38d2cf0b6338dceac172c3e4167265470ca82e369e68",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\BMNRUSDT_15min_current.pkl": "346c941bbcd74795cdf17580645a79713491f60678499b476f867455cdfc722b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\CBRSUSDT_15min_current.pkl": "5a8d808e8bcdbd26d96cf05eae1d299b6ba8aa4bb4000b9c51b1a81a40cd6bc3",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\COINUSDT_15min_current.pkl": "eb796e68d8c3c3d4c947cc2cb72c791dc61448f8db8318b1b9a772b3da20c943",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\CRCLUSDT_15min_current.pkl": "e603425c7546104623df1c5d4d3857de65fe7d98685a60bade197e342c96a9a8",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\CRWVUSDT_15min_current.pkl": "8472a269ae7393dc19f67d6631e24b567dd5ad6ba80eb43944b704919467b150",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\DELLUSDT_15min_current.pkl": "e608674fe24ea620f0789917f8f8ff1dd4da844b4a1b0b763b1356c7cd35a245",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\DRAMUSDT_15min_current.pkl": "eac729bb4ee25cbdf26ad7591857d92b4d86ea2405d9662ec9a4ad93a3325fc3",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\EWYUSDT_15min_current.pkl": "35d5724f7fa53f435fbfd59df9a3e03c12048112c7ff221ecf4d461095c5d3fb",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\GOOGLUSDT_15min_current.pkl": "8751b624c33f7dc83eaf0ac1b4acf320dbacd7e0541625d715d2358b2ad994ee",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\HOODUSDT_15min_current.pkl": "92de287c9215ea08d43a185b2b62280012f602256ddd86002e9b7c370bc98b72",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\INTCUSDT_15min_current.pkl": "b003b89a4c352e948bebe833bf2f8b22ebc657abddf928fb2ac7383535f688cb",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\KOUSDT_15min_current.pkl": "cd7886d05987064d7c05a87fc5cfa18b3b17ff798517005cba893e2897149a37",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\LITEUSDT_15min_current.pkl": "38c5c8fe2f7b0c663544834bed895e17e6ff91a9f5548da6003a878a3a012a85",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\METAUSDT_15min_current.pkl": "46f9f8ad779ebda342a8789a805fa9d2a27c5a29ddb314fb5711cfce7110d41c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\MRNAUSDT_15min_current.pkl": "6219465995f5b44ad268ccb589689d20f0c4e2b916c78bc65cba0213e140a638",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\MRVLUSDT_15min_current.pkl": "926254beb705cbe4d1d3321beee4ecb73f2d1ea5d8c9f83176abd78dd64f4efe",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\MSFTUSDT_15min_current.pkl": "76b7d617f9bd00175e168a197e872d0827b2e0a8c0c4274a1b86130b076b4eea",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\MSTRUSDT_15min_current.pkl": "bfaf48b83039888658267e7835beaee938521a08cb6e141ef14413f6b5a3469e",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\MUUSDT_15min_current.pkl": "dd7574621aba94b984a92fb0b1b937e1644ec6ff02cf9a5e5a60e26f406d01f7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\NBISUSDT_15min_current.pkl": "27a3642628bcd3b3f4670755613391daf2a5311d1ccd99750f7a46a46db570e5",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\NVDAUSDT_15min_current.pkl": "d5ab44dcd561b2609312b0ba4e6b4f37d3b0a0ef39b163d77ece315a23772042",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\OKTAUSDT_15min_current.pkl": "d05b26547352151e1bd46587363ce25e2826b10dcfb7e6e5554891e59c069152",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\PLTRUSDT_15min_current.pkl": "395723c9d609881db97d25c6e35509e411a60c627a1f0b645a3937c9403c667d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\QCOMUSDT_15min_current.pkl": "f5c1c7424cf6c6d1c5b1c017a180789478a2f44b9210533e9c0d6ef55a54d6ba",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\RKLBUSDT_15min_current.pkl": "97fa0358df2ead754e189483c6dc65bc490877f7d9827cf45209f9d5e32c78fd",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SAMSUNGUSDT_15min_current.pkl": "4d327a0e8791f619af58bb7b84cf852225398aab19cda53efafbd3782bb5e2a1",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SKHYNIXUSDT_15min_current.pkl": "9fcbaf3739dba990fccb73410118190d33537c984d97715acd4b140d998647e7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SKHYUSDT_15min_current.pkl": "ccce57bd5a5fa6c7f873659738f7980ae5422c84a5153be2b85bef42844337c8",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SNDKUSDT_15min_current.pkl": "05b16a145159fa8a037a239a408c790134db97a1cbdd7ad511a6aa95bfbaad5a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SNXXUSDT_15min_current.pkl": "883c663491d7a9e150259838f08ff35463b8edd4c7fcb26c5d5617c1dab54a49",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SOFTBANKUSDT_15min_current.pkl": "2f8ab902695f844d5b3f062f2b11add4da3eecb8eb4fd4d5ecde44b3eb20d187",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SOXLUSDT_15min_current.pkl": "52dfafd478d495c85e6e4aae9f7390a06096b65ee06c8a3ca0520c5b7967b6c2",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SOXSUSDT_15min_current.pkl": "cd941d8ac1666642e4e02c0dae6ebfab8b2009809b130da3005d7f965bc3686a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\SPCXUSDT_15min_current.pkl": "ea10ae3bee6484e078706f4d32f61557c1f031d7e8af36d34c874ba569f3ead7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\TSLAUSDT_15min_current.pkl": "075a26ceaad6ce1165974f533196a05479cf857e3cad7c4397d4be0bff3c9bbd",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\WDCUSDT_15min_current.pkl": "2eba69ca691cc5ab10563f4700adfa78672ea9ce778995f7ed5a72a7ef47fb58",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30_1000\\manifest.json": "38ccefdafe563c172d1f25d75a7c6741362df34cd50343160cfd294bb627b022"
+  },
+  "status": "REJECTED_CONFIRMATION_AND_POSTHOC",
+  "test_pass": true,
+  "top_selection_candidates": [
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.06,
+        "basket_96_at_most": -0.06
+      },
+      "selection_return_gain_pp": 7.1165,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.4122,
+          "literal_tp_rate_pct": 30.6306,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 222,
+          "return_pct": 26.2585,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.1795,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 234,
+          "return_pct": 53.6715,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 0.0,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 0,
+          "pending": 0,
+          "resolved": 0,
+          "return_pct": 0.0,
+          "trades_per_active_day": 0.0
+        }
+      },
+      "vetoed_raw_candidates": 318
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.06,
+        "basket_96_at_most": -0.04
+      },
+      "selection_return_gain_pp": 7.1165,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.5839,
+          "literal_tp_rate_pct": 29.2237,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 219,
+          "return_pct": 21.296,
+          "trades_per_active_day": 7.8214
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.1795,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 234,
+          "return_pct": 53.6715,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 0.0,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 0,
+          "pending": 0,
+          "resolved": 0,
+          "return_pct": 0.0,
+          "trades_per_active_day": 0.0
+        }
+      },
+      "vetoed_raw_candidates": 356
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.08,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 6.706,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 31.0811,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 222,
+          "return_pct": 27.3136,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.2385,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 239,
+          "return_pct": 53.261,
+          "trades_per_active_day": 7.7097
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 167
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.06,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 6.6811,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.4122,
+          "literal_tp_rate_pct": 30.6306,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 222,
+          "return_pct": 26.2585,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.2881,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 236,
+          "return_pct": 53.2361,
+          "trades_per_active_day": 7.6129
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 218
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.06,
+        "basket_64_at_most": -0.08,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 6.5512,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 30.7339,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 218,
+          "return_pct": 26.6981,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.5,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 240,
+          "return_pct": 53.1062,
+          "trades_per_active_day": 7.7419
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 67
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.06,
+        "basket_64_at_most": -0.06,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 6.5512,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 30.7339,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 218,
+          "return_pct": 26.6981,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.5,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 240,
+          "return_pct": 53.1062,
+          "trades_per_active_day": 7.7419
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 79
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.06,
+        "basket_64_at_most": -0.04,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 6.5512,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 30.7339,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 218,
+          "return_pct": 26.6981,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.5,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 240,
+          "return_pct": 53.1062,
+          "trades_per_active_day": 7.7419
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 85
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.04,
+        "basket_64_at_most": -0.04,
+        "basket_96_at_most": -0.08
+      },
+      "selection_return_gain_pp": 5.8558,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 30.137,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 219,
+          "return_pct": 25.2354,
+          "trades_per_active_day": 7.8214
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 37.7119,
+          "max_loss_streak": 13,
+          "pending": 0,
+          "resolved": 236,
+          "return_pct": 52.4108,
+          "trades_per_active_day": 7.6129
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.1973,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.1973,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 158
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.08,
+        "basket_96_at_most": -0.06
+      },
+      "selection_return_gain_pp": 5.6438,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 31.0811,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 222,
+          "return_pct": 27.3136,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 36.9748,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 238,
+          "return_pct": 52.1988,
+          "trades_per_active_day": 7.6774
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.2,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.2,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 188
+    },
+    {
+      "config": {
+        "basket_32_at_most": -0.02,
+        "basket_64_at_most": -0.08,
+        "basket_96_at_most": -0.04
+      },
+      "selection_return_gain_pp": 5.6438,
+      "values": {
+        "confirmation_old_october": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 31.0811,
+          "max_loss_streak": 7,
+          "pending": 0,
+          "resolved": 222,
+          "return_pct": 27.3136,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 36.9748,
+          "max_loss_streak": 9,
+          "pending": 0,
+          "resolved": 238,
+          "return_pct": 52.1988,
+          "trades_per_active_day": 7.6774
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "pending": 0,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "visible_post_hypothesis_slice": {
+          "dd_pct": 1.2,
+          "literal_tp_rate_pct": 0.0,
+          "max_loss_streak": 4,
+          "pending": 0,
+          "resolved": 4,
+          "return_pct": -1.2,
+          "trades_per_active_day": 4.0
+        }
+      },
+      "vetoed_raw_candidates": 190
+    }
+  ]
+}
