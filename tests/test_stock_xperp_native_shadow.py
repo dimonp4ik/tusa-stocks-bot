@@ -9,7 +9,8 @@ import main
 from src import db
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
-    LONG_MIN_BASKET_TREND, backing_level_allows_entry, basket_trend,
+    LONG_MIN_BASKET_TREND, SHORT_MIN_BASKET_TREND,
+    backing_level_allows_entry, basket_trend,
     native_shadow_setups, normalized_atr14,
 )
 from src.telegram_notifier import bracket_for_analysis
@@ -51,6 +52,7 @@ def test_native_route_uses_closed_cross_section_and_has_no_size():
     assert setup["backing_level_lookback_bars"] == BACKING_LEVEL_LOOKBACK_BARS
     assert setup["cross_z"] > 2
     assert setup["basket_trend_96"] >= LONG_MIN_BASKET_TREND
+    assert setup["basket_trend_16"] > SHORT_MIN_BASKET_TREND
     assert "size" not in setup
     assert "size_mult" not in setup
 
@@ -92,6 +94,25 @@ def test_basket_trend_detects_broad_decline_from_closed_bars_only():
     assert value < LONG_MIN_BASKET_TREND
 
 
+def test_native_route_rejects_short_after_exhausted_basket_decline():
+    data = universe()
+    for values in data.values():
+        base = values["close"][-18]
+        for index in range(len(values["close"]) - 17, len(values["close"])):
+            base *= .9985
+            values["open"][index] = base
+            values["close"][index] = base
+            values["high"][index] = base + .05
+            values["low"][index] = base - .05
+    first = sorted(data)[0]
+    data[first]["close"][-1] *= 1.02
+    data[first]["open"][-1] = data[first]["close"][-1]
+    data[first]["high"][-1] = data[first]["close"][-1] + .05
+    data[first]["low"][-1] = data[first]["close"][-1] - .05
+    assert basket_trend(data, 119 * 900, 16) <= SHORT_MIN_BASKET_TREND
+    assert native_shadow_setups(data, now=119 * 900 + 901) == []
+
+
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     analysis = main._native_xperp_analysis(setup, 100.0)
@@ -100,6 +121,7 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     assert analysis["strategy_max_bars"] == 64
     assert any("Backing level 32 bars" in value
                for value in analysis["signals"])
+    assert any("Basket trend 16" in value for value in analysis["signals"])
     assert "size" not in analysis
     assert bracket_for_analysis(analysis, 100.0) == (98.0, 98.0, 101.0)
 
