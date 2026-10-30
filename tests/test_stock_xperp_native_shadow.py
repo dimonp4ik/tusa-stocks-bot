@@ -11,7 +11,7 @@ from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
     LONG_MIN_BASKET_TREND, SHORT_MIN_BASKET_TREND,
     backing_level_allows_entry, basket_trend,
-    native_shadow_setups, normalized_atr14,
+    native_shadow_setups, normalized_atr14, routed_target_fraction,
 )
 from src.telegram_notifier import bracket_for_analysis
 
@@ -46,13 +46,14 @@ def test_native_route_uses_closed_cross_section_and_has_no_size():
     assert len(setups) == 1
     setup = setups[0]
     assert setup["direction"] == "SHORT"
-    assert setup["target_r"] == 2.5
+    assert setup["target_r"] == 3.0
     assert setup["hold_bars"] == HOLD_BARS
     assert setup["universe_n"] == 20
     assert setup["backing_level_lookback_bars"] == BACKING_LEVEL_LOOKBACK_BARS
     assert setup["cross_z"] > 2
     assert setup["basket_trend_96"] >= LONG_MIN_BASKET_TREND
     assert setup["basket_trend_16"] > SHORT_MIN_BASKET_TREND
+    assert "basket_trend_32" in setup
     assert "size" not in setup
     assert "size_mult" not in setup
 
@@ -113,6 +114,12 @@ def test_native_route_rejects_short_after_exhausted_basket_decline():
     assert native_shadow_setups(data, now=119 * 900 + 901) == []
 
 
+def test_target_router_uses_exhaustion_before_utc_expansion():
+    assert routed_target_fraction(-.041, 8 * 3600) == .02
+    assert routed_target_fraction(-.02, 8 * 3600) == .03
+    assert routed_target_fraction(-.02, 14 * 3600) == .025
+
+
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     analysis = main._native_xperp_analysis(setup, 100.0)
@@ -122,8 +129,9 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     assert any("Backing level 32 bars" in value
                for value in analysis["signals"])
     assert any("Basket trend 16" in value for value in analysis["signals"])
+    assert any("Basket trend 32" in value for value in analysis["signals"])
     assert "size" not in analysis
-    assert bracket_for_analysis(analysis, 100.0) == (97.5, 97.5, 101.0)
+    assert bracket_for_analysis(analysis, 100.0) == (97.0, 97.0, 101.0)
 
 
 def test_native_scan_publishes_only_paper_candidate_contract():

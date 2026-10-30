@@ -971,7 +971,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "LONG: тренд корзины за 96 точек не ниже −0.563%\n"
                 "SHORT: не входить после падения корзины за 16 точек на 1%+\n"
                 "Рынок: 24/7, вход по текущей цене\n"
-                "Цель: 2.5% цены, стоп: 1%, максимум 64 свечи\n"
+                "Цель: 2% при истощении / 3% в 06–12 UTC / иначе 2.5%\n"
+                "Стоп: 1%, максимум 64 свечи\n"
                 f"За скользящий час: максимум {NATIVE_XPERP_ROLLING_HOUR_CAP} входа\n"
                 f"Пауза: после {NATIVE_XPERP_LOSS_PAUSE_STREAK} закрытых убытков за UTC-день\n"
             )
@@ -3430,6 +3431,7 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
     signal_bar = float(setup["signal_bar_ts"])
     z_score = float(setup["cross_z"])
     atr_fraction = float(setup["atr14_fraction"])
+    target_r = float(setup["target_r"])
     return {
         "symbol": setup["symbol"],
         "direction": direction,
@@ -3442,7 +3444,7 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "market_price": price,
         "atr": price * .01,
         "fixed_stop_atr": 1.0,
-        "fixed_target_r": 2.5,
+        "fixed_target_r": target_r,
         "entry_source": "MARKET",
         "strategy_tp1_close_frac": 1.0,
         "strategy_runner_mode": "single_target",
@@ -3465,11 +3467,12 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
             f"Two-bar move {100 * float(setup['signal_return']):+.2f}%",
             f"ATR14 {100 * atr_fraction:.2f}%",
             f"Basket trend 16 {100 * float(setup['basket_trend_16']):+.2f}%",
+            f"Basket trend 32 {100 * float(setup['basket_trend_32']):+.2f}%",
             f"Basket trend 96 {100 * float(setup['basket_trend_96']):+.2f}%",
             (f"Backing level {int(setup['backing_level_lookback_bars'])} bars: "
              f"{float(setup['backing_level']):.8g}"),
             f"Universe {int(setup['universe_n'])}",
-            "Fixed price move target 2.50% / stop 1.00%",
+            f"Routed price move target {target_r:.2f}% / stop 1.00%",
         ],
         "source": "stock_xperp_native_shadow",
         "signal_bar_ts": signal_bar,

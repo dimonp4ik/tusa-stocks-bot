@@ -28,6 +28,8 @@ MINIMUM_ABS_Z = 2.0
 MAXIMUM_ATR14_FRACTION = .01
 STOP_FRACTION = .01
 TARGET_FRACTION = .025
+EXHAUSTED_TARGET_FRACTION = .02
+EXPANDED_TARGET_FRACTION = .03
 HOLD_BARS = 64
 BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 900
@@ -35,6 +37,10 @@ BASKET_TREND_BARS = 96
 LONG_MIN_BASKET_TREND = -0.005626823134606253
 SHORT_EXHAUSTION_BARS = 16
 SHORT_MIN_BASKET_TREND = -.01
+TARGET_EXHAUSTION_BARS = 32
+TARGET_EXHAUSTION_THRESHOLD = -.04
+TARGET_EXPANSION_START_HOUR = 6
+TARGET_EXPANSION_END_HOUR = 12
 
 
 def _finite_series(candles: dict, key: str) -> list[float] | None:
@@ -169,6 +175,21 @@ def basket_trend(candles_by_symbol: dict[str, dict], signal_time: int,
     return None if values is None else values[bars]
 
 
+def routed_target_fraction(basket_trend_32: float,
+                           entry_time: float) -> float:
+    """Choose the audited shadow target from causal basket state and UTC hour."""
+    trend = float(basket_trend_32)
+    stamp = float(entry_time)
+    if not math.isfinite(trend) or not math.isfinite(stamp):
+        raise ValueError("target router inputs must be finite")
+    if trend <= TARGET_EXHAUSTION_THRESHOLD:
+        return EXHAUSTED_TARGET_FRACTION
+    hour = int(stamp // 3600) % 24
+    if TARGET_EXPANSION_START_HOUR <= hour < TARGET_EXPANSION_END_HOUR:
+        return EXPANDED_TARGET_FRACTION
+    return TARGET_FRACTION
+
+
 def native_shadow_setups(candles_by_symbol: dict[str, dict],
                          now: float | None = None) -> list[dict]:
     """Return all qualifying rows in causal quality order for portfolio gating."""
@@ -189,11 +210,13 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
         return []
     trends = basket_trends(
         candles_by_symbol, signal_time,
-        (SHORT_EXHAUSTION_BARS, BASKET_TREND_BARS))
+        (SHORT_EXHAUSTION_BARS, TARGET_EXHAUSTION_BARS, BASKET_TREND_BARS))
     if trends is None:
         return []
     short_trend = trends[SHORT_EXHAUSTION_BARS]
+    target_trend = trends[TARGET_EXHAUSTION_BARS]
     long_trend = trends[BASKET_TREND_BARS]
+    target_fraction = routed_target_fraction(target_trend, entry_time)
     output = []
     for row in rows:
         move = float(row["signal_return"])
@@ -219,7 +242,7 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "direction": direction,
             "entry": close,
             "atr": close * STOP_FRACTION,
-            "target_r": TARGET_FRACTION / STOP_FRACTION,
+            "target_r": target_fraction / STOP_FRACTION,
             "signal_bar_ts": float(signal_time),
             "entry_time": float(entry_time),
             "cross_z": float(z_score),
@@ -231,6 +254,7 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "backing_level": level,
             "backing_level_lookback_bars": BACKING_LEVEL_LOOKBACK_BARS,
             "basket_trend_16": short_trend,
+            "basket_trend_32": target_trend,
             "basket_trend_96": long_trend,
             "hold_bars": HOLD_BARS,
             "module": "native_xperp_quality_reversal",
