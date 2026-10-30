@@ -1084,6 +1084,17 @@ def _row_r(row) -> float:
     return _status_r(row["status"]) * _size_of(row)
 
 
+def _row_unit_r(row) -> float:
+    """Realized R before any legacy strategy size multiplier.
+
+    Telegram users choose one margin percentage for every signal.  Their result
+    must therefore use the signal outcome itself, rather than an old internal
+    size rule that may have been stored on the row.
+    """
+    rr = row["realized_r"] if "realized_r" in row.keys() else None
+    return float(rr) if rr is not None else _status_r(row["status"])
+
+
 def _row_net_r(row):
     """Estimated net signal R; unknown execution geometry is not a winning trade."""
     try:
@@ -1097,7 +1108,8 @@ def _row_net_r(row):
         return None
 
 
-def get_stats(days: int = 7, since_ts: float = None) -> dict:
+def get_stats(days: int = 7, since_ts: float = None,
+              margin_pct: float = 3.0, leverage: float = 10.0) -> dict:
     """Aggregate stats with R-value, direction breakdown and recent streak.
 
     `days`     — rolling window (last N×24h) when since_ts is None.
@@ -1107,7 +1119,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     with _conn() as c:
         rows = c.execute(
             "SELECT status, direction, opened_at, premium, realized_r, "
-            "entry_price, sl, size_mult FROM signals WHERE opened_at >= ?",
+            "entry_price, sl, size_mult FROM signals WHERE opened_at >= ? "
+            "ORDER BY opened_at, rowid",
             (cutoff,)
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
@@ -1131,7 +1144,10 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     sl_hit      = sum(1 for r in rows if r["status"] == "SL_HIT")
     expired     = sum(1 for r in rows if r["status"] == "EXPIRED")
     tp1_expired = sum(1 for r in rows if r["status"] == "TP1_EXPIRED")
-    profitable  = sum(1 for r in rows if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
+    closed_rows = [r for r in rows if r["status"] in FINAL_STATUSES]
+    profitable  = sum(1 for r in closed_rows if _row_unit_r(r) > 0)
+    losing      = sum(1 for r in closed_rows if _row_unit_r(r) < 0)
+    flat        = closed - profitable - losing
 
     win_rate = (profitable / closed * 100) if closed else 0.0
     tp1_rate = (tp1_hit    / total  * 100) if total  else 0.0
@@ -1139,6 +1155,45 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     # ── Total R ───────────────────────────────────────────────────────────────
     total_r = sum(_row_r(r) for r in rows if r["status"] in FINAL_STATUSES)
     r_per_trade = (total_r / closed) if closed else 0.0
+    unit_total_r = sum(_row_unit_r(r) for r in closed_rows)
+    unit_r_per_trade = (unit_total_r / closed) if closed else 0.0
+
+    # User-facing deposit model.  A signal's price return is unit-R multiplied
+    # by its own stop distance.  Apply the same client-selected margin share and
+    # leverage to every closed signal, compounding in signal order.  This is a
+    # transparent paper-account estimate; open signals are deliberately absent.
+    try:
+        model_margin_pct = max(0.0, float(margin_pct))
+        model_leverage = max(0.0, float(leverage))
+    except (TypeError, ValueError):
+        model_margin_pct, model_leverage = 3.0, 10.0
+    equity = peak = 1.0
+    account_max_dd = 0.0
+    account_model_n = 0
+    account_model_missing = 0
+    loss_run = max_loss_run = 0
+    for row in closed_rows:
+        unit_r = _row_unit_r(row)
+        if unit_r < 0:
+            loss_run += 1
+            max_loss_run = max(max_loss_run, loss_run)
+        else:
+            loss_run = 0
+        try:
+            entry = float(row.get("entry_price") or 0.0)
+            stop = float(row.get("sl") or 0.0)
+            risk_fraction = abs(entry - stop) / entry
+        except (TypeError, ValueError, ZeroDivisionError):
+            risk_fraction = 0.0
+        if not math.isfinite(risk_fraction) or risk_fraction <= 0:
+            account_model_missing += 1
+            continue
+        trade_return = (model_margin_pct / 100.0) * model_leverage * unit_r * risk_fraction
+        equity *= max(0.0, 1.0 + trade_return)
+        peak = max(peak, equity)
+        if peak > 0:
+            account_max_dd = max(account_max_dd, (peak - equity) / peak)
+        account_model_n += 1
 
     # realized_r is GROSS: the monitor derives it from entry/TP/SL prices alone,
     # so it carries no fees and no funding. The backtest reports NET. Comparing
@@ -1177,8 +1232,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     for direction in ("LONG", "SHORT"):
         dr = [r for r in rows if r.get("direction") == direction]
         dr_closed = [r for r in dr if r["status"] in FINAL_STATUSES]
-        dr_wins   = sum(1 for r in dr_closed if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
-        dr_r      = sum(_row_r(r) for r in dr_closed)
+        dr_wins   = sum(1 for r in dr_closed if _row_unit_r(r) > 0)
+        dr_r      = sum(_row_unit_r(r) for r in dr_closed)
         dir_stats[direction] = {
             "total":    len(dr),
             "closed":   len(dr_closed),
@@ -1190,8 +1245,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
     # ── Premium breakdown (💎 OB+FVG overlap + sweep setups) ──────────────────
     prem_rows   = [r for r in rows if r.get("premium")]
     prem_closed = [r for r in prem_rows if r["status"] in FINAL_STATUSES]
-    prem_wins   = sum(1 for r in prem_closed if r["status"] in FINAL_STATUSES and (_row_net_r(r) or 0) > 0)
-    prem_r      = sum(_row_r(r) for r in prem_closed)
+    prem_wins   = sum(1 for r in prem_closed if _row_unit_r(r) > 0)
+    prem_r      = sum(_row_unit_r(r) for r in prem_closed)
     premium = {
         "total":    len(prem_rows),
         "closed":   len(prem_closed),
@@ -1226,6 +1281,8 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
 
     return {
         "days":             days,
+        "since":            cutoff,
+        "until":            time_mod.time(),
         "total":            total,
         "closed":           closed,
         "open":             active_open,
@@ -1238,8 +1295,20 @@ def get_stats(days: int = 7, since_ts: float = None) -> dict:
         "sl_hit":           sl_hit,
         "expired":          expired,
         "win_rate":         round(win_rate, 1),
+        "wins":             profitable,
+        "losses":           losing,
+        "flat":             flat,
+        "max_loss_streak":  max_loss_run,
         "total_r":          round(total_r, 2),
         "r_per_trade":      round(r_per_trade, 3),
+        "unit_total_r":     round(unit_total_r, 3),
+        "unit_r_per_trade": round(unit_r_per_trade, 3),
+        "account_return_pct": round((equity - 1.0) * 100.0, 3),
+        "account_max_drawdown_pct": round(account_max_dd * 100.0, 3),
+        "account_model_n":  account_model_n,
+        "account_model_missing": account_model_missing,
+        "account_margin_pct": model_margin_pct,
+        "account_leverage": model_leverage,
         "cost_r":           round(_cost_r, 2),
         "cost_n":           _cost_n,
         "net_r":            round(net_r, 2),

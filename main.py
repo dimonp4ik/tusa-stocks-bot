@@ -12,7 +12,7 @@ import math
 import os
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Flask, request as flask_request
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -32,6 +32,7 @@ from config import (
     POST_TP1_WEAK_CLOSE_PROGRESS, STOCK_VENUE_FILTER_MODE, STOCK_VENUE_FILTER_PROFILE,
     DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
     NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_ROLLING_HOUR_CAP,
+    AUTOTRADE_LEVERAGE,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
@@ -43,17 +44,19 @@ from src.stock_5m_shadow_router import (
 )
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS as NATIVE_XPERP_SYMBOLS,
+    REQUIRED_HISTORY_BARS as NATIVE_XPERP_REQUIRED_HISTORY_BARS,
     backing_level_allows_entry, native_shadow_setups,
 )
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
     send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual,
-    _disp_sym,
+    _disp_sym, _format_price,
 )
 from src.news_agent import get_daily_digest, get_day_events, generate_weekly_commentary
 from config import EXTENDED_SESSION_WINDOWS
 from src.market_hours import session_hours_between
 from src.r_model import blended_r
+from src.result_summary import format_results_message
 from src.backtest_integrity import simulate_exit
 from src.db import (
     init_db, get_open_signals, update_signal_status, get_stats, set_sl_xperp_only,
@@ -184,6 +187,13 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         else:
             A("  всё, что есть в базе")
         A("")
+        A("## МЕТОДИКА РАСЧЁТА")
+        A("  доля прибыльных = закрытые сделки с realized_r > 0 / все закрытые")
+        A("  открытые сделки не входят ни в результат, ни в долю прибыльных")
+        A("  unit R не использует старые внутренние size_mult: размер задаёт клиент")
+        A("  доходность сделки = маржа% × плечо × unit_R × |вход-стоп| / вход")
+        A("  доходность окна и max DD считаются последовательным реинвестированием")
+        A("")
 
         # Same-named windows print the same block twice: when the report's own
         # window IS the 7-day one, since_ts and since7 differ by a hair and the
@@ -194,22 +204,52 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         _seen = set()
         _wins = [w for w in _wins if not (w[0] in _seen or _seen.add(w[0]))]
         for label, cut in _wins:
-            s = get_stats(since_ts=cut) if cut > 0 else get_stats(days=36500)
+            s = get_stats(since_ts=cut) if cut > 0 else get_stats(since_ts=0.0)
             A(f"## ЖИВЫЕ РЕЗУЛЬТАТЫ — {label}")
             A(f"  сигналов: {s['total']}  закрыто: {s['closed']}  "
               f"открыто: {s['open']}+{s['tp1_partial_open']}")
-            A(f"  винрейт: {s['win_rate']}%")
+            A(f"  исходы закрытых: прибыль {s.get('wins', 0)}  "
+              f"убыток {s.get('losses', 0)}  ноль {s.get('flat', 0)}")
+            A(f"  доля прибыльных: {s['win_rate']}% от {s['closed']} закрытых")
             A(f"  TP1: {s['tp1_hit']} ({s['tp1_rate']}%)  TP2: {s['tp2_hit']}  "
               f"SL: {s['sl_hit']}  истекло: {s['expired']}")
-            A(f"  валовой: {s['total_r']}R  ({s['r_per_trade']}R/сделка)")
-            A(f"  издержки: -{s.get('cost_r', 0)}R  "
-              f"(комиссия+спред, посчитаны по {s.get('cost_n', 0)} сделкам)")
-            A(f"  ЧИСТЫМИ: {s.get('net_r', 0)}R  "
-              f"({s.get('net_per_trade', 0)}R/сделка)  оценка по сигналам, не PnL счёта OKX")
+            A(f"  единый размер клиента: {s.get('unit_total_r', 0):+.3f}R  "
+              f"({s.get('unit_r_per_trade', 0):+.3f}R/закрытую)")
+            A(f"  модель депозита: {s.get('account_return_pct', 0):+.3f}%  "
+              f"max DD {s.get('account_max_drawdown_pct', 0):.3f}%  "
+              f"при {s.get('account_margin_pct', 3):g}% маржи ×{s.get('account_leverage', 10):g}")
+            A(f"  полнота модели: {s.get('account_model_n', 0)}/{s['closed']} сделок; "
+              f"без геометрии {s.get('account_model_missing', 0)}; "
+              f"макс. серия убытков {s.get('max_loss_streak', 0)}")
+            A(f"  контроль legacy-size: {s['total_r']:+.2f}R "
+              f"(не показывается клиенту)")
             _l, _sh = s.get("long") or {}, s.get("short") or {}
             A(f"  LONG  n={_l.get('total', 0)} WR={_l.get('win_rate', 0)}% R={_l.get('total_r', 0)}")
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
             A("")
+
+        A("## ПОСЛЕДНИЙ СКАН NATIVE X-PERP")
+        try:
+            _scan = json.loads(get_bot_state("native_scan_audit") or "{}")
+            if _scan:
+                A(f"  время UTC: {datetime.fromtimestamp(float(_scan.get('ts') or 0), timezone.utc):%Y-%m-%d %H:%M:%S}")
+                A(f"  итог: {_scan.get('result', 'unknown')}")
+                A(f"  инструменты: доступно {_scan.get('available_instruments', 0)}, "
+                  f"целей {_scan.get('targets', 0)}, загружено {_scan.get('fetched', 0)}")
+                A(f"  история: минимум {_scan.get('minimum_fetched_bars', 0)}, "
+                  f"нужно {_scan.get('required_history_bars', 0)} свечей")
+                _sa = _scan.get("strategy") or {}
+                A(f"  aligned universe: {_sa.get('aligned_symbols', 0)}; "
+                  f"сырых сетапов {_scan.get('raw_setups', 0)}; "
+                  f"к публикации {_scan.get('publish_candidates', 0)}; "
+                  f"отправлено {_scan.get('published', 0)}")
+                A(f"  причины фильтра: {json.dumps(_sa.get('rejected') or {}, ensure_ascii=False, sort_keys=True)}")
+                A(f"  причины портфеля: {json.dumps(_scan.get('portfolio_rejects') or {}, ensure_ascii=False, sort_keys=True)}")
+            else:
+                A("  данных ещё нет после запуска этой версии")
+        except Exception as _scan_exc:
+            A(f"  ошибка чтения аудита: {_scan_exc}")
+        A("")
 
         A(f"## КЛОД: ТОЧНОСТЬ И ДОЛЯ ОДОБРЕНИЙ ({window_label})")
         acc = get_setup_accuracy(since_ts)
@@ -419,13 +459,42 @@ def _active_strategy_label() -> str:
             else STOCK_VENUE_FILTER_PROFILE)
 
 
+def _native_scan_status_text() -> str:
+    try:
+        row = json.loads(get_bot_state("native_scan_audit") or "{}")
+        if not row:
+            return "Последний скан: данных ещё нет"
+        age_minutes = max(0, int((time.time() - float(row.get("ts") or 0)) / 60))
+        result_names = {
+            "published": "сигнал опубликован",
+            "no_candidate_passed": "рынок проверен, сетапов нет",
+            "qualified_but_not_published": "сетап отфильтрован портфелем",
+            "daily_loss_pause": "пауза после серии убытков",
+            "insufficient_instruments": "не хватает инструментов",
+            "insufficient_regime_history": "не хватает истории",
+            "no_aligned_universe": "свечи инструментов не синхронизированы",
+            "stale_or_unclosed_bar": "нет новой закрытой свечи",
+        }
+        result = result_names.get(
+            str(row.get("result")), str(row.get("result") or "неизвестно"))
+        return (
+            f"Последний скан: {age_minutes} мин назад · {result}\n"
+            f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
+            f"инструментов · сетапов {int(row.get('raw_setups') or 0)} · "
+            f"отправлено {int(row.get('published') or 0)}"
+        )
+    except Exception:
+        return "Последний скан: аудит недоступен"
+
+
 @app.route("/status")
 def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
-            f"Signal cache: {len(_signal_cache)} entries."), 200
+            f"Signal cache: {len(_signal_cache)} entries. "
+            f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
 # ── Admin panel helpers ───────────────────────────────────────────────────────
@@ -433,7 +502,7 @@ def status():
 # Persistent Telegram menu for the forward paper test.
 _USER_KB = {
     "keyboard": [
-        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -441,7 +510,7 @@ _USER_KB = {
 _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
-        [{"text": "📋 Paper-сделки"}, {"text": "📈 Paper-результаты"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -450,16 +519,16 @@ _GROUP_KB = _USER_KB
 _GROUP_ADMIN_KB = _ADMIN_KB
 
 _ADMIN_KEYBOARD = {"inline_keyboard": [
-    [{"text": "📊 Paper-торговля", "callback_data": "adm_sec_trading"},
+    [{"text": "📊 Сигналы и сделки", "callback_data": "adm_sec_trading"},
      {"text": "🧩 Фильтры", "callback_data": "adm_sec_settings"}],
     [{"text": "📈 Аналитика", "callback_data": "adm_sec_analytics"},
      {"text": "👥 Люди", "callback_data": "adm_sec_people"}],
 ]}
 _BACK_ROW = [{"text": "« Назад", "callback_data": "adm_back"}]
 _KB_TRADING = {"inline_keyboard": [
-    [{"text": "📊 Paper-статистика", "callback_data": "adm_stats"},
-     {"text": "📋 Paper-сделки", "callback_data": "adm_open"}],
-    [{"text": "🔍 История сигналов", "callback_data": "adm_setups"}],
+    [{"text": "📊 Статистика", "callback_data": "adm_stats"},
+     {"text": "📋 Сделки", "callback_data": "adm_open"}],
+    [{"text": "🔍 Проверка сигналов", "callback_data": "adm_setups"}],
     _BACK_ROW,
 ]}
 
@@ -561,7 +630,7 @@ def _kb_settings():
 _KB_ANALYTICS = {"inline_keyboard": [
     [{"text": "🏆 Топ тикеров", "callback_data": "adm_top"},
      {"text": "💀 Худшие тикеры", "callback_data": "adm_worst"}],
-    [{"text": "📦 Paper-отчёт", "callback_data": "adm_fullreport"}],
+    [{"text": "📦 Полный аудит", "callback_data": "adm_fullreport"}],
     _BACK_ROW,
 ]}
 _KB_PEOPLE = {"inline_keyboard": [
@@ -574,14 +643,18 @@ _KB_PEOPLE = {"inline_keyboard": [
 def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = True):
     """Send the persistent bottom-bar keyboard. Admins get extra admin button;
     groups get the keyboard without the DM-only autotrade button."""
-    kb = (_ADMIN_KB if is_admin else _USER_KB) if is_dm else _GROUP_KB
-    text = ("✅ Меню активировано.\n🛠 Админ панель доступна."
+    if is_dm:
+        kb = _ADMIN_KB if is_admin else _USER_KB
+    else:
+        kb = _GROUP_ADMIN_KB if is_admin else _GROUP_KB
+    text = ("✅ *Меню готово*\nВыберите нужный раздел. Админ-панель доступна."
             if is_admin else
-            "✅ Меню активировано. Кнопки внизу всегда доступны.")
+            "✅ *Меню готово*\nВыберите нужный раздел кнопками внизу.")
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "reply_markup": kb},
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
+                  "reply_markup": kb},
             timeout=10,
         )
     except Exception as e:
@@ -763,11 +836,19 @@ def _format_open_signal(s: dict) -> str:
         # positive pnl means price moved in our favour
         pnl   = pct if direction == "LONG" else -pct
         pnl_s = f"+{pnl:.2f}%" if pnl >= 0 else f"{pnl:.2f}%"
-        price_line = f"   {arrow} `{cur}` ({pnl_s}) | 🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+        price_line = (
+            f"{arrow} Сейчас: `{_format_price(cur)}`  ·  по сигналу {pnl_s}\n"
+            f"🎯 Следующая цель {nearest_label}: `{_format_price(nearest_tp)}`\n"
+            f"🛑 Стоп: `{_format_price(sl)}`")
     else:
-        price_line = f"   🎯 {nearest_label}: `{nearest_tp}` | 🛑 SL: `{sl}`"
+        price_line = (
+            f"🎯 Следующая цель {nearest_label}: `{_format_price(nearest_tp)}`\n"
+            f"🛑 Стоп: `{_format_price(sl)}`")
 
-    header = f"{icon} *{_disp_sym(s['symbol'])}* {direction} @ `{entry}`  _{age_h}ч_"
+    direction_ru = "LONG · рост" if direction == "LONG" else "SHORT · снижение"
+    header = (
+        f"{icon} *{_disp_sym(s['symbol'])}*  ·  {direction_ru}\n"
+        f"💰 Вход: `{_format_price(entry)}`  ·  в работе {age_h} ч")
     return f"{header}\n{price_line}"
 
 
@@ -1005,7 +1086,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _admin_section[chat_id] = data
 
     if data == "adm_sec_trading":
-        _edit_admin_text(chat_id, message_id, "📊 *Paper-торговля*\nВыбери раздел:", _KB_TRADING)
+        _edit_admin_text(chat_id, message_id, "📊 *Сигналы и сделки*\nВыберите раздел:", _KB_TRADING)
 
     elif data == "adm_sec_settings":
         _hdr = "🔧 *Настройки*\n\n*Когда бот ищет сетапы:*\n"
@@ -1041,37 +1122,16 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
 
     elif data == "adm_stats":
         try:
-            _now_riga      = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-            txt = (
-                f"📈 *СТАТИСТИКА*\n\n"
-                f"*Сегодня:*\n"
-                f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
-                f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
-                f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
-                f"  Win rate: *{sd['win_rate']}%*\n\n"
-                f"*За 7 дней:*\n"
-                f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
-                f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
-                f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
-                f"  Win rate: *{s7['win_rate']}%*\n\n"
-                f"*За 30 дней:*\n"
-                f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
-                f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
-                f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
-                f"  Win rate: *{s30['win_rate']}%*"
-            )
+            txt = _paper_results_text(user_id)
         except Exception as e:
-            txt = f"Ошибка: {e}"
+            log.exception("Admin paper results failed")
+            txt = f"Не удалось посчитать результаты: {e}"
         _edit_message(chat_id, message_id, txt)
 
     elif data == "adm_fullreport":
         _edit_admin_text(
             chat_id, message_id,
-            "📦 *Полный отчёт*\n\nС какой даты считать?\n"
+            "📦 *Полный аудит*\n\nС какой даты считать?\n"
             "_Настройки фильтров менялись — данные до и после смешивать нельзя, "
             "иначе цифры ни о чём._",
             {"inline_keyboard": [
@@ -1783,6 +1843,36 @@ def _riga_tz():
         return _tz(_td(hours=3))
 
 
+def _result_margin_for_user(user_id: int) -> tuple[float, bool]:
+    """Client-selected margin share, or the documented 3% paper example."""
+    try:
+        row = at_get(user_id) or {}
+        if row.get("size_mode") == "percent":
+            value = float(row.get("size_value") or 0)
+            if 1 <= value <= 10:
+                return value, True
+    except (TypeError, ValueError):
+        pass
+    return 3.0, False
+
+
+def _paper_results_text(user_id: int) -> str:
+    margin_pct, configured = _result_margin_for_user(user_id)
+    now = datetime.now(_riga_tz())
+    midnight = now.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    kwargs = {"margin_pct": margin_pct, "leverage": AUTOTRADE_LEVERAGE}
+    today = get_stats(since_ts=midnight, **kwargs)
+    week = get_stats(days=7, **kwargs)
+    month = get_stats(days=30, **kwargs)
+    return format_results_message(
+        today, week, month, _riga_tz(), margin_pct, AUTOTRADE_LEVERAGE,
+        configured=configured)
+
+
+def _send_paper_results(chat_id: int, user_id: int) -> None:
+    _reply(chat_id, _paper_results_text(user_id))
+
+
 def _format_day_news() -> str:
     """'📰 Новости на сегодня' — economic calendar + market headlines, ≤10 total."""
     RIGA = _riga_tz()
@@ -2313,10 +2403,11 @@ def webhook():
     elif text == "🛡 режим":
         _reply(chat_id,
                "🛡 *ТЕНЕВОЙ РЕЖИМ*\n\n"
-               f"Работает профиль `{STOCK_VENUE_FILTER_PROFILE}`.\n"
+               f"Работает профиль `{_active_strategy_label()}`.\n"
                "Сигналы входят по рынку и считаются виртуально.\n"
                "Нейросеть не принимает торговых решений.\n"
-               "Реальные ордера отключены на уровне конфигурации и кода.")
+               "Реальные ордера отключены на уровне конфигурации и кода.\n\n"
+               f"🔎 {_native_scan_status_text()}")
 
     elif text == "🤖 автотрейдинг":
         if DEPLOYMENT_MODE == "shadow":
@@ -2356,99 +2447,10 @@ def webhook():
     # 📈 Результаты
     elif text in ("📈 результаты", "📈 paper-результаты"):
         try:
-            # "Today" = since midnight Europe/Riga (calendar day, not rolling 24h)
-            _now_riga    = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-
-            def _fmt_stats(s: dict, label: str) -> str:
-                # R sign and emoji
-                r_val  = s["total_r"]
-                r_sign = "📈" if r_val > 0 else ("📉" if r_val < 0 else "➖")
-                r_str  = f"{r_val:+.2f}R"
-                rpt    = s["r_per_trade"]
-                rpt_str = f"{rpt:+.3f}R"
-
-                # Direction lines (only show if data exists)
-                lo = s.get("long",  {})
-                sh = s.get("short", {})
-                dir_lines = ""
-                if lo.get("total", 0) or sh.get("total", 0):
-                    def _dir(d, name):
-                        if not d.get("total"):
-                            return ""
-                        wr  = d["win_rate"]
-                        dr  = d["total_r"]
-                        dr_s = f"{dr:+.2f}R"
-                        icon = "🟢" if dr > 0 else ("🔴" if dr < 0 else "⚪")
-                        return f"  {icon} {name}: {d['total']} сд. → {wr}% win  {dr_s}\n"
-                    dir_lines = "\n" + _dir(lo, "LONG") + _dir(sh, "SHORT")
-
-                in_work = s["open"] + s["tp1_partial_open"]
-                in_work_str = ""
-                if in_work:
-                    tp1p = s["tp1_partial_open"]
-                    in_work_str = f"  В работе сейчас: *{in_work}*"
-                    if tp1p:
-                        in_work_str += f" ({tp1p} уже взяли TP1)"
-                    in_work_str += "\n"
-
-                # Premium 💎 breakdown (only when at least one premium signal exists)
-                prem = s.get("premium", {})
-                prem_str = ""
-                if prem.get("total"):
-                    pr_r = prem["total_r"]
-                    pr_sign = "🟢" if pr_r > 0 else ("🔴" if pr_r < 0 else "⚪")
-                    if prem.get("closed"):
-                        prem_str = (
-                            f"\n💎 Premium: {prem['total']} сд. "
-                            f"({prem['closed']} закр.) → *{prem['win_rate']}%* win  "
-                            f"{pr_sign} {pr_r:+.2f}R\n"
-                        )
-                    else:
-                        prem_str = f"\n💎 Premium: {prem['total']} сд. (ещё в работе)\n"
-
-                return (
-                    f"*{label}*\n"
-                    f"  Сигналов: {s['total']}  •  Закрыто: {s['closed']}\n"
-                    f"{in_work_str}"
-                    f"  TP1: {s['tp1_hit']}  TP2: {s['tp2_hit']}  "
-                    f"BE: {s['breakeven']}  SL: {s['sl_hit']}\n"
-                    f"  Win rate: *{s['win_rate']}%*  "
-                    f"•  TP1 reach: {s['tp1_rate']}%\n"
-                    f"{dir_lines}"
-                    f"{prem_str}"
-                    f"\n{r_sign} Итого: *{r_str}*  •  {rpt_str} за сделку"
-                )
-
-            def _fmt_streak(s: dict) -> str:
-                if not s.get("streak"):
-                    return ""
-                icons = " ".join(s["streak"])
-                run   = s["current_run"]
-                first = s["streak"][0]
-                if first == "❌" and run >= 2:
-                    run_txt = f"  ⚠️ {run} SL подряд"
-                elif first in ("✅", "🏆") and run >= 2:
-                    run_txt = f"  🔥 {run} в прибыли подряд"
-                else:
-                    run_txt = ""
-                return f"🕐 *Последние:* {icons}{run_txt}\n\n"
-
-            text_out = (
-                "📈 *Результаты бота*\n\n"
-                + _fmt_streak(s30)
-                + _fmt_stats(sd,  "Сегодня")
-                + "\n\n"
-                + _fmt_stats(s7,  "За 7 дней")
-                + "\n\n"
-                + _fmt_stats(s30, "За 30 дней")
-            )
-            _reply(chat_id, text_out)
+            _send_paper_results(chat_id, user_id)
         except Exception as e:
-            _reply(chat_id, f"Ошибка: {e}")
+            log.exception("Paper results failed")
+            _reply(chat_id, f"Не удалось посчитать результаты: {e}")
 
     # 📰 Новости на сегодня
     elif text == "📰 новости на сегодня":
@@ -2459,42 +2461,19 @@ def webhook():
 
     # ❓ Помощь
     elif text == "❓ помощь":
-        _reply(chat_id,
-               "❓ *Как читать paper-сигналы*\n\n"
-               "LONG — фильтр ожидает рост, SHORT — снижение.\n"
-               "Вход фиксируется по рыночной цене X-Perp в момент сигнала.\n"
-               "Цель и стоп заданы самим замороженным модулем.\n\n"
-               "🧪 PAPER означает, что Telegram показывает виртуальную сделку: "
-               "биржевой ордер не создаётся. Кнопки результатов считают только "
-               "новые forward-сигналы.")
-
-    elif text == "❓ помощь":
-        _reply(chat_id,
-               "❓ *Как читать сигналы*\n\n"
-               "*Направление:*\n"
-               "  📈 LONG — ожидаем рост, покупаем\n"
-               "  📉 SHORT — ожидаем падение, продаём\n\n"
-               "*Уровни:*\n"
-               "  🎯 *TP1* — первая цель. Позиция НЕ закрывается, включается трейлинг-стоп\n"
-               "  🎯 *TP2* — вторая цель. Потолок для всей позиции\n"
-               "  🛑 *SL* — стоп-лосс. Выход если цена пошла против\n\n"
-               "*Как работает сделка:*\n"
-               "  1. Сигнал открыт — бот ждёт TP1 или SL\n"
-               "  2. TP1 взят — вся позиция остаётся открытой\n"
-               "  3. Дальше сделка ведётся *трейлинг-стопом*: стоп ползёт\n"
-               "     за ценой (сила трейла зависит от силы движения после TP1)\n"
-               "     и никогда не опускается ниже входа\n"
-               "  4. Закрывается по трейлингу или при достижении TP2\n\n"
-               "*Исходы сделки:*\n"
-               "  ✅ *TP1\\_TRAIL* — TP1 взят, раннер закрыт трейлингом \\(прибыль\\)\n"
-               "  🏆 *TP2\\_HIT* — TP1 + TP2 оба взяты \\(максимум\\)\n"
-               "  ⚖️ *BE* — TP1 взят, остаток закрыт в безубыток\n"
-               "  ❌ *SL* — убыток \\(до TP1 не дошло\\)\n"
-               "  ⏱ *Expired* — время вышло, закрыто без результата\n\n"
-               "*Win rate* — % прибыльных от закрытых.\n"
-               "Норма для SMC стратегии: 38–45% при высоком R\\:R.\n\n"
-               "💎 *PREMIUM* — тройное совпадение зон \\(OB \\+ FVG \\+ свип\\),\n"
-               "повышенная вероятность успеха.")
+        _reply(
+            chat_id,
+            "❓ *Как пользоваться ботом*\n\n"
+            "📋 *Открытые сделки* — текущая цена, результат от входа, ближайшая цель и стоп.\n"
+            "📈 *Результаты* — только закрытые PAPER-сделки за сегодня, 7 и 30 дней.\n"
+            "🛡 *Режим* — активная стратегия и состояние реальных ордеров.\n\n"
+            "*Как читать сигнал*\n"
+            "LONG — ожидается рост, SHORT — снижение. Вход фиксируется по рыночной цене "
+            "X-Perp в момент сигнала. Цель и стоп задаёт замороженный фильтр.\n\n"
+            "*Как считаются результаты*\n"
+            "Доля прибыльных = прибыльные / закрытые. Открытые сделки в неё не входят. "
+            "Модель депозита использует выбранный клиентом процент маржи и плечо ×10.\n\n"
+            "🧪 PAPER — виртуальная сделка для forward-проверки. Биржевой ордер не создаётся.")
 
     # /admin works in groups too; group privacy mode still delivers commands.
     elif text.startswith("/admin") or text in ("admin", "admin panel", "panel"):
@@ -2512,38 +2491,16 @@ def webhook():
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
                f"🧩 Профиль: `{_active_strategy_label()}`\n"
-               f"🚫 Реальные ордера отключены")
+               f"🚫 Реальные ордера отключены\n\n"
+               f"🔎 {_native_scan_status_text()}")
 
-    # /stats — статистика побед/поражений
+    # /stats — тот же проверяемый расчёт, что и у кнопки.
     elif text in ("/stats", "/статистика"):
         try:
-            _now_riga      = datetime.now(_riga_tz())
-            _riga_midnight = _now_riga.replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
-            sd  = get_stats(since_ts=_riga_midnight)
-            s7  = get_stats(days=7)
-            s30 = get_stats(days=30)
-            blocks = get_active_symbol_blocks()
-            blocks_line = ", ".join(b["symbol"] for b in blocks[:6]) if blocks else "нет"
-            _reply(chat_id,
-                   f"📈 *СТАТИСТИКА*\n\n"
-                   f"*Сегодня:*\n"
-                   f"  Сигналов: {sd['total']}  Закрыто: {sd['closed']}\n"
-                   f"  TP1: {sd['tp1_hit']} ({sd['tp1_rate']}%)  TP2: {sd['tp2_hit']}\n"
-                   f"  BE: {sd['breakeven']}  SL: {sd['sl_hit']}  Expired: {sd['expired']}\n"
-                   f"  Win rate: *{sd['win_rate']}%*\n\n"
-                   f"*За 7 дней:*\n"
-                   f"  Сигналов: {s7['total']}  Закрыто: {s7['closed']}\n"
-                   f"  TP1: {s7['tp1_hit']} ({s7['tp1_rate']}%)  TP2: {s7['tp2_hit']}\n"
-                   f"  BE: {s7['breakeven']}  SL: {s7['sl_hit']}  Expired: {s7['expired']}\n"
-                   f"  Win rate: *{s7['win_rate']}%*\n\n"
-                   f"*За 30 дней:*\n"
-                   f"  Сигналов: {s30['total']}  Закрыто: {s30['closed']}\n"
-                   f"  TP1: {s30['tp1_hit']} ({s30['tp1_rate']}%)  TP2: {s30['tp2_hit']}\n"
-                   f"  BE: {s30['breakeven']}  SL: {s30['sl_hit']}  Expired: {s30['expired']}\n"
-                   f"  Win rate: *{s30['win_rate']}%*\n\n"
-                   f"🚫 Авто-блок: {blocks_line}")
+            _send_paper_results(chat_id, user_id)
         except Exception as e:
-            _reply(chat_id, f"Ошибка статистики: {e}")
+            log.exception("Paper stats command failed")
+            _reply(chat_id, f"Не удалось посчитать результаты: {e}")
 
     return "ok", 200
 
@@ -3545,11 +3502,23 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
     return published
 
 
+def _persist_native_scan_audit(payload: dict) -> None:
+    """Keep the latest scan explainable after a worker restart or quiet week."""
+    try:
+        set_bot_state("native_scan_audit", json.dumps(payload, ensure_ascii=False))
+    except Exception as exc:
+        log.warning("Native scan audit persistence failed: %s", exc)
+
+
 def _run_native_xperp_shadow_scan() -> None:
     """Publish only the frozen 44-symbol native route as paper signals."""
     if not NATIVE_XPERP_SHADOW_ENABLED:
         return
     if _native_xperp_daily_loss_pause():
+        _persist_native_scan_audit({
+            "ts": time.time(), "result": "daily_loss_pause",
+            "loss_pause_streak": NATIVE_XPERP_LOSS_PAUSE_STREAK,
+        })
         log.warning(
             "Native X-Perp shadow paused after %s consecutive UTC-day losses",
             NATIVE_XPERP_LOSS_PAUSE_STREAK)
@@ -3559,6 +3528,10 @@ def _run_native_xperp_shadow_scan() -> None:
         symbol for symbol in NATIVE_XPERP_SYMBOLS
         if symbol[:-4] in available)
     if len(targets) < 10:
+        _persist_native_scan_audit({
+            "ts": time.time(), "result": "insufficient_instruments",
+            "available_instruments": len(available), "targets": len(targets),
+        })
         log.warning("Native X-Perp shadow refused: only %s symbols available",
                     len(targets))
         return
@@ -3567,7 +3540,12 @@ def _run_native_xperp_shadow_scan() -> None:
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     def _fetch(symbol: str):
-        return symbol, get_klines_xperp(symbol, limit=80)
+        # The regime gate reads 96 historical cross-sectional moves and every
+        # move itself needs two earlier bars.  The previous limit of 80 made
+        # ``basket_trends`` return None on every scan, so this route could never
+        # emit a candidate even though its unit tests used 120 bars.
+        return symbol, get_klines_xperp(
+            symbol, limit=NATIVE_XPERP_REQUIRED_HISTORY_BARS)
 
     with ThreadPoolExecutor(max_workers=4) as pool:
         futures = [pool.submit(_fetch, symbol) for symbol in targets]
@@ -3580,7 +3558,9 @@ def _run_native_xperp_shadow_scan() -> None:
                 log.warning("Native X-Perp candle fetch failed: %s", exc)
 
     now = time.time()
-    setups = native_shadow_setups(fetched, now=now)
+    strategy_audit = {}
+    setups = native_shadow_setups(
+        fetched, now=now, diagnostics=strategy_audit)
     active_rows = get_open_signals()
     active = {row["symbol"] for row in active_rows}
     blocked = {row["symbol"] for row in get_active_symbol_blocks()}
@@ -3589,9 +3569,17 @@ def _run_native_xperp_shadow_scan() -> None:
         for direction in ("LONG", "SHORT")
     }
     candidates = []
+    portfolio_rejects = {
+        "already_open": 0, "symbol_blocked": 0, "duplicate_bar": 0,
+        "backing_level_crossed": 0, "cooldown": 0,
+    }
     for setup in setups:
         symbol = setup["symbol"]
-        if symbol in active or symbol in blocked:
+        if symbol in active:
+            portfolio_rejects["already_open"] += 1
+            continue
+        if symbol in blocked:
+            portfolio_rejects["symbol_blocked"] += 1
             continue
         try:
             market = get_xperp_price(symbol)
@@ -3600,12 +3588,15 @@ def _run_native_xperp_shadow_scan() -> None:
             analysis = _native_xperp_analysis(setup, float(market))
             setup_id = log_setup_candidate_once(analysis)
             if not setup_id:
+                portfolio_rejects["duplicate_bar"] += 1
                 continue
             analysis["_setup_log_id"] = setup_id
             if not backing_level_allows_entry(setup, float(market)):
+                portfolio_rejects["backing_level_crossed"] += 1
                 mark_setup_blocked(setup_id, "backing_level")
                 continue
             if _venue_signal_on_cooldown(symbol, analysis["direction"], now):
+                portfolio_rejects["cooldown"] += 1
                 mark_setup_blocked(setup_id, "cooldown")
                 continue
             candidates.append((analysis, setup_id))
@@ -3613,8 +3604,30 @@ def _run_native_xperp_shadow_scan() -> None:
             log.warning("Native X-Perp setup failed for %s: %s", symbol, exc)
     published = _publish_stock_venue_candidates(
         candidates, open_direction_counts)
+    bar_lengths = [len(row.get("close") or []) for row in fetched.values()]
+    audit = {
+        "ts": now,
+        "result": ("published" if published else
+                   "qualified_but_not_published" if candidates else
+                   strategy_audit.get("result", "no_candidates")),
+        "available_instruments": len(available),
+        "targets": len(targets),
+        "fetched": len(fetched),
+        "required_history_bars": NATIVE_XPERP_REQUIRED_HISTORY_BARS,
+        "minimum_fetched_bars": min(bar_lengths) if bar_lengths else 0,
+        "maximum_fetched_bars": max(bar_lengths) if bar_lengths else 0,
+        "strategy": strategy_audit,
+        "raw_setups": len(setups),
+        "portfolio_rejects": portfolio_rejects,
+        "publish_candidates": len(candidates),
+        "published": published,
+        "open_long": open_direction_counts.get("LONG", 0),
+        "open_short": open_direction_counts.get("SHORT", 0),
+    }
+    _persist_native_scan_audit(audit)
     _last_scan_stats.update(
-        coins=len(fetched), setups=published, fresh=published, ts=now)
+        coins=len(fetched), setups=len(setups), fresh=len(candidates),
+        enriched=len(candidates), sent=published, ts=now)
     log.info(
         "Native X-Perp shadow scan complete: %s/%s symbols, %s candidates, "
         "%s paper signals", len(fetched), len(targets), len(candidates), published)

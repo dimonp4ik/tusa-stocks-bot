@@ -10,6 +10,7 @@ from src import db
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
     LONG_MIN_BASKET_TREND, SHORT_MIN_BASKET_TREND,
+    REQUIRED_HISTORY_BARS,
     backing_level_allows_entry, basket_trend,
     native_shadow_setups, normalized_atr14, routed_target_fraction,
 )
@@ -72,6 +73,20 @@ def test_native_route_rejects_high_atr_and_stale_signal():
     data[first] = candles(102.0, wide=True)
     assert native_shadow_setups(data, now=119 * 900 + 901) == []
     assert native_shadow_setups(universe(), now=119 * 900 + 1801) == []
+
+
+def test_native_route_diagnostics_explain_insufficient_runtime_history():
+    data = universe()
+    shortened = {
+        symbol: {key: values[-80:] for key, values in series.items()}
+        for symbol, series in data.items()
+    }
+    audit = {}
+    assert native_shadow_setups(
+        shortened, now=119 * 900 + 901, diagnostics=audit) == []
+    assert audit["result"] == "insufficient_regime_history"
+    assert audit["required_history_bars"] == REQUIRED_HISTORY_BARS
+    assert audit["aligned_symbols"] == 20
 
 
 def test_normalized_atr_uses_fourteen_closed_bars():
@@ -147,6 +162,7 @@ def test_native_scan_publishes_only_paper_candidate_contract():
             patch.object(main, "get_xperp_price", return_value=100.0), \
             patch.object(main, "log_setup_candidate_once", return_value=7), \
             patch.object(main, "_venue_signal_on_cooldown", return_value=False), \
+            patch.object(main, "_persist_native_scan_audit"), \
             patch.object(main, "_publish_stock_venue_candidates",
                          return_value=1) as publish:
         main._run_native_xperp_shadow_scan()
@@ -157,6 +173,23 @@ def test_native_scan_publishes_only_paper_candidate_contract():
     assert setup_id == 7
     assert analysis["source"] == "stock_xperp_native_shadow"
     assert analysis["_shadow_only"] is True
+
+
+def test_native_scan_fetches_enough_bars_for_longest_regime_gate():
+    symbols = sorted(AUDITED_SYMBOLS)[:10]
+    with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
+            patch.object(main, "get_xperp_instruments",
+                         return_value={symbol[:-4]: "id" for symbol in symbols}), \
+            patch.object(main, "get_klines_xperp", return_value=candles()) as fetch, \
+            patch.object(main, "native_shadow_setups", return_value=[]), \
+            patch.object(main, "get_open_signals", return_value=[]), \
+            patch.object(main, "get_active_symbol_blocks", return_value=[]), \
+            patch.object(main, "_persist_native_scan_audit"), \
+            patch.object(main, "_publish_stock_venue_candidates", return_value=0):
+        main._run_native_xperp_shadow_scan()
+    assert fetch.call_count == len(symbols)
+    assert all(call.kwargs["limit"] >= REQUIRED_HISTORY_BARS
+               for call in fetch.call_args_list)
 
 
 def test_backing_level_blocks_crossed_short_resistance():
@@ -181,6 +214,7 @@ def test_native_scan_records_but_does_not_publish_crossed_level():
             patch.object(main, "get_xperp_price", return_value=crossed), \
             patch.object(main, "log_setup_candidate_once", return_value=7), \
             patch.object(main, "mark_setup_blocked") as blocked, \
+            patch.object(main, "_persist_native_scan_audit"), \
             patch.object(main, "_publish_stock_venue_candidates",
                          return_value=0) as publish:
         main._run_native_xperp_shadow_scan()

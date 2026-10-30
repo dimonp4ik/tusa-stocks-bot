@@ -226,6 +226,9 @@ def send_signal(analysis: dict) -> bool:
     rec_low   = analysis.get("recent_low",  price * 0.97)
 
     tp1, tp2, sl = bracket_for_analysis(analysis, price)
+    tp1_move_pct = abs(tp1 - price) / price * 100 if price else 0.0
+    tp2_move_pct = abs(tp2 - price) / price * 100 if price else 0.0
+    stop_move_pct = abs(sl - price) / price * 100 if price else 0.0
 
     if analysis.get("_shadow_only"):
         arrow = "🟢 LONG" if decision == "LONG" else "🔴 SHORT"
@@ -239,14 +242,16 @@ def send_signal(analysis: dict) -> bool:
                 analysis.get("strategy_tp1_close_frac") or 0.0))
             target_text = (
                 f"🎯 TP1, закрыть {lock_pct}%: `{_format_price(tp1)}` "
-                f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+                f"(+{tp1_move_pct:.2f}% цены · "
+                f"`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
                 f"🏃 TP2, остаток {100 - lock_pct}%: `{_format_price(tp2)}` "
-                f"(`{float(runner_r):.2f}R`)\n"
+                f"(+{tp2_move_pct:.2f}% цены · `{float(runner_r):.2f}R`)\n"
             )
         else:
             target_text = (
                 f"🎯 Цель: `{_format_price(tp2)}` "
-                f"(`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
+                f"(+{tp2_move_pct:.2f}% цены · "
+                f"`{float(analysis.get('fixed_target_r') or 0):.2f}R`)\n"
             )
         message = (
             "🧪 *ТЕНЕВОЙ СИГНАЛ — ОРДЕР НЕ ОТКРЫТ*\n"
@@ -254,7 +259,7 @@ def send_signal(analysis: dict) -> bool:
             "━━━━━━━━━━━━━━━━━━━\n"
             f"💰 Вход по рынку: `{_format_price(price)}`\n"
             f"{target_text}"
-            f"🛑 Стоп: `{_format_price(sl)}`\n"
+            f"🛑 Стоп: `{_format_price(sl)}` (-{stop_move_pct:.2f}% цены)\n"
             f"🧩 Фильтр: `{_esc(module)}`\n"
             "━━━━━━━━━━━━━━━━━━━\n"
             "ℹ️ Сделка записана только для forward-проверки.\n"

@@ -34,6 +34,10 @@ HOLD_BARS = 64
 BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 900
 BASKET_TREND_BARS = 96
+# ``basket_trends`` needs the full regime window plus the two bars used by each
+# cross-sectional return.  Keep this public so the runtime fetch and tests use
+# the same requirement instead of repeating a smaller magic limit.
+REQUIRED_HISTORY_BARS = BASKET_TREND_BARS + LOOKBACK_BARS + 1
 LONG_MIN_BASKET_TREND = -0.005626823134606253
 SHORT_EXHAUSTION_BARS = 16
 SHORT_MIN_BASKET_TREND = -.01
@@ -191,15 +195,35 @@ def routed_target_fraction(basket_trend_32: float,
 
 
 def native_shadow_setups(candles_by_symbol: dict[str, dict],
-                         now: float | None = None) -> list[dict]:
+                         now: float | None = None,
+                         diagnostics: dict | None = None) -> list[dict]:
     """Return all qualifying rows in causal quality order for portfolio gating."""
+    diag = diagnostics if diagnostics is not None else {}
+    diag.clear()
+    diag.update({
+        "required_history_bars": REQUIRED_HISTORY_BARS,
+        "symbols_received": len(AUDITED_SYMBOLS & set(candles_by_symbol)),
+        "thresholds": {
+            "minimum_universe": MINIMUM_UNIVERSE,
+            "minimum_move_pct": MINIMUM_MOVE_FRACTION * 100,
+            "minimum_abs_z": MINIMUM_ABS_Z,
+            "maximum_atr14_pct": MAXIMUM_ATR14_FRACTION * 100,
+        },
+    })
     found = _latest_rows(candles_by_symbol)
     if found is None:
+        diag["result"] = "no_aligned_universe"
         return []
     signal_time, rows = found
+    diag.update(signal_time=signal_time, aligned_symbols=len(rows))
     entry_time = signal_time + 900
     current_time = time.time() if now is None else float(now)
     if current_time < entry_time or current_time - entry_time > MAX_SIGNAL_AGE_SECONDS:
+        diag.update(
+            result="stale_or_unclosed_bar",
+            entry_time=entry_time,
+            age_seconds=current_time - entry_time,
+        )
         return []
     moves = [float(row["signal_return"]) for row in rows]
     if len(moves) < MINIMUM_UNIVERSE:
@@ -207,34 +231,50 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
     mean = statistics.fmean(moves)
     deviation = statistics.stdev(moves)
     if not math.isfinite(deviation) or deviation <= 0:
+        diag["result"] = "zero_cross_section_deviation"
         return []
     trends = basket_trends(
         candles_by_symbol, signal_time,
         (SHORT_EXHAUSTION_BARS, TARGET_EXHAUSTION_BARS, BASKET_TREND_BARS))
     if trends is None:
+        diag["result"] = "insufficient_regime_history"
         return []
     short_trend = trends[SHORT_EXHAUSTION_BARS]
     target_trend = trends[TARGET_EXHAUSTION_BARS]
     long_trend = trends[BASKET_TREND_BARS]
     target_fraction = routed_target_fraction(target_trend, entry_time)
+    rejected = {
+        "abs_z": 0, "minimum_move": 0, "atr_missing": 0, "atr_too_high": 0,
+        "long_basket_trend": 0, "short_basket_trend": 0, "backing_level": 0,
+    }
     output = []
     for row in rows:
         move = float(row["signal_return"])
         z_score = (move - mean) / deviation
         atr_fraction = normalized_atr14(row["candles"], row["signal_index"])
-        if (abs(z_score) < MINIMUM_ABS_Z
-                or abs(move) < MINIMUM_MOVE_FRACTION
-                or atr_fraction is None
-                or atr_fraction > MAXIMUM_ATR14_FRACTION):
+        if abs(z_score) < MINIMUM_ABS_Z:
+            rejected["abs_z"] += 1
+            continue
+        if abs(move) < MINIMUM_MOVE_FRACTION:
+            rejected["minimum_move"] += 1
+            continue
+        if atr_fraction is None:
+            rejected["atr_missing"] += 1
+            continue
+        if atr_fraction > MAXIMUM_ATR14_FRACTION:
+            rejected["atr_too_high"] += 1
             continue
         direction = "SHORT" if move > 0 else "LONG"
         if direction == "LONG" and long_trend < LONG_MIN_BASKET_TREND:
+            rejected["long_basket_trend"] += 1
             continue
         if direction == "SHORT" and short_trend <= SHORT_MIN_BASKET_TREND:
+            rejected["short_basket_trend"] += 1
             continue
         level = backing_level(
             row["candles"], row["signal_index"], direction)
         if level is None:
+            rejected["backing_level"] += 1
             continue
         close = float(row["candles"]["close"][row["signal_index"]])
         output.append({
@@ -261,5 +301,16 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "_quality_rank": -abs(float(z_score)),
             "_native_xperp_shadow": True,
         })
+    diag.update({
+        "result": "candidates" if output else "no_candidate_passed",
+        "cross_mean_pct": mean * 100,
+        "cross_std_pct": deviation * 100,
+        "basket_trend_16_pct": short_trend * 100,
+        "basket_trend_32_pct": target_trend * 100,
+        "basket_trend_96_pct": long_trend * 100,
+        "target_pct": target_fraction * 100,
+        "rejected": rejected,
+        "candidates": len(output),
+    })
     return sorted(output, key=lambda row: (
         row["_quality_rank"], row["symbol"]))
