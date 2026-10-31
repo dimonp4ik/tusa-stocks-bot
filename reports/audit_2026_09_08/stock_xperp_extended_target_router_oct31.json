@@ -1,0 +1,3217 @@
+{
+  "candidate_count": 60,
+  "candidates": [
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_5_threshold_-0.04_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 203,
+          "profitable_exit_rate_pct": 43.8424,
+          "return_pct": 22.6589,
+          "trades_per_active_day": 7.5185
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.8753,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 232,
+          "profitable_exit_rate_pct": 45.6897,
+          "return_pct": 52.6016,
+          "trades_per_active_day": 7.4839
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.2641,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.506925
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.04_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 45.1613,
+          "return_pct": 24.919,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4925,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 233,
+          "profitable_exit_rate_pct": 46.3519,
+          "return_pct": 42.4095,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.1812,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.3488
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.04_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 45.1613,
+          "return_pct": 25.6477,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4925,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 233,
+          "profitable_exit_rate_pct": 45.9227,
+          "return_pct": 42.3471,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.6352,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.3332
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3_threshold_-0.06_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.9541,
+          "return_pct": 25.5626,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7241,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 24.1667,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 231,
+          "profitable_exit_rate_pct": 45.4545,
+          "return_pct": 45.1051,
+          "trades_per_active_day": 7.4516
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.24705
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.04_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 203,
+          "profitable_exit_rate_pct": 43.8424,
+          "return_pct": 24.4962,
+          "trades_per_active_day": 7.5185
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.2826,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 231,
+          "profitable_exit_rate_pct": 45.0216,
+          "return_pct": 49.5251,
+          "trades_per_active_day": 7.4516
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 31.7911,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.246925
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.04_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 45.1613,
+          "return_pct": 25.0288,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4612,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 233,
+          "profitable_exit_rate_pct": 46.3519,
+          "return_pct": 41.9973,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.9775,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.206625
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.06_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.9541,
+          "return_pct": 26.3341,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7241,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 24.3498,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.2174,
+          "return_pct": 43.7029,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.0979,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.125375
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_5_threshold_-0.06_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 203,
+          "profitable_exit_rate_pct": 43.3498,
+          "return_pct": 21.5646,
+          "trades_per_active_day": 7.5185
+        },
+        "selection_august": {
+          "dd_pct": 3.8447,
+          "max_loss_streak": 7,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.8164,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 228,
+          "profitable_exit_rate_pct": 44.7368,
+          "return_pct": 51.3435,
+          "trades_per_active_day": 7.3548
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.2641,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.118775
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3_threshold_-0.04_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 45.4128,
+          "return_pct": 26.6957,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.1538,
+          "return_pct": 46.555,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.025525
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.02_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 220,
+          "profitable_exit_rate_pct": 45.9091,
+          "return_pct": 26.8404,
+          "trades_per_active_day": 7.8571
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4925,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.5812,
+          "return_pct": 41.0808,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.0569,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.016625
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.02_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 220,
+          "profitable_exit_rate_pct": 45.9091,
+          "return_pct": 27.9498,
+          "trades_per_active_day": 7.8571
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4925,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.1538,
+          "return_pct": 41.02,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.5105,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 39.001425
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.04_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.9541,
+          "return_pct": 24.3532,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.2642,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 233,
+          "profitable_exit_rate_pct": 46.3519,
+          "return_pct": 41.7866,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.4136,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.9077
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.04_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 45.4128,
+          "return_pct": 27.4742,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.8819,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 233,
+          "profitable_exit_rate_pct": 45.9227,
+          "return_pct": 45.1405,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.0979,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.8999
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.02_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 220,
+          "profitable_exit_rate_pct": 45.9091,
+          "return_pct": 26.7718,
+          "trades_per_active_day": 7.8571
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.4612,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.5812,
+          "return_pct": 40.6725,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.8534,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.875425
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.06_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 203,
+          "profitable_exit_rate_pct": 43.3498,
+          "return_pct": 23.3855,
+          "trades_per_active_day": 7.5185
+        },
+        "selection_august": {
+          "dd_pct": 3.8447,
+          "max_loss_streak": 7,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.2235,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 227,
+          "profitable_exit_rate_pct": 44.0529,
+          "return_pct": 47.6422,
+          "trades_per_active_day": 7.3226
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 31.7911,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.702325
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.04_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 207,
+          "profitable_exit_rate_pct": 44.9275,
+          "return_pct": 26.8456,
+          "trades_per_active_day": 7.6667
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.0236,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 233,
+          "profitable_exit_rate_pct": 45.4936,
+          "return_pct": 48.5082,
+          "trades_per_active_day": 7.5161
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.95,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.66895
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.02_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 209,
+          "profitable_exit_rate_pct": 44.9761,
+          "return_pct": 23.3685,
+          "trades_per_active_day": 7.7407
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.2826,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 232,
+          "profitable_exit_rate_pct": 45.2586,
+          "return_pct": 47.056,
+          "trades_per_active_day": 7.4839
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 31.6652,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.62965
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.02_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 221,
+          "profitable_exit_rate_pct": 45.7014,
+          "return_pct": 25.9233,
+          "trades_per_active_day": 7.8929
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.2642,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.5812,
+          "return_pct": 40.4637,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.29,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.576975
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_5_threshold_-0.02_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 210,
+          "profitable_exit_rate_pct": 44.7619,
+          "return_pct": 20.4878,
+          "trades_per_active_day": 7.7778
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.8753,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 232,
+          "profitable_exit_rate_pct": 45.6897,
+          "return_pct": 48.781,
+          "trades_per_active_day": 7.4839
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.1397,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.551775
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_4_threshold_-0.04_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 208,
+          "profitable_exit_rate_pct": 44.7115,
+          "return_pct": 25.4944,
+          "trades_per_active_day": 7.7037
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.6172,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 45.7265,
+          "return_pct": 49.9616,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.8832,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.5243
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.02_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 222,
+          "profitable_exit_rate_pct": 45.9459,
+          "return_pct": 27.436,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.8819,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.1538,
+          "return_pct": 43.5802,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.9737,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.509825
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3_threshold_-0.02_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 222,
+          "profitable_exit_rate_pct": 45.9459,
+          "return_pct": 26.4628,
+          "trades_per_active_day": 7.9286
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 46.1538,
+          "return_pct": 43.7331,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.6742,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.32005
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.06_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 207,
+          "profitable_exit_rate_pct": 44.4444,
+          "return_pct": 24.5779,
+          "trades_per_active_day": 7.6667
+        },
+        "selection_august": {
+          "dd_pct": 3.7234,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.569,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 229,
+          "profitable_exit_rate_pct": 44.9782,
+          "return_pct": 44.1081,
+          "trades_per_active_day": 7.3871
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.5536,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.250675
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3.5_threshold_-0.06_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 208,
+          "profitable_exit_rate_pct": 44.2308,
+          "return_pct": 23.1477,
+          "trades_per_active_day": 7.7037
+        },
+        "selection_august": {
+          "dd_pct": 3.7234,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.1917,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.2174,
+          "return_pct": 45.7299,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.6928,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.1845
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.02_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 211,
+          "profitable_exit_rate_pct": 45.4976,
+          "return_pct": 25.135,
+          "trades_per_active_day": 7.8148
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 23.0236,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 45.7265,
+          "return_pct": 46.464,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.825,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.1579
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3_threshold_-0.04_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 22.6197,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 225,
+          "profitable_exit_rate_pct": 46.2222,
+          "return_pct": 39.5781,
+          "trades_per_active_day": 7.2581
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.8251,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 38.126825
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.06_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 207,
+          "profitable_exit_rate_pct": 44.4444,
+          "return_pct": 25.7138,
+          "trades_per_active_day": 7.6667
+        },
+        "selection_august": {
+          "dd_pct": 3.8447,
+          "max_loss_streak": 7,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.9647,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 227,
+          "profitable_exit_rate_pct": 44.4934,
+          "return_pct": 45.9839,
+          "trades_per_active_day": 7.3226
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.95,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.96425
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3.5_threshold_-0.02_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4668,
+          "max_loss_streak": 7,
+          "n": 221,
+          "profitable_exit_rate_pct": 45.2489,
+          "return_pct": 23.9759,
+          "trades_per_active_day": 7.8929
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 226,
+          "profitable_exit_rate_pct": 46.4602,
+          "return_pct": 38.717,
+          "trades_per_active_day": 7.2903
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.4755,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.91155
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3.5_threshold_-0.04_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 22.9848,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.9821,
+          "return_pct": 38.5358,
+          "trades_per_active_day": 7.4667
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.5992,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.86625
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3_threshold_-0.02_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4668,
+          "max_loss_streak": 7,
+          "n": 221,
+          "profitable_exit_rate_pct": 45.2489,
+          "return_pct": 23.794,
+          "trades_per_active_day": 7.8929
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 226,
+          "profitable_exit_rate_pct": 46.4602,
+          "return_pct": 38.5136,
+          "trades_per_active_day": 7.2903
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.7011,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.8607
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_4_threshold_-0.06_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 208,
+          "profitable_exit_rate_pct": 44.2308,
+          "return_pct": 24.3747,
+          "trades_per_active_day": 7.7037
+        },
+        "selection_august": {
+          "dd_pct": 3.8447,
+          "max_loss_streak": 7,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.5585,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 228,
+          "profitable_exit_rate_pct": 44.7368,
+          "return_pct": 47.4124,
+          "trades_per_active_day": 7.3548
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.8832,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.813625
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.04_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 207,
+          "profitable_exit_rate_pct": 44.9275,
+          "return_pct": 25.6995,
+          "trades_per_active_day": 7.6667
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.782,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 45.7265,
+          "return_pct": 45.8375,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.5536,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.699275
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_4_threshold_-0.02_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 212,
+          "profitable_exit_rate_pct": 45.283,
+          "return_pct": 23.2819,
+          "trades_per_active_day": 7.8519
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.6172,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 234,
+          "profitable_exit_rate_pct": 45.7265,
+          "return_pct": 46.6248,
+          "trades_per_active_day": 7.5484
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.7592,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.6901
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3.5_threshold_-0.04_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 208,
+          "profitable_exit_rate_pct": 44.7115,
+          "return_pct": 24.2564,
+          "trades_per_active_day": 7.7037
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.4071,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 235,
+          "profitable_exit_rate_pct": 45.9574,
+          "return_pct": 47.4787,
+          "trades_per_active_day": 7.5806
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.6928,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.64095
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_4_threshold_-0.06_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 44.7005,
+          "return_pct": 23.8011,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.4883,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.6522,
+          "return_pct": 40.4094,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.1812,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.354675
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_5_threshold_-0.06_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 44.7005,
+          "return_pct": 24.5233,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.4883,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.2174,
+          "return_pct": 40.3431,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.6352,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.3381
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_4_threshold_-0.02_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4668,
+          "max_loss_streak": 7,
+          "n": 221,
+          "profitable_exit_rate_pct": 45.2489,
+          "return_pct": 24.1577,
+          "trades_per_active_day": 7.8929
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 226,
+          "profitable_exit_rate_pct": 46.0177,
+          "return_pct": 36.323,
+          "trades_per_active_day": 7.2903
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 28.8601,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 37.31305
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_5_threshold_-0.02_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4668,
+          "max_loss_streak": 7,
+          "n": 221,
+          "profitable_exit_rate_pct": 45.2489,
+          "return_pct": 24.5215,
+          "trades_per_active_day": 7.8929
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 226,
+          "profitable_exit_rate_pct": 46.0177,
+          "return_pct": 36.323,
+          "trades_per_active_day": 7.2903
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 29.3235,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 37.31305
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_4_threshold_-0.04_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.3504,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.5357,
+          "return_pct": 36.1448,
+          "trades_per_active_day": 7.4667
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 28.9833,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 37.2685
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_5_threshold_-0.04_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 24.0833,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.0893,
+          "return_pct": 24.0812,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 3.7384,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 45.5357,
+          "return_pct": 36.1448,
+          "trades_per_active_day": 7.4667
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 29.4471,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 37.2685
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.02_hours_6_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 211,
+          "profitable_exit_rate_pct": 45.4976,
+          "return_pct": 24.4715,
+          "trades_per_active_day": 7.8148
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.782,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 235,
+          "profitable_exit_rate_pct": 45.9574,
+          "return_pct": 44.0645,
+          "trades_per_active_day": 7.5806
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 30.4289,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.256025
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3.5_threshold_-0.06_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 44.7005,
+          "return_pct": 23.91,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.4573,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.6522,
+          "return_pct": 40.003,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.9775,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 37.214325
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        12,
+        18
+      ],
+      "name": "expanded_3_threshold_-0.06_hours_12_18",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.2404,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.2619,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 45.6522,
+          "return_pct": 39.7952,
+          "trades_per_active_day": 7.4194
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.4136,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 36.918125
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        6,
+        12
+      ],
+      "name": "expanded_3.5_threshold_-0.02_hours_6_12",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.352,
+          "max_loss_streak": 9,
+          "n": 212,
+          "profitable_exit_rate_pct": 45.283,
+          "return_pct": 22.6945,
+          "trades_per_active_day": 7.8519
+        },
+        "selection_august": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.1964,
+          "return_pct": 22.4071,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 235,
+          "profitable_exit_rate_pct": 45.9574,
+          "return_pct": 44.4333,
+          "trades_per_active_day": 7.5806
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.5689,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 36.8796
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3_threshold_-0.06_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.0367,
+          "return_pct": 21.5225,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.0803,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 222,
+          "profitable_exit_rate_pct": 45.045,
+          "return_pct": 36.2413,
+          "trades_per_active_day": 7.1613
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.8251,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 35.80265
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_3.5_threshold_-0.06_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.0367,
+          "return_pct": 21.8843,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.0803,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 221,
+          "profitable_exit_rate_pct": 44.7964,
+          "return_pct": 35.5541,
+          "trades_per_active_day": 7.3667
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "profitable_exit_rate_pct": 43.7229,
+          "return_pct": 29.5992,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "selection_score": 35.63085
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_4_threshold_-0.06_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.0367,
+          "return_pct": 22.2466,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.0803,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 221,
+          "profitable_exit_rate_pct": 44.3439,
+          "return_pct": 33.606,
+          "trades_per_active_day": 7.3667
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 28.9833,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 35.143825
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        18,
+        24
+      ],
+      "name": "expanded_5_threshold_-0.06_hours_18_24",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.4661,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.0367,
+          "return_pct": 22.973,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 3.7246,
+          "max_loss_streak": 8,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 23.0803,
+          "trades_per_active_day": 7.2258
+        },
+        "selection_july": {
+          "dd_pct": 4.2161,
+          "max_loss_streak": 8,
+          "n": 220,
+          "profitable_exit_rate_pct": 44.0909,
+          "return_pct": 32.5025,
+          "trades_per_active_day": 7.3333
+        },
+        "test_september": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 230,
+          "profitable_exit_rate_pct": 43.4783,
+          "return_pct": 29.4471,
+          "trades_per_active_day": 7.931
+        }
+      },
+      "selection_score": 34.86795
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_4_threshold_-0.04_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.7735,
+          "max_loss_streak": 7,
+          "n": 214,
+          "profitable_exit_rate_pct": 42.0561,
+          "return_pct": 27.1297,
+          "trades_per_active_day": 7.6429
+        },
+        "selection_august": {
+          "dd_pct": 5.1151,
+          "max_loss_streak": 9,
+          "n": 214,
+          "profitable_exit_rate_pct": 39.7196,
+          "return_pct": 19.2617,
+          "trades_per_active_day": 6.9032
+        },
+        "selection_july": {
+          "dd_pct": 4.3182,
+          "max_loss_streak": 8,
+          "n": 206,
+          "profitable_exit_rate_pct": 42.233,
+          "return_pct": 39.8372,
+          "trades_per_active_day": 6.6452
+        },
+        "test_september": {
+          "dd_pct": 3.9155,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 38.5321,
+          "return_pct": 29.4817,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 31.478875
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_5_threshold_-0.04_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.0827,
+          "max_loss_streak": 9,
+          "n": 213,
+          "profitable_exit_rate_pct": 41.3146,
+          "return_pct": 27.0713,
+          "trades_per_active_day": 7.6071
+        },
+        "selection_august": {
+          "dd_pct": 3.937,
+          "max_loss_streak": 9,
+          "n": 216,
+          "profitable_exit_rate_pct": 40.7407,
+          "return_pct": 18.2688,
+          "trades_per_active_day": 6.9677
+        },
+        "selection_july": {
+          "dd_pct": 4.9011,
+          "max_loss_streak": 12,
+          "n": 205,
+          "profitable_exit_rate_pct": 41.4634,
+          "return_pct": 43.1098,
+          "trades_per_active_day": 6.6129
+        },
+        "test_september": {
+          "dd_pct": 3.3587,
+          "max_loss_streak": 11,
+          "n": 218,
+          "profitable_exit_rate_pct": 37.6147,
+          "return_pct": 30.3336,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 31.1629
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_4_threshold_-0.06_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.7735,
+          "max_loss_streak": 7,
+          "n": 214,
+          "profitable_exit_rate_pct": 41.5888,
+          "return_pct": 25.9921,
+          "trades_per_active_day": 7.6429
+        },
+        "selection_august": {
+          "dd_pct": 5.1151,
+          "max_loss_streak": 9,
+          "n": 213,
+          "profitable_exit_rate_pct": 39.4366,
+          "return_pct": 19.0706,
+          "trades_per_active_day": 6.871
+        },
+        "selection_july": {
+          "dd_pct": 4.793,
+          "max_loss_streak": 8,
+          "n": 203,
+          "profitable_exit_rate_pct": 41.3793,
+          "return_pct": 37.9688,
+          "trades_per_active_day": 6.5484
+        },
+        "test_september": {
+          "dd_pct": 3.9155,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 38.5321,
+          "return_pct": 29.4817,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 30.7729
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 4.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_4_threshold_-0.02_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.7735,
+          "max_loss_streak": 7,
+          "n": 217,
+          "profitable_exit_rate_pct": 42.8571,
+          "return_pct": 26.1533,
+          "trades_per_active_day": 7.75
+        },
+        "selection_august": {
+          "dd_pct": 5.1151,
+          "max_loss_streak": 9,
+          "n": 214,
+          "profitable_exit_rate_pct": 39.7196,
+          "return_pct": 19.2617,
+          "trades_per_active_day": 6.9032
+        },
+        "selection_july": {
+          "dd_pct": 4.8872,
+          "max_loss_streak": 8,
+          "n": 208,
+          "profitable_exit_rate_pct": 42.7885,
+          "return_pct": 36.1527,
+          "trades_per_active_day": 6.7097
+        },
+        "test_september": {
+          "dd_pct": 3.9155,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 38.9908,
+          "return_pct": 30.7365,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 30.55775
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3.5_threshold_-0.04_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.1242,
+          "max_loss_streak": 7,
+          "n": 211,
+          "profitable_exit_rate_pct": 42.654,
+          "return_pct": 25.1167,
+          "trades_per_active_day": 7.5357
+        },
+        "selection_august": {
+          "dd_pct": 5.116,
+          "max_loss_streak": 9,
+          "n": 217,
+          "profitable_exit_rate_pct": 40.553,
+          "return_pct": 18.1101,
+          "trades_per_active_day": 7.0
+        },
+        "selection_july": {
+          "dd_pct": 4.4604,
+          "max_loss_streak": 8,
+          "n": 216,
+          "profitable_exit_rate_pct": 43.5185,
+          "return_pct": 41.505,
+          "trades_per_active_day": 6.9677
+        },
+        "test_september": {
+          "dd_pct": 3.9168,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 39.9083,
+          "return_pct": 30.2678,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 30.455875
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_5_threshold_-0.02_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.0827,
+          "max_loss_streak": 8,
+          "n": 216,
+          "profitable_exit_rate_pct": 42.1296,
+          "return_pct": 25.9992,
+          "trades_per_active_day": 7.7143
+        },
+        "selection_august": {
+          "dd_pct": 3.937,
+          "max_loss_streak": 9,
+          "n": 216,
+          "profitable_exit_rate_pct": 40.7407,
+          "return_pct": 18.2688,
+          "trades_per_active_day": 6.9677
+        },
+        "selection_july": {
+          "dd_pct": 4.8872,
+          "max_loss_streak": 8,
+          "n": 208,
+          "profitable_exit_rate_pct": 42.3077,
+          "return_pct": 38.7081,
+          "trades_per_active_day": 6.7097
+        },
+        "test_september": {
+          "dd_pct": 3.3587,
+          "max_loss_streak": 11,
+          "n": 218,
+          "profitable_exit_rate_pct": 38.0734,
+          "return_pct": 31.5966,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 30.069425
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3.5_threshold_-0.02_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.5994,
+          "max_loss_streak": 7,
+          "n": 214,
+          "profitable_exit_rate_pct": 43.4579,
+          "return_pct": 24.5306,
+          "trades_per_active_day": 7.6429
+        },
+        "selection_august": {
+          "dd_pct": 5.116,
+          "max_loss_streak": 9,
+          "n": 217,
+          "profitable_exit_rate_pct": 40.553,
+          "return_pct": 18.1101,
+          "trades_per_active_day": 7.0
+        },
+        "selection_july": {
+          "dd_pct": 4.8872,
+          "max_loss_streak": 8,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.0367,
+          "return_pct": 38.8373,
+          "trades_per_active_day": 7.0323
+        },
+        "test_september": {
+          "dd_pct": 3.9168,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 40.367,
+          "return_pct": 31.5302,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 29.78895
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.5,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3.5_threshold_-0.06_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.1242,
+          "max_loss_streak": 7,
+          "n": 211,
+          "profitable_exit_rate_pct": 42.1801,
+          "return_pct": 23.9971,
+          "trades_per_active_day": 7.5357
+        },
+        "selection_august": {
+          "dd_pct": 5.116,
+          "max_loss_streak": 9,
+          "n": 216,
+          "profitable_exit_rate_pct": 40.2778,
+          "return_pct": 17.9149,
+          "trades_per_active_day": 6.9677
+        },
+        "selection_july": {
+          "dd_pct": 4.9345,
+          "max_loss_streak": 8,
+          "n": 213,
+          "profitable_exit_rate_pct": 42.723,
+          "return_pct": 39.6143,
+          "trades_per_active_day": 6.871
+        },
+        "test_september": {
+          "dd_pct": 3.9168,
+          "max_loss_streak": 12,
+          "n": 218,
+          "profitable_exit_rate_pct": 39.9083,
+          "return_pct": 30.2678,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 29.7392
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.04,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3_threshold_-0.04_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.5352,
+          "max_loss_streak": 8,
+          "n": 215,
+          "profitable_exit_rate_pct": 44.186,
+          "return_pct": 25.1087,
+          "trades_per_active_day": 7.6786
+        },
+        "selection_august": {
+          "dd_pct": 4.5388,
+          "max_loss_streak": 9,
+          "n": 218,
+          "profitable_exit_rate_pct": 41.7431,
+          "return_pct": 17.0629,
+          "trades_per_active_day": 7.0323
+        },
+        "selection_july": {
+          "dd_pct": 4.3113,
+          "max_loss_streak": 8,
+          "n": 220,
+          "profitable_exit_rate_pct": 44.5455,
+          "return_pct": 39.6192,
+          "trades_per_active_day": 7.0968
+        },
+        "test_september": {
+          "dd_pct": 2.7443,
+          "max_loss_streak": 8,
+          "n": 223,
+          "profitable_exit_rate_pct": 43.4978,
+          "return_pct": 35.5903,
+          "trades_per_active_day": 7.6897
+        }
+      },
+      "selection_score": 28.964025
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.02,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3_threshold_-0.02_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.5352,
+          "max_loss_streak": 8,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.9541,
+          "return_pct": 25.9279,
+          "trades_per_active_day": 7.7857
+        },
+        "selection_august": {
+          "dd_pct": 4.5388,
+          "max_loss_streak": 9,
+          "n": 218,
+          "profitable_exit_rate_pct": 41.7431,
+          "return_pct": 17.0629,
+          "trades_per_active_day": 7.0323
+        },
+        "selection_july": {
+          "dd_pct": 4.3113,
+          "max_loss_streak": 8,
+          "n": 221,
+          "profitable_exit_rate_pct": 44.7964,
+          "return_pct": 36.9614,
+          "trades_per_active_day": 7.129
+        },
+        "test_september": {
+          "dd_pct": 2.7443,
+          "max_loss_streak": 8,
+          "n": 223,
+          "profitable_exit_rate_pct": 43.4978,
+          "return_pct": 35.2571,
+          "trades_per_active_day": 7.6897
+        }
+      },
+      "selection_score": 28.299575
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 5.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_5_threshold_-0.06_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 3.0827,
+          "max_loss_streak": 9,
+          "n": 213,
+          "profitable_exit_rate_pct": 40.8451,
+          "return_pct": 25.9342,
+          "trades_per_active_day": 7.6071
+        },
+        "selection_august": {
+          "dd_pct": 3.937,
+          "max_loss_streak": 9,
+          "n": 215,
+          "profitable_exit_rate_pct": 40.0,
+          "return_pct": 16.4836,
+          "trades_per_active_day": 6.9355
+        },
+        "selection_july": {
+          "dd_pct": 5.373,
+          "max_loss_streak": 12,
+          "n": 202,
+          "profitable_exit_rate_pct": 40.5941,
+          "return_pct": 41.1977,
+          "trades_per_active_day": 6.5161
+        },
+        "test_september": {
+          "dd_pct": 3.3587,
+          "max_loss_streak": 11,
+          "n": 218,
+          "profitable_exit_rate_pct": 37.6147,
+          "return_pct": 30.3336,
+          "trades_per_active_day": 7.5172
+        }
+      },
+      "selection_score": 28.217425
+    },
+    {
+      "base_target_pct": 2.5,
+      "exhausted_target_pct": 2.0,
+      "exhaustion_threshold": -0.06,
+      "expanded_target_pct": 3.0,
+      "expansion_window": [
+        0,
+        6
+      ],
+      "name": "expanded_3_threshold_-0.06_hours_0_6",
+      "periods": {
+        "confirmation_october": {
+          "dd_pct": 2.5352,
+          "max_loss_streak": 8,
+          "n": 215,
+          "profitable_exit_rate_pct": 43.7209,
+          "return_pct": 23.9891,
+          "trades_per_active_day": 7.6786
+        },
+        "selection_august": {
+          "dd_pct": 4.5388,
+          "max_loss_streak": 9,
+          "n": 217,
+          "profitable_exit_rate_pct": 41.4747,
+          "return_pct": 16.5359,
+          "trades_per_active_day": 7.0
+        },
+        "selection_july": {
+          "dd_pct": 4.7861,
+          "max_loss_streak": 8,
+          "n": 217,
+          "profitable_exit_rate_pct": 43.7788,
+          "return_pct": 37.8667,
+          "trades_per_active_day": 7.0
+        },
+        "test_september": {
+          "dd_pct": 2.7443,
+          "max_loss_streak": 8,
+          "n": 223,
+          "profitable_exit_rate_pct": 43.4978,
+          "return_pct": 35.5903,
+          "trades_per_active_day": 7.6897
+        }
+      },
+      "selection_score": 27.7435
+    }
+  ],
+  "created_at": "2026-10-31T00:46:51.919604+00:00",
+  "current_runtime_policy": {
+    "base_target_pct": 2.5,
+    "exhausted_target_pct": 2.0,
+    "exhaustion_threshold": -0.04,
+    "expanded_target_pct": 3.0,
+    "expansion_window": [
+      6,
+      12
+    ],
+    "name": "expanded_3_threshold_-0.04_hours_6_12",
+    "periods": {
+      "confirmation_october": {
+        "dd_pct": 2.3607,
+        "max_loss_streak": 7,
+        "n": 218,
+        "profitable_exit_rate_pct": 45.4128,
+        "return_pct": 26.6957,
+        "trades_per_active_day": 7.7857
+      },
+      "selection_august": {
+        "dd_pct": 3.7247,
+        "max_loss_streak": 8,
+        "n": 224,
+        "profitable_exit_rate_pct": 44.6429,
+        "return_pct": 23.6995,
+        "trades_per_active_day": 7.2258
+      },
+      "selection_july": {
+        "dd_pct": 4.4752,
+        "max_loss_streak": 9,
+        "n": 234,
+        "profitable_exit_rate_pct": 46.1538,
+        "return_pct": 46.555,
+        "trades_per_active_day": 7.5484
+      },
+      "test_september": {
+        "dd_pct": 2.4471,
+        "max_loss_streak": 8,
+        "n": 231,
+        "profitable_exit_rate_pct": 43.7229,
+        "return_pct": 29.7981,
+        "trades_per_active_day": 7.9655
+      }
+    },
+    "selection_score": 39.025525
+  },
+  "fixed_target_diagnostics": {
+    "1.5": {
+      "confirmation_october": {
+        "dd_pct": 2.6901,
+        "max_loss_streak": 7,
+        "n": 249,
+        "profitable_exit_rate_pct": 49.7992,
+        "return_pct": 15.3405,
+        "trades_per_active_day": 8.5862
+      },
+      "selection_august": {
+        "dd_pct": 1.7926,
+        "max_loss_streak": 6,
+        "n": 255,
+        "profitable_exit_rate_pct": 54.1176,
+        "return_pct": 26.1352,
+        "trades_per_active_day": 8.2258
+      },
+      "selection_july": {
+        "dd_pct": 3.6677,
+        "max_loss_streak": 5,
+        "n": 255,
+        "profitable_exit_rate_pct": 50.9804,
+        "return_pct": 32.8291,
+        "trades_per_active_day": 8.2258
+      },
+      "test_september": {
+        "dd_pct": 2.3367,
+        "max_loss_streak": 7,
+        "n": 259,
+        "profitable_exit_rate_pct": 46.332,
+        "return_pct": 11.5031,
+        "trades_per_active_day": 8.6333
+      }
+    },
+    "2.0": {
+      "confirmation_october": {
+        "dd_pct": 2.4217,
+        "max_loss_streak": 7,
+        "n": 237,
+        "profitable_exit_rate_pct": 48.1013,
+        "return_pct": 22.7367,
+        "trades_per_active_day": 8.1724
+      },
+      "selection_august": {
+        "dd_pct": 3.0869,
+        "max_loss_streak": 7,
+        "n": 247,
+        "profitable_exit_rate_pct": 46.9636,
+        "return_pct": 21.5072,
+        "trades_per_active_day": 7.9677
+      },
+      "selection_july": {
+        "dd_pct": 3.3193,
+        "max_loss_streak": 8,
+        "n": 231,
+        "profitable_exit_rate_pct": 47.1861,
+        "return_pct": 33.7621,
+        "trades_per_active_day": 7.4516
+      },
+      "test_september": {
+        "dd_pct": 2.5831,
+        "max_loss_streak": 8,
+        "n": 248,
+        "profitable_exit_rate_pct": 45.5645,
+        "return_pct": 23.0393,
+        "trades_per_active_day": 8.2667
+      }
+    },
+    "2.5": {
+      "confirmation_october": {
+        "dd_pct": 2.3607,
+        "max_loss_streak": 7,
+        "n": 218,
+        "profitable_exit_rate_pct": 44.4954,
+        "return_pct": 22.5167,
+        "trades_per_active_day": 7.7857
+      },
+      "selection_august": {
+        "dd_pct": 3.7246,
+        "max_loss_streak": 8,
+        "n": 224,
+        "profitable_exit_rate_pct": 44.6429,
+        "return_pct": 23.0803,
+        "trades_per_active_day": 7.2258
+      },
+      "selection_july": {
+        "dd_pct": 4.2161,
+        "max_loss_streak": 8,
+        "n": 230,
+        "profitable_exit_rate_pct": 45.6522,
+        "return_pct": 38.728,
+        "trades_per_active_day": 7.4194
+      },
+      "test_september": {
+        "dd_pct": 2.4471,
+        "max_loss_streak": 8,
+        "n": 231,
+        "profitable_exit_rate_pct": 43.7229,
+        "return_pct": 29.114,
+        "trades_per_active_day": 7.9655
+      }
+    },
+    "3.0": {
+      "confirmation_october": {
+        "dd_pct": 3.0493,
+        "max_loss_streak": 8,
+        "n": 214,
+        "profitable_exit_rate_pct": 43.4579,
+        "return_pct": 26.0926,
+        "trades_per_active_day": 7.6429
+      },
+      "selection_august": {
+        "dd_pct": 4.5388,
+        "max_loss_streak": 9,
+        "n": 214,
+        "profitable_exit_rate_pct": 41.5888,
+        "return_pct": 17.2411,
+        "trades_per_active_day": 7.1333
+      },
+      "selection_july": {
+        "dd_pct": 5.0437,
+        "max_loss_streak": 9,
+        "n": 208,
+        "profitable_exit_rate_pct": 42.3077,
+        "return_pct": 34.6212,
+        "trades_per_active_day": 6.7097
+      },
+      "test_september": {
+        "dd_pct": 2.7443,
+        "max_loss_streak": 8,
+        "n": 223,
+        "profitable_exit_rate_pct": 43.4978,
+        "return_pct": 37.616,
+        "trades_per_active_day": 7.6897
+      }
+    },
+    "3.5": {
+      "confirmation_october": {
+        "dd_pct": 3.424,
+        "max_loss_streak": 9,
+        "n": 200,
+        "profitable_exit_rate_pct": 41.5,
+        "return_pct": 24.6126,
+        "trades_per_active_day": 7.4074
+      },
+      "selection_august": {
+        "dd_pct": 5.116,
+        "max_loss_streak": 9,
+        "n": 216,
+        "profitable_exit_rate_pct": 40.2778,
+        "return_pct": 18.6284,
+        "trades_per_active_day": 6.9677
+      },
+      "selection_july": {
+        "dd_pct": 5.1917,
+        "max_loss_streak": 9,
+        "n": 202,
+        "profitable_exit_rate_pct": 40.5941,
+        "return_pct": 36.679,
+        "trades_per_active_day": 6.7333
+      },
+      "test_september": {
+        "dd_pct": 3.9168,
+        "max_loss_streak": 12,
+        "n": 218,
+        "profitable_exit_rate_pct": 39.9083,
+        "return_pct": 32.6374,
+        "trades_per_active_day": 7.5172
+      }
+    },
+    "4.0": {
+      "confirmation_october": {
+        "dd_pct": 3.9761,
+        "max_loss_streak": 9,
+        "n": 203,
+        "profitable_exit_rate_pct": 40.8867,
+        "return_pct": 27.7828,
+        "trades_per_active_day": 7.5185
+      },
+      "selection_august": {
+        "dd_pct": 5.1151,
+        "max_loss_streak": 9,
+        "n": 213,
+        "profitable_exit_rate_pct": 39.4366,
+        "return_pct": 19.9987,
+        "trades_per_active_day": 6.871
+      },
+      "selection_july": {
+        "dd_pct": 5.0506,
+        "max_loss_streak": 9,
+        "n": 192,
+        "profitable_exit_rate_pct": 38.0208,
+        "return_pct": 32.4221,
+        "trades_per_active_day": 6.4
+      },
+      "test_september": {
+        "dd_pct": 3.9155,
+        "max_loss_streak": 12,
+        "n": 216,
+        "profitable_exit_rate_pct": 37.963,
+        "return_pct": 29.3105,
+        "trades_per_active_day": 7.4483
+      }
+    },
+    "5.0": {
+      "confirmation_october": {
+        "dd_pct": 4.1381,
+        "max_loss_streak": 9,
+        "n": 202,
+        "profitable_exit_rate_pct": 38.1188,
+        "return_pct": 25.6649,
+        "trades_per_active_day": 7.4815
+      },
+      "selection_august": {
+        "dd_pct": 4.8379,
+        "max_loss_streak": 9,
+        "n": 208,
+        "profitable_exit_rate_pct": 38.4615,
+        "return_pct": 14.4819,
+        "trades_per_active_day": 6.7097
+      },
+      "selection_july": {
+        "dd_pct": 5.629,
+        "max_loss_streak": 12,
+        "n": 190,
+        "profitable_exit_rate_pct": 35.7895,
+        "return_pct": 35.1563,
+        "trades_per_active_day": 6.3333
+      },
+      "test_september": {
+        "dd_pct": 3.3587,
+        "max_loss_streak": 11,
+        "n": 216,
+        "profitable_exit_rate_pct": 37.037,
+        "return_pct": 32.1533,
+        "trades_per_active_day": 7.4483
+      }
+    }
+  },
+  "limitations": [
+    "The X-Perp history starts in late June 2026.",
+    "No October-aware policy is eligible for selection.",
+    "No tested target route reached 30% in October at 3% margin.",
+    "Gross results exclude fees at user request."
+  ],
+  "october_grid_max_return_pct": 27.9498,
+  "october_grid_reaches_30pct": false,
+  "october_oracle_diagnostic_not_selectable": {
+    "base_target_pct": 2.5,
+    "exhausted_target_pct": 2.0,
+    "exhaustion_threshold": -0.02,
+    "expanded_target_pct": 5.0,
+    "expansion_window": [
+      12,
+      18
+    ],
+    "name": "expanded_5_threshold_-0.02_hours_12_18",
+    "periods": {
+      "confirmation_october": {
+        "dd_pct": 2.3607,
+        "max_loss_streak": 7,
+        "n": 220,
+        "profitable_exit_rate_pct": 45.9091,
+        "return_pct": 27.9498,
+        "trades_per_active_day": 7.8571
+      },
+      "selection_august": {
+        "dd_pct": 3.7247,
+        "max_loss_streak": 8,
+        "n": 224,
+        "profitable_exit_rate_pct": 45.0893,
+        "return_pct": 24.4925,
+        "trades_per_active_day": 7.2258
+      },
+      "selection_july": {
+        "dd_pct": 3.7384,
+        "max_loss_streak": 8,
+        "n": 234,
+        "profitable_exit_rate_pct": 46.1538,
+        "return_pct": 41.02,
+        "trades_per_active_day": 7.5484
+      },
+      "test_september": {
+        "dd_pct": 2.4471,
+        "max_loss_streak": 8,
+        "n": 231,
+        "profitable_exit_rate_pct": 43.7229,
+        "return_pct": 30.5105,
+        "trades_per_active_day": 7.9655
+      }
+    },
+    "selection_score": 39.001425
+  },
+  "orders_possible": false,
+  "protocol": {
+    "exhaustion_thresholds": [
+      -0.06,
+      -0.04,
+      -0.02
+    ],
+    "expanded_targets_pct": [
+      3.0,
+      3.5,
+      4.0,
+      5.0
+    ],
+    "expansion_windows_utc": [
+      [
+        0,
+        6
+      ],
+      [
+        6,
+        12
+      ],
+      [
+        12,
+        18
+      ],
+      [
+        18,
+        24
+      ],
+      [
+        6,
+        18
+      ]
+    ],
+    "leverage": 10,
+    "margin_fraction": 0.03,
+    "orders": "market only",
+    "position_fraction": "client setting",
+    "sealed_holdouts": [
+      "2026-09",
+      "2026-10"
+    ],
+    "selection": [
+      "2026-07",
+      "2026-08"
+    ],
+    "targets_pct": [
+      1.5,
+      2.0,
+      2.5,
+      3.0,
+      3.5,
+      4.0,
+      5.0
+    ]
+  },
+  "ready_for_live_orders": false,
+  "runtime_change_allowed": false,
+  "selected_before_holdouts": {
+    "base_target_pct": 2.5,
+    "exhausted_target_pct": 2.0,
+    "exhaustion_threshold": -0.04,
+    "expanded_target_pct": 5.0,
+    "expansion_window": [
+      6,
+      12
+    ],
+    "name": "expanded_5_threshold_-0.04_hours_6_12",
+    "periods": {
+      "confirmation_october": {
+        "dd_pct": 3.352,
+        "max_loss_streak": 9,
+        "n": 203,
+        "profitable_exit_rate_pct": 43.8424,
+        "return_pct": 22.6589,
+        "trades_per_active_day": 7.5185
+      },
+      "selection_august": {
+        "dd_pct": 3.7247,
+        "max_loss_streak": 8,
+        "n": 224,
+        "profitable_exit_rate_pct": 44.1964,
+        "return_pct": 22.8753,
+        "trades_per_active_day": 7.2258
+      },
+      "selection_july": {
+        "dd_pct": 4.4752,
+        "max_loss_streak": 9,
+        "n": 232,
+        "profitable_exit_rate_pct": 45.6897,
+        "return_pct": 52.6016,
+        "trades_per_active_day": 7.4839
+      },
+      "test_september": {
+        "dd_pct": 2.4471,
+        "max_loss_streak": 8,
+        "n": 231,
+        "profitable_exit_rate_pct": 43.7229,
+        "return_pct": 30.2641,
+        "trades_per_active_day": 7.9655
+      }
+    },
+    "selection_score": 39.506925
+  },
+  "selected_holdout_pass": false,
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_extended_target_router_oct31_audit.py": "53e799e745507e0cd9c7a2d119ab7f8951ddba94797bbc616ad7f7caeccdbb66",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_oct30\\manifest.json": "83d7b406ffd0940230f14af0f5a4e534e524023e5fed0c507a424b6d4fce21af"
+  },
+  "status": "REJECTED_EXTENDED_TARGET_ROUTER"
+}
