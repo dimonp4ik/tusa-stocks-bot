@@ -84,6 +84,37 @@ class VenueShadowTrackerTests(unittest.TestCase):
         self.assertEqual(value[:3], ("SL", 0, 0))
         self.assertAlmostEqual(value[3], -1.0)
 
+    def test_native_shadow_uses_touch_stop(self):
+        setup = {
+            **self.setup(), "source": "stock_xperp_native_shadow",
+            "ts": 1230.0, "signal_bar_ts": 900.0,
+        }
+        candles = {
+            "time": [1800], "open": [100.0], "high": [100.2],
+            "low": [98.8], "close": [100.0], "volume": [1.0],
+        }
+        with patch.object(main, "STOP_CLOSE_CONFIRM", True):
+            value = main._resolve_unsent_venue_setup(setup, candles, now=2200)
+        self.assertEqual(value[:3], ("SL", 0, 0))
+
+    def test_native_shadow_expires_at_64_bars(self):
+        setup = {
+            **self.setup(), "source": "stock_xperp_native_shadow",
+            "ts": 1800.0, "signal_bar_ts": 900.0,
+        }
+        count = main.NATIVE_XPERP_HOLD_BARS
+        candles = {
+            "time": [1800 + i * 900 for i in range(count + 5)],
+            "open": [100.0] * (count + 5),
+            "high": [100.2] * (count + 5),
+            "low": [99.8] * (count + 5),
+            "close": [100.1] * (count + 5),
+            "volume": [1.0] * (count + 5),
+        }
+        value = main._resolve_unsent_venue_setup(
+            setup, candles, now=1800 + count * 900)
+        self.assertEqual(value[:3], ("EXPIRED", 0, 0))
+
     def test_worker_only_persists_outcome(self):
         rows = [self.setup()]
         candles = self.candles(high=101.2, low=99.5, close=101.0)

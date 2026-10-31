@@ -86,8 +86,12 @@ class SetupDedupTests(unittest.TestCase):
                     **base, "signal_bar_ts": 1_700_000_300.0,
                     "source": "stock_venue_shadow_5m",
                 })
-                db.log_setup_candidate_once({
+                native_id = db.log_setup_candidate_once({
                     **base, "signal_bar_ts": 1_700_000_900.0,
+                    "source": "stock_xperp_native_shadow",
+                })
+                db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": 1_700_001_800.0,
                     "source": "retired_strategy",
                 })
                 with db._conn() as conn:
@@ -96,7 +100,7 @@ class SetupDedupTests(unittest.TestCase):
                 rows = db.get_unresolved_venue_setups()
 
         self.assertCountEqual([row["id"] for row in rows],
-                              [venue_id, five_minute_id])
+                              [venue_id, five_minute_id, native_id])
 
     def test_five_minute_row_is_eligible_before_fifteen_minute_row(self):
         base = {
@@ -126,6 +130,35 @@ class SetupDedupTests(unittest.TestCase):
                     rows = db.get_unresolved_venue_setups()
 
         self.assertEqual([row["id"] for row in rows], [five_minute_id])
+
+    def test_cap_impact_uses_exact_realised_r_for_native_routes(self):
+        base = {
+            "symbol": "TESTUSDT", "direction": "SHORT", "decision": "SHORT",
+            "current_price": 100.0, "atr": 1.0, "fixed_stop_atr": 1.0,
+            "fixed_target_r": 2.5, "source": "stock_xperp_native_shadow",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / "cap_impact.db")
+            with patch.object(db, "DB_PATH", path), \
+                    patch("src.telegram_notifier.bracket_for_analysis",
+                          return_value=(97.5, 97.5, 101.0)):
+                db.init_db()
+                winner = db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": 1_700_000_000.0,
+                })
+                loser = db.log_setup_candidate_once({
+                    **base, "signal_bar_ts": 1_700_000_900.0,
+                })
+                db.mark_setup_blocked(winner, "earnings_blackout")
+                db.mark_setup_blocked(loser, "earnings_blackout")
+                db.mark_setup_resolved(winner, "TP2", 1, 1, net_r=2.5)
+                db.mark_setup_resolved(loser, "SL", 0, 0, net_r=-1.0)
+                stats = db.get_cap_impact_stats(0)["earnings_blackout"]
+
+        self.assertEqual(stats["n"], 2)
+        self.assertEqual(stats["reached_tp1"], 1)
+        self.assertEqual(stats["sl"], 1)
+        self.assertAlmostEqual(stats["saved_r"], -1.5)
 
 
 if __name__ == "__main__":

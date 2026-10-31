@@ -44,9 +44,11 @@ from src.stock_5m_shadow_router import (
 )
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS as NATIVE_XPERP_SYMBOLS,
+    HOLD_BARS as NATIVE_XPERP_HOLD_BARS,
     REQUIRED_HISTORY_BARS as NATIVE_XPERP_REQUIRED_HISTORY_BARS,
     backing_level_allows_entry, native_shadow_setups,
 )
+from src.earnings_calendar import is_earnings_blackout
 from src.telegram_notifier import (
     send_signal, send_status, send_signal_update, send_morning_digest, send_weekly_digest,
     send_daily_prayer, send_commandments, send_evening_prayer, send_evening_ritual,
@@ -291,6 +293,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
                             ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за 15 мин"),
                             ("rolling_hour_cap", f"лимит {NATIVE_XPERP_ROLLING_HOUR_CAP} за скользящий час"),
                             ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
+                            ("earnings_blackout", "отчёт компании сегодня или завтра"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
             st = _caps.get(code) or {}
             if st.get("n"):
@@ -3075,12 +3078,18 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
     opened = float(setup["ts"])
     signal_bar = float(setup.get("signal_bar_ts") or 0.0)
     five_minute_shadow = setup.get("source") == "stock_venue_shadow_5m"
+    native_xperp_shadow = setup.get("source") == "stock_xperp_native_shadow"
     bar_seconds = 300 if five_minute_shadow else 900
     entry_bar_open = (signal_bar + bar_seconds if signal_bar > 0
                       else math.floor(opened / bar_seconds) * bar_seconds)
     sliced = _slice_candles_from_open(candles, entry_bar_open)
     if not sliced.get("time"):
         return None
+    if native_xperp_shadow:
+        # The frozen route expires after 64 15m bars. Do not let later candles
+        # turn an expired counterfactual into a fictional TP or stop.
+        sliced = {key: value[:NATIVE_XPERP_HOLD_BARS]
+                  for key, value in sliced.items()}
     intrabar = float(sliced["time"][0]) < opened
     result = simulate_exit(
         sliced, range(len(sliced["time"])), direction=setup["direction"],
@@ -3090,7 +3099,8 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         # The frozen 5m research uses conservative touch stops.  Preserve the
         # existing production venue exit rule while keeping its forward sample
         # exactly comparable with the audited strategy.
-        stop_on_close=False if five_minute_shadow else STOP_CLOSE_CONFIRM,
+        stop_on_close=(False if five_minute_shadow or native_xperp_shadow
+                       else STOP_CLOSE_CONFIRM),
         backstop_r=STOP_EXCHANGE_BACKSTOP_R,
         choose_trail=lambda _h, _l, _c: 0.0,
         intrabar_entry=intrabar,
@@ -3099,6 +3109,13 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         reached_tp1 = int(result.outcome in {"TP1", "TP2", "TRAIL"})
         reached_tp2 = int(result.outcome == "TP2")
         return result.outcome, reached_tp1, reached_tp2, result.gross_r
+
+    if native_xperp_shadow:
+        horizon_end = entry_bar_open + NATIVE_XPERP_HOLD_BARS * bar_seconds
+        if (now < horizon_end
+                or len(sliced.get("time") or []) < NATIVE_XPERP_HOLD_BARS):
+            return None
+        return "EXPIRED", int(result.reached_tp1), 0, result.gross_r
 
     session_expired = session_hours_between(opened, now) > SIGNAL_EXPIRY_HOURS
     calendar_expired = (SIGNAL_EXPIRY_MAX_DAYS > 0
@@ -3473,6 +3490,13 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
         native = analysis.get("source") == "stock_xperp_native_shadow"
+        blackout, blackout_reason = is_earnings_blackout(
+            analysis.get("symbol", ""))
+        if blackout:
+            mark_setup_blocked(setup_id, "earnings_blackout")
+            log.info("Stock setup blocked for %s: %s",
+                     analysis.get("symbol", ""), blackout_reason)
+            continue
         if (native
                 and native_recent_hour_count >= NATIVE_XPERP_ROLLING_HOUR_CAP):
             mark_setup_blocked(setup_id, "rolling_hour_cap")

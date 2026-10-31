@@ -1479,30 +1479,38 @@ def mark_setup_blocked(setup_log_id: int, reason: str) -> None:
 
 
 def get_cap_impact_stats(since_ts: float) -> dict:
-    """Outcomes of setups Claude approved but never sent.
+    """Outcomes of valid setups blocked before Telegram publication.
 
     Directly answers "did withholding it save money or cost it": the shadow
     tracker resolves these rows regardless of whether a trade was ever opened.
-    Reported per reason — the two caps are deliberate risk controls,
-    'send_failed' is a delivery bug and should read near-zero n.
+    Reported per reason; ``send_failed`` is a delivery bug and should remain at
+    zero. Native X-Perp rows carry their exact realised R, so the calculation
+    remains valid when routes use different targets.
     """
     out = {}
     with _conn() as c:
         for reason in ("dir_cap", "scan_cap", "rolling_hour_cap",
-                       "cooldown", "send_failed"):
+                       "cooldown", "earnings_blackout", "send_failed"):
             rows = c.execute(
-                """SELECT outcome, reached_tp1 FROM setup_log
+                """SELECT outcome, reached_tp1, net_r FROM setup_log
                    WHERE resolved=1 AND COALESCE(outcome,'') != 'NO_FILL'
                      AND ts >= ? AND block_reason=?
-                     AND COALESCE(source,'live')='live'""",
+                     AND COALESCE(source,'live')!='backtest'""",
                 (since_ts, reason),
             ).fetchall()
             n = len(rows)
             tp1 = sum(1 for r in rows if r["reached_tp1"])
             sl = sum(1 for r in rows if r["outcome"] == "SL")
-            # Same first-order basis the mirror experiment uses: a stop avoided
-            # is +1R, a TP1 missed is -TP1_R_MULT (this bot's own value).
-            saved_r = sl * 1.0 - tp1 * float(TP1_R_MULT)
+            # A blocked trade saves the opposite of the R it would have made.
+            # Older unresolved-history rows can lack net_r; keep the previous
+            # first-order estimate only for those legacy rows.
+            saved_r = sum(
+                -float(r["net_r"])
+                if r["net_r"] is not None else
+                (1.0 if r["outcome"] == "SL" else
+                 -float(TP1_R_MULT) if r["reached_tp1"] else 0.0)
+                for r in rows
+            )
             out[reason] = {
                 "n": n, "reached_tp1": tp1, "sl": sl,
                 "tp1_pct": (tp1 / n * 100) if n else 0.0,
@@ -1601,7 +1609,8 @@ def get_unresolved_venue_setups(limit: int = 80) -> list:
             """SELECT * FROM setup_log
                WHERE resolved=0 AND sl IS NOT NULL AND signal_id IS NULL
                  AND COALESCE(sent,0)=0
-                 AND ((source='stock_venue_regime' AND ts <= ?)
+                 AND ((source IN ('stock_venue_regime',
+                                  'stock_xperp_native_shadow') AND ts <= ?)
                       OR (source='stock_venue_shadow_5m' AND ts <= ?))
                ORDER BY ts ASC LIMIT ?""",
             (now - 900, now - 300, limit),

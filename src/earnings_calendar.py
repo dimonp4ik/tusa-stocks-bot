@@ -48,7 +48,10 @@ _NON_EQUITY_BASES = {
 }
 
 _CACHE_TTL = 6 * 3600
-_cache: dict[str, tuple[float, set]] = {}  # date_str -> (fetched_at, {symbols})
+_FAILURE_TTL = 5 * 60
+# date_str -> (fetched_at, {symbols}, successful_fetch). A short negative
+# cache prevents one Nasdaq outage from adding two HTTP timeouts per candidate.
+_cache: dict[str, tuple[float, set, bool]] = {}
 
 
 def _base_of(symbol: str) -> str:
@@ -63,7 +66,12 @@ def _reporters_on(date_str: str) -> set:
     """Set of US tickers reporting on date_str (YYYY-MM-DD). Cached; empty on failure."""
     now = time.time()
     hit = _cache.get(date_str)
-    if hit and now - hit[0] < _CACHE_TTL:
+    # Accept the old two-field cache during a hot module reload. A normal
+    # Railway deployment starts a fresh process, but this avoids a rare scan
+    # failure when a developer reloads only this module locally.
+    successful = bool(hit and len(hit) >= 3 and hit[2])
+    ttl = _CACHE_TTL if successful else _FAILURE_TTL
+    if hit and now - hit[0] < ttl:
         return hit[1]
     try:
         resp = requests.get(
@@ -74,12 +82,14 @@ def _reporters_on(date_str: str) -> set:
         )
         rows = ((resp.json().get("data") or {}).get("rows")) or []
         symbols = {str(r.get("symbol", "")).upper() for r in rows if r.get("symbol")}
-        _cache[date_str] = (now, symbols)
+        _cache[date_str] = (now, symbols, True)
         return symbols
     except Exception as e:
         _log.warning(f"Earnings calendar fetch failed for {date_str}: {e}")
         stale = _cache.get(date_str)
-        return stale[1] if stale else set()
+        symbols = stale[1] if stale else set()
+        _cache[date_str] = (now, symbols, False)
+        return symbols
 
 
 def is_earnings_blackout(symbol: str) -> tuple[bool, str]:

@@ -12,6 +12,12 @@ from src import telegram_notifier as notifier
 
 
 class ShadowDeploymentTests(unittest.TestCase):
+    def setUp(self):
+        patcher = patch.object(
+            main, "is_earnings_blackout", return_value=(False, ""))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_real_orders_fail_closed(self):
         self.assertEqual(config.DEPLOYMENT_MODE, "shadow")
         self.assertFalse(config.AUTOTRADE_ENABLED)
@@ -171,6 +177,21 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertEqual(published, 0)
         send.assert_not_called()
         blocked.assert_called_once_with(9, "rolling_hour_cap")
+
+    def test_earnings_blackout_blocks_candidate_before_send(self):
+        candidate = ({
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow",
+        }, 12)
+        with patch.object(main, "is_earnings_blackout",
+                          return_value=(True, "отчёт сегодня")), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            published = main._publish_stock_venue_candidates([candidate])
+        self.assertEqual(published, 0)
+        send.assert_not_called()
+        blocked.assert_called_once_with(12, "earnings_blackout")
 
     def test_five_minute_analysis_is_permanently_shadow_only(self):
         setup = {
