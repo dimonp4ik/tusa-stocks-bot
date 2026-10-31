@@ -19,9 +19,12 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                    rolling_hour_cap: int | None = None,
                    weak_index_max_ratio: float | None = None,
                    rank_key: Callable[[dict], object] | None = None,
-                   loss_streak_cap: int = 3) -> list[dict]:
+                   loss_streak_cap: int = 3,
+                   direction_cap: int = 4) -> list[dict]:
     if loss_streak_cap < 1:
         raise ValueError("loss_streak_cap must be positive")
+    if direction_cap < 1:
+        raise ValueError("direction_cap must be positive")
     pending: list[tuple[float, int, dict]] = []
     opened: dict[str, dict] = {}
     last: dict[tuple[str, str], float] = {}
@@ -78,7 +81,8 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                             max(qqq / spy, spy / qqq) > weak_index_max_ratio)
             if inconsistent and per_module[module_key] >= 1:
                 continue
-        if sum(item["direction"] == row["direction"] for item in opened.values()) >= 4:
+        if (sum(item["direction"] == row["direction"]
+                for item in opened.values()) >= direction_cap):
             continue
         opened[row["symbol"]] = row
         last[key] = now
