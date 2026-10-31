@@ -366,6 +366,25 @@ class ShadowDeploymentTests(unittest.TestCase):
         send.assert_not_called()
         blocked.assert_called_once_with(1, "dir_cap")
 
+    def test_publish_diagnostics_explain_rejected_candidate(self):
+        candidates = [({
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow",
+        }, 7)]
+        diagnostics = {}
+        with patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            published = main._publish_stock_venue_candidates(
+                candidates,
+                {"SHORT": config.MAX_SAME_DIRECTION_POSITIONS},
+                diagnostics,
+            )
+        self.assertEqual(published, 0)
+        self.assertEqual(diagnostics, {"dir_cap": 1})
+        send.assert_not_called()
+        blocked.assert_called_once_with(7, "dir_cap")
+
     def test_daily_loss_pause_uses_only_closed_signal_streak(self):
         with patch.object(main, "get_today_sl_streak",
                           return_value=config.VENUE_LOSS_PAUSE_STREAK):

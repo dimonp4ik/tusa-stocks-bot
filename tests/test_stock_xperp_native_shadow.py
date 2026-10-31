@@ -162,17 +162,20 @@ def test_native_scan_publishes_only_paper_candidate_contract():
             patch.object(main, "get_xperp_price", return_value=100.0), \
             patch.object(main, "log_setup_candidate_once", return_value=7), \
             patch.object(main, "_venue_signal_on_cooldown", return_value=False), \
-            patch.object(main, "_persist_native_scan_audit"), \
+            patch.object(main, "_persist_native_scan_audit") as persist, \
             patch.object(main, "_publish_stock_venue_candidates",
                          return_value=1) as publish:
         main._run_native_xperp_shadow_scan()
-    candidates, exposure = publish.call_args.args
+    candidates, exposure, diagnostics = publish.call_args.args
     assert exposure == {"LONG": 0, "SHORT": 0}
+    assert diagnostics == {}
     assert len(candidates) == 1
     analysis, setup_id = candidates[0]
     assert setup_id == 7
     assert analysis["source"] == "stock_xperp_native_shadow"
     assert analysis["_shadow_only"] is True
+    audit = persist.call_args.args[0]
+    assert audit["publish_rejects"] == {}
 
 
 def test_native_scan_fetches_enough_bars_for_longest_regime_gate():

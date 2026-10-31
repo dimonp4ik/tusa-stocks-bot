@@ -480,11 +480,34 @@ def _native_scan_status_text() -> str:
         }
         result = result_names.get(
             str(row.get("result")), str(row.get("result") or "неизвестно"))
+        reject_names = {
+            "already_open": "уже открыт",
+            "symbol_blocked": "блокировка символа",
+            "duplicate_bar": "повтор свечи",
+            "backing_level_crossed": "уровень пробит",
+            "cooldown": "кулдаун",
+            "earnings_blackout": "отчётность",
+            "rolling_hour_cap": "лимит за час",
+            "scan_cap": "лимит на свечу",
+            "dir_cap": "лимит направления",
+            "send_failed": "ошибка отправки",
+        }
+        reject_parts = []
+        for group in (row.get("portfolio_rejects") or {},
+                      row.get("publish_rejects") or {}):
+            for reason, count in group.items():
+                if int(count or 0):
+                    reject_parts.append(
+                        f"{reject_names.get(reason, reason)} {int(count)}")
+        reject_text = ("\nОтсев: " + ", ".join(reject_parts)
+                       if reject_parts else "")
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
             f"инструментов · сетапов {int(row.get('raw_setups') or 0)} · "
+            f"к отправке {int(row.get('publish_candidates') or 0)} · "
             f"отправлено {int(row.get('published') or 0)}"
+            f"{reject_text}"
         )
     except Exception:
         return "Последний скан: аудит недоступен"
@@ -3456,9 +3479,17 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
     }
 
 
-def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
-                                    open_direction_counts: dict[str, int] | None = None) -> int:
+def _publish_stock_venue_candidates(
+        candidates: list[tuple[dict, int]],
+        open_direction_counts: dict[str, int] | None = None,
+        diagnostics: dict[str, int] | None = None) -> int:
     """Publish at most the historically replayed number of entries per scan."""
+    reject_counts = diagnostics if diagnostics is not None else {}
+
+    def reject(setup_id: int, reason: str) -> None:
+        reject_counts[reason] = int(reject_counts.get(reason, 0)) + 1
+        mark_setup_blocked(setup_id, reason)
+
     published = 0
     direction_counts = dict(open_direction_counts or {})
     scan_count = 0
@@ -3493,25 +3524,25 @@ def _publish_stock_venue_candidates(candidates: list[tuple[dict, int]],
         blackout, blackout_reason = is_earnings_blackout(
             analysis.get("symbol", ""))
         if blackout:
-            mark_setup_blocked(setup_id, "earnings_blackout")
+            reject(setup_id, "earnings_blackout")
             log.info("Stock setup blocked for %s: %s",
                      analysis.get("symbol", ""), blackout_reason)
             continue
         if (native
                 and native_recent_hour_count >= NATIVE_XPERP_ROLLING_HOUR_CAP):
-            mark_setup_blocked(setup_id, "rolling_hour_cap")
+            reject(setup_id, "rolling_hour_cap")
             continue
         if scan_count >= VENUE_MAX_SIGNALS_PER_SCAN:
             # This persistent block prevents the same 15m candle from being
             # offered again by the next five-minute scheduler tick.
-            mark_setup_blocked(setup_id, "scan_cap")
+            reject(setup_id, "scan_cap")
             continue
         direction = analysis.get("direction", "")
         if direction_counts.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS:
-            mark_setup_blocked(setup_id, "dir_cap")
+            reject(setup_id, "dir_cap")
             continue
         if not send_signal(analysis):
-            mark_setup_blocked(setup_id, "send_failed")
+            reject(setup_id, "send_failed")
             continue
         mark_setup_sent(setup_id)
         _cache_signal(analysis["symbol"], analysis["direction"])
@@ -3626,8 +3657,9 @@ def _run_native_xperp_shadow_scan() -> None:
             candidates.append((analysis, setup_id))
         except Exception as exc:
             log.warning("Native X-Perp setup failed for %s: %s", symbol, exc)
+    publish_rejects = {}
     published = _publish_stock_venue_candidates(
-        candidates, open_direction_counts)
+        candidates, open_direction_counts, publish_rejects)
     bar_lengths = [len(row.get("close") or []) for row in fetched.values()]
     audit = {
         "ts": now,
@@ -3643,6 +3675,7 @@ def _run_native_xperp_shadow_scan() -> None:
         "strategy": strategy_audit,
         "raw_setups": len(setups),
         "portfolio_rejects": portfolio_rejects,
+        "publish_rejects": publish_rejects,
         "publish_candidates": len(candidates),
         "published": published,
         "open_long": open_direction_counts.get("LONG", 0),
