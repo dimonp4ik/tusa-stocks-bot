@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import tempfile
 from pathlib import Path
@@ -176,6 +177,35 @@ def test_native_scan_publishes_only_paper_candidate_contract():
     assert analysis["_shadow_only"] is True
     audit = persist.call_args.args[0]
     assert audit["publish_rejects"] == {}
+
+
+def test_native_status_explains_recent_decisions_and_open_rows():
+    audit = {
+        "ts": 2_000_000_000.0,
+        "result": "qualified_but_not_published",
+        "targets": 44,
+        "fetched": 44,
+        "raw_setups": 2,
+        "publish_candidates": 0,
+        "published": 0,
+        "portfolio_rejects": {"duplicate_bar": 1},
+        "publish_rejects": {},
+    }
+    recent = [{
+        "symbol": "TESTUSDT", "direction": "SHORT",
+        "source": "stock_xperp_native_shadow", "sent": 0,
+        "block_reason": "dir_cap", "resolved": 1, "outcome": "SL",
+    }]
+    with patch.object(main.time, "time", return_value=2_000_000_060.0), \
+            patch.object(main, "get_bot_state", return_value=json.dumps(audit)), \
+            patch.object(main, "get_all_setups_since", return_value=recent), \
+            patch.object(main, "get_open_signals", return_value=[{
+                "symbol": "OPENUSDT", "direction": "LONG", "status": "OPEN",
+            }]):
+        text = main._native_scan_status_text()
+    assert "повтор свечи 1" in text
+    assert "OPENUSDT LONG OPEN" in text
+    assert "TESTUSDT SHORT dir_cap/SL" in text
 
 
 def test_native_scan_fetches_enough_bars_for_longest_regime_gate():

@@ -501,6 +501,28 @@ def _native_scan_status_text() -> str:
                         f"{reject_names.get(reason, reason)} {int(count)}")
         reject_text = ("\nОтсев: " + ", ".join(reject_parts)
                        if reject_parts else "")
+        recent_rows = [
+            item for item in get_all_setups_since(time.time() - 6 * 3600)
+            if item.get("source") == "stock_xperp_native_shadow"
+        ][-4:]
+        recent_parts = []
+        for item in recent_rows:
+            state = ("отправлен" if int(item.get("sent") or 0)
+                     else str(item.get("block_reason") or "ожидает"))
+            if int(item.get("resolved") or 0):
+                state += f"/{item.get('outcome') or 'закрыт'}"
+            recent_parts.append(
+                f"{item.get('symbol', '?')} {item.get('direction', '?')} {state}")
+        recent_text = ("\nПоследние решения: " + "; ".join(recent_parts)
+                       if recent_parts else "")
+        open_rows = get_open_signals()
+        open_parts = [
+            f"{item.get('symbol', '?')} {item.get('direction', '?')} "
+            f"{item.get('status', '?')}"
+            for item in open_rows[:6]
+        ]
+        open_text = ("\nОткрытые: " + "; ".join(open_parts)
+                     if open_parts else "\nОткрытые: нет")
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
@@ -508,6 +530,8 @@ def _native_scan_status_text() -> str:
             f"к отправке {int(row.get('publish_candidates') or 0)} · "
             f"отправлено {int(row.get('published') or 0)}"
             f"{reject_text}"
+            f"{open_text}"
+            f"{recent_text}"
         )
     except Exception:
         return "Последний скан: аудит недоступен"
