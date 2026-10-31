@@ -516,11 +516,14 @@ def _native_scan_status_text() -> str:
         recent_text = ("\nПоследние решения: " + "; ".join(recent_parts)
                        if recent_parts else "")
         open_rows = get_open_signals()
-        open_parts = [
-            f"{item.get('symbol', '?')} {item.get('direction', '?')} "
-            f"{item.get('status', '?')}"
-            for item in open_rows[:6]
-        ]
+        open_parts = []
+        for item in open_rows[:6]:
+            age_hours = max(0.0, (time.time() - float(
+                item.get("opened_at") or time.time())) / 3600)
+            source = str(item.get("source") or "unknown")
+            open_parts.append(
+                f"{item.get('symbol', '?')} {item.get('direction', '?')} "
+                f"{item.get('status', '?')} {age_hours:.1f}ч {source}")
         open_text = ("\nОткрытые: " + "; ".join(open_parts)
                      if open_parts else "\nОткрытые: нет")
         return (

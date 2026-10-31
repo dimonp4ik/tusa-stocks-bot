@@ -201,10 +201,12 @@ def test_native_status_explains_recent_decisions_and_open_rows():
             patch.object(main, "get_all_setups_since", return_value=recent), \
             patch.object(main, "get_open_signals", return_value=[{
                 "symbol": "OPENUSDT", "direction": "LONG", "status": "OPEN",
+                "opened_at": 2_000_000_000.0,
+                "source": "stock_xperp_native_shadow",
             }]):
         text = main._native_scan_status_text()
     assert "повтор свечи 1" in text
-    assert "OPENUSDT LONG OPEN" in text
+    assert "OPENUSDT LONG OPEN 0.0ч stock_xperp_native_shadow" in text
     assert "TESTUSDT SHORT dir_cap/SL" in text
 
 
