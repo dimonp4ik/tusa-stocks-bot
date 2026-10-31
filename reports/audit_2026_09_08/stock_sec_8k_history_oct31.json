@@ -1,0 +1,7048 @@
+{
+  "causal_policy": "acceptance_datetime_utc is authoritative; downstream strategies may first use an event in the next complete regular session",
+  "created_at": "2026-10-31T17:15:45.343525+00:00",
+  "events": [
+    {
+      "acceptance_datetime_utc": "2017-01-19T21:10:06.000Z",
+      "accession": "0001045810-17-000006",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2017-01-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-01-18",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-01-19T21:49:44.000Z",
+      "accession": "0000723125-17-000010",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-01-19",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-01-18",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-02-02T21:11:29.000Z",
+      "accession": "0001045810-17-000012",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2017-02-02",
+      "form": "8-K",
+      "items": [
+        "1.01"
+      ],
+      "non_earnings_items": [
+        "1.01"
+      ],
+      "report_date": "2017-01-27",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-02-03T21:17:02.000Z",
+      "accession": "0001193125-17-030734",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2017-02-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-01-30",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-02-03T21:52:08.000Z",
+      "accession": "0000723125-17-000014",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-02-03",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-02-02",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-02-09T22:02:03.000Z",
+      "accession": "0001193125-17-036283",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-02-09",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-02-02",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-02-16T15:32:13.000Z",
+      "accession": "0000723125-17-000020",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-02-16",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-02-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-01T14:00:56.000Z",
+      "accession": "0001193125-17-064019",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2017-03-01",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-02-28",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-02T17:21:02.000Z",
+      "accession": "0000723125-17-000026",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-03-02",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-03-02",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-03T21:36:03.000Z",
+      "accession": "0001193125-17-069853",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-03-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-02-14",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-07T21:07:51.000Z",
+      "accession": "0001326801-17-000011",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2017-03-07",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-03-06",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-13T21:12:28.000Z",
+      "accession": "0001045810-17-000038",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2017-03-13",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-03-07",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-14T21:18:04.000Z",
+      "accession": "0001193125-17-082168",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2017-03-14",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-03-14",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-17T21:15:35.000Z",
+      "accession": "0001018724-17-000044",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2017-03-17",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-03-14",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-03-27T12:09:07.000Z",
+      "accession": "0000723125-17-000033",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-03-27",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-03-27",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-04-10T16:51:25.000Z",
+      "accession": "0000723125-17-000045",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-04-10",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-04-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-04-10T20:19:20.000Z",
+      "accession": "0000723125-17-000047",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-04-10",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-04-04",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-04-11T23:24:03.000Z",
+      "accession": "0001193125-17-120198",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2017-04-12",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2017-04-12",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-04-28T15:50:48.000Z",
+      "accession": "0000723125-17-000053",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-04-28",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-04-26",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-05-11T20:56:33.000Z",
+      "accession": "0001193125-17-167400",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-05-11",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-05-04",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-05-17T16:04:34.000Z",
+      "accession": "0000723125-17-000060",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-05-17",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-05-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-05-24T21:19:03.000Z",
+      "accession": "0001193125-17-181867",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-05-24",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-05-17",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-05-25T20:37:13.000Z",
+      "accession": "0001018724-17-000084",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2017-05-25",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-05-23",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-05-30T20:09:07.000Z",
+      "accession": "0001045810-17-000097",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2017-05-30",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-05-23",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-02T23:58:06.000Z",
+      "accession": "0001045810-17-000103",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2017-06-05",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "3.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "3.02"
+      ],
+      "report_date": "2017-06-02",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-06T20:45:54.000Z",
+      "accession": "0001326801-17-000033",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2017-06-06",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-06-01",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-14T21:00:33.000Z",
+      "accession": "0001193125-17-203579",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2017-06-14",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2017-06-13",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-16T13:07:05.000Z",
+      "accession": "0001193125-17-205287",
+      "category": "material_transaction",
+      "cik": "0001018724",
+      "filing_date": "2017-06-16",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "7.01"
+      ],
+      "report_date": "2017-06-15",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-20T20:36:33.000Z",
+      "accession": "0001193125-17-208226",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-06-20",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-06-13",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-06-28T18:46:39.000Z",
+      "accession": "0000723125-17-000076",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-06-28",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "8.01"
+      ],
+      "report_date": "2017-06-22",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-07-27T18:40:42.000Z",
+      "accession": "0000723125-17-000092",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-07-27",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-07-24",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-03T20:04:04.000Z",
+      "accession": "0001193125-17-247395",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2017-08-03",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2017-08-03",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-15T12:27:35.000Z",
+      "accession": "0001193125-17-258008",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2017-08-15",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-08-15",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-15T22:43:05.000Z",
+      "accession": "0001193125-17-258814",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2017-08-16",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-08-15",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-18T20:30:58.000Z",
+      "accession": "0001193125-17-262261",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-08-18",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-08-15",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-22T20:56:59.000Z",
+      "accession": "0001193125-17-264654",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2017-08-22",
+      "form": "8-K",
+      "items": [
+        "1.02",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.02",
+        "2.03"
+      ],
+      "report_date": "2017-08-22",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-24T20:14:35.000Z",
+      "accession": "0001193125-17-266837",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2017-08-24",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2017-08-24",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-08-28T10:02:19.000Z",
+      "accession": "0001193125-17-269093",
+      "category": "material_transaction",
+      "cik": "0001018724",
+      "filing_date": "2017-08-28",
+      "form": "8-K",
+      "items": [
+        "2.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "2.01"
+      ],
+      "report_date": "2017-08-28",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-09-08T20:30:51.000Z",
+      "accession": "0001018724-17-000127",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2017-09-08",
+      "form": "8-K/A",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2017-05-23",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2017-09-12T20:45:59.000Z",
+      "accession": "0001193125-17-282809",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-09-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-09-05",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-09-19T21:14:03.000Z",
+      "accession": "0001193125-17-288464",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2017-09-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-09-19",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-09-22T20:06:03.000Z",
+      "accession": "0001326801-17-000042",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2017-09-22",
+      "form": "8-K",
+      "items": [
+        "3.03",
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "3.03",
+        "8.01"
+      ],
+      "report_date": "2017-09-21",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2017-09-26T20:00:30.000Z",
+      "accession": "0000723125-17-000106",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-09-26",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2017-09-26",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-10-10T20:02:52.000Z",
+      "accession": "0001104659-17-061554",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-10-10",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-10-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-10-12T20:31:33.000Z",
+      "accession": "0001193125-17-308859",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2017-10-12",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-10-06",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-10-16T20:01:02.000Z",
+      "accession": "0001104659-17-062365",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2017-10-16",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2017-10-11",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-10-18T12:30:47.000Z",
+      "accession": "0001104659-17-062673",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-10-18",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-10-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-10-19T17:31:18.000Z",
+      "accession": "0001104659-17-062911",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-10-19",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-10-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-11-09T21:23:57.000Z",
+      "accession": "0001045810-17-000164",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2017-11-09",
+      "form": "8-K",
+      "items": [
+        "1.02",
+        "2.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.02"
+      ],
+      "report_date": "2017-11-06",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-11-13T21:44:57.000Z",
+      "accession": "0001193125-17-341015",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2017-11-13",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-11-06",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2017-11-13T22:23:12.000Z",
+      "accession": "0000723125-17-000148",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2017-11-13",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2017-11-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-11-30T22:00:55.000Z",
+      "accession": "0001193125-17-357415",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2017-11-30",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2017-11-29",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2017-12-15T21:31:03.000Z",
+      "accession": "0001045810-17-000178",
+      "category": "distress_or_accounting",
+      "cik": "0001045810",
+      "filing_date": "2017-12-15",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2017-12-15",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2017-12-19T21:01:11.000Z",
+      "accession": "0000723125-17-000162",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2017-12-19",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2017-12-19",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2017-12-20T22:04:03.000Z",
+      "accession": "0001193125-17-374998",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2017-12-20",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-12-20",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2018-01-02T22:32:02.000Z",
+      "accession": "0000723125-18-000003",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-01-03",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2017-12-27",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-01-08T19:35:09.000Z",
+      "accession": "0000723125-18-000007",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-01-08",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-01-08",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-01-18T22:07:45.000Z",
+      "accession": "0001326801-18-000003",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2018-01-18",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-01-17",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-01-19T17:59:23.000Z",
+      "accession": "0000723125-18-000010",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-01-19",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2018-01-17",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-02-05T22:21:41.000Z",
+      "accession": "0000723125-18-000015",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-02-05",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "8.01"
+      ],
+      "report_date": "2018-02-01",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-02-07T21:16:51.000Z",
+      "accession": "0000723125-18-000017",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-02-07",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-02-07",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-02-14T21:54:21.000Z",
+      "accession": "0001193125-18-045761",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2018-02-14",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2018-02-13",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2018-03-13T21:13:29.000Z",
+      "accession": "0001045810-18-000026",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2018-03-13",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-03-07",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2018-03-22T20:01:31.000Z",
+      "accession": "0000723125-18-000031",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-03-22",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2018-03-22",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-04-18T21:04:02.000Z",
+      "accession": "0001193125-18-121161",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2018-04-18",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2018-04-18",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2018-04-23T20:35:36.000Z",
+      "accession": "0000723125-18-000043",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-04-23",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-04-20",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-04-25T20:18:44.000Z",
+      "accession": "0001326801-18-000026",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2018-04-25",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-04-25",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-04-27T21:23:04.000Z",
+      "accession": "0001193125-18-139368",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2018-04-27",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03",
+        "8.01"
+      ],
+      "report_date": "2018-04-27",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-01T12:31:05.000Z",
+      "accession": "0001193125-18-145181",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2018-05-01",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-04-30",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-07T20:30:56.000Z",
+      "accession": "0001193125-18-154515",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2018-05-07",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-04-30",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-08T01:31:32.000Z",
+      "accession": "0001193125-18-154948",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2018-05-08",
+      "form": "8-K/A",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-04-30",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-08T20:27:27.000Z",
+      "accession": "0001326801-18-000037",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2018-05-08",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "8.01"
+      ],
+      "report_date": "2018-05-07",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-08T20:38:11.000Z",
+      "accession": "0001326801-18-000039",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2018-05-08",
+      "form": "8-K/A",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-05-07",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-15T20:42:31.000Z",
+      "accession": "0000723125-18-000049",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-05-15",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-05-14",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-21T20:55:13.000Z",
+      "accession": "0001045810-18-000058",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2018-05-21",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2018-05-16",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2018-05-21T21:10:22.000Z",
+      "accession": "0000723125-18-000052",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-05-21",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-05-21",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-06-01T20:31:47.000Z",
+      "accession": "0001018724-18-000104",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2018-06-01",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2018-05-30",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2018-06-04T17:43:01.000Z",
+      "accession": "0001193125-18-182975",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2018-06-04",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01",
+        "8.01"
+      ],
+      "report_date": "2018-06-04",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2018-06-05T20:35:33.000Z",
+      "accession": "0001326801-18-000049",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2018-06-05",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2018-05-31",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-07-03T20:44:36.000Z",
+      "accession": "0000723125-18-000072",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2018-07-03",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2018-07-03",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-07-05T20:35:12.000Z",
+      "accession": "0000723125-18-000074",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-07-05",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-07-05",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-07-17T12:03:30.000Z",
+      "accession": "0000723125-18-000076",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-07-17",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-07-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-09-19T20:15:58.000Z",
+      "accession": "0001193125-18-277602",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2018-09-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-09-17",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2018-09-20T20:32:01.000Z",
+      "accession": "0000723125-18-000087",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-09-20",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-09-20",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-10-17T21:06:02.000Z",
+      "accession": "0000723125-18-000100",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-10-17",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2018-10-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-10-18T20:42:27.000Z",
+      "accession": "0000723125-18-000115",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-10-18",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-10-18",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-10-24T21:26:28.000Z",
+      "accession": "0001326801-18-000060",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2018-10-24",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-10-24",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2018-11-14T21:53:47.000Z",
+      "accession": "0000723125-18-000135",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-11-14",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-11-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-11-28T21:44:23.000Z",
+      "accession": "0000723125-18-000137",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2018-11-28",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-11-28",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-11-29T20:29:57.000Z",
+      "accession": "0001193125-18-337951",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2018-11-29",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2018-11-28",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2018-12-06T16:59:22.000Z",
+      "accession": "0000723125-18-000145",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2018-12-06",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2018-12-06",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2018-12-07T21:31:36.000Z",
+      "accession": "0001326801-18-000069",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2018-12-07",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2018-12-06",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2019-01-14T21:51:18.000Z",
+      "accession": "0000723125-19-000003",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2019-01-14",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-01-14",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-01-22T21:43:43.000Z",
+      "accession": "0000723125-19-000005",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2019-01-22",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2019-01-17",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-02-01T22:02:38.000Z",
+      "accession": "0000723125-19-000007",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2019-02-01",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-01-31",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-02-04T21:32:00.000Z",
+      "accession": "0001018724-19-000008",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2019-02-04",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-02-04",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-02-06T13:00:34.000Z",
+      "accession": "0000320193-19-000026",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2019-02-06",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-02-05",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2019-02-06T21:00:57.000Z",
+      "accession": "0001104659-19-006069",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2019-02-06",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2019-02-04",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-02-25T21:20:32.000Z",
+      "accession": "0001193125-19-049914",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2019-02-25",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-02-25",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-03-04T21:32:18.000Z",
+      "accession": "0000320193-19-000032",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2019-03-04",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2019-03-01",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2019-03-09T01:00:57.000Z",
+      "accession": "0001045810-19-000029",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2019-03-11",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-03-06",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2019-03-11T21:06:27.000Z",
+      "accession": "0001045810-19-000031",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2019-03-11",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2019-03-10",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2019-03-14T20:14:15.000Z",
+      "accession": "0001326801-19-000016",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2019-03-14",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-03-11",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2019-04-01T21:21:14.000Z",
+      "accession": "0001045810-19-000060",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2019-04-01",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-03-30",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2019-04-04T17:11:32.000Z",
+      "accession": "0001193125-19-097640",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2019-04-04",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-04-04",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-04-10T22:27:03.000Z",
+      "accession": "0001193125-19-103013",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2019-04-11",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2019-04-11",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-04-12T20:44:35.000Z",
+      "accession": "0000723125-19-000020",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2019-04-12",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-04-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-04-15T21:25:47.000Z",
+      "accession": "0001326801-19-000029",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2019-04-15",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2019-04-10",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2019-05-07T13:00:41.000Z",
+      "accession": "0000723125-19-000023",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2019-05-07",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-05-03",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-05-24T21:00:05.000Z",
+      "accession": "0001018724-19-000061",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2019-05-24",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2019-05-22",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-05-29T20:21:30.000Z",
+      "accession": "0001045810-19-000107",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2019-05-29",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2019-05-22",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2019-06-03T20:44:24.000Z",
+      "accession": "0001326801-19-000043",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2019-06-03",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2019-05-30",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2019-06-17T20:27:58.000Z",
+      "accession": "0001045810-19-000112",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2019-06-17",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-06-17",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2019-07-01T21:20:11.000Z",
+      "accession": "0000723125-19-000037",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2019-07-01",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2019-07-01",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-07-09T20:16:20.000Z",
+      "accession": "0001104659-19-039711",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2019-07-09",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2019-07-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-07-12T20:01:09.000Z",
+      "accession": "0001104659-19-040167",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2019-07-12",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2019-07-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-07-19T20:39:04.000Z",
+      "accession": "0001104659-19-041113",
+      "category": "other_8k",
+      "cik": "0000723125",
+      "filing_date": "2019-07-19",
+      "form": "8-K",
+      "items": [
+        "3.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "3.03"
+      ],
+      "report_date": "2019-07-19",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-08-01T20:58:50.000Z",
+      "accession": "0001018724-19-000081",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2019-08-01",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-07-31",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-09-11T20:21:21.000Z",
+      "accession": "0001193125-19-242975",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2019-09-11",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-09-04",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2019-09-13T21:15:36.000Z",
+      "accession": "0000320193-19-000093",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2019-09-13",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-09-10",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2019-09-19T20:20:02.000Z",
+      "accession": "0001193125-19-249565",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2019-09-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-09-19",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2019-10-17T15:16:13.000Z",
+      "accession": "0000723125-19-000091",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2019-10-17",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-10-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-10-30T20:13:02.000Z",
+      "accession": "0001326801-19-000066",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2019-10-30",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "5.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "8.01"
+      ],
+      "report_date": "2019-10-27",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2019-11-01T20:59:52.000Z",
+      "accession": "0000723125-19-000146",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2019-11-01",
+      "form": "8-K",
+      "items": [
+        "1.02",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.02",
+        "2.03"
+      ],
+      "report_date": "2019-10-30",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2019-11-15T11:02:24.000Z",
+      "accession": "0001193125-19-292676",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2019-11-15",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2019-11-07",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2019-11-19T21:45:54.000Z",
+      "accession": "0001018724-19-000093",
+      "category": "other_8k",
+      "cik": "0001018724",
+      "filing_date": "2019-11-19",
+      "form": "8-K",
+      "items": [
+        "5.04"
+      ],
+      "non_earnings_items": [
+        "5.04"
+      ],
+      "report_date": "2019-11-15",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2019-12-05T19:02:50.000Z",
+      "accession": "0001193125-19-307138",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2019-12-05",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2019-12-04",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2019-12-11T17:57:07.000Z",
+      "accession": "0000723125-19-000165",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2019-12-11",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2019-12-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-01-22T22:45:16.000Z",
+      "accession": "0000723125-20-000007",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2020-01-23",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2020-01-15",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-01-23T21:06:19.000Z",
+      "accession": "0000723125-20-000012",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2020-01-23",
+      "form": "8-K/A",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2020-01-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-01-29T21:10:08.000Z",
+      "accession": "0001326801-20-000010",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2020-01-29",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-01-29",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-02-03T21:20:12.000Z",
+      "accession": "0001326801-20-000018",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2020-02-03",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-02-03",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-02-18T11:24:57.000Z",
+      "accession": "0001193125-20-039203",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2020-02-18",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-02-17",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2020-02-26T22:10:49.000Z",
+      "accession": "0001193125-20-050232",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-02-26",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-02-26",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-02-27T11:14:21.000Z",
+      "accession": "0001193125-20-050884",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2020-02-27",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2020-02-26",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-09T20:34:36.000Z",
+      "accession": "0001326801-20-000023",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2020-03-09",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-03-05",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-10T20:12:46.000Z",
+      "accession": "0001045810-20-000033",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2020-03-10",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-03-04",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-12T21:25:35.000Z",
+      "accession": "0000723125-20-000020",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2020-03-12",
+      "form": "8-K",
+      "items": [
+        "1.02"
+      ],
+      "non_earnings_items": [
+        "1.02"
+      ],
+      "report_date": "2020-03-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-13T21:02:57.000Z",
+      "accession": "0000723125-20-000022",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2020-03-13",
+      "form": "8-K",
+      "items": [
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "2.03"
+      ],
+      "report_date": "2020-03-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-13T21:11:53.000Z",
+      "accession": "0001193125-20-073072",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2020-03-13",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-03-13",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-13T21:14:53.000Z",
+      "accession": "0001326801-20-000028",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2020-03-13",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-03-11",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-26T20:13:23.000Z",
+      "accession": "0001326801-20-000031",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2020-03-26",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-03-23",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-31T10:10:19.000Z",
+      "accession": "0001193125-20-091746",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-03-31",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-03-28",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-03-31T21:15:12.000Z",
+      "accession": "0001193125-20-092939",
+      "category": "distress_or_accounting",
+      "cik": "0001045810",
+      "filing_date": "2020-03-31",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2020-03-26",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-04-16T01:52:40.000Z",
+      "accession": "0001193125-20-108427",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2020-04-16",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-04-16",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-04-16T22:06:42.000Z",
+      "accession": "0001045810-20-000048",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2020-04-17",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-04-16",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-04-24T20:00:47.000Z",
+      "accession": "0001104659-20-050965",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2020-04-24",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2020-04-21",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-04-27T10:19:11.000Z",
+      "accession": "0001045810-20-000052",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2020-04-27",
+      "form": "8-K",
+      "items": [
+        "2.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "2.01"
+      ],
+      "report_date": "2020-04-27",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-04-30T20:07:50.000Z",
+      "accession": "0001193125-20-128779",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-04-30",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-04-30",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-11T20:31:15.000Z",
+      "accession": "0001193125-20-139112",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2020-05-11",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-05-04",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-12T11:50:03.000Z",
+      "accession": "0000723125-20-000041",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2020-05-12",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-05-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-14T18:05:02.000Z",
+      "accession": "0000723125-20-000047",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2020-05-14",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-05-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-14T20:55:20.000Z",
+      "accession": "0001193125-20-142890",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-05-14",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-05-14",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-22T17:45:59.000Z",
+      "accession": "0000723125-20-000050",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2020-05-22",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-05-22",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-27T17:24:59.000Z",
+      "accession": "0000723125-20-000053",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2020-05-27",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-05-27",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-29T21:27:43.000Z",
+      "accession": "0001326801-20-000058",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2020-05-29",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2020-05-27",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2020-05-29T21:28:25.000Z",
+      "accession": "0001018724-20-000015",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2020-05-29",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2020-05-27",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-06-01T20:06:26.000Z",
+      "accession": "0001193125-20-157234",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-06-01",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-05-29",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-06-03T20:21:04.000Z",
+      "accession": "0001193125-20-159531",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2020-06-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-06-03",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-06-15T20:22:15.000Z",
+      "accession": "0001045810-20-000103",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2020-06-15",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2020-06-09",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-06-23T20:14:04.000Z",
+      "accession": "0001193125-20-176528",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2020-06-23",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2020-06-23",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-06-26T13:10:16.000Z",
+      "accession": "0001193125-20-180036",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-06-26",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-06-26",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-07-01T00:18:09.000Z",
+      "accession": "0001045810-20-000120",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2020-07-01",
+      "form": "8-K/A",
+      "items": [
+        "2.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "2.01"
+      ],
+      "report_date": "2020-04-27",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-07-01T13:01:57.000Z",
+      "accession": "0001193125-20-184744",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2020-07-01",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-07-01",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-07-07T13:32:33.000Z",
+      "accession": "0001193125-20-188481",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2020-07-07",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-07-01",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-07-13T20:22:43.000Z",
+      "accession": "0001045810-20-000127",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2020-07-13",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-07-13",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-08-03T12:32:03.000Z",
+      "accession": "0001193125-20-207517",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-08-03",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-08-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-08-04T20:10:29.000Z",
+      "accession": "0001104659-20-090285",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2020-08-04",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2020-08-04",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-08-07T21:20:23.000Z",
+      "accession": "0001193125-20-213158",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2020-08-07",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2020-08-03",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2020-08-20T20:30:57.000Z",
+      "accession": "0001193125-20-225672",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2020-08-20",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2020-08-13",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2020-08-21T13:20:03.000Z",
+      "accession": "0001193125-20-226520",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2020-08-21",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-08-21",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-09-09T20:07:28.000Z",
+      "accession": "0001018724-20-000026",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2020-09-09",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-09-09",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2020-09-14T10:08:02.000Z",
+      "accession": "0001193125-20-244601",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2020-09-14",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "7.01"
+      ],
+      "report_date": "2020-09-13",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-09-21T20:05:56.000Z",
+      "accession": "0001193125-20-250163",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2020-09-21",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-09-21",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2020-09-21T20:44:09.000Z",
+      "accession": "0000723125-20-000074",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2020-09-21",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-09-21",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-11-09T21:32:03.000Z",
+      "accession": "0001045810-20-000181",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2020-11-09",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-11-09",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2020-12-01T14:00:18.000Z",
+      "accession": "0000723125-20-000094",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2020-12-01",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2020-12-01",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-12-01T21:31:24.000Z",
+      "accession": "0000723125-20-000097",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2020-12-01",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-12-01",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2020-12-04T20:27:34.000Z",
+      "accession": "0001193125-20-310549",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2020-12-04",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2020-12-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-01-05T21:32:16.000Z",
+      "accession": "0001193125-21-001982",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2021-01-05",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2020-12-29",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2021-01-15T21:01:03.000Z",
+      "accession": "0000723125-21-000015",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2021-01-15",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2021-01-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-01-27T02:12:01.000Z",
+      "accession": "0001193125-21-018066",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-01-27",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-01-26",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-01-27T21:08:08.000Z",
+      "accession": "0001326801-21-000011",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2021-01-27",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-01-27",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2021-02-02T21:30:08.000Z",
+      "accession": "0001018724-21-000002",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-02-02",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-02-02",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-02-08T21:31:03.000Z",
+      "accession": "0001193125-21-032394",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2021-02-08",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-02-01",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2021-02-16T21:25:04.000Z",
+      "accession": "0001193125-21-044940",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-02-16",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-02-16",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-02-16T21:28:09.000Z",
+      "accession": "0000723125-21-000018",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2021-02-16",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2021-02-15",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-02-24T21:31:21.000Z",
+      "accession": "0001193125-21-054710",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2021-02-24",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2021-02-23",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2021-03-02T22:19:56.000Z",
+      "accession": "0001193125-21-065751",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-03-02",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-03-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-03-03T14:05:06.000Z",
+      "accession": "0000723125-21-000021",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2021-03-03",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2021-03-03",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-03-16T20:43:04.000Z",
+      "accession": "0000723125-21-000024",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2021-03-16",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2021-03-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-03-17T21:23:06.000Z",
+      "accession": "0001193125-21-084239",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-03-17",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-03-16",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-03-18T23:30:13.000Z",
+      "accession": "0001045810-21-000034",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2021-03-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-03-15",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-04-12T14:51:09.000Z",
+      "accession": "0001193125-21-112687",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-04-12",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2021-04-12",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-04-12T18:08:45.000Z",
+      "accession": "0001045810-21-000047",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2021-04-12",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2021-04-12",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-04-14T22:55:25.000Z",
+      "accession": "0001104659-21-050346",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2021-04-15",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2021-04-15",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-12T20:19:08.000Z",
+      "accession": "0001193125-21-159084",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2021-05-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-05-12",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-17T20:01:20.000Z",
+      "accession": "0000723125-21-000040",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2021-05-17",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "1.02",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "1.02",
+        "2.03"
+      ],
+      "report_date": "2021-05-14",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-20T21:15:35.000Z",
+      "accession": "0001193125-21-167940",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2021-05-20",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-05-20",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-21T13:02:17.000Z",
+      "accession": "0001045810-21-000056",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2021-05-21",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-05-21",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-27T21:16:49.000Z",
+      "accession": "0001326801-21-000040",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2021-05-27",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2021-05-26",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2021-05-28T20:06:39.000Z",
+      "accession": "0001018724-21-000012",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-05-28",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2021-05-26",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-06-04T22:50:36.000Z",
+      "accession": "0001045810-21-000075",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2021-06-07",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2021-06-03",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-06-16T20:27:01.000Z",
+      "accession": "0001193125-21-192149",
+      "category": "distress_or_accounting",
+      "cik": "0001045810",
+      "filing_date": "2021-06-16",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2021-06-14",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-06-17T13:01:05.000Z",
+      "accession": "0001193125-21-192783",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-06-17",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-06-16",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-06-28T21:25:47.000Z",
+      "accession": "0001045810-21-000117",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2021-06-28",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "7.01",
+        "8.01"
+      ],
+      "report_date": "2021-06-28",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2021-07-02T20:07:53.000Z",
+      "accession": "0001018724-21-000016",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-07-02",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-06-28",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-07-08T20:24:37.000Z",
+      "accession": "0001193125-21-210827",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2021-07-08",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-07-08",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2021-08-02T20:07:38.000Z",
+      "accession": "0000723125-21-000056",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2021-08-02",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-08-02",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-08-05T20:31:44.000Z",
+      "accession": "0001193125-21-237787",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2021-08-05",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-07-29",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2021-09-20T20:59:31.000Z",
+      "accession": "0001018724-21-000022",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-09-20",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-09-20",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-09-22T20:43:59.000Z",
+      "accession": "0001326801-21-000053",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2021-09-22",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-09-20",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2021-10-19T20:53:59.000Z",
+      "accession": "0000723125-21-000067",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2021-10-19",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01"
+      ],
+      "report_date": "2021-10-18",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-10-25T20:08:12.000Z",
+      "accession": "0001326801-21-000062",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2021-10-25",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2021-10-25",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2021-10-28T21:23:03.000Z",
+      "accession": "0001326801-21-000071",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2021-10-28",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "8.01"
+      ],
+      "report_date": "2021-10-28",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2021-11-01T20:35:33.000Z",
+      "accession": "0001104659-21-132377",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2021-11-01",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2021-11-01",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2021-11-12T14:00:15.000Z",
+      "accession": "0001018724-21-000030",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2021-11-12",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-11-10",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2021-11-12T21:31:14.000Z",
+      "accession": "0001193125-21-328151",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2021-11-12",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2021-11-09",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2021-11-30T21:25:20.000Z",
+      "accession": "0001193125-21-343711",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2021-11-30",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2021-11-30",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2022-01-10T21:23:55.000Z",
+      "accession": "0001104659-22-002742",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2022-01-10",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "7.01"
+      ],
+      "report_date": "2022-01-06",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-01-11T21:23:21.000Z",
+      "accession": "0001326801-22-000006",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-01-11",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-01-10",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-01-18T13:02:43.000Z",
+      "accession": "0000723125-22-000008",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2022-01-18",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2022-01-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-01-18T13:49:05.000Z",
+      "accession": "0001193125-22-010667",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2022-01-18",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-01-18",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2022-02-08T13:09:34.000Z",
+      "accession": "0001045810-22-000005",
+      "category": "material_transaction",
+      "cik": "0001045810",
+      "filing_date": "2022-02-08",
+      "form": "8-K",
+      "items": [
+        "1.02"
+      ],
+      "non_earnings_items": [
+        "1.02"
+      ],
+      "report_date": "2022-02-08",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2022-02-10T22:02:34.000Z",
+      "accession": "0001326801-22-000028",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-02-10",
+      "form": "8-K/A",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-01-10",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-02-10T22:06:22.000Z",
+      "accession": "0001326801-22-000030",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-02-10",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-02-05",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-03-01T21:31:59.000Z",
+      "accession": "0001326801-22-000034",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-03-01",
+      "form": "8-K/A",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2021-09-20",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-03-04T21:35:09.000Z",
+      "accession": "0001193125-22-066169",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2022-03-04",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2022-03-04",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2022-03-09T21:17:13.000Z",
+      "accession": "0001045810-22-000023",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2022-03-09",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2022-03-03",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2022-03-09T21:38:21.000Z",
+      "accession": "0001018724-22-000009",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2022-03-09",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-03-09",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-04-08T20:40:01.000Z",
+      "accession": "0000723125-22-000020",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2022-04-08",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-04-08",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-04-13T20:28:56.000Z",
+      "accession": "0001193125-22-104336",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2022-04-13",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-04-13",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-04-13T21:51:45.000Z",
+      "accession": "0001104659-22-045579",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2022-04-14",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-04-14",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-05-12T18:09:06.000Z",
+      "accession": "0000723125-22-000025",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2022-05-12",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-05-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-05-26T23:46:29.000Z",
+      "accession": "0001326801-22-000066",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-05-27",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2022-05-25",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-05-27T20:04:55.000Z",
+      "accession": "0001104659-22-065872",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2022-05-27",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2022-05-25",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-05-31T20:18:52.000Z",
+      "accession": "0001326801-22-000070",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2022-05-31",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-05-31",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-06-01T20:04:26.000Z",
+      "accession": "0001326801-22-000073",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-06-01",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-05-28",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-06-02T13:01:35.000Z",
+      "accession": "0001193125-22-165839",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2022-06-02",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-06-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2022-06-03T16:10:24.000Z",
+      "accession": "0001018724-22-000015",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2022-06-03",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-06-01",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-06-06T21:29:41.000Z",
+      "accession": "0001045810-22-000088",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2022-06-06",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2022-06-02",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2022-07-28T21:28:23.000Z",
+      "accession": "0001326801-22-000085",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-07-28",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-07-24",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-01T20:28:38.000Z",
+      "accession": "0001326801-22-000090",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-08-01",
+      "form": "8-K/A",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-05-28",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-04T12:00:50.000Z",
+      "accession": "0000950103-22-013666",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2022-08-04",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-08-04",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-08T20:32:16.000Z",
+      "accession": "0001193125-22-214914",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2022-08-08",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-08-01",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-09T10:04:10.000Z",
+      "accession": "0000723125-22-000039",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2022-08-09",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-08-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-09T20:33:19.000Z",
+      "accession": "0000950103-22-013830",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2022-08-09",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-08-09",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-19T20:31:06.000Z",
+      "accession": "0001193125-22-225365",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2022-08-19",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2022-08-17",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2022-08-31T21:00:22.000Z",
+      "accession": "0001045810-22-000146",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2022-08-31",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-08-26",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2022-09-01T11:05:16.000Z",
+      "accession": "0001045810-22-000151",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2022-09-01",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-08-31",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2022-09-30T20:32:57.000Z",
+      "accession": "0001326801-22-000094",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2022-09-30",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2022-09-26",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-10-31T20:12:30.000Z",
+      "accession": "0000723125-22-000051",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2022-10-31",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2022-10-31",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-11-03T20:34:24.000Z",
+      "accession": "0000723125-22-000053",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2022-11-03",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2022-11-03",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-11-07T11:27:07.000Z",
+      "accession": "0001193125-22-278435",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2022-11-07",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-11-06",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2022-11-09T11:14:36.000Z",
+      "accession": "0001326801-22-000116",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2022-11-09",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-11-09",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2022-11-16T13:55:33.000Z",
+      "accession": "0000723125-22-000056",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2022-11-16",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2022-11-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2022-11-18T21:36:06.000Z",
+      "accession": "0001193125-22-289041",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2022-11-18",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2022-11-18",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-12-01T21:46:00.000Z",
+      "accession": "0001193125-22-296602",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2022-12-01",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2022-12-01",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2022-12-16T14:01:06.000Z",
+      "accession": "0001193125-22-306591",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2022-12-16",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2022-12-13",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2022-12-21T21:00:43.000Z",
+      "accession": "0000723125-22-000070",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2022-12-21",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "2.05",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "2.05"
+      ],
+      "report_date": "2022-12-21",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-01-03T22:06:08.000Z",
+      "accession": "0001193125-23-000849",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2023-01-03",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2023-01-03",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-01-05T21:15:42.000Z",
+      "accession": "0000723125-23-000004",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2023-01-05",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2023-01-05",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-01-06T21:42:03.000Z",
+      "accession": "0001193125-23-003621",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2023-01-06",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2023-01-05",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-01-13T21:25:40.000Z",
+      "accession": "0000723125-23-000007",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2023-01-13",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-01-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-01-18T14:15:37.000Z",
+      "accession": "0001193125-23-009934",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2023-01-18",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-01-18",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-01T21:22:15.000Z",
+      "accession": "0001326801-23-000008",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2023-02-01",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-02-01",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-02T01:30:19.000Z",
+      "accession": "0001326801-23-000015",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2023-02-02",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-01-27",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-09T21:40:46.000Z",
+      "accession": "0000723125-23-000011",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2023-02-09",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-02-05",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-09T22:13:02.000Z",
+      "accession": "0000723125-23-000014",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2023-02-09",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2023-02-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-13T21:09:07.000Z",
+      "accession": "0001326801-23-000019",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2023-02-13",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-02-08",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-02-15T21:25:51.000Z",
+      "accession": "0001326801-23-000023",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2023-02-15",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-02-09",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-03-08T21:12:15.000Z",
+      "accession": "0001045810-23-000039",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2023-03-08",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2023-03-02",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2023-03-10T21:30:52.000Z",
+      "accession": "0001140361-23-011192",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2023-03-10",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-03-10",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2023-03-14T13:18:43.000Z",
+      "accession": "0001326801-23-000035",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2023-03-14",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-03-14",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-04-10T20:18:35.000Z",
+      "accession": "0001326801-23-000038",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2023-04-10",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-04-07",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-04-11T21:19:30.000Z",
+      "accession": "0000723125-23-000026",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2023-04-11",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2023-04-11",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-04-12T22:03:57.000Z",
+      "accession": "0001104659-23-044715",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2023-04-13",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-04-13",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-05-03T20:13:28.000Z",
+      "accession": "0001193125-23-134410",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2023-05-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-05-01",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-05-10T20:31:27.000Z",
+      "accession": "0001140361-23-023909",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2023-05-10",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-05-08",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2023-05-22T10:13:08.000Z",
+      "accession": "0000723125-23-000028",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2023-05-22",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-05-22",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-05-26T20:09:07.000Z",
+      "accession": "0001104659-23-065457",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2023-05-26",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-05-24",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-06-02T01:58:13.000Z",
+      "accession": "0001326801-23-000083",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2023-06-02",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-05-31",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2023-06-16T13:30:58.000Z",
+      "accession": "0000723125-23-000034",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2023-06-16",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-06-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-06-27T21:11:03.000Z",
+      "accession": "0001045810-23-000146",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2023-06-27",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-06-22",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2023-07-03T20:05:34.000Z",
+      "accession": "0001193125-23-181341",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2023-07-03",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2023-07-01",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-07-24T20:35:01.000Z",
+      "accession": "0001045810-23-000164",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2023-07-24",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-07-24",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2023-08-21T12:41:32.000Z",
+      "accession": "0000723125-23-000048",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2023-08-21",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-08-21",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-09-13T20:22:21.000Z",
+      "accession": "0001018724-23-000014",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2023-09-13",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2023-09-13",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-11T20:17:04.000Z",
+      "accession": "0001193125-23-254151",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2023-10-11",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-10-11",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-13T12:37:32.000Z",
+      "accession": "0001193125-23-255762",
+      "category": "material_transaction",
+      "cik": "0000789019",
+      "filing_date": "2023-10-13",
+      "form": "8-K",
+      "items": [
+        "2.01"
+      ],
+      "non_earnings_items": [
+        "2.01"
+      ],
+      "report_date": "2023-10-13",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-16T21:30:10.000Z",
+      "accession": "0001104659-23-109428",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2023-10-16",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-10-16",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-17T21:27:14.000Z",
+      "accession": "0001045810-23-000217",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2023-10-17",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-10-17",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-24T13:00:18.000Z",
+      "accession": "0001045810-23-000221",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2023-10-24",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-10-23",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2023-10-30T10:04:32.000Z",
+      "accession": "0001193125-23-265616",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2023-10-30",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-10-27",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-11-01T21:28:24.000Z",
+      "accession": "0001104659-23-113444",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2023-11-01",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "1.02",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "1.02",
+        "2.03"
+      ],
+      "report_date": "2023-11-01",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2023-11-06T21:14:08.000Z",
+      "accession": "0001193125-23-271376",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2023-11-06",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2023-11-06",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2023-11-28T14:00:13.000Z",
+      "accession": "0001104659-23-121460",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2023-11-28",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2023-11-28",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2023-12-08T21:31:05.000Z",
+      "accession": "0001193125-23-291720",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2023-12-08",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2023-12-07",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2024-01-12T21:01:56.000Z",
+      "accession": "0001104659-24-003666",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2024-01-12",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03",
+        "8.01"
+      ],
+      "report_date": "2024-01-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-01-18T00:42:58.000Z",
+      "accession": "0001326801-24-000003",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2024-01-18",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-01-16",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-01-19T21:14:12.000Z",
+      "accession": "0001104659-24-005219",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2024-01-19",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2024-01-18",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-01-19T21:39:35.000Z",
+      "accession": "0001193125-24-011295",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2024-01-19",
+      "form": "8-K",
+      "items": [
+        "1.05",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.05",
+        "7.01"
+      ],
+      "report_date": "2024-01-17",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2024-02-01T21:10:29.000Z",
+      "accession": "0001326801-24-000010",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2024-02-01",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2024-02-01",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-02-14T21:28:03.000Z",
+      "accession": "0001326801-24-000019",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2024-02-14",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-02-13",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-02-28T22:09:05.000Z",
+      "accession": "0001140361-24-010155",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2024-02-28",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2024-02-28",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2024-03-08T13:58:04.000Z",
+      "accession": "0001193125-24-062997",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2024-03-08",
+      "form": "8-K/A",
+      "items": [
+        "1.05",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.05",
+        "7.01"
+      ],
+      "report_date": "2024-01-17",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2024-03-11T20:29:16.000Z",
+      "accession": "0001104659-24-033011",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2024-03-11",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2024-03-11",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-03-14T20:30:50.000Z",
+      "accession": "0001045810-24-000069",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2024-03-14",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2024-03-08",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2024-04-10T22:24:36.000Z",
+      "accession": "0001104659-24-045915",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2024-04-11",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-04-11",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2024-04-11T01:06:30.000Z",
+      "accession": "0001104659-24-045952",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2024-04-11",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-04-10",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-04-19T10:07:10.000Z",
+      "accession": "0001104659-24-049030",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2024-04-19",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-04-17",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-03T20:35:42.000Z",
+      "accession": "0001140361-24-024352",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2024-05-03",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-05-03",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-03T20:41:53.000Z",
+      "accession": "0001104659-24-057026",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2024-05-03",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2024-05-03",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-14T20:04:30.000Z",
+      "accession": "0001104659-24-061143",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2024-05-14",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-05-14",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-22T20:21:29.000Z",
+      "accession": "0001045810-24-000113",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2024-05-22",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2024-05-22",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-24T20:03:37.000Z",
+      "accession": "0001104659-24-065117",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2024-05-24",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2024-05-22",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2024-05-31T20:14:51.000Z",
+      "accession": "0001326801-24-000057",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2024-05-31",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2024-05-29",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-06-07T20:19:34.000Z",
+      "accession": "0001045810-24-000144",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2024-06-07",
+      "form": "8-K",
+      "items": [
+        "5.03"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2024-06-07",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2024-07-02T20:47:41.000Z",
+      "accession": "0001045810-24-000206",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2024-07-02",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2024-06-26",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2024-07-19T20:05:25.000Z",
+      "accession": "0001104659-24-081160",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2024-07-19",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2024-07-18",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-08-07T12:45:51.000Z",
+      "accession": "0001104659-24-086571",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2024-08-07",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-08-07",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-08-09T20:30:30.000Z",
+      "accession": "0001193125-24-197873",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2024-08-09",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2024-08-07",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-08-21T20:08:55.000Z",
+      "accession": "0001193125-24-204403",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2024-08-21",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-08-21",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2024-08-23T20:30:44.000Z",
+      "accession": "0001140361-24-038403",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2024-08-23",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2024-08-20",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2024-08-26T21:20:33.000Z",
+      "accession": "0001140361-24-038601",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2024-08-26",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-08-26",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2024-09-10T13:06:34.000Z",
+      "accession": "0001140361-24-040659",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2024-09-10",
+      "form": "8-K",
+      "items": [
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2024-09-10",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2024-09-10T20:53:12.000Z",
+      "accession": "0001326801-24-000072",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2024-09-10",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2024-09-05",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2024-10-30T20:22:02.000Z",
+      "accession": "0001104659-24-112626",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2024-10-30",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.03"
+      ],
+      "report_date": "2024-10-25",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-11-07T21:35:26.000Z",
+      "accession": "0001045810-24-000300",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2024-11-07",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-11-07",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2024-12-03T21:00:37.000Z",
+      "accession": "0000950170-24-132722",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2024-12-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2024-12-03",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2024-12-10T21:05:18.000Z",
+      "accession": "0001104659-24-127174",
+      "category": "material_transaction",
+      "cik": "0000723125",
+      "filing_date": "2024-12-10",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "7.01"
+      ],
+      "report_date": "2024-12-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2024-12-11T21:01:27.000Z",
+      "accession": "0001193125-24-275524",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2024-12-11",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "5.07",
+        "7.01"
+      ],
+      "report_date": "2024-12-10",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-03T21:30:56.000Z",
+      "accession": "0001140361-25-000228",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2025-01-03",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-12-30",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-06T21:40:45.000Z",
+      "accession": "0001326801-25-000005",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2025-01-06",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2024-12-30",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-16T21:05:55.000Z",
+      "accession": "0001104659-25-004100",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2025-01-16",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03",
+        "8.01"
+      ],
+      "report_date": "2025-01-13",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-17T21:59:50.000Z",
+      "accession": "0001045810-25-000007",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2025-01-17",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-01-13",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-21T21:01:53.000Z",
+      "accession": "0001104659-25-004879",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2025-01-21",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "1.02",
+        "2.03",
+        "5.02",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "1.02",
+        "2.03",
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2025-01-16",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-01-22T22:15:39.000Z",
+      "accession": "0001193125-25-010492",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2025-01-22",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-01-22",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-02-20T21:33:09.000Z",
+      "accession": "0001326801-25-000021",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2025-02-20",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-02-13",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-02-25T21:47:19.000Z",
+      "accession": "0001140361-25-005876",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2025-02-25",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2025-02-25",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-03-05T21:10:13.000Z",
+      "accession": "0001104659-25-020878",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2025-03-05",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-03-05",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-03-07T22:09:13.000Z",
+      "accession": "0001045810-25-000039",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2025-03-07",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-03-03",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2025-03-12T20:05:43.000Z",
+      "accession": "0001104659-25-022973",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2025-03-12",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "1.02",
+        "2.03"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "1.02",
+        "2.03"
+      ],
+      "report_date": "2025-03-12",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-04-09T21:47:09.000Z",
+      "accession": "0001104659-25-033450",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2025-04-10",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2025-04-10",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2025-04-11T21:04:06.000Z",
+      "accession": "0001326801-25-000027",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2025-04-11",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-04-11",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-04-15T21:22:59.000Z",
+      "accession": "0001045810-25-000082",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2025-04-15",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-04-09",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2025-04-29T20:04:16.000Z",
+      "accession": "0001104659-25-041201",
+      "category": "distress_or_accounting",
+      "cik": "0000723125",
+      "filing_date": "2025-04-29",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03",
+        "8.01"
+      ],
+      "report_date": "2025-04-24",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-05-12T20:30:28.000Z",
+      "accession": "0001140361-25-018400",
+      "category": "reg_fd_or_other",
+      "cik": "0000320193",
+      "filing_date": "2025-05-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-05-05",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-05-22T20:31:45.000Z",
+      "accession": "0001104659-25-052014",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2025-05-22",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2025-05-21",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2025-05-30T20:22:05.000Z",
+      "accession": "0001326801-25-000090",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2025-05-30",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2025-05-28",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-06-12T12:40:40.000Z",
+      "accession": "0001104659-25-058741",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2025-06-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-06-11",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-06-30T22:35:29.000Z",
+      "accession": "0001045810-25-000179",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2025-07-01",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2025-06-25",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2025-07-01T21:00:47.000Z",
+      "accession": "0001193125-25-154103",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2025-07-01",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2025-07-01",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-07-09T01:18:13.000Z",
+      "accession": "0001140361-25-025275",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2025-07-09",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-07-08",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-07-18T20:05:39.000Z",
+      "accession": "0001104659-25-069019",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2025-07-18",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03"
+      ],
+      "report_date": "2025-07-17",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-07-25T20:30:49.000Z",
+      "accession": "0001140361-25-027340",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2025-07-25",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-07-21",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-08-05T20:31:08.000Z",
+      "accession": "0001045810-25-000197",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2025-08-05",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-07-31",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2025-08-11T12:05:18.000Z",
+      "accession": "0001104659-25-075940",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2025-08-11",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2025-08-11",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-09-30T20:37:10.000Z",
+      "accession": "0001193125-25-225125",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2025-09-30",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-09-24",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-10-21T20:09:06.000Z",
+      "accession": "0001104659-25-101237",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2025-10-21",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-10-15",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2025-10-29T20:07:42.000Z",
+      "accession": "0001193125-25-256310",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2025-10-29",
+      "form": "8-K",
+      "items": [
+        "2.02",
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2025-10-28",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-11-03T21:18:13.000Z",
+      "accession": "0001193125-25-262593",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2025-11-03",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-10-30",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-11-20T22:00:42.000Z",
+      "accession": "0001104659-25-114647",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2025-11-20",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-11-20",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2025-12-05T21:31:42.000Z",
+      "accession": "0001140361-25-044561",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2025-12-05",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-12-04",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2025-12-08T21:00:35.000Z",
+      "accession": "0001193125-25-311196",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2025-12-08",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.02",
+        "5.07"
+      ],
+      "report_date": "2025-12-05",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2025-12-12T21:14:29.000Z",
+      "accession": "0001628280-25-056768",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2025-12-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2025-12-05",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2025-12-19T22:00:37.000Z",
+      "accession": "0001628280-25-058337",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2025-12-19",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-12-19",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-01-02T21:30:52.000Z",
+      "accession": "0001140361-26-000199",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2026-01-02",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2025-12-30",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2026-01-16T21:56:58.000Z",
+      "accession": "0001628280-26-002429",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2026-01-16",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-01-12",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-01-21T21:05:37.000Z",
+      "accession": "0001104659-26-005366",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2026-01-21",
+      "form": "8-K",
+      "items": [
+        "5.03",
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.03",
+        "5.07"
+      ],
+      "report_date": "2026-01-15",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2026-01-23T22:01:33.000Z",
+      "accession": "0001045810-26-000003",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-01-23",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-01-20",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-02-24T21:55:58.000Z",
+      "accession": "0001140361-26-006577",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2026-02-24",
+      "form": "8-K",
+      "items": [
+        "5.07",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2026-02-24",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2026-02-27T13:36:30.000Z",
+      "accession": "0001104659-26-021050",
+      "category": "material_transaction",
+      "cik": "0001018724",
+      "filing_date": "2026-02-27",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "7.01",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "7.01",
+        "8.01"
+      ],
+      "report_date": "2026-02-27",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-03-06T21:11:25.000Z",
+      "accession": "0001045810-26-000024",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-03-06",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-03-02",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-03-13T21:01:35.000Z",
+      "accession": "0001104659-26-027729",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-03-13",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-03-13",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-03-16T20:54:55.000Z",
+      "accession": "0001104659-26-028556",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-03-16",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-03-16",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-03-25T12:26:22.000Z",
+      "accession": "0001104659-26-034174",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2026-03-25",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-03-25",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-01T12:33:36.000Z",
+      "accession": "0001104659-26-038249",
+      "category": "reg_fd_or_other",
+      "cik": "0000723125",
+      "filing_date": "2026-04-01",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-03-31",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-08T22:02:20.000Z",
+      "accession": "0001104659-26-041034",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-04-09",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2026-04-09",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-14T12:04:26.000Z",
+      "accession": "0001104659-26-042880",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-04-14",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2026-04-14",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-14T21:01:31.000Z",
+      "accession": "0001628280-26-025108",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2026-04-14",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-04-08",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-20T21:29:51.000Z",
+      "accession": "0001140361-26-015711",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2026-04-20",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-04-17",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2026-04-27T20:10:30.000Z",
+      "accession": "0001045810-26-000026",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-04-27",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-04-24",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-05-04T20:36:02.000Z",
+      "accession": "0001193125-26-204128",
+      "category": "reg_fd_or_other",
+      "cik": "0001326801",
+      "filing_date": "2026-05-04",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-04-30",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-05-08T20:35:07.000Z",
+      "accession": "0001045810-26-000028",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-05-08",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-05-07",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-05-14T20:28:48.000Z",
+      "accession": "0001193125-26-224155",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2026-05-14",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-05-13",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2026-05-22T20:12:53.000Z",
+      "accession": "0001104659-26-065717",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2026-05-22",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2026-05-20",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-05-29T20:16:13.000Z",
+      "accession": "0001628280-26-039193",
+      "category": "governance",
+      "cik": "0001326801",
+      "filing_date": "2026-05-29",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2026-05-27",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-05T14:36:56.000Z",
+      "accession": "0001193125-26-258667",
+      "category": "governance",
+      "cik": "0000789019",
+      "filing_date": "2026-06-05",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-06-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-09T20:13:47.000Z",
+      "accession": "0001104659-26-071845",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2026-06-09",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-06-09",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-10T13:00:19.000Z",
+      "accession": "0001104659-26-072140",
+      "category": "distress_or_accounting",
+      "cik": "0001018724",
+      "filing_date": "2026-06-10",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03"
+      ],
+      "report_date": "2026-06-08",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-12T21:00:28.000Z",
+      "accession": "0001104659-26-073562",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-06-12",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-06-12",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-18T20:00:24.000Z",
+      "accession": "0001193125-26-275783",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2026-06-18",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-06-15",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-06-30T20:27:26.000Z",
+      "accession": "0001045810-26-000056",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-06-30",
+      "form": "8-K",
+      "items": [
+        "5.07"
+      ],
+      "non_earnings_items": [
+        "5.07"
+      ],
+      "report_date": "2026-06-24",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-07-02T13:23:16.000Z",
+      "accession": "0001045810-26-000060",
+      "category": "governance",
+      "cik": "0001045810",
+      "filing_date": "2026-07-02",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-06-28",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-07-09T20:46:08.000Z",
+      "accession": "0001104659-26-082293",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-07-09",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-07-09",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-08-17T12:41:33.000Z",
+      "accession": "0001045810-26-000069",
+      "category": "distress_or_accounting",
+      "cik": "0001045810",
+      "filing_date": "2026-08-17",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.03",
+        "7.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "2.03",
+        "7.01"
+      ],
+      "report_date": "2026-08-17",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-08-26T12:06:55.000Z",
+      "accession": "0001104659-26-101067",
+      "category": "governance",
+      "cik": "0000723125",
+      "filing_date": "2026-08-26",
+      "form": "8-K",
+      "items": [
+        "5.02",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-08-24",
+      "symbol": "MU"
+    },
+    {
+      "acceptance_datetime_utc": "2026-09-01T20:30:35.000Z",
+      "accession": "0001140361-26-035325",
+      "category": "governance",
+      "cik": "0000320193",
+      "filing_date": "2026-09-01",
+      "form": "8-K/A",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-04-17",
+      "symbol": "AAPL"
+    },
+    {
+      "acceptance_datetime_utc": "2026-09-02T20:30:24.000Z",
+      "accession": "0001193125-26-380280",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2026-09-02",
+      "form": "8-K",
+      "items": [
+        "7.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "7.01"
+      ],
+      "report_date": "2026-09-02",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2026-09-03T12:03:56.000Z",
+      "accession": "0001045810-26-000078",
+      "category": "reg_fd_or_other",
+      "cik": "0001045810",
+      "filing_date": "2026-09-03",
+      "form": "8-K",
+      "items": [
+        "8.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-09-02",
+      "symbol": "NVDA"
+    },
+    {
+      "acceptance_datetime_utc": "2026-09-09T20:28:21.000Z",
+      "accession": "0001018724-26-000036",
+      "category": "governance",
+      "cik": "0001018724",
+      "filing_date": "2026-09-09",
+      "form": "8-K",
+      "items": [
+        "5.02"
+      ],
+      "non_earnings_items": [
+        "5.02"
+      ],
+      "report_date": "2026-09-08",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-09-14T20:45:41.000Z",
+      "accession": "0001104659-26-107526",
+      "category": "reg_fd_or_other",
+      "cik": "0001018724",
+      "filing_date": "2026-09-14",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-09-14",
+      "symbol": "AMZN"
+    },
+    {
+      "acceptance_datetime_utc": "2026-10-21T20:03:35.000Z",
+      "accession": "0001628280-26-066700",
+      "category": "material_transaction",
+      "cik": "0001326801",
+      "filing_date": "2026-10-21",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "2.02",
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "8.01"
+      ],
+      "report_date": "2026-10-19",
+      "symbol": "META"
+    },
+    {
+      "acceptance_datetime_utc": "2026-10-28T20:11:03.000Z",
+      "accession": "0001193125-26-436149",
+      "category": "reg_fd_or_other",
+      "cik": "0000789019",
+      "filing_date": "2026-10-28",
+      "form": "8-K",
+      "items": [
+        "8.01",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "8.01"
+      ],
+      "report_date": "2026-10-28",
+      "symbol": "MSFT"
+    },
+    {
+      "acceptance_datetime_utc": "2026-10-29T21:08:00.000Z",
+      "accession": "0001193125-26-438017",
+      "category": "material_transaction",
+      "cik": "0001326801",
+      "filing_date": "2026-10-29",
+      "form": "8-K",
+      "items": [
+        "1.01",
+        "3.03",
+        "5.03",
+        "9.01"
+      ],
+      "non_earnings_items": [
+        "1.01",
+        "3.03",
+        "5.03"
+      ],
+      "report_date": "2026-10-26",
+      "symbol": "META"
+    }
+  ],
+  "exclusions": [
+    "8-K filings whose only substantive item is earnings Item 2.02",
+    "Item 9.01 because it is normally an attachment index"
+  ],
+  "provider": "U.S. Securities and Exchange Commission",
+  "records": 406,
+  "records_by_category": {
+    "distress_or_accounting": 24,
+    "governance": 194,
+    "material_transaction": 25,
+    "other_8k": 2,
+    "reg_fd_or_other": 161
+  },
+  "records_by_symbol": {
+    "AAPL": 49,
+    "AMZN": 66,
+    "META": 66,
+    "MSFT": 56,
+    "MU": 111,
+    "NVDA": 58
+  },
+  "requested_end_exclusive": "2026-11-01",
+  "requested_start": "2017-01-01",
+  "source_policy": "official data.sec.gov submissions JSON",
+  "sources": {
+    "https://data.sec.gov/submissions/CIK0000320193.json": {
+      "bytes": 163586,
+      "company_name": "Apple Inc.",
+      "sha256": "2a1c62401f90039b5f3c10a80e3c4bb7f112c6e833ef0a163469f8b949396510"
+    },
+    "https://data.sec.gov/submissions/CIK0000723125-submissions-001.json": {
+      "bytes": 285742,
+      "company_name": "MICRON TECHNOLOGY INC",
+      "filing_from": "1994-01-06",
+      "filing_to": "2017-10-17",
+      "sha256": "3069d5e6c9046bc2dd423484841908dc51d7817ce232b7cc816981e2f1faa18d"
+    },
+    "https://data.sec.gov/submissions/CIK0000723125.json": {
+      "bytes": 165204,
+      "company_name": "MICRON TECHNOLOGY INC",
+      "sha256": "b50ed951ec0bd75b90b6fc2305573200c3d52da9c568f05593b8b0cdeaf87f5c"
+    },
+    "https://data.sec.gov/submissions/CIK0000789019-submissions-001.json": {
+      "bytes": 308181,
+      "company_name": "MICROSOFT CORP",
+      "filing_from": "2008-08-28",
+      "filing_to": "2020-09-07",
+      "sha256": "bd8d4e5c30f839955b7bd56f9353207e4ed94fa9132d30a4c17c7742d87bbbfd"
+    },
+    "https://data.sec.gov/submissions/CIK0000789019.json": {
+      "bytes": 185269,
+      "company_name": "MICROSOFT CORP",
+      "sha256": "46f3d184653f44f040005c30746b50f6e6a3e93b6e08630d4b400a73a9f6738e"
+    },
+    "https://data.sec.gov/submissions/CIK0001018724-submissions-001.json": {
+      "bytes": 316358,
+      "company_name": "AMAZON COM INC",
+      "filing_from": "2000-02-07",
+      "filing_to": "2020-10-27",
+      "sha256": "a10e0269618a507814b792fc9f0b78a7aab11a9810ead55993d14632f2d303d2"
+    },
+    "https://data.sec.gov/submissions/CIK0001018724.json": {
+      "bytes": 159780,
+      "company_name": "AMAZON COM INC",
+      "sha256": "32d842f937f5a283afdff5b782324978f03e42a88fde0893446c231fc66ec79b"
+    },
+    "https://data.sec.gov/submissions/CIK0001045810-submissions-001.json": {
+      "bytes": 239281,
+      "company_name": "NVIDIA CORP",
+      "filing_from": "1998-03-06",
+      "filing_to": "2020-09-16",
+      "sha256": "3bc4efde56260e6c3c0233c6cc2d1d3319f5b389db7bbcfb97d57f130442b880"
+    },
+    "https://data.sec.gov/submissions/CIK0001045810.json": {
+      "bytes": 159761,
+      "company_name": "NVIDIA CORP",
+      "sha256": "d0d8527d09b31831022a6367d05bbdd5f2d2b3eda55323fd3383395016b90aaa"
+    },
+    "https://data.sec.gov/submissions/CIK0001326801-submissions-001.json": {
+      "bytes": 314453,
+      "company_name": "Meta Platforms, Inc.",
+      "filing_from": "2017-06-12",
+      "filing_to": "2024-06-23",
+      "sha256": "ba206fdea216e844adcff62f6ad9e6fdd5de8aefc5e866a04391047c41151d04"
+    },
+    "https://data.sec.gov/submissions/CIK0001326801-submissions-002.json": {
+      "bytes": 188594,
+      "company_name": "Meta Platforms, Inc.",
+      "filing_from": "2005-05-06",
+      "filing_to": "2017-06-10",
+      "sha256": "5af48d32c512cf363e416a7215c49f4c7207d58776860a5b5528c1d5260ebaf6"
+    },
+    "https://data.sec.gov/submissions/CIK0001326801.json": {
+      "bytes": 157392,
+      "company_name": "Meta Platforms, Inc.",
+      "sha256": "22b3d14392e7ad9740a5d5c6f977b7383024ba14cc33ebc33c1ddb1366745e0f"
+    }
+  },
+  "status": "IMMUTABLE_OFFICIAL_SEC_RESEARCH_INPUT",
+  "symbols": [
+    "AAPL",
+    "AMZN",
+    "META",
+    "MSFT",
+    "MU",
+    "NVDA"
+  ]
+}
