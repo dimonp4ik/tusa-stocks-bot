@@ -9,7 +9,8 @@ from unittest.mock import Mock, patch
 os.environ['PYTHON_DOTENV_DISABLED'] = '1'
 from src.backtest_integrity import closed_snapshot, simulate_exit
 from src.live_accounting import trailing_observation, marked_r
-from src.risk_limits import bounded_margin, equity_guard, position_risk
+from src.risk_limits import (account_margin_allows, bounded_margin,
+                             equity_guard, position_risk)
 from src import okx_trader as okx
 
 
@@ -167,6 +168,14 @@ class RiskTests(unittest.TestCase):
                               max_drawdown=.03,peak_floor=140)
         self.assertEqual(state['peak'],150)
 
+    def test_shared_account_margin_reserves_sister_bot_race(self):
+        self.assertTrue(account_margin_allows(
+            equity=100, occupied_margin=84, requested_margin=3,
+            max_fraction=.90, simultaneous_writers=2))
+        self.assertFalse(account_margin_allows(
+            equity=100, occupied_margin=85, requested_margin=3,
+            max_fraction=.90, simultaneous_writers=2))
+
 
 class ExchangeTests(unittest.TestCase):
     def test_shadow_signal_cannot_reach_real_traders(self):
@@ -181,6 +190,20 @@ class ExchangeTests(unittest.TestCase):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])
 
+    def test_exchange_position_margin_uses_conservative_estimate(self):
+        rows = [
+            {'instId':'BTC-X','pos':'2','margin':'9','imr':'8',
+             'notionalUsd':'100','lever':'10'},
+            {'instId':'AAPL-X','pos':'1','margin':'','imr':'4',
+             'notionalUsd':'60','lever':'10'},
+            {'instId':'FLAT-X','pos':'0'},
+        ]
+        with patch.object(okx, '_request', return_value=(True, rows)):
+            good, value = okx.get_open_position_margin({})
+        self.assertTrue(good)
+        self.assertEqual(value['margin_usd'], 16)
+        self.assertEqual(value['inst_ids'], ('AAPL-X', 'BTC-X'))
+
     def test_live_entry_uses_client_margin_without_strategy_resizing(self):
         from src import autotrader as at
         from contextlib import ExitStack
@@ -192,6 +215,7 @@ class ExchangeTests(unittest.TestCase):
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                  ('get_position_size',(True,0)),('ensure_leverage',(True,None)),
                  ('get_order_book',{'ts':at.time.time()*1000,'bids':[['99.99','1000']],
                                     'asks':[['100.01','1000']]})]:

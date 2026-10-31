@@ -2135,7 +2135,13 @@ AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
 # falls — the leverage signature, so 3 stays. Tightening to 2 loses both.
 KILL_SWITCH_SL_STREAK = int(os.getenv("KILL_SWITCH_SL_STREAK", "3"))
 
-# Risk budget fractions. Portfolio cap covers positions tracked by this service.
+# Risk budget fractions.  The exchange-wide margin cap below is shared by both
+# Railway services.  The writer count reserves room for two entries that read
+# the same OKX snapshot at once; 0.90 is the authorised ceiling, not a target.
+AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION = min(
+    .90, max(.10, float(os.getenv("AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION", "0.90"))))
+AUTOTRADE_ACCOUNT_WRITER_COUNT = max(
+    1, min(10, int(os.getenv("AUTOTRADE_ACCOUNT_WRITER_COUNT", "2"))))
 AUTOTRADE_RISK_PER_TRADE = float(os.getenv("AUTOTRADE_RISK_PER_TRADE", "0.0025"))
 AUTOTRADE_MAX_OPEN_RISK = float(os.getenv("AUTOTRADE_MAX_OPEN_RISK", "0.0075"))
 AUTOTRADE_COST_RESERVE = float(os.getenv("AUTOTRADE_COST_RESERVE", "0.0014"))

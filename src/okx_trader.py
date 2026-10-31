@@ -211,6 +211,61 @@ def get_position_size(creds: dict, inst_id: str) -> tuple:
         return False, f'position parse failed: {exc}'
 
 
+def get_open_position_margin(creds: dict) -> tuple:
+    """Return exchange-wide occupied derivative margin for this account.
+
+    The two bots run against separate Railway databases, so their local rows
+    cannot enforce a shared account limit.  OKX positions are authoritative.
+    For every non-flat position use the largest available conservative margin
+    estimate: isolated margin, initial-margin requirement, or notional/leverage.
+    A non-flat row without a usable estimate fails closed.
+    """
+    ok, data = _request(creds, "GET", "/api/v5/account/positions")
+    if not ok:
+        return False, data
+    try:
+        if not isinstance(data, list):
+            raise ValueError('positions response must be a list')
+        total = 0.0
+        instruments = []
+        for row in data:
+            raw_pos = row.get('pos')
+            if raw_pos in ('', None):
+                raise ValueError('position size missing')
+            position = abs(float(raw_pos))
+            if not math.isfinite(position):
+                raise ValueError('position size non-finite')
+            if position == 0:
+                continue
+            inst_id = str(row.get('instId') or '').strip()
+            if not inst_id:
+                raise ValueError('position instrument missing')
+            estimates = []
+            for field in ('margin', 'imr'):
+                raw = row.get(field)
+                if raw not in ('', None):
+                    value = abs(float(raw))
+                    if math.isfinite(value) and value > 0:
+                        estimates.append(value)
+            raw_notional, raw_leverage = row.get('notionalUsd'), row.get('lever')
+            if raw_notional not in ('', None) and raw_leverage not in ('', None):
+                notional, leverage = abs(float(raw_notional)), abs(float(raw_leverage))
+                if (math.isfinite(notional) and math.isfinite(leverage)
+                        and notional > 0 and leverage > 0):
+                    estimates.append(notional/leverage)
+            if not estimates:
+                raise ValueError(f'position margin unavailable for {inst_id}')
+            total += max(estimates)
+            instruments.append(inst_id)
+        return True, {
+            'margin_usd': total,
+            'count': len(instruments),
+            'inst_ids': tuple(sorted(set(instruments))),
+        }
+    except (TypeError, ValueError, KeyError, AttributeError) as exc:
+        return False, f'position margin parse failed: {exc}'
+
+
 def get_position_avg_px(creds: dict, inst_id: str) -> float | None:
     """Average fill price of the open position, or None if flat/unavailable.
 

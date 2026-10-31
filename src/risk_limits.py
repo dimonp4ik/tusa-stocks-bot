@@ -46,6 +46,29 @@ def position_risk(position, contract_value, cost_fraction):
     return sz*cv*(distance+entry*cost_fraction)
 
 
+def account_margin_allows(*, equity, occupied_margin, requested_margin,
+                          max_fraction=.90, simultaneous_writers=2):
+    """Reserve room for this entry and one concurrent sister-bot entry.
+
+    Each Railway service has its own database, so the exchange is the shared
+    source of truth.  Two services can read the same snapshot at once; counting
+    ``simultaneous_writers`` requested margins keeps their combined fills at or
+    below the account limit even in that race.
+    """
+    equity = finite_positive(equity, 'equity')
+    requested = finite_positive(requested_margin, 'requested margin')
+    occupied = float(occupied_margin)
+    fraction = float(max_fraction)
+    writers = int(simultaneous_writers)
+    if not math.isfinite(occupied) or occupied < 0:
+        raise ValueError('occupied margin must be finite and nonnegative')
+    if not math.isfinite(fraction) or not 0 < fraction <= 1:
+        raise ValueError('account margin fraction must lie between 0 and 1')
+    if writers < 1:
+        raise ValueError('simultaneous writers must be positive')
+    return occupied + requested*writers <= equity*fraction + 1e-9
+
+
 def equity_guard(state, *, equity, day, max_daily_loss, max_drawdown, peak_floor=None):
     equity = finite_positive(equity,'equity')
     for limit in (max_daily_loss,max_drawdown):

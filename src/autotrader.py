@@ -32,9 +32,10 @@ import time
 
 import requests
 
-from src.risk_limits import equity_guard
+from src.risk_limits import account_margin_allows, equity_guard
 from config import (
     AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
+    AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION, AUTOTRADE_ACCOUNT_WRITER_COUNT,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_CONTACT,
@@ -193,6 +194,37 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
     if margin > balance:
         _dm(uid, f"⚠️ Автотрейдинг: на балансе ${balance:.2f} меньше, чем размер сделки ${margin:.2f} — {disp} пропущен.")
+        return
+
+    # The exchange is the only shared state visible to both Railway services.
+    # Refuse on read/parse failure: proceeding would make the 90% account cap a
+    # guess. Reserve one same-sized peer entry so simultaneous crypto + stock
+    # decisions cannot both pass from an 87%-occupied snapshot and reach 93%.
+    margin_ok, account_positions = okx.get_open_position_margin(creds)
+    if not margin_ok:
+        log.warning("autotrade account margin unavailable for %s: %s",
+                    uid, account_positions)
+        _dm(uid, "⚠️ Автотрейдинг: не смог проверить общую загрузку счёта OKX — "
+                 f"сделка по {disp} пропущена.\n`{account_positions}`")
+        return
+    if inst_id in account_positions["inst_ids"]:
+        log.warning("autotrade: %s already holds %s on exchange — entry refused",
+                    uid, inst_id)
+        _dm(uid, f"ℹ️ Автотрейдинг: по {disp} уже есть позиция на общем счёте — "
+                 "повторный сигнал пропущен.")
+        return
+    if not account_margin_allows(
+            equity=balance,
+            occupied_margin=account_positions["margin_usd"],
+            requested_margin=margin,
+            max_fraction=AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
+            simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT):
+        used = 100*float(account_positions["margin_usd"])/balance
+        limit = 100*AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION
+        log.warning("autotrade shared margin cap %s: used %.2f%%, request %.2f%%",
+                    uid, used, 100*margin/balance)
+        _dm(uid, f"ℹ️ Автотрейдинг: общая загрузка счёта уже {used:.1f}%. "
+                 f"Для безопасного лимита {limit:.0f}% сделка по {disp} пропущена.")
         return
 
     spec = okx.get_xperp_spec(inst_id)
