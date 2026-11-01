@@ -464,10 +464,11 @@ def _active_strategy_label() -> str:
 
 def _native_scan_status_text() -> str:
     try:
+        now = time.time()
         row = json.loads(get_bot_state("native_scan_audit") or "{}")
         if not row:
             return "Последний скан: данных ещё нет"
-        age_minutes = max(0, int((time.time() - float(row.get("ts") or 0)) / 60))
+        age_minutes = max(0, int((now - float(row.get("ts") or 0)) / 60))
         result_names = {
             "published": "сигнал опубликован",
             "no_candidate_passed": "рынок проверен, сетапов нет",
@@ -519,13 +520,42 @@ def _native_scan_status_text() -> str:
         open_parts = []
         for item in open_rows[:6]:
             age_hours = max(0.0, (time.time() - float(
-                item.get("opened_at") or time.time())) / 3600)
-            source = str(item.get("source") or "unknown")
+                item.get("opened_at") or now)) / 3600)
+            source = str(item.get("source") or (
+                "stock_xperp_native_shadow"
+                if (item.get("strategy_runner_mode") == "single_target"
+                    and int(item.get("strategy_bar_seconds") or 0) == 900)
+                else "unknown"))
             open_parts.append(
                 f"{item.get('symbol', '?')} {item.get('direction', '?')} "
                 f"{item.get('status', '?')} {age_hours:.1f}ч {source}")
         open_text = ("\nОткрытые: " + "; ".join(open_parts)
                      if open_parts else "\nОткрытые: нет")
+        closed_parts = []
+        closed_counts = {}
+        recent_signals = get_recent_signals(40)
+        native_recent = [item for item in recent_signals
+                         if (item.get("strategy_runner_mode") == "single_target"
+                             and int(item.get("strategy_bar_seconds") or 0) == 900
+                             and item.get("closed_at")
+                             and now - float(item["closed_at"]) <= 24 * 3600)]
+        for item in native_recent:
+            status = str(item.get("status") or "UNKNOWN")
+            closed_counts[status] = closed_counts.get(status, 0) + 1
+        for item in native_recent[:8]:
+            duration = max(0.0, (float(item.get("closed_at") or now)
+                                 - float(item.get("opened_at") or now)) / 3600)
+            realized = item.get("realized_r")
+            r_text = f"{float(realized):+.2f}R" if realized is not None else "R?"
+            closed_parts.append(
+                f"{item.get('symbol', '?')} {item.get('direction', '?')} "
+                f"{item.get('status', '?')} {r_text} {duration:.1f}ч")
+        closed_text = ("\nЗакрыто 24ч: "
+                       + (", ".join(f"{key} {value}" for key, value
+                                    in sorted(closed_counts.items()))
+                          if closed_counts else "нет")
+                       + ("\nПоследние исходы: " + "; ".join(closed_parts)
+                          if closed_parts else ""))
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
@@ -534,6 +564,7 @@ def _native_scan_status_text() -> str:
             f"отправлено {int(row.get('published') or 0)}"
             f"{reject_text}"
             f"{open_text}"
+            f"{closed_text}"
             f"{recent_text}"
         )
     except Exception:
