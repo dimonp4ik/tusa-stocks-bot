@@ -238,7 +238,33 @@ class ExchangeTests(unittest.TestCase):
                 order.assert_called_once()  # No additional market entry on refused depth.
         order.assert_called_once()
         quantity=order.call_args.args[-1]
-        self.assertEqual(quantity, okx.calc_contracts(3.84, at.AUTOTRADE_LEVERAGE, 100, spec))
+        self.assertEqual(quantity, okx.calc_contracts(
+            3.84, at.AUTOTRADE_LEVERAGE, 100, spec))
+
+    def test_live_entry_refuses_shared_account_position_overflow(self):
+        from src import autotrader as at
+        from contextlib import ExitStack
+        sig = dict(id=1, symbol='TEST', direction='LONG', entry_price=100,
+                   sl=98, tp1=102, tp2=110)
+        with ExitStack() as stack:
+            for name, value in [('_creds_of', {'test': True}),
+                                ('at_has_open_position', False),
+                                ('at_set_balance', None), ('get_bot_state', None),
+                                ('set_bot_state', None),
+                                ('set_signal_size_mult', None), ('_dm', None)]:
+                stack.enter_context(patch.object(at, name, return_value=value))
+            stack.enter_context(patch.object(
+                at.okx, 'get_balance', return_value=(True, 128)))
+            stack.enter_context(patch.object(
+                at.okx, 'get_open_position_margin', return_value=(True, {
+                    'margin_usd': 55, 'count': 11,
+                    'inst_ids': tuple(f'OPEN-{i}' for i in range(11)),
+                })))
+            order = stack.enter_context(patch.object(at.okx, 'place_market_entry'))
+            at._open_for_user(
+                dict(user_id=7, size_mode='percent', size_value=3),
+                sig, 'TEST', 'TEST')
+        order.assert_not_called()
 
     def test_client_percentage_uses_latest_balance(self):
         from src import autotrader as at
