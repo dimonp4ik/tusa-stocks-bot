@@ -393,7 +393,9 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
 
     arrow = "🟢" if direction == "LONG" else "🔴"
     timestamp = datetime.now(_RIGA).strftime("%d.%m.%Y %H:%M (Рига)")
-    sign = "+" if lev_profit >= 0 else ""
+    # Use the unrounded move for the sign.  A small loss can round to -0 at
+    # 10x and must not be rendered with a misleading leading plus.
+    sign = "+" if move_pct >= 0 else ""
     strategy_frac = sig.get("strategy_tp1_close_frac")
     runner_mode = str(sig.get("strategy_runner_mode") or "").lower()
     fixed_be_runner = runner_mode == "fixed_be"
@@ -452,10 +454,30 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             f"Движение: `{move_pct:.2f}%`  (x{lev}: `{lev_profit:.0f}%`)"
         )
     elif new_status == "EXPIRED":
-        icon  = "⌛"
-        title = ("ИСТЁК (конец сессии)"
-                 if sig.get("strategy_expire_at") else "ИСТЁК")
-        body  = f"Цена: `{_format_price(exit_price)}`  — цель не достигнута"
+        # A time exit can be profitable even when the full target was not
+        # reached.  The old generic "expired" wording hid that distinction
+        # and made profitable marked exits look like failed signals.
+        risk = abs(entry - sl)
+        realized_r = ((exit_price - entry) / risk
+                      if direction == "LONG" and risk > 0 else
+                      (entry - exit_price) / risk
+                      if direction == "SHORT" and risk > 0 else 0.0)
+        if realized_r > .005:
+            icon, result = "🟢", "В ПЛЮС"
+        elif realized_r < -.005:
+            icon, result = "🟠", "В МИНУС"
+        else:
+            icon, result = "⚪", "ОКОЛО НУЛЯ"
+        suffix = " · конец сессии" if sig.get(
+            "strategy_expire_at") else ""
+        title = f"ЗАКРЫТО ПО ВРЕМЕНИ {result}{suffix}"
+        body = (
+            f"Цена закрытия: `{_format_price(exit_price)}`\n"
+            f"Движение: `{sign}{move_pct:.2f}%`  "
+            f"(x{lev}: `{sign}{lev_profit:.0f}%`)\n"
+            f"Итог сигнала: `{realized_r:+.2f}R`  ·  "
+            f"полная цель не была достигнута"
+        )
     elif new_status == "TP1_EXPIRED":
         icon  = "⏳"
         title = "TP1 ИСТЁК"

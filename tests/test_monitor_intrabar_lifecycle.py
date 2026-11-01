@@ -104,6 +104,29 @@ def test_single_target_update_uses_single_target_wording():
     assert "TP2 ДОСТИГНУТ" not in sent[0]
 
 
+def test_profitable_time_exit_is_not_presented_as_a_failed_signal():
+    sent = []
+    row = signal(entry_price=100.0, sl=99.0, direction="LONG")
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "EXPIRED", 101.26)
+
+    assert "ЗАКРЫТО ПО ВРЕМЕНИ В ПЛЮС" in sent[0]
+    assert "+1.26R" in sent[0]
+    assert "полная цель не была достигнута" in sent[0]
+
+
+def test_losing_time_exit_is_labeled_as_a_loss():
+    sent = []
+    row = signal(entry_price=100.0, sl=99.0, direction="LONG")
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "EXPIRED", 99.6)
+
+    assert "ЗАКРЫТО ПО ВРЕМЕНИ В МИНУС" in sent[0]
+    assert "-0.40R" in sent[0]
+
+
 def test_fixed_runner_update_reports_its_actual_strategy_interval():
     sent = []
     row = signal(strategy_bar_seconds=300)
