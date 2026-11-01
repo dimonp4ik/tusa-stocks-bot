@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 os.environ['PYTHON_DOTENV_DISABLED'] = '1'
 from src.backtest_integrity import closed_snapshot, simulate_exit
 from src.live_accounting import trailing_observation, marked_r
-from src.risk_limits import (account_margin_allows, bounded_margin,
+from src.risk_limits import (account_margin_allows, account_position_count_allows, bounded_margin,
                              equity_guard, position_risk)
 from src import okx_trader as okx
 
@@ -175,6 +175,14 @@ class RiskTests(unittest.TestCase):
         self.assertFalse(account_margin_allows(
             equity=100, occupied_margin=85, requested_margin=3,
             max_fraction=.90, simultaneous_writers=2))
+
+    def test_shared_account_position_cap_reserves_sister_bot_race(self):
+        self.assertTrue(account_position_count_allows(
+            occupied_positions=10, max_positions=12,
+            simultaneous_writers=2))
+        self.assertFalse(account_position_count_allows(
+            occupied_positions=11, max_positions=12,
+            simultaneous_writers=2))
 
 
 class ExchangeTests(unittest.TestCase):

@@ -69,6 +69,26 @@ def account_margin_allows(*, equity, occupied_margin, requested_margin,
     return occupied + requested*writers <= equity*fraction + 1e-9
 
 
+def account_position_count_allows(*, occupied_positions, max_positions=12,
+                                  simultaneous_writers=2):
+    """Bound the shared OKX account's position count across both bots.
+
+    As with the margin gate, reserve one slot for every Railway writer that may
+    have read the same exchange snapshot.  This prevents two simultaneous
+    entries from turning 11 visible positions into 13 when the ceiling is 12.
+    """
+    occupied = int(occupied_positions)
+    maximum = int(max_positions)
+    writers = int(simultaneous_writers)
+    if occupied < 0:
+        raise ValueError('occupied positions must be nonnegative')
+    if maximum < 1:
+        raise ValueError('maximum positions must be positive')
+    if writers < 1:
+        raise ValueError('simultaneous writers must be positive')
+    return occupied + writers <= maximum
+
+
 def equity_guard(state, *, equity, day, max_daily_loss, max_drawdown, peak_floor=None):
     equity = finite_positive(equity,'equity')
     for limit in (max_daily_loss,max_drawdown):

@@ -32,10 +32,12 @@ import time
 
 import requests
 
-from src.risk_limits import account_margin_allows, equity_guard
+from src.risk_limits import (
+    account_margin_allows, account_position_count_allows, equity_guard)
 from config import (
     AUTOTRADE_MAX_DAILY_LOSS, AUTOTRADE_MAX_DRAWDOWN, AUTOTRADE_EQUITY_PEAK_FLOOR,
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION, AUTOTRADE_ACCOUNT_WRITER_COUNT,
+    AUTOTRADE_MAX_ACCOUNT_POSITIONS,
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_CONTACT,
@@ -212,6 +214,17 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                     uid, inst_id)
         _dm(uid, f"ℹ️ Автотрейдинг: по {disp} уже есть позиция на общем счёте — "
                  "повторный сигнал пропущен.")
+        return
+    if not account_position_count_allows(
+            occupied_positions=account_positions["count"],
+            max_positions=AUTOTRADE_MAX_ACCOUNT_POSITIONS,
+            simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT):
+        count = int(account_positions["count"])
+        log.warning("autotrade shared position cap %s: open %s, limit %s",
+                    uid, count, AUTOTRADE_MAX_ACCOUNT_POSITIONS)
+        _dm(uid, f"ℹ️ Автотрейдинг: на общем счёте уже {count} "
+                 f"открытых позиций. Лимит {AUTOTRADE_MAX_ACCOUNT_POSITIONS}; "
+                 f"сделка по {disp} пропущена.")
         return
     if not account_margin_allows(
             equity=balance,
