@@ -226,6 +226,18 @@ def test_native_status_explains_recent_decisions_and_open_rows():
     assert "OLDUSDT" not in text
 
 
+def test_http_status_exposes_build_and_native_daily_brake():
+    with patch.dict(main.os.environ, {"RAILWAY_GIT_COMMIT_SHA": "abcdef123456"}), \
+            patch.object(main, "get_today_realized_r", return_value=-2.5), \
+            patch.object(main, "get_today_loss_streak", return_value=0), \
+            patch.object(main, "_native_xperp_daily_loss_pause", return_value=True), \
+            patch.object(main, "_native_scan_status_text", return_value="scan"):
+        text, code = main.status()
+    assert code == 200
+    assert "Build: abcdef12" in text
+    assert "Native UTC-day: -2.50R; loss streak 0; paused yes" in text
+
+
 def test_native_scan_fetches_enough_bars_for_longest_regime_gate():
     symbols = sorted(AUDITED_SYMBOLS)[:10]
     with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \

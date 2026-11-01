@@ -575,11 +575,25 @@ def _native_scan_status_text() -> str:
 
 @app.route("/status")
 def status():
+    day_start = int(time.time() // 86400) * 86400
+    route = "Native stock X-Perp shadow"
+    try:
+        native_day_r = get_today_realized_r(day_start, route)
+        native_loss_streak = get_today_loss_streak(day_start, route)
+        risk_text = (
+            f"Native UTC-day: {native_day_r:+.2f}R; "
+            f"loss streak {native_loss_streak}; "
+            f"paused {'yes' if _native_xperp_daily_loss_pause() else 'no'}. ")
+    except Exception as exc:
+        risk_text = f"Native UTC-day audit unavailable: {type(exc).__name__}. "
+    deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
+                  or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
+            f"Build: {deploy_sha}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
-            f"Signal cache: {len(_signal_cache)} entries. "
+            f"Signal cache: {len(_signal_cache)} entries. {risk_text}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
