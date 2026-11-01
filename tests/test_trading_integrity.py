@@ -291,6 +291,7 @@ class DatabaseTests(unittest.TestCase):
                 live_id = db.log_signal(base, 106, 120, 90)
                 shadow_id = db.log_signal({
                     **base, '_shadow_only': True,
+                    'source': 'stock_xperp_native_shadow',
                     'strategy_tp1_close_frac': .70,
                     'strategy_runner_mode': 'fixed_be',
                     'fixed_runner_target_r': 4.0,
@@ -309,6 +310,7 @@ class DatabaseTests(unittest.TestCase):
                 self.assertEqual(row['strategy_entry_bar_ts'], 1234.0)
                 self.assertEqual(row['strategy_stop_on_close'], 0)
                 self.assertEqual(row['strategy_expire_at'], 4321.0)
+                self.assertEqual(row['source'], 'stock_xperp_native_shadow')
                 db.update_signal_status(
                     shadow_id, 'TP1_PARTIAL', 106,
                     runner_activation_bar_ts=1500.0)

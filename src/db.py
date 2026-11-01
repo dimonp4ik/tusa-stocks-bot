@@ -183,6 +183,11 @@ def init_db():
             # in production.
             "session":       "TEXT",
             "volume_ratio":  "REAL",
+            # Route identity is part of the portfolio contract.  The rolling
+            # native-hour cap reads recent signal rows after every scheduler
+            # invocation, so dropping this field reset that cap every five
+            # minutes even though the setup log still knew the source.
+            "source":        "TEXT",
             # 2026-08-27: ORDERLY_SIZE_MULT keys on all three of eff_ratio,
             # vol_atr_pct and bos_extension_atr. The last was already here; the
             # other two were not, so without this the rule would size correctly
@@ -518,9 +523,9 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
                 confidence, reason, entry_low, entry_high, entry_source, market_price, zone_entry_price,
                 mtf_score, mtf_score_max, premium, atr, bos_extension_atr,
                 session, volume_ratio, eff_ratio, vol_atr_pct, trend_1h,
-                trend_4h, rsi
+                trend_4h, rsi, source
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             analysis["symbol"], analysis["direction"], analysis["current_price"],
             tp1, tp2, sl, time_mod.time(),
@@ -539,6 +544,7 @@ def log_signal(analysis: dict, tp1: float, tp2: float, sl: float) -> int:
             analysis.get("trend_1h"),
             analysis.get("trend_4h"),
             analysis.get("rsi"),
+            analysis.get("source"),
         ))
         c.execute("""
             UPDATE signals SET
@@ -1975,6 +1981,23 @@ def get_today_loss_streak(day_start_ts: float,
             break
         streak += 1
     return streak
+
+
+def get_today_realized_r(day_start_ts: float,
+                         reason_prefix: str | None = None) -> float:
+    """Sum exact realized R for closed rows in the current UTC day/route."""
+    query = (
+        "SELECT realized_r FROM signals "
+        "WHERE closed_at IS NOT NULL AND closed_at >= ?"
+    )
+    values: list[object] = [day_start_ts]
+    if reason_prefix:
+        query += " AND reason LIKE ?"
+        values.append(f"{reason_prefix}%")
+    with _conn() as c:
+        rows = c.execute(query, values).fetchall()
+    return float(sum(float(row["realized_r"])
+                     for row in rows if row["realized_r"] is not None))
 
 
 def get_calibration_rows(since_ts: float, limit: int = 800) -> list:

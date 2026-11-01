@@ -61,6 +61,12 @@ NATIVE_XPERP_SHADOW_ENABLED = (
     and os.getenv("NATIVE_XPERP_SHADOW_ENABLED", "1") == "1"
 )
 NATIVE_XPERP_LOSS_PAUSE_STREAK = 2
+# A flat/profitable expiry can break the consecutive-loss counter even while
+# the UTC day remains deeply negative.  The Nov-1 shadow incident reached four
+# -1R stops around neutral expiries and kept admitting new correlated trades.
+# The complete Jul-Oct replay shows a -2R daily net brake rejects one additional
+# row in July and none in Aug-Oct, so keep both brakes active.
+NATIVE_XPERP_DAILY_LOSS_R_CAP = 2.0
 # Frozen on July-August, confirmed on September, then checked on the untouched
 # Oct-17+ snapshot.  This limits correlated market bets that arrive on nearby
 # 15-minute bars while preserving the complete-month return objective.

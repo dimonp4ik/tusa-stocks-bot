@@ -31,7 +31,8 @@ from config import (
     POST_TP1_STRONG_CLOSE_PROGRESS, POST_TP1_STRONG_WICK_PROGRESS,
     POST_TP1_WEAK_CLOSE_PROGRESS, STOCK_VENUE_FILTER_MODE, STOCK_VENUE_FILTER_PROFILE,
     DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
-    NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_ROLLING_HOUR_CAP,
+    NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_DAILY_LOSS_R_CAP,
+    NATIVE_XPERP_ROLLING_HOUR_CAP,
     AUTOTRADE_LEVERAGE,
 )
 from src.binance_client import (
@@ -76,6 +77,7 @@ from src.db import (
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct,
     get_today_sl_streak, get_today_loss_streak, get_recent_signals,
+    get_today_realized_r,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -2693,10 +2695,16 @@ def _venue_daily_loss_pause() -> bool:
 
 def _native_xperp_daily_loss_pause() -> bool:
     day_start = int(time.time() // 86400) * 86400
-    return (NATIVE_XPERP_LOSS_PAUSE_STREAK > 0
-            and get_today_loss_streak(
-                day_start, "Native stock X-Perp shadow")
-            >= NATIVE_XPERP_LOSS_PAUSE_STREAK)
+    route = "Native stock X-Perp shadow"
+    streak_pause = (
+        NATIVE_XPERP_LOSS_PAUSE_STREAK > 0
+        and get_today_loss_streak(day_start, route)
+        >= NATIVE_XPERP_LOSS_PAUSE_STREAK)
+    net_pause = (
+        NATIVE_XPERP_DAILY_LOSS_R_CAP > 0
+        and get_today_realized_r(day_start, route)
+        <= -NATIVE_XPERP_DAILY_LOSS_R_CAP)
+    return streak_pause or net_pause
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -3561,7 +3569,9 @@ def _publish_stock_venue_candidates(
                 int(float(row.get("opened_at") or 0) // 900) == scan_bucket
                 for row in recent_rows)
             native_recent_hour_count = sum(
-                row.get("source") == "stock_xperp_native_shadow"
+                (row.get("source") == "stock_xperp_native_shadow"
+                 or (row.get("strategy_runner_mode") == "single_target"
+                     and int(row.get("strategy_bar_seconds") or 0) == 900))
                 and float(row.get("opened_at") or 0) > now - 3600
                 for row in recent_rows)
         except Exception as exc:

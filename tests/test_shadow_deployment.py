@@ -178,6 +178,25 @@ class ShadowDeploymentTests(unittest.TestCase):
         send.assert_not_called()
         blocked.assert_called_once_with(9, "rolling_hour_cap")
 
+    def test_native_hour_cap_recognizes_legacy_rows_missing_source(self):
+        candidate = ({
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow",
+        }, 9)
+        recent = [{
+            "source": None, "opened_at": stamp,
+            "strategy_runner_mode": "single_target",
+            "strategy_bar_seconds": 900,
+        } for stamp in (7000, 8000, 9000, 9500)]
+        with patch.object(main.time, "time", return_value=10000), \
+             patch.object(main, "get_recent_signals", return_value=recent), \
+             patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            published = main._publish_stock_venue_candidates([candidate])
+        self.assertEqual(published, 0)
+        send.assert_not_called()
+        blocked.assert_called_once_with(9, "rolling_hour_cap")
+
     def test_earnings_blackout_blocks_candidate_before_send(self):
         candidate = ({
             "symbol": "AAPLUSDT", "direction": "SHORT",
@@ -389,6 +408,16 @@ class ShadowDeploymentTests(unittest.TestCase):
         with patch.object(main, "get_today_sl_streak",
                           return_value=config.VENUE_LOSS_PAUSE_STREAK):
             self.assertTrue(main._venue_daily_loss_pause())
+
+    def test_native_pause_uses_daily_net_r_even_when_streak_was_broken(self):
+        with patch.object(main, "get_today_loss_streak", return_value=0), \
+             patch.object(main, "get_today_realized_r", return_value=-2.5):
+            self.assertTrue(main._native_xperp_daily_loss_pause())
+
+    def test_native_pause_stays_open_above_both_loss_limits(self):
+        with patch.object(main, "get_today_loss_streak", return_value=0), \
+             patch.object(main, "get_today_realized_r", return_value=-1.5):
+            self.assertFalse(main._native_xperp_daily_loss_pause())
 
 
 if __name__ == "__main__":

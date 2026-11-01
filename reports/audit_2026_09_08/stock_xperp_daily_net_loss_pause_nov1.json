@@ -1,0 +1,375 @@
+{
+  "baseline": {
+    "2026-07": {
+      "margin_3pct": {
+        "dd_pct": 4.4752,
+        "max_loss_streak": 9,
+        "n": 234,
+        "return_pct": 46.555,
+        "trades_per_active_day": 7.5484
+      },
+      "margin_5pct": {
+        "dd_pct": 7.409,
+        "max_loss_streak": 9,
+        "n": 234,
+        "return_pct": 87.3701,
+        "trades_per_active_day": 7.5484
+      }
+    },
+    "2026-08": {
+      "margin_3pct": {
+        "dd_pct": 3.7247,
+        "max_loss_streak": 8,
+        "n": 224,
+        "return_pct": 23.6995,
+        "trades_per_active_day": 7.2258
+      },
+      "margin_5pct": {
+        "dd_pct": 6.1603,
+        "max_loss_streak": 8,
+        "n": 224,
+        "return_pct": 42.049,
+        "trades_per_active_day": 7.2258
+      }
+    },
+    "2026-09": {
+      "margin_3pct": {
+        "dd_pct": 2.4471,
+        "max_loss_streak": 8,
+        "n": 231,
+        "return_pct": 29.7981,
+        "trades_per_active_day": 7.9655
+      },
+      "margin_5pct": {
+        "dd_pct": 4.0508,
+        "max_loss_streak": 8,
+        "n": 231,
+        "return_pct": 53.8213,
+        "trades_per_active_day": 7.9655
+      }
+    },
+    "2026-10": {
+      "margin_3pct": {
+        "dd_pct": 2.3607,
+        "max_loss_streak": 7,
+        "n": 228,
+        "return_pct": 25.5118,
+        "trades_per_active_day": 7.6
+      },
+      "margin_5pct": {
+        "dd_pct": 3.9334,
+        "max_loss_streak": 7,
+        "n": 228,
+        "return_pct": 45.3752,
+        "trades_per_active_day": 7.6
+      }
+    }
+  },
+  "candidates": [
+    {
+      "accepted": 753,
+      "daily_net_loss_cap_r": 1.0,
+      "months": {
+        "2026-07": {
+          "margin_3pct": {
+            "dd_pct": 3.6649,
+            "max_loss_streak": 9,
+            "n": 200,
+            "return_pct": 36.2412,
+            "trades_per_active_day": 6.4516
+          },
+          "margin_5pct": {
+            "dd_pct": 6.0706,
+            "max_loss_streak": 9,
+            "n": 200,
+            "return_pct": 66.1211,
+            "trades_per_active_day": 6.4516
+          }
+        },
+        "2026-08": {
+          "margin_3pct": {
+            "dd_pct": 2.7286,
+            "max_loss_streak": 7,
+            "n": 175,
+            "return_pct": 21.3763,
+            "trades_per_active_day": 5.6452
+          },
+          "margin_5pct": {
+            "dd_pct": 4.5183,
+            "max_loss_streak": 7,
+            "n": 175,
+            "return_pct": 37.6697,
+            "trades_per_active_day": 5.6452
+          }
+        },
+        "2026-09": {
+          "margin_3pct": {
+            "dd_pct": 3.3647,
+            "max_loss_streak": 6,
+            "n": 194,
+            "return_pct": 27.5048,
+            "trades_per_active_day": 6.6897
+          },
+          "margin_5pct": {
+            "dd_pct": 5.5604,
+            "max_loss_streak": 6,
+            "n": 194,
+            "return_pct": 49.3451,
+            "trades_per_active_day": 6.6897
+          }
+        },
+        "2026-10": {
+          "margin_3pct": {
+            "dd_pct": 2.1128,
+            "max_loss_streak": 6,
+            "n": 175,
+            "return_pct": 19.3801,
+            "trades_per_active_day": 6.25
+          },
+          "margin_5pct": {
+            "dd_pct": 3.5156,
+            "max_loss_streak": 6,
+            "n": 175,
+            "return_pct": 33.8719,
+            "trades_per_active_day": 6.25
+          }
+        }
+      },
+      "rejected": 173
+    },
+    {
+      "accepted": 925,
+      "daily_net_loss_cap_r": 2.0,
+      "months": {
+        "2026-07": {
+          "margin_3pct": {
+            "dd_pct": 4.4752,
+            "max_loss_streak": 9,
+            "n": 233,
+            "return_pct": 47.0037,
+            "trades_per_active_day": 7.5161
+          },
+          "margin_5pct": {
+            "dd_pct": 7.409,
+            "max_loss_streak": 9,
+            "n": 233,
+            "return_pct": 88.3394,
+            "trades_per_active_day": 7.5161
+          }
+        },
+        "2026-08": {
+          "margin_3pct": {
+            "dd_pct": 3.7247,
+            "max_loss_streak": 8,
+            "n": 224,
+            "return_pct": 23.6995,
+            "trades_per_active_day": 7.2258
+          },
+          "margin_5pct": {
+            "dd_pct": 6.1603,
+            "max_loss_streak": 8,
+            "n": 224,
+            "return_pct": 42.049,
+            "trades_per_active_day": 7.2258
+          }
+        },
+        "2026-09": {
+          "margin_3pct": {
+            "dd_pct": 2.4471,
+            "max_loss_streak": 8,
+            "n": 231,
+            "return_pct": 29.7981,
+            "trades_per_active_day": 7.9655
+          },
+          "margin_5pct": {
+            "dd_pct": 4.0508,
+            "max_loss_streak": 8,
+            "n": 231,
+            "return_pct": 53.8213,
+            "trades_per_active_day": 7.9655
+          }
+        },
+        "2026-10": {
+          "margin_3pct": {
+            "dd_pct": 2.3607,
+            "max_loss_streak": 7,
+            "n": 228,
+            "return_pct": 25.5118,
+            "trades_per_active_day": 7.6
+          },
+          "margin_5pct": {
+            "dd_pct": 3.9334,
+            "max_loss_streak": 7,
+            "n": 228,
+            "return_pct": 45.3752,
+            "trades_per_active_day": 7.6
+          }
+        }
+      },
+      "rejected": 1
+    },
+    {
+      "accepted": 926,
+      "daily_net_loss_cap_r": 3.0,
+      "months": {
+        "2026-07": {
+          "margin_3pct": {
+            "dd_pct": 4.4752,
+            "max_loss_streak": 9,
+            "n": 234,
+            "return_pct": 46.555,
+            "trades_per_active_day": 7.5484
+          },
+          "margin_5pct": {
+            "dd_pct": 7.409,
+            "max_loss_streak": 9,
+            "n": 234,
+            "return_pct": 87.3701,
+            "trades_per_active_day": 7.5484
+          }
+        },
+        "2026-08": {
+          "margin_3pct": {
+            "dd_pct": 3.7247,
+            "max_loss_streak": 8,
+            "n": 224,
+            "return_pct": 23.6995,
+            "trades_per_active_day": 7.2258
+          },
+          "margin_5pct": {
+            "dd_pct": 6.1603,
+            "max_loss_streak": 8,
+            "n": 224,
+            "return_pct": 42.049,
+            "trades_per_active_day": 7.2258
+          }
+        },
+        "2026-09": {
+          "margin_3pct": {
+            "dd_pct": 2.4471,
+            "max_loss_streak": 8,
+            "n": 231,
+            "return_pct": 29.7981,
+            "trades_per_active_day": 7.9655
+          },
+          "margin_5pct": {
+            "dd_pct": 4.0508,
+            "max_loss_streak": 8,
+            "n": 231,
+            "return_pct": 53.8213,
+            "trades_per_active_day": 7.9655
+          }
+        },
+        "2026-10": {
+          "margin_3pct": {
+            "dd_pct": 2.3607,
+            "max_loss_streak": 7,
+            "n": 228,
+            "return_pct": 25.5118,
+            "trades_per_active_day": 7.6
+          },
+          "margin_5pct": {
+            "dd_pct": 3.9334,
+            "max_loss_streak": 7,
+            "n": 228,
+            "return_pct": 45.3752,
+            "trades_per_active_day": 7.6
+          }
+        }
+      },
+      "rejected": 0
+    }
+  ],
+  "created_at": "2026-11-01T20:56:21.240203+00:00",
+  "finding": "The -2R brake rejects one additional historical row in July and none in August-October on top of the frozen consecutive-loss pause.",
+  "limitations": [
+    "This brake was formulated after observing the Nov-1 live shadow loss cluster.",
+    "It is a loss-containment rule, not evidence of higher future return.",
+    "Gross returns exclude fees at user request."
+  ],
+  "orders_possible": false,
+  "policy": {
+    "existing_rule_retained": "pause after two consecutive negative closes",
+    "orders": "market only",
+    "position_size": "client setting",
+    "rule": "pause new native entries after UTC-day realized R <= -2R"
+  },
+  "ready_for_live_orders": false,
+  "reason": "Four Nov-1 stops were interleaved with flat/profitable expiries, so the consecutive-loss brake reset while the day remained negative.",
+  "selected": {
+    "accepted": 925,
+    "daily_net_loss_cap_r": 2.0,
+    "months": {
+      "2026-07": {
+        "margin_3pct": {
+          "dd_pct": 4.4752,
+          "max_loss_streak": 9,
+          "n": 233,
+          "return_pct": 47.0037,
+          "trades_per_active_day": 7.5161
+        },
+        "margin_5pct": {
+          "dd_pct": 7.409,
+          "max_loss_streak": 9,
+          "n": 233,
+          "return_pct": 88.3394,
+          "trades_per_active_day": 7.5161
+        }
+      },
+      "2026-08": {
+        "margin_3pct": {
+          "dd_pct": 3.7247,
+          "max_loss_streak": 8,
+          "n": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "margin_5pct": {
+          "dd_pct": 6.1603,
+          "max_loss_streak": 8,
+          "n": 224,
+          "return_pct": 42.049,
+          "trades_per_active_day": 7.2258
+        }
+      },
+      "2026-09": {
+        "margin_3pct": {
+          "dd_pct": 2.4471,
+          "max_loss_streak": 8,
+          "n": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "margin_5pct": {
+          "dd_pct": 4.0508,
+          "max_loss_streak": 8,
+          "n": 231,
+          "return_pct": 53.8213,
+          "trades_per_active_day": 7.9655
+        }
+      },
+      "2026-10": {
+        "margin_3pct": {
+          "dd_pct": 2.3607,
+          "max_loss_streak": 7,
+          "n": 228,
+          "return_pct": 25.5118,
+          "trades_per_active_day": 7.6
+        },
+        "margin_5pct": {
+          "dd_pct": 3.9334,
+          "max_loss_streak": 7,
+          "n": 228,
+          "return_pct": 45.3752,
+          "trades_per_active_day": 7.6
+        }
+      }
+    },
+    "rejected": 1
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_daily_net_loss_pause_nov1_audit.py": "c0a896e75b09d4a6240e21cdb2ffef1c77bacf566efaabb35ac4c9a4c1335eb5",
+    "reports\\audit_2026_09_08\\stock_xperp_regime_target_router_nov1_forward.csv": "518bf187674394516d2cfa72ef3b1d826abeb96bb48717961fbb3685147909d2"
+  },
+  "status": "SHADOW_DAILY_NET_R_BRAKE"
+}
