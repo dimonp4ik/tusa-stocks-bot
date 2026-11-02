@@ -73,7 +73,11 @@ def test_native_route_rejects_high_atr_and_stale_signal():
     first = sorted(data)[0]
     data[first] = candles(102.0, wide=True)
     assert native_shadow_setups(data, now=119 * 900 + 901) == []
-    assert native_shadow_setups(universe(), now=119 * 900 + 1801) == []
+    # The replay enters at the next bar open.  Production may wait briefly for
+    # OKX to confirm the just-closed bar, but a later five-minute retry must not
+    # publish the old setup at a price the replay never traded.
+    assert native_shadow_setups(universe(), now=120 * 900 + 180) != []
+    assert native_shadow_setups(universe(), now=120 * 900 + 181) == []
 
 
 def test_native_route_diagnostics_explain_insufficient_runtime_history():

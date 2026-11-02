@@ -32,7 +32,11 @@ EXHAUSTED_TARGET_FRACTION = .02
 EXPANDED_TARGET_FRACTION = .03
 HOLD_BARS = 64
 BACKING_LEVEL_LOOKBACK_BARS = 32
-MAX_SIGNAL_AGE_SECONDS = 900
+# Historical replay enters at the next 15-minute bar open.  The production
+# scheduler normally sees that closed signal bar at +60 seconds.  Allow a small
+# delivery buffer, but never let the +6/+11 minute retry ticks turn the same
+# setup into a materially later entry that the replay never measured.
+MAX_SIGNAL_AGE_SECONDS = 180
 BASKET_TREND_BARS = 96
 # ``basket_trends`` needs the full regime window plus the two bars used by each
 # cross-sectional return.  Keep this public so the runtime fetch and tests use
