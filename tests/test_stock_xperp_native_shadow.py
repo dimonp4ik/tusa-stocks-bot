@@ -230,12 +230,13 @@ def test_http_status_exposes_build_and_native_daily_brake():
     with patch.dict(main.os.environ, {"RAILWAY_GIT_COMMIT_SHA": "abcdef123456"}), \
             patch.object(main, "get_today_realized_r", return_value=-2.5), \
             patch.object(main, "get_today_loss_streak", return_value=0), \
+            patch.object(main, "get_today_max_loss_streak", return_value=3), \
             patch.object(main, "_native_xperp_daily_loss_pause", return_value=True), \
             patch.object(main, "_native_scan_status_text", return_value="scan"):
         text, code = main.status()
     assert code == 200
     assert "Build: abcdef12" in text
-    assert "Native UTC-day: -2.50R; loss streak 0; paused yes" in text
+    assert "Native UTC-day: -2.50R; loss streak 0; max streak 3; paused yes" in text
 
 
 def test_native_scan_fetches_enough_bars_for_longest_regime_gate():
@@ -309,4 +310,34 @@ def test_route_specific_loss_streak_counts_negative_timed_exit():
             finally:
                 connection.close()
             assert db.get_today_loss_streak(
+                0, "Native stock X-Perp shadow") == 2
+
+
+def test_route_specific_max_loss_streak_survives_later_winner():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = str(Path(tmp) / "test.db")
+        with patch.object(db, "DB_PATH", path):
+            db.init_db()
+            connection = sqlite3.connect(path)
+            try:
+                values = [
+                    (100, "SL_HIT", -1.0),
+                    (200, "EXPIRED", -.2),
+                    (300, "TP2_HIT", 2.5),
+                ]
+                for closed_at, status, realized_r in values:
+                    connection.execute(
+                        """INSERT INTO signals
+                           (symbol,direction,entry_price,tp1,tp2,sl,opened_at,
+                            status,closed_at,reason,realized_r)
+                           VALUES ('AAPLUSDT','LONG',100,102,102,99,1,?,?,?,?)""",
+                        (status, closed_at,
+                         "Native stock X-Perp shadow test", realized_r),
+                    )
+                connection.commit()
+            finally:
+                connection.close()
+            assert db.get_today_loss_streak(
+                0, "Native stock X-Perp shadow") == 0
+            assert db.get_today_max_loss_streak(
                 0, "Native stock X-Perp shadow") == 2

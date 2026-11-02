@@ -76,7 +76,8 @@ from src.db import (
     get_unresolved_shadow_exit_variants, mark_shadow_exit_variant_resolved,
     at_add_allowed, at_remove, at_get, at_all_allowed, at_set_keys, at_set_mode,
     at_set_active, at_set_balance, at_set_tp1_close_pct,
-    get_today_sl_streak, get_today_loss_streak, get_recent_signals,
+    get_today_sl_streak, get_today_loss_streak, get_today_max_loss_streak,
+    get_recent_signals,
     get_today_realized_r,
 )
 from src import autotrader
@@ -580,9 +581,11 @@ def status():
     try:
         native_day_r = get_today_realized_r(day_start, route)
         native_loss_streak = get_today_loss_streak(day_start, route)
+        native_max_loss_streak = get_today_max_loss_streak(day_start, route)
         risk_text = (
             f"Native UTC-day: {native_day_r:+.2f}R; "
             f"loss streak {native_loss_streak}; "
+            f"max streak {native_max_loss_streak}; "
             f"paused {'yes' if _native_xperp_daily_loss_pause() else 'no'}. ")
     except Exception as exc:
         risk_text = f"Native UTC-day audit unavailable: {type(exc).__name__}. "
@@ -2707,18 +2710,39 @@ def _venue_daily_loss_pause() -> bool:
             and get_today_sl_streak(day_start) >= VENUE_LOSS_PAUSE_STREAK)
 
 
+_NATIVE_XPERP_PAUSE_DAY_KEY = "native_xperp_daily_pause_day"
+
+
 def _native_xperp_daily_loss_pause() -> bool:
+    """Latch the audited native-route loss pause until the next UTC day.
+
+    The portfolio replay permanently pauses a UTC day as soon as its loss
+    threshold is crossed.  Recomputing only the *current* streak let a later
+    winner clear the condition and restart the live shadow route, so Railway
+    could publish trades that the replay had rejected.  Persist the paused day
+    so restarts and later profitable closes cannot silently resume that book.
+    """
     day_start = int(time.time() // 86400) * 86400
+    try:
+        latched_day = int(get_bot_state(_NATIVE_XPERP_PAUSE_DAY_KEY) or -1)
+    except (TypeError, ValueError):
+        latched_day = -1
+    if latched_day == day_start:
+        return True
+
     route = "Native stock X-Perp shadow"
     streak_pause = (
         NATIVE_XPERP_LOSS_PAUSE_STREAK > 0
-        and get_today_loss_streak(day_start, route)
+        and get_today_max_loss_streak(day_start, route)
         >= NATIVE_XPERP_LOSS_PAUSE_STREAK)
     net_pause = (
         NATIVE_XPERP_DAILY_LOSS_R_CAP > 0
         and get_today_realized_r(day_start, route)
         <= -NATIVE_XPERP_DAILY_LOSS_R_CAP)
-    return streak_pause or net_pause
+    paused = streak_pause or net_pause
+    if paused:
+        set_bot_state(_NATIVE_XPERP_PAUSE_DAY_KEY, str(day_start))
+    return paused
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────

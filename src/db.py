@@ -1983,6 +1983,36 @@ def get_today_loss_streak(day_start_ts: float,
     return streak
 
 
+def get_today_max_loss_streak(day_start_ts: float,
+                              reason_prefix: str | None = None) -> int:
+    """Largest completed loss run in the UTC day for one strategy route.
+
+    The audited portfolio pause is latched after a loss run occurs.  Looking
+    only at the newest outcomes loses that information as soon as a later
+    winner closes, especially when several open signals are resolved in one
+    monitor cycle.
+    """
+    query = (
+        "SELECT status, realized_r FROM signals "
+        "WHERE closed_at IS NOT NULL AND closed_at >= ?"
+    )
+    values: list[object] = [day_start_ts]
+    if reason_prefix:
+        query += " AND reason LIKE ?"
+        values.append(f"{reason_prefix}%")
+    query += " ORDER BY closed_at ASC, id ASC"
+    with _conn() as c:
+        rows = c.execute(query, values).fetchall()
+    current = maximum = 0
+    for row in rows:
+        realized = row["realized_r"]
+        lost = ((realized is not None and float(realized) < 0)
+                or (realized is None and row["status"] == "SL_HIT"))
+        current = current + 1 if lost else 0
+        maximum = max(maximum, current)
+    return maximum
+
+
 def get_today_realized_r(day_start_ts: float,
                          reason_prefix: str | None = None) -> float:
     """Sum exact realized R for closed rows in the current UTC day/route."""

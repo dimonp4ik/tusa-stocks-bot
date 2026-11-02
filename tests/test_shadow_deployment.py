@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 import unittest
 from unittest.mock import patch
 
@@ -410,14 +411,34 @@ class ShadowDeploymentTests(unittest.TestCase):
             self.assertTrue(main._venue_daily_loss_pause())
 
     def test_native_pause_uses_daily_net_r_even_when_streak_was_broken(self):
-        with patch.object(main, "get_today_loss_streak", return_value=0), \
-             patch.object(main, "get_today_realized_r", return_value=-2.5):
+        with patch.object(main, "get_today_max_loss_streak", return_value=0), \
+             patch.object(main, "get_today_realized_r", return_value=-2.5), \
+             patch.object(main, "get_bot_state", return_value=None), \
+             patch.object(main, "set_bot_state") as save:
             self.assertTrue(main._native_xperp_daily_loss_pause())
+        save.assert_called_once_with(
+            main._NATIVE_XPERP_PAUSE_DAY_KEY,
+            str(int(time.time() // 86400) * 86400),
+        )
 
     def test_native_pause_stays_open_above_both_loss_limits(self):
-        with patch.object(main, "get_today_loss_streak", return_value=0), \
-             patch.object(main, "get_today_realized_r", return_value=-1.5):
+        with patch.object(main, "get_today_max_loss_streak", return_value=0), \
+             patch.object(main, "get_today_realized_r", return_value=-1.5), \
+             patch.object(main, "get_bot_state", return_value=None), \
+             patch.object(main, "set_bot_state") as save:
             self.assertFalse(main._native_xperp_daily_loss_pause())
+        save.assert_not_called()
+
+    def test_native_pause_remains_latched_after_later_winner(self):
+        day_start = int(time.time() // 86400) * 86400
+        with patch.object(main, "get_bot_state", return_value=str(day_start)), \
+             patch.object(main, "get_today_max_loss_streak") as streak, \
+             patch.object(main, "get_today_realized_r") as realized, \
+             patch.object(main, "set_bot_state") as save:
+            self.assertTrue(main._native_xperp_daily_loss_pause())
+        streak.assert_not_called()
+        realized.assert_not_called()
+        save.assert_not_called()
 
 
 if __name__ == "__main__":
