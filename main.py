@@ -46,6 +46,7 @@ from src.stock_5m_shadow_router import (
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS as NATIVE_XPERP_SYMBOLS,
     HOLD_BARS as NATIVE_XPERP_HOLD_BARS,
+    MAX_SIGNAL_AGE_SECONDS as NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS,
     REQUIRED_HISTORY_BARS as NATIVE_XPERP_REQUIRED_HISTORY_BARS,
     backing_level_allows_entry, native_shadow_setups,
 )
@@ -594,6 +595,7 @@ def status():
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Build: {deploy_sha}. "
             f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Max entry delay: {NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS}s. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
             f"Signal cache: {len(_signal_cache)} entries. {risk_text}"
