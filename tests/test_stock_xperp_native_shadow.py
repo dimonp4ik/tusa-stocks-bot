@@ -249,6 +249,7 @@ def test_http_status_exposes_build_and_native_daily_brake():
     assert "Build: abcdef12" in text
     assert "Native UTC-day: -2.50R; loss streak 0; max streak 3; paused yes" in text
     assert "Max entry delay: 180s" in text
+    assert "Shared account cap: 12 positions / 90% margin / 2 writers" in text
 
 
 def test_native_scan_fetches_enough_bars_for_longest_regime_gate():

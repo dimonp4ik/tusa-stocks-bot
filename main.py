@@ -34,6 +34,9 @@ from config import (
     NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_DAILY_LOSS_R_CAP,
     NATIVE_XPERP_ROLLING_HOUR_CAP,
     AUTOTRADE_LEVERAGE,
+    AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
+    AUTOTRADE_ACCOUNT_WRITER_COUNT,
+    AUTOTRADE_MAX_ACCOUNT_POSITIONS,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
@@ -611,6 +614,9 @@ def status():
             f"Max entry delay: {NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS}s. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
+            f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
+            f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
+            f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
             f"Signal cache: {len(_signal_cache)} entries. {risk_text}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
