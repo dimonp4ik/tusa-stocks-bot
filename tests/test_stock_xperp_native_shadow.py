@@ -134,6 +134,27 @@ def test_native_route_rejects_short_after_exhausted_basket_decline():
     assert native_shadow_setups(data, now=119 * 900 + 901) == []
 
 
+def test_promoted_short_exhaustion_guard_catches_moderate_basket_decline():
+    data = universe()
+    for values in data.values():
+        base = values["close"][-18]
+        for index in range(len(values["close"]) - 17, len(values["close"])):
+            base *= .9997
+            values["open"][index] = base
+            values["close"][index] = base
+            values["high"][index] = base + .05
+            values["low"][index] = base - .05
+    first = sorted(data)[0]
+    data[first]["close"][-1] *= 1.02
+    data[first]["open"][-1] = data[first]["close"][-1]
+    data[first]["high"][-1] = data[first]["close"][-1] + .05
+    data[first]["low"][-1] = data[first]["close"][-1] - .05
+    trend = basket_trend(data, 119 * 900, 16)
+    assert trend is not None
+    assert -.01 < trend <= SHORT_MIN_BASKET_TREND
+    assert native_shadow_setups(data, now=119 * 900 + 901) == []
+
+
 def test_target_router_uses_exhaustion_before_utc_expansion():
     assert routed_target_fraction(-.041, 8 * 3600) == .02
     assert routed_target_fraction(-.02, 8 * 3600) == .03

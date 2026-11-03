@@ -51,6 +51,7 @@ from src.stock_xperp_native_shadow import (
     HOLD_BARS as NATIVE_XPERP_HOLD_BARS,
     MAX_SIGNAL_AGE_SECONDS as NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS,
     REQUIRED_HISTORY_BARS as NATIVE_XPERP_REQUIRED_HISTORY_BARS,
+    SHORT_MIN_BASKET_TREND as NATIVE_XPERP_SHORT_MIN_BASKET_TREND,
     backing_level_allows_entry, native_shadow_setups,
 )
 from src.earnings_calendar import is_earnings_blackout
@@ -1174,7 +1175,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "Порог: |z| ≥ 2, движение ≥ 0.4%, ATR14 ≤ 1%\n"
                 "Уровень: вход только пока 32-свечная опора не пробита\n"
                 "LONG: тренд корзины за 96 точек не ниже −0.563%\n"
-                "SHORT: не входить после падения корзины за 16 точек на 1%+\n"
+                "SHORT: не входить после падения корзины за 16 точек на "
+                f"{abs(100 * NATIVE_XPERP_SHORT_MIN_BASKET_TREND):.2f}%+\n"
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% при истощении / 3% в 06–12 UTC / иначе 2.5%\n"
                 "Стоп: 1%, максимум 64 свечи\n"

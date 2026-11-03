@@ -44,7 +44,11 @@ BASKET_TREND_BARS = 96
 REQUIRED_HISTORY_BARS = BASKET_TREND_BARS + LOOKBACK_BARS + 1
 LONG_MIN_BASKET_TREND = -0.005626823134606253
 SHORT_EXHAUSTION_BARS = 16
-SHORT_MIN_BASKET_TREND = -.01
+# Promoted in shadow after the pre-declared Oct-30 robustness grid was replayed
+# through Nov-3.  The -0.75% variant improved aggregate return and reduced the
+# fresh stop cluster while every complete month stayed profitable.  Real order
+# enablement remains separately disabled.
+SHORT_MIN_BASKET_TREND = -.0075
 TARGET_EXHAUSTION_BARS = 32
 TARGET_EXHAUSTION_THRESHOLD = -.04
 TARGET_EXPANSION_START_HOUR = 6

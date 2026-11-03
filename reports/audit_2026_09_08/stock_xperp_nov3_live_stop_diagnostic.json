@@ -1,0 +1,1198 @@
+{
+  "created_at": "2026-11-03T13:10:28.958192+00:00",
+  "integrity": {
+    "raw_candle_overlap": {
+      "by_symbol": {
+        "AAOIUSDT": {
+          "overlap_bars": 11177,
+          "value_mismatches": 0
+        },
+        "AAPLUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "AMDUSDT": {
+          "overlap_bars": 11089,
+          "value_mismatches": 0
+        },
+        "AMZNUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "ARMUSDT": {
+          "overlap_bars": 7343,
+          "value_mismatches": 0
+        },
+        "AVGOUSDT": {
+          "overlap_bars": 6473,
+          "value_mismatches": 0
+        },
+        "AXTIUSDT": {
+          "overlap_bars": 7147,
+          "value_mismatches": 0
+        },
+        "BEUSDT": {
+          "overlap_bars": 6472,
+          "value_mismatches": 0
+        },
+        "BMNRUSDT": {
+          "overlap_bars": 7055,
+          "value_mismatches": 0
+        },
+        "CBRSUSDT": {
+          "overlap_bars": 11856,
+          "value_mismatches": 0
+        },
+        "COINUSDT": {
+          "overlap_bars": 9451,
+          "value_mismatches": 0
+        },
+        "CRCLUSDT": {
+          "overlap_bars": 11856,
+          "value_mismatches": 0
+        },
+        "CRWVUSDT": {
+          "overlap_bars": 7052,
+          "value_mismatches": 0
+        },
+        "DELLUSDT": {
+          "overlap_bars": 7246,
+          "value_mismatches": 0
+        },
+        "DRAMUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "EWYUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "GOOGLUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "HOODUSDT": {
+          "overlap_bars": 9453,
+          "value_mismatches": 0
+        },
+        "INTCUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "KOUSDT": {
+          "overlap_bars": 5426,
+          "value_mismatches": 0
+        },
+        "LITEUSDT": {
+          "overlap_bars": 7922,
+          "value_mismatches": 0
+        },
+        "METAUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "MRNAUSDT": {
+          "overlap_bars": 6001,
+          "value_mismatches": 0
+        },
+        "MRVLUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "MSFTUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "MSTRUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "MUUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "NBISUSDT": {
+          "overlap_bars": 11177,
+          "value_mismatches": 0
+        },
+        "NVDAUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "OKTAUSDT": {
+          "overlap_bars": 6385,
+          "value_mismatches": 0
+        },
+        "PLTRUSDT": {
+          "overlap_bars": 9450,
+          "value_mismatches": 0
+        },
+        "QCOMUSDT": {
+          "overlap_bars": 9452,
+          "value_mismatches": 0
+        },
+        "QQQUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "RKLBUSDT": {
+          "overlap_bars": 7342,
+          "value_mismatches": 0
+        },
+        "SAMSUNGUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "SKHYNIXUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "SKHYUSDT": {
+          "overlap_bars": 7149,
+          "value_mismatches": 0
+        },
+        "SNDKUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "SNXXUSDT": {
+          "overlap_bars": 7148,
+          "value_mismatches": 0
+        },
+        "SOFTBANKUSDT": {
+          "overlap_bars": 11762,
+          "value_mismatches": 0
+        },
+        "SOXLUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "SOXSUSDT": {
+          "overlap_bars": 5427,
+          "value_mismatches": 0
+        },
+        "SPCXUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "SPYUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "TSLAUSDT": {
+          "overlap_bars": 11938,
+          "value_mismatches": 0
+        },
+        "WDCUSDT": {
+          "overlap_bars": 6384,
+          "value_mismatches": 0
+        }
+      },
+      "overlap_bars": 453455,
+      "passes": true,
+      "symbols": 46,
+      "value_mismatches": 0
+    }
+  },
+  "last_resolved": [
+    {
+      "atr14_fraction": 0.001607562742933931,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": -0.0003776775804268471,
+      "basket_trend_32": 0.00010259389242031972,
+      "basket_trend_96": -0.0020300605768510727,
+      "cross_z": -6.2799539316168635,
+      "direction": "LONG",
+      "entry_time": 1793492100,
+      "entry_utc": "2026-11-01T00:15:00+00:00",
+      "exit_time": 1793549700,
+      "exit_utc": "2026-11-01T16:15:00+00:00",
+      "outcome": "TIME",
+      "signal_return": -0.02201051248357433,
+      "signed_return": 0.0,
+      "symbol": "OKTAUSDT"
+    },
+    {
+      "atr14_fraction": 0.0009245361004155066,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.00044983542388032314,
+      "basket_trend_32": 0.0013444050332767918,
+      "basket_trend_96": -0.0036210798428041695,
+      "cross_z": 3.7353351431406656,
+      "direction": "SHORT",
+      "entry_time": 1793497500,
+      "entry_utc": "2026-11-01T01:45:00+00:00",
+      "exit_time": 1793528100,
+      "exit_utc": "2026-11-01T10:15:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.005666156202144057,
+      "signed_return": -0.01,
+      "symbol": "INTCUSDT"
+    },
+    {
+      "atr14_fraction": 0.0005960542885126693,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.00044983542388032314,
+      "basket_trend_32": 0.0013444050332767918,
+      "basket_trend_96": -0.0036210798428041695,
+      "cross_z": 3.2524587967510667,
+      "direction": "SHORT",
+      "entry_time": 1793497500,
+      "entry_utc": "2026-11-01T01:45:00+00:00",
+      "exit_time": 1793555100,
+      "exit_utc": "2026-11-01T17:45:00+00:00",
+      "outcome": "TIME",
+      "signal_return": 0.005020179151491222,
+      "signed_return": -0.0029970617042114345,
+      "symbol": "AMDUSDT"
+    },
+    {
+      "atr14_fraction": 0.0011526370939573813,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.0012211288875001588,
+      "basket_trend_32": 0.001310236808617424,
+      "basket_trend_96": -0.000201493564388092,
+      "cross_z": 3.431127731481049,
+      "direction": "SHORT",
+      "entry_time": 1793504700,
+      "entry_utc": "2026-11-01T03:45:00+00:00",
+      "exit_time": 1793562300,
+      "exit_utc": "2026-11-01T19:45:00+00:00",
+      "outcome": "TIME",
+      "signal_return": 0.004420432220039183,
+      "signed_return": -0.0,
+      "symbol": "BMNRUSDT"
+    },
+    {
+      "atr14_fraction": 0.00047144114319238917,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.002603414167916302,
+      "basket_trend_32": 0.0022257365874894072,
+      "basket_trend_96": 5.6959193895341434e-05,
+      "cross_z": 5.865913304513928,
+      "direction": "SHORT",
+      "entry_time": 1793506500,
+      "entry_utc": "2026-11-01T04:15:00+00:00",
+      "exit_time": 1793509200,
+      "exit_utc": "2026-11-01T05:00:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.0066440277572714646,
+      "signed_return": -0.013347022587268942,
+      "symbol": "SNXXUSDT"
+    },
+    {
+      "atr14_fraction": 0.0006805366517596761,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.004089926113251716,
+      "basket_trend_32": 0.003352516497158179,
+      "basket_trend_96": 0.002017996367473762,
+      "cross_z": -4.180990074047906,
+      "direction": "LONG",
+      "entry_time": 1793508300,
+      "entry_utc": "2026-11-01T04:45:00+00:00",
+      "exit_time": 1793512800,
+      "exit_utc": "2026-11-01T06:00:00+00:00",
+      "outcome": "SL",
+      "signal_return": -0.009437596302003137,
+      "signed_return": -0.01,
+      "symbol": "SOXSUSDT"
+    },
+    {
+      "atr14_fraction": 0.0005439203889740269,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.0063594039999701115,
+      "basket_trend_32": 0.00573337033842012,
+      "basket_trend_96": 0.005199037956004691,
+      "cross_z": 2.9240069546482004,
+      "direction": "SHORT",
+      "entry_time": 1793510100,
+      "entry_utc": "2026-11-01T05:15:00+00:00",
+      "exit_time": 1793567700,
+      "exit_utc": "2026-11-01T21:15:00+00:00",
+      "outcome": "TIME",
+      "signal_return": 0.007673316874624803,
+      "signed_return": -0.0043040656866639715,
+      "symbol": "SKHYUSDT"
+    },
+    {
+      "atr14_fraction": 0.0016950050320461904,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.00782105944276185,
+      "basket_trend_32": 0.0016516735208759212,
+      "basket_trend_96": 0.012881514356824377,
+      "cross_z": -3.394955192512404,
+      "direction": "LONG",
+      "entry_time": 1793577600,
+      "entry_utc": "2026-11-02T00:00:00+00:00",
+      "exit_time": 1793582100,
+      "exit_utc": "2026-11-02T01:15:00+00:00",
+      "outcome": "TP",
+      "signal_return": -0.01676995989792196,
+      "signed_return": 0.025,
+      "symbol": "SOFTBANKUSDT"
+    },
+    {
+      "atr14_fraction": 0.006366533324293202,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.00782105944276185,
+      "basket_trend_32": 0.0016516735208759212,
+      "basket_trend_96": 0.012881514356824377,
+      "cross_z": 3.059827730415115,
+      "direction": "SHORT",
+      "entry_time": 1793577600,
+      "entry_utc": "2026-11-02T00:00:00+00:00",
+      "exit_time": 1793578500,
+      "exit_utc": "2026-11-02T00:15:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.020437814800464915,
+      "signed_return": -0.01,
+      "symbol": "SKHYNIXUSDT"
+    },
+    {
+      "atr14_fraction": 0.0027331311079389397,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.009070608205622426,
+      "basket_trend_32": 0.0026579986165216653,
+      "basket_trend_96": 0.01496063862307841,
+      "cross_z": -3.85170331638048,
+      "direction": "LONG",
+      "entry_time": 1793578500,
+      "entry_utc": "2026-11-02T00:15:00+00:00",
+      "exit_time": 1793582100,
+      "exit_utc": "2026-11-02T01:15:00+00:00",
+      "outcome": "TP",
+      "signal_return": -0.017893160024061938,
+      "signed_return": 0.025,
+      "symbol": "LITEUSDT"
+    },
+    {
+      "atr14_fraction": 0.004563128311541805,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.009070608205622426,
+      "basket_trend_32": 0.0026579986165216653,
+      "basket_trend_96": 0.01496063862307841,
+      "cross_z": 2.364981029343701,
+      "direction": "SHORT",
+      "entry_time": 1793578500,
+      "entry_utc": "2026-11-02T00:15:00+00:00",
+      "exit_time": 1793581200,
+      "exit_utc": "2026-11-02T01:00:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.013000000000000123,
+      "signed_return": -0.01,
+      "symbol": "SNXXUSDT"
+    },
+    {
+      "atr14_fraction": 0.005646978296209691,
+      "audited_target_pct": 2.5,
+      "basket_trend_16": 0.009689100765480622,
+      "basket_trend_32": 0.004418164015408031,
+      "basket_trend_96": 0.017059517786421587,
+      "cross_z": 2.2879440882430813,
+      "direction": "SHORT",
+      "entry_time": 1793581200,
+      "entry_utc": "2026-11-02T01:00:00+00:00",
+      "exit_time": 1793591100,
+      "exit_utc": "2026-11-02T03:45:00+00:00",
+      "outcome": "TP",
+      "signal_return": 0.006631832797427739,
+      "signed_return": 0.026125401929260383,
+      "symbol": "SOXSUSDT"
+    },
+    {
+      "atr14_fraction": 0.005025859801887616,
+      "audited_target_pct": 2.0,
+      "basket_trend_16": -0.0008175775283029315,
+      "basket_trend_32": -0.06480063570612216,
+      "basket_trend_96": -0.09315920586205659,
+      "cross_z": 2.917205963786066,
+      "direction": "SHORT",
+      "entry_time": 1793664900,
+      "entry_utc": "2026-11-03T00:15:00+00:00",
+      "exit_time": 1793684700,
+      "exit_utc": "2026-11-03T05:45:00+00:00",
+      "outcome": "TP",
+      "signal_return": 0.010959470636890067,
+      "signed_return": 0.025772141542237614,
+      "symbol": "AXTIUSDT"
+    },
+    {
+      "atr14_fraction": 0.006740018300711941,
+      "audited_target_pct": 2.0,
+      "basket_trend_16": 0.007621627017823171,
+      "basket_trend_32": -0.059619452354512624,
+      "basket_trend_96": -0.09521473878857163,
+      "cross_z": 3.2671644814687295,
+      "direction": "SHORT",
+      "entry_time": 1793666700,
+      "entry_utc": "2026-11-03T00:45:00+00:00",
+      "exit_time": 1793682900,
+      "exit_utc": "2026-11-03T05:15:00+00:00",
+      "outcome": "TP",
+      "signal_return": 0.01057783391221978,
+      "signed_return": 0.02,
+      "symbol": "AAOIUSDT"
+    },
+    {
+      "atr14_fraction": 0.009625653990185053,
+      "audited_target_pct": 2.0,
+      "basket_trend_16": 0.010505875314939458,
+      "basket_trend_32": -0.055280467188723335,
+      "basket_trend_96": -0.10416097930470336,
+      "cross_z": 2.619459915777285,
+      "direction": "SHORT",
+      "entry_time": 1793668500,
+      "entry_utc": "2026-11-03T01:15:00+00:00",
+      "exit_time": 1793680200,
+      "exit_utc": "2026-11-03T04:30:00+00:00",
+      "outcome": "TP",
+      "signal_return": 0.02076893353941278,
+      "signed_return": 0.02,
+      "symbol": "SKHYNIXUSDT"
+    },
+    {
+      "atr14_fraction": 0.009685230024213084,
+      "audited_target_pct": 2.0,
+      "basket_trend_16": 0.012386636644297264,
+      "basket_trend_32": -0.046620299121751974,
+      "basket_trend_96": -0.1075839935397729,
+      "cross_z": 2.1915334039104524,
+      "direction": "SHORT",
+      "entry_time": 1793669400,
+      "entry_utc": "2026-11-03T01:30:00+00:00",
+      "exit_time": 1793682900,
+      "exit_utc": "2026-11-03T05:15:00+00:00",
+      "outcome": "TP",
+      "signal_return": 0.021815154038301365,
+      "signed_return": 0.02511902807420796,
+      "symbol": "SNXXUSDT"
+    },
+    {
+      "atr14_fraction": 0.004528903279168034,
+      "audited_target_pct": 3.0,
+      "basket_trend_16": -0.007719520701892985,
+      "basket_trend_32": -0.01464867116123414,
+      "basket_trend_96": -0.12307195670747909,
+      "cross_z": 4.066644970649181,
+      "direction": "SHORT",
+      "entry_time": 1793692800,
+      "entry_utc": "2026-11-03T08:00:00+00:00",
+      "exit_time": 1793697300,
+      "exit_utc": "2026-11-03T09:15:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.01752999497090313,
+      "signed_return": -0.01,
+      "symbol": "NBISUSDT"
+    },
+    {
+      "atr14_fraction": 0.0015191859145045248,
+      "audited_target_pct": 3.0,
+      "basket_trend_16": -0.007719520701892985,
+      "basket_trend_32": -0.01464867116123414,
+      "basket_trend_96": -0.12307195670747909,
+      "cross_z": 2.0351722874825793,
+      "direction": "SHORT",
+      "entry_time": 1793692800,
+      "entry_utc": "2026-11-03T08:00:00+00:00",
+      "exit_time": 1793698200,
+      "exit_utc": "2026-11-03T09:30:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.00970165584652416,
+      "signed_return": -0.014809998555121995,
+      "symbol": "LITEUSDT"
+    },
+    {
+      "atr14_fraction": 0.00333704115684094,
+      "audited_target_pct": 3.0,
+      "basket_trend_16": -0.003199227466819079,
+      "basket_trend_32": -0.01122932926983287,
+      "basket_trend_96": -0.12407440291547968,
+      "cross_z": 4.008530063614753,
+      "direction": "SHORT",
+      "entry_time": 1793694600,
+      "entry_utc": "2026-11-03T08:30:00+00:00",
+      "exit_time": 1793697300,
+      "exit_utc": "2026-11-03T09:15:00+00:00",
+      "outcome": "SL",
+      "signal_return": 0.013365539452495856,
+      "signed_return": -0.01,
+      "symbol": "AAOIUSDT"
+    }
+  ],
+  "limitations": [
+    "Nov-3 influenced shadow promotion among thresholds declared before Nov-3.",
+    "This report authorizes shadow evidence collection only, not real orders.",
+    "The public replay uses next-bar open and cannot reproduce live ticker latency.",
+    "Gross results exclude fees at user request."
+  ],
+  "november": {
+    "dd_pct": 1.8116,
+    "literal_tp_rate_pct": 36.8421,
+    "max_loss_streak": 3,
+    "n": 19,
+    "pending": 1,
+    "profitable_exit_rate_pct": 36.8421,
+    "resolved": 19,
+    "return_pct": 2.1033,
+    "trades_per_active_day": 6.3333
+  },
+  "orders_possible": false,
+  "promoted_route_changes_since_nov1": [
+    {
+      "basket_trend_16": -0.008461468138253686,
+      "basket_trend_96": -0.13331081453460852,
+      "change": "removed_by_promoted_minus_0_75pct",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T04:45:00+00:00",
+      "outcome": "PENDING",
+      "signed_return": null,
+      "symbol": "HOODUSDT"
+    },
+    {
+      "basket_trend_16": -0.007719520701892985,
+      "basket_trend_96": -0.12307195670747909,
+      "change": "removed_by_promoted_minus_0_75pct",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T08:00:00+00:00",
+      "outcome": "SL",
+      "signed_return": -0.014809998555121995,
+      "symbol": "LITEUSDT"
+    },
+    {
+      "basket_trend_16": -0.007719520701892985,
+      "basket_trend_96": -0.12307195670747909,
+      "change": "removed_by_promoted_minus_0_75pct",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T08:00:00+00:00",
+      "outcome": "SL",
+      "signed_return": -0.01,
+      "symbol": "NBISUSDT"
+    },
+    {
+      "basket_trend_16": -0.004587255726490743,
+      "basket_trend_96": -0.12308409570158077,
+      "change": "added_after_replacement",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T08:15:00+00:00",
+      "outcome": "SL",
+      "signed_return": -0.01,
+      "symbol": "NBISUSDT"
+    },
+    {
+      "basket_trend_16": -0.003199227466819079,
+      "basket_trend_96": -0.12407440291547968,
+      "change": "added_after_replacement",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T08:30:00+00:00",
+      "outcome": "SL",
+      "signed_return": -0.019250672738563512,
+      "symbol": "AXTIUSDT"
+    },
+    {
+      "basket_trend_16": -0.002959679049679969,
+      "basket_trend_96": -0.12705760538550462,
+      "change": "added_after_replacement",
+      "direction": "SHORT",
+      "entry_utc": "2026-11-03T09:00:00+00:00",
+      "outcome": "TP",
+      "signed_return": 0.03,
+      "symbol": "PLTRUSDT"
+    }
+  ],
+  "promoted_shadow_filter": {
+    "direction": "SHORT",
+    "field": "basket_trend_16",
+    "previous_veto_at_or_below": -0.01,
+    "promoted_veto_at_or_below": -0.0075,
+    "reason": "higher aggregate Jul-Nov replay return, lower Nov-3 drawdown, and every complete month remained profitable",
+    "selection_origin": "pre-declared Oct-30 robustness grid"
+  },
+  "ready_for_live_orders": false,
+  "runtime_change_allowed": true,
+  "short_exhaustion_threshold_grid": {
+    "-0.0050": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 38.009,
+          "max_loss_streak": 9,
+          "n": 221,
+          "pending": 0,
+          "profitable_exit_rate_pct": 47.5113,
+          "resolved": 221,
+          "return_pct": 51.8987,
+          "trades_per_active_day": 7.129
+        },
+        "2026-08": {
+          "dd_pct": 2.103,
+          "literal_tp_rate_pct": 25.9091,
+          "max_loss_streak": 7,
+          "n": 220,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.6364,
+          "resolved": 220,
+          "return_pct": 23.5125,
+          "trades_per_active_day": 7.0968
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "literal_tp_rate_pct": 28.3105,
+          "max_loss_streak": 8,
+          "n": 219,
+          "pending": 0,
+          "profitable_exit_rate_pct": 42.9224,
+          "resolved": 219,
+          "return_pct": 24.0137,
+          "trades_per_active_day": 7.5517
+        },
+        "2026-10": {
+          "dd_pct": 2.4326,
+          "literal_tp_rate_pct": 29.4643,
+          "max_loss_streak": 7,
+          "n": 224,
+          "pending": 0,
+          "profitable_exit_rate_pct": 45.0893,
+          "resolved": 224,
+          "return_pct": 27.1915,
+          "trades_per_active_day": 7.4667
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 40.0,
+          "max_loss_streak": 3,
+          "n": 20,
+          "pending": 0,
+          "profitable_exit_rate_pct": 40.0,
+          "resolved": 20,
+          "return_pct": 2.8944,
+          "trades_per_active_day": 6.6667
+        }
+      },
+      "november_3": {
+        "dd_pct": 0.6,
+        "literal_tp_rate_pct": 62.5,
+        "max_loss_streak": 2,
+        "n": 8,
+        "pending": 0,
+        "profitable_exit_rate_pct": 62.5,
+        "resolved": 8,
+        "return_pct": 2.4416,
+        "trades_per_active_day": 8.0
+      }
+    },
+    "-0.0075": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 38.4956,
+          "max_loss_streak": 9,
+          "n": 226,
+          "pending": 0,
+          "profitable_exit_rate_pct": 47.7876,
+          "resolved": 226,
+          "return_pct": 55.4092,
+          "trades_per_active_day": 7.2903
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "literal_tp_rate_pct": 26.6055,
+          "max_loss_streak": 7,
+          "n": 218,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.4954,
+          "resolved": 218,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "literal_tp_rate_pct": 30.2128,
+          "max_loss_streak": 8,
+          "n": 235,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.8298,
+          "resolved": 235,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "literal_tp_rate_pct": 28.7611,
+          "max_loss_streak": 7,
+          "n": 226,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.2478,
+          "resolved": 226,
+          "return_pct": 23.3132,
+          "trades_per_active_day": 7.5333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 40.0,
+          "max_loss_streak": 3,
+          "n": 20,
+          "pending": 0,
+          "profitable_exit_rate_pct": 40.0,
+          "resolved": 20,
+          "return_pct": 2.8944,
+          "trades_per_active_day": 6.6667
+        }
+      },
+      "november_3": {
+        "dd_pct": 0.6,
+        "literal_tp_rate_pct": 62.5,
+        "max_loss_streak": 2,
+        "n": 8,
+        "pending": 0,
+        "profitable_exit_rate_pct": 62.5,
+        "resolved": 8,
+        "return_pct": 2.4416,
+        "trades_per_active_day": 8.0
+      }
+    },
+    "-0.0100": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.5054,
+          "literal_tp_rate_pct": 37.8261,
+          "max_loss_streak": 9,
+          "n": 230,
+          "pending": 0,
+          "profitable_exit_rate_pct": 47.8261,
+          "resolved": 230,
+          "return_pct": 52.751,
+          "trades_per_active_day": 7.4194
+        },
+        "2026-08": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.7857,
+          "max_loss_streak": 8,
+          "n": 224,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.6429,
+          "resolved": 224,
+          "return_pct": 23.6995,
+          "trades_per_active_day": 7.2258
+        },
+        "2026-09": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.303,
+          "max_loss_streak": 8,
+          "n": 231,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.7229,
+          "resolved": 231,
+          "return_pct": 29.7981,
+          "trades_per_active_day": 7.9655
+        },
+        "2026-10": {
+          "dd_pct": 2.3607,
+          "literal_tp_rate_pct": 29.8246,
+          "max_loss_streak": 7,
+          "n": 228,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.7368,
+          "resolved": 228,
+          "return_pct": 25.5118,
+          "trades_per_active_day": 7.6
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 36.8421,
+          "max_loss_streak": 3,
+          "n": 19,
+          "pending": 1,
+          "profitable_exit_rate_pct": 36.8421,
+          "resolved": 19,
+          "return_pct": 2.1033,
+          "trades_per_active_day": 6.3333
+        }
+      },
+      "november_3": {
+        "dd_pct": 1.0443,
+        "literal_tp_rate_pct": 57.1429,
+        "max_loss_streak": 3,
+        "n": 7,
+        "pending": 1,
+        "profitable_exit_rate_pct": 57.1429,
+        "resolved": 7,
+        "return_pct": 1.654,
+        "trades_per_active_day": 7.0
+      }
+    },
+    "-0.0125": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.5063,
+          "literal_tp_rate_pct": 39.5833,
+          "max_loss_streak": 9,
+          "n": 240,
+          "pending": 0,
+          "profitable_exit_rate_pct": 49.5833,
+          "resolved": 240,
+          "return_pct": 61.5447,
+          "trades_per_active_day": 7.7419
+        },
+        "2026-08": {
+          "dd_pct": 3.7247,
+          "literal_tp_rate_pct": 26.8722,
+          "max_loss_streak": 8,
+          "n": 227,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.9339,
+          "resolved": 227,
+          "return_pct": 24.2317,
+          "trades_per_active_day": 7.3226
+        },
+        "2026-09": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.1724,
+          "max_loss_streak": 8,
+          "n": 232,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.3966,
+          "resolved": 232,
+          "return_pct": 30.566,
+          "trades_per_active_day": 8.0
+        },
+        "2026-10": {
+          "dd_pct": 2.4223,
+          "literal_tp_rate_pct": 29.5652,
+          "max_loss_streak": 8,
+          "n": 230,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.3478,
+          "resolved": 230,
+          "return_pct": 25.0481,
+          "trades_per_active_day": 7.6667
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 36.8421,
+          "max_loss_streak": 3,
+          "n": 19,
+          "pending": 1,
+          "profitable_exit_rate_pct": 36.8421,
+          "resolved": 19,
+          "return_pct": 2.1033,
+          "trades_per_active_day": 6.3333
+        }
+      },
+      "november_3": {
+        "dd_pct": 1.0443,
+        "literal_tp_rate_pct": 57.1429,
+        "max_loss_streak": 3,
+        "n": 7,
+        "pending": 1,
+        "profitable_exit_rate_pct": 57.1429,
+        "resolved": 7,
+        "return_pct": 1.654,
+        "trades_per_active_day": 7.0
+      }
+    },
+    "-0.0150": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.5063,
+          "literal_tp_rate_pct": 39.4068,
+          "max_loss_streak": 9,
+          "n": 236,
+          "pending": 0,
+          "profitable_exit_rate_pct": 49.5763,
+          "resolved": 236,
+          "return_pct": 55.3148,
+          "trades_per_active_day": 7.6129
+        },
+        "2026-08": {
+          "dd_pct": 4.2985,
+          "literal_tp_rate_pct": 25.1101,
+          "max_loss_streak": 8,
+          "n": 227,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.1718,
+          "resolved": 227,
+          "return_pct": 18.8884,
+          "trades_per_active_day": 7.3226
+        },
+        "2026-09": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.0429,
+          "max_loss_streak": 8,
+          "n": 233,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.206,
+          "resolved": 233,
+          "return_pct": 30.2058,
+          "trades_per_active_day": 8.0345
+        },
+        "2026-10": {
+          "dd_pct": 2.4223,
+          "literal_tp_rate_pct": 28.8889,
+          "max_loss_streak": 8,
+          "n": 225,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.0,
+          "resolved": 225,
+          "return_pct": 22.0174,
+          "trades_per_active_day": 7.5
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 36.8421,
+          "max_loss_streak": 3,
+          "n": 19,
+          "pending": 1,
+          "profitable_exit_rate_pct": 36.8421,
+          "resolved": 19,
+          "return_pct": 2.1033,
+          "trades_per_active_day": 6.3333
+        }
+      },
+      "november_3": {
+        "dd_pct": 1.0443,
+        "literal_tp_rate_pct": 57.1429,
+        "max_loss_streak": 3,
+        "n": 7,
+        "pending": 1,
+        "profitable_exit_rate_pct": 57.1429,
+        "resolved": 7,
+        "return_pct": 1.654,
+        "trades_per_active_day": 7.0
+      }
+    },
+    "-0.0200": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.5063,
+          "literal_tp_rate_pct": 37.6623,
+          "max_loss_streak": 9,
+          "n": 231,
+          "pending": 0,
+          "profitable_exit_rate_pct": 47.619,
+          "resolved": 231,
+          "return_pct": 49.2298,
+          "trades_per_active_day": 7.4516
+        },
+        "2026-08": {
+          "dd_pct": 3.579,
+          "literal_tp_rate_pct": 25.2174,
+          "max_loss_streak": 8,
+          "n": 230,
+          "pending": 0,
+          "profitable_exit_rate_pct": 42.6087,
+          "resolved": 230,
+          "return_pct": 17.6232,
+          "trades_per_active_day": 7.4194
+        },
+        "2026-09": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 30.4721,
+          "max_loss_streak": 8,
+          "n": 233,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.6352,
+          "resolved": 233,
+          "return_pct": 31.5112,
+          "trades_per_active_day": 8.0345
+        },
+        "2026-10": {
+          "dd_pct": 2.4223,
+          "literal_tp_rate_pct": 29.0749,
+          "max_loss_streak": 8,
+          "n": 227,
+          "pending": 0,
+          "profitable_exit_rate_pct": 44.0529,
+          "resolved": 227,
+          "return_pct": 21.8872,
+          "trades_per_active_day": 7.5667
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 36.8421,
+          "max_loss_streak": 3,
+          "n": 19,
+          "pending": 1,
+          "profitable_exit_rate_pct": 36.8421,
+          "resolved": 19,
+          "return_pct": 1.8149,
+          "trades_per_active_day": 6.3333
+        }
+      },
+      "november_3": {
+        "dd_pct": 1.3238,
+        "literal_tp_rate_pct": 57.1429,
+        "max_loss_streak": 3,
+        "n": 7,
+        "pending": 1,
+        "profitable_exit_rate_pct": 57.1429,
+        "resolved": 7,
+        "return_pct": 1.3668,
+        "trades_per_active_day": 7.0
+      }
+    },
+    "no_short_exhaustion_guard": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 4.4752,
+          "literal_tp_rate_pct": 35.865,
+          "max_loss_streak": 9,
+          "n": 237,
+          "pending": 0,
+          "profitable_exit_rate_pct": 45.5696,
+          "resolved": 237,
+          "return_pct": 41.2919,
+          "trades_per_active_day": 7.6452
+        },
+        "2026-08": {
+          "dd_pct": 3.5755,
+          "literal_tp_rate_pct": 25.8621,
+          "max_loss_streak": 8,
+          "n": 232,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.1034,
+          "resolved": 232,
+          "return_pct": 19.0406,
+          "trades_per_active_day": 7.4839
+        },
+        "2026-09": {
+          "dd_pct": 2.4471,
+          "literal_tp_rate_pct": 29.6137,
+          "max_loss_streak": 8,
+          "n": 233,
+          "pending": 0,
+          "profitable_exit_rate_pct": 43.7768,
+          "resolved": 233,
+          "return_pct": 28.4376,
+          "trades_per_active_day": 8.0345
+        },
+        "2026-10": {
+          "dd_pct": 2.6059,
+          "literal_tp_rate_pct": 27.8539,
+          "max_loss_streak": 8,
+          "n": 219,
+          "pending": 0,
+          "profitable_exit_rate_pct": 42.9224,
+          "resolved": 219,
+          "return_pct": 18.0342,
+          "trades_per_active_day": 7.3
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "literal_tp_rate_pct": 42.1053,
+          "max_loss_streak": 3,
+          "n": 19,
+          "pending": 4,
+          "profitable_exit_rate_pct": 42.1053,
+          "resolved": 19,
+          "return_pct": 3.0438,
+          "trades_per_active_day": 6.3333
+        }
+      },
+      "november_3": {
+        "dd_pct": 0.7195,
+        "literal_tp_rate_pct": 71.4286,
+        "max_loss_streak": 1,
+        "n": 7,
+        "pending": 4,
+        "profitable_exit_rate_pct": 71.4286,
+        "resolved": 7,
+        "return_pct": 2.5904,
+        "trades_per_active_day": 7.0
+      }
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_nov3_live_stop_diagnostic.py": "5e6472c440841a2537f02bf94f729ee866cab7c596398e884f5d026b11417da7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAOIUSDT_15min_current.pkl": "7ad9fb4651e4cdfde2a700cd4247655235805bc4f5361356edcbc0aec093f6ce",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AAPLUSDT_15min_current.pkl": "bcca54fb8e4193ceecb4c80b1d93b9cd7f34832c792851ca7796186517d2542d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMDUSDT_15min_current.pkl": "10536359924465ba0ae5355c5629292e0dc3778add5142be3168579929af91c1",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AMZNUSDT_15min_current.pkl": "3983489741c2079b90b28555f008bbe7062f352f83f940887fc03dc12d301a12",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\ARMUSDT_15min_current.pkl": "96c6df328b38e46fecd57bd4afd70f70dd730e7021fcc6a28d47db6d39d6e9e2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AVGOUSDT_15min_current.pkl": "19511681e5beb77b1f52ab44fb92d152bd829debb38d95bc5cbceb493fd3a72b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\AXTIUSDT_15min_current.pkl": "cb0fda92191302778b514a6d16d87e295352f071160eaaff1d855c8ca9327dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BEUSDT_15min_current.pkl": "519689e8e11b39e448bfb9d458d90c3c9b71348054c0dc16e4ab37cedec57ec6",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\BMNRUSDT_15min_current.pkl": "1601db724d3d53507546a5daefd8bf462770d57b1509d2b866881c44c75bc09c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CBRSUSDT_15min_current.pkl": "f57bbfea3e9fb8be143928dc24952552b0ea1a60239c967589e0515dab057dd9",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\COINUSDT_15min_current.pkl": "4f0b805bdb21cfcad60b1aa93fa784e53af02768905b1a90820f2617e6d00e88",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRCLUSDT_15min_current.pkl": "f5ba420adc973bc5d60f785789b8e00c689fd8e83c838b999bf9b53d8336fb08",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\CRWVUSDT_15min_current.pkl": "29c92824136a395475e1d9f1edefaa928ea8d19ce3f77f8cec2540a1a7db8d8c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DELLUSDT_15min_current.pkl": "40fa4bc48011f062a680d1f028f73c6eb1cbc779bdb050eb600869c683c86556",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\DRAMUSDT_15min_current.pkl": "594dfacf2ad0f62f64de7d7bafe66aabb56ecfaed88d6973a8eccf98264bad3f",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\EWYUSDT_15min_current.pkl": "b39d4be6086f6341f485c43ecf961678a67add5cda75d7413e63ec0f2c517a57",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\GOOGLUSDT_15min_current.pkl": "6b6ba3d4f63bfb26e9978d19473edb68484a5f61bc0b6968fedb760d99efffe2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\HOODUSDT_15min_current.pkl": "03d4fb895e32d77788da6169f2bfa34ab5252c7a9abb5b07d15efe05e5f1aed4",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\INTCUSDT_15min_current.pkl": "9a3795ce16c9e433a578cbca68c9f2735a58c40d2b2b0ca0737cb3b5dfa686c3",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\KOUSDT_15min_current.pkl": "2db4782713e441ce21038bf80cc2d4b6a20b0ff125bd43f38f7008836321c935",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\LITEUSDT_15min_current.pkl": "6825ed79c54df5a106faf528c653cf58f1d9a6d90eb9e409c23fef2a47e3ea6c",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\METAUSDT_15min_current.pkl": "637da1d086136ec0f7787cc4c29f8e4a507a8dbf118ba03b03eb97b0a2aa9e78",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRNAUSDT_15min_current.pkl": "54e72f56f3d3432590737cc15c06bbda182b312bd84146571eac52116129a1ae",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MRVLUSDT_15min_current.pkl": "31d1cbaedc6f65973b04e56bdc9422358cd3d3adc486c07e3badcc3833b6e453",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSFTUSDT_15min_current.pkl": "e515bc39168b6b2b74c1e14e5ec1e051d976f679ed1401d1edb44dadeef97465",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MSTRUSDT_15min_current.pkl": "3a9b914f21db0f10b10b274e19c1c2f921a0dbf577bf959d71076117180b431e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\MUUSDT_15min_current.pkl": "b51dfe194f9b43c3eae63409fd6a2c9d24ab48c96ea866f909671bb9d56f8917",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NBISUSDT_15min_current.pkl": "74e2300d4a76f41131960e503930be1b2bfb7b251159116477149c162a8601f7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\NVDAUSDT_15min_current.pkl": "c8be37f06d23df2c8b1547e66cf3af8b3ac0c03e6d627bce219cdb93f2945148",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\OKTAUSDT_15min_current.pkl": "b6fb702557d401e751d3e623b4bed25622037355ac65bcf1c2346efd3df33869",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\PLTRUSDT_15min_current.pkl": "e500f53ec1f05a63c6ec0a51c44ac9b34db0391f89b31e7f1fa06dffc56b478e",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\QCOMUSDT_15min_current.pkl": "48ee6ab9cbea98de2602cbee4619bf2a60d62bb842e279875ba93f1085e8a20d",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\RKLBUSDT_15min_current.pkl": "a02876a1ddc69681552a3d9ff0cd33874f4ac1f71d6f84f25ef487aedb5d07cf",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SAMSUNGUSDT_15min_current.pkl": "b8c8d7e3f9eaf03686e302b1ab3b6624fd1d33490a0dea4398700c1352be2ada",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYNIXUSDT_15min_current.pkl": "51759b100a02e0c3e9594f829df23333ce193e9fe46515fb33fba6e295e0a347",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SKHYUSDT_15min_current.pkl": "2ea85cb8dfba4dc4bee632267937f73fb281994ffdade0c5ecddf5addfa3c70b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNDKUSDT_15min_current.pkl": "1a614308b6c19af18574596c3b36e291e863d561e5e0989358b50a21b7b7b4d7",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SNXXUSDT_15min_current.pkl": "0b6f0004c8725b6f7be426895544e4e2862d1eeac22ece62f3d3b09242b99163",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOFTBANKUSDT_15min_current.pkl": "05d5dc031a7d4a7a387d904015d1d053bd08f445605d51a7cd1d31140d7a00a5",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXLUSDT_15min_current.pkl": "5c8911bda9c3df4bb2d1ce1bb7a2c9671b0ff7336086edced711f1d0c7d44609",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SOXSUSDT_15min_current.pkl": "ba55293b86038456b01f4c88852089adfa4a36354b86f58d19b6e9036b88e66b",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\SPCXUSDT_15min_current.pkl": "215e63ab7b5723ccee4a486412c5673d3c89fbc08316a18e5deec06a6940c8c2",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\TSLAUSDT_15min_current.pkl": "f32bd866da14d1299fb4de5b9c21b1894d2c6f4ca8cbaeda75d735fc446f8d01",
+    "reports\\audit_2026_09_08\\stock_xperp_all_equities_oct17\\WDCUSDT_15min_current.pkl": "f24f71533524b4f21f1da5a394c8c7e20929546234265322da98742d586c6055",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov2_stop_review\\frozen_manifest.json": "13f6dbe02a8a9b32b45559213f1361b3b180fff7b16730c8f822b19430ab1490",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AAOIUSDT_15min_current.pkl": "f570a39c75db8fb5ce553f71180cfb90e5f2bc010c8e4ab721d040443fb76052",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AAPLUSDT_15min_current.pkl": "e9a4b7183b9faf8c3d998ffb6aadcd82edfad945315ebd4f8f96ae7795f31557",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AMDUSDT_15min_current.pkl": "36219eb2225ab87a6c1cb4bdeabbeb4de2510784c8f96514633c2cfc70992754",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AMZNUSDT_15min_current.pkl": "73d1fc6c3fbcfc5e96b3910d099a3ff3f4395a69f07cc943a620c7f103fb83e6",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\ARMUSDT_15min_current.pkl": "ef3e62ec408f8f291eb02c04d578c50db10868bdbb721da26d1e73d7aa8143d0",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AVGOUSDT_15min_current.pkl": "090bd717d3ea0e845d1341fa9fb5d1c87afda80236828814d177d68c51e7d0df",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\AXTIUSDT_15min_current.pkl": "979fa7351945c5577078f7259ce97daa687e5dcaa465fe837a8f53caf2b44fbe",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\BEUSDT_15min_current.pkl": "0cec3a7c3dcd3d7d560fe736b87c01fa76583ce70084a2a07214961446d4b948",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\BMNRUSDT_15min_current.pkl": "2436ba55d350c93169b1c5d005e3f1d6b9e61192ec8634de609a69bce835b323",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\CBRSUSDT_15min_current.pkl": "e8e3456df2260f071a5addab2ae0cae30b42094fcd4d76307c89e1efa6d9d279",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\COINUSDT_15min_current.pkl": "02d24b593da01f44fde0c043cb2b59395d2e7b7b8a16d22426e2bd25c61d2432",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\CRCLUSDT_15min_current.pkl": "ab584b93903a9cbb6ff5821a80be816e8737fbf4fbc6883ecac652932c104781",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\CRWVUSDT_15min_current.pkl": "f13ac7d01d74d071b3d8d7d638cad7c64fa07d38a498016b4bd1ee4d2251a402",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\DELLUSDT_15min_current.pkl": "e837f70532f3052e4fa1d96669764d0b1e03ba70c23dad092876dec3403cf31b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\DRAMUSDT_15min_current.pkl": "7a501e757a59a21b25670f2861a695ce2b729dba47c6ba899c7bd963c4886a58",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\EWYUSDT_15min_current.pkl": "09c6a86c14bd458d68d5f41414b53857b66651f889d5521ac266d475c3849b0f",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\GOOGLUSDT_15min_current.pkl": "d9f63d9793574109bee69642626fb3918f76a22e56e5bce42807c2818e2dda18",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\HOODUSDT_15min_current.pkl": "bdd5019f1712864d26a6491109adb6b0a5d78e44feaebd67308cb93015a37a4c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\INTCUSDT_15min_current.pkl": "dcdca4eb53de16a842139dc9929d9bc269f3686397105ee9a7af6fe8ea374620",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\KOUSDT_15min_current.pkl": "7502c707062c40b329adfe3e6c990d2f93a5699736525279961950b98e9f3825",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\LITEUSDT_15min_current.pkl": "c2cef196e6daffc6d9660001c32f7459682d0515eebe44e3b32beed6c5db66bc",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\METAUSDT_15min_current.pkl": "039c0f000420219ebdd9611f68a777a870b630696aecaaa11b80221c0f61b184",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\MRNAUSDT_15min_current.pkl": "1e47c343edbcb3ad18091d444a18d9756eec48c8d54f410be9554ffc292d9609",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\MRVLUSDT_15min_current.pkl": "ba897d2aee89759d6b036f28ffd90ffd5c0fdb0bb5f4998b2c59e6fdc900ba75",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\MSFTUSDT_15min_current.pkl": "7f0bc2098fca695423b33f75de56aea2557e9a2e2350c4c37f6bcea9a9cc81c4",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\MSTRUSDT_15min_current.pkl": "93eb5dc3438564ce35f005807bce67c2efa31741a437aac1faaaba39915e9121",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\MUUSDT_15min_current.pkl": "88bc9e1ccf99d7010e8648374357fb851b0cbfff0e560650e1853c0695298ed8",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\NBISUSDT_15min_current.pkl": "9aec68cf8bb5eb3578dd8116aabd51d889ee0af259292b6c0ede49f82aeef227",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\NVDAUSDT_15min_current.pkl": "d319ae13224b8e071630ae2f4d9967e8ae1a76d038b2907f11275929d2a3f79b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\OKTAUSDT_15min_current.pkl": "5fa95a4b1824b28b49a7c072654011bb6ebc955af34c8de2444b7a27d5a46623",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\PLTRUSDT_15min_current.pkl": "c289205e0b2d2af5c83a62208b3b68ca1cc01690f82f3b6b4c82385c4d4edf58",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\QCOMUSDT_15min_current.pkl": "2b8cfb6cbe54f20a4323cec8ef5eb0676939896e295e6062777b0dbac0c563ae",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\RKLBUSDT_15min_current.pkl": "45b94d72bd2ace6cd4d89c2ee33fc8e6eae16aa5b25253deab6a033118c49e7b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SAMSUNGUSDT_15min_current.pkl": "83f80a063f64102265af5d77776a61a01d0cbbb1aa495b21f668d4be0837d894",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SKHYNIXUSDT_15min_current.pkl": "5f244078fba3cf6f8655b32c239a88feb450091a385b6fea7507f93a867933bc",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SKHYUSDT_15min_current.pkl": "27d3335bc47f9ba26a07bd5d1f8f4f896ce476259a3663e4381be6b8246ed8cf",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SNDKUSDT_15min_current.pkl": "8f4617c5fda5637a42f8f7e63385428d30718381bf1b9fe2bb9eed2b851b43e2",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SNXXUSDT_15min_current.pkl": "edaabf13f7b3da10b98191bca300bcf5fa1696db06c627b4c2962947a524325a",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SOFTBANKUSDT_15min_current.pkl": "f3382dfdc948e61ece5727cf9349ddd93fb3c9753c32007fb42d7b1ae2a44643",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SOXLUSDT_15min_current.pkl": "74ec8bdefa66318e97da1adc2d786c18b175f2eb3ecfc4dfb7a226dedb41043b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SOXSUSDT_15min_current.pkl": "afbd9ad66dc10d2caba9bd748b91d17310b3dfee980e8293593cfd68ffc38cab",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\SPCXUSDT_15min_current.pkl": "1ac3ca698fab396ec733c15299617381ec94a2d21059a97810b82e949cf8a765",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\TSLAUSDT_15min_current.pkl": "f9d8cb94b63d9da45daaef345918aba610771319bbaf1bcfb86a703ab19fd7e7",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\WDCUSDT_15min_current.pkl": "0f019ac12414f92ab0ed4f119009b5201e764e205843f60d3ed2b2147ecf331b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_stop_review\\manifest.json": "b1b8a4147810ae07a12a7c4a478244effbd2d2a329b09e3a3dabc6a33d1554a2"
+  },
+  "status": "SHADOW_FILTER_PROMOTION_PASSED"
+}
