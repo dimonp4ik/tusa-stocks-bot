@@ -9,6 +9,8 @@ from __future__ import annotations
 import math
 import statistics
 import time
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 
 AUDITED_SYMBOLS = frozenset({
@@ -53,6 +55,15 @@ TARGET_EXHAUSTION_BARS = 32
 TARGET_EXHAUSTION_THRESHOLD = -.04
 TARGET_EXPANSION_START_HOUR = 6
 TARGET_EXPANSION_END_HOUR = 12
+PREMARKET_REGIME_TIMEZONE = "America/New_York"
+PREMARKET_REGIME_BASKET_BARS = 64
+PREMARKET_REGIME_TRIGGER_START_MINUTE = 3 * 60 + 15
+PREMARKET_REGIME_TRIGGER_END_MINUTE = 4 * 60
+PREMARKET_REGIME_LIQUIDITY_LOOKBACK_BARS = 8
+PREMARKET_REGIME_MIN_ACTIVE_BARS = 6
+PREMARKET_REGIME_MAX_LIQUID_UNIVERSE_RATIO = .55
+PREMARKET_REGIME_MAX_BASKET_TREND_64 = -.06
+_NEW_YORK = ZoneInfo(PREMARKET_REGIME_TIMEZONE)
 
 
 def _finite_series(candles: dict, key: str) -> list[float] | None:
@@ -187,6 +198,67 @@ def basket_trend(candles_by_symbol: dict[str, dict], signal_time: int,
     return None if values is None else values[bars]
 
 
+def active_volume_bars(candles: dict, index: int,
+                       lookback: int = PREMARKET_REGIME_LIQUIDITY_LOOKBACK_BARS
+                       ) -> int | None:
+    """Count fully closed bars with contracts traded, ending at ``index``."""
+    index = int(index)
+    if lookback < 1 or index < lookback - 1:
+        return None
+    volumes = candles.get("volume") or []
+    if index >= len(volumes):
+        return None
+    try:
+        values = [float(volumes[offset])
+                  for offset in range(index - lookback + 1, index + 1)]
+    except (TypeError, ValueError):
+        return None
+    if not all(math.isfinite(value) and value >= 0 for value in values):
+        return None
+    return sum(value > 0 for value in values)
+
+
+def liquid_universe_ratio(rows: list[dict]) -> float | None:
+    """Share of aligned symbols trading in at least six of eight closed bars."""
+    counts = [active_volume_bars(row["candles"], row["signal_index"])
+              for row in rows]
+    available = [value for value in counts if value is not None]
+    if len(available) < MINIMUM_UNIVERSE:
+        return None
+    liquid = sum(value >= PREMARKET_REGIME_MIN_ACTIVE_BARS
+                 for value in available)
+    return liquid / len(available)
+
+
+def new_york_calendar_day(stamp: float) -> str:
+    """Return the DST-aware New York calendar day for a UTC epoch."""
+    value = float(stamp)
+    if not math.isfinite(value):
+        raise ValueError("timestamp must be finite")
+    return datetime.fromtimestamp(value, tz=timezone.utc).astimezone(
+        _NEW_YORK).date().isoformat()
+
+
+def premarket_regime_trigger(entry_time: float, basket_trend_64: float,
+                             liquidity_ratio: float | None) -> bool:
+    """Detect the audited illiquid crash regime at US premarket discovery."""
+    if liquidity_ratio is None:
+        return False
+    stamp = float(entry_time)
+    trend = float(basket_trend_64)
+    ratio = float(liquidity_ratio)
+    if not all(math.isfinite(value) for value in (stamp, trend, ratio)):
+        return False
+    local = datetime.fromtimestamp(stamp, tz=timezone.utc).astimezone(_NEW_YORK)
+    minute = local.hour * 60 + local.minute
+    return (
+        PREMARKET_REGIME_TRIGGER_START_MINUTE <= minute
+        < PREMARKET_REGIME_TRIGGER_END_MINUTE
+        and trend <= PREMARKET_REGIME_MAX_BASKET_TREND_64
+        and ratio <= PREMARKET_REGIME_MAX_LIQUID_UNIVERSE_RATIO
+    )
+
+
 def routed_target_fraction(basket_trend_32: float,
                            entry_time: float) -> float:
     """Choose the audited shadow target from causal basket state and UTC hour."""
@@ -243,13 +315,27 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
         return []
     trends = basket_trends(
         candles_by_symbol, signal_time,
-        (SHORT_EXHAUSTION_BARS, TARGET_EXHAUSTION_BARS, BASKET_TREND_BARS))
+        (SHORT_EXHAUSTION_BARS, TARGET_EXHAUSTION_BARS,
+         PREMARKET_REGIME_BASKET_BARS, BASKET_TREND_BARS))
     if trends is None:
         diag["result"] = "insufficient_regime_history"
         return []
     short_trend = trends[SHORT_EXHAUSTION_BARS]
     target_trend = trends[TARGET_EXHAUSTION_BARS]
+    premarket_trend = trends[PREMARKET_REGIME_BASKET_BARS]
     long_trend = trends[BASKET_TREND_BARS]
+    liquidity_ratio = liquid_universe_ratio(rows)
+    if premarket_regime_trigger(
+            entry_time, premarket_trend, liquidity_ratio):
+        diag.update({
+            "result": "premarket_liquidity_regime_trigger",
+            "premarket_regime_trigger": True,
+            "premarket_regime_new_york_day": new_york_calendar_day(entry_time),
+            "basket_trend_64_pct": premarket_trend * 100,
+            "liquid_universe_ratio": liquidity_ratio,
+            "liquid_universe_symbols": len(rows),
+        })
+        return []
     target_fraction = routed_target_fraction(target_trend, entry_time)
     rejected = {
         "abs_z": 0, "minimum_move": 0, "atr_missing": 0, "atr_too_high": 0,
@@ -303,7 +389,9 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
             "backing_level_lookback_bars": BACKING_LEVEL_LOOKBACK_BARS,
             "basket_trend_16": short_trend,
             "basket_trend_32": target_trend,
+            "basket_trend_64": premarket_trend,
             "basket_trend_96": long_trend,
+            "liquid_universe_ratio": liquidity_ratio,
             "hold_bars": HOLD_BARS,
             "module": "native_xperp_quality_reversal",
             "_quality_rank": -abs(float(z_score)),
@@ -315,7 +403,9 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
         "cross_std_pct": deviation * 100,
         "basket_trend_16_pct": short_trend * 100,
         "basket_trend_32_pct": target_trend * 100,
+        "basket_trend_64_pct": premarket_trend * 100,
         "basket_trend_96_pct": long_trend * 100,
+        "liquid_universe_ratio": liquidity_ratio,
         "target_pct": target_fraction * 100,
         "rejected": rejected,
         "candidates": len(output),

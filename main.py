@@ -52,7 +52,10 @@ from src.stock_xperp_native_shadow import (
     MAX_SIGNAL_AGE_SECONDS as NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS,
     REQUIRED_HISTORY_BARS as NATIVE_XPERP_REQUIRED_HISTORY_BARS,
     SHORT_MIN_BASKET_TREND as NATIVE_XPERP_SHORT_MIN_BASKET_TREND,
+    PREMARKET_REGIME_MAX_BASKET_TREND_64,
+    PREMARKET_REGIME_MAX_LIQUID_UNIVERSE_RATIO,
     backing_level_allows_entry, native_shadow_setups,
+    new_york_calendar_day,
 )
 from src.earnings_calendar import is_earnings_blackout
 from src.telegram_notifier import (
@@ -482,6 +485,8 @@ def _native_scan_status_text() -> str:
             "no_candidate_passed": "рынок проверен, сетапов нет",
             "qualified_but_not_published": "сетап отфильтрован портфелем",
             "daily_loss_pause": "пауза после серии убытков",
+            "premarket_liquidity_regime_trigger": "защита от тонкого падающего рынка",
+            "premarket_liquidity_regime_pause": "дневная пауза тонкого падающего рынка",
             "insufficient_instruments": "не хватает инструментов",
             "insufficient_regime_history": "не хватает истории",
             "no_aligned_universe": "свечи инструментов не синхронизированы",
@@ -605,8 +610,12 @@ def status():
             f"loss streak {native_loss_streak}; "
             f"max streak {native_max_loss_streak}; "
             f"paused {'yes' if _native_xperp_daily_loss_pause() else 'no'}. ")
+        regime_text = (
+            "Premarket regime paused "
+            f"{'yes' if _native_xperp_premarket_regime_pause() else 'no'}. ")
     except Exception as exc:
         risk_text = f"Native UTC-day audit unavailable: {type(exc).__name__}. "
+        regime_text = "Premarket regime audit unavailable. "
     deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
@@ -618,7 +627,7 @@ def status():
             f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
             f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
-            f"Signal cache: {len(_signal_cache)} entries. {risk_text}"
+            f"Signal cache: {len(_signal_cache)} entries. {risk_text}{regime_text}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
@@ -1177,6 +1186,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "LONG: тренд корзины за 96 точек не ниже −0.563%\n"
                 "SHORT: не входить после падения корзины за 16 точек на "
                 f"{abs(100 * NATIVE_XPERP_SHORT_MIN_BASKET_TREND):.2f}%+\n"
+                "Защита 03:15–04:00 NY: если корзина 64 ≤ "
+                f"{100 * PREMARKET_REGIME_MAX_BASKET_TREND_64:.0f}% и ликвидны ≤ "
+                f"{100 * PREMARKET_REGIME_MAX_LIQUID_UNIVERSE_RATIO:.0f}% инструментов, "
+                "пауза до следующего дня NY\n"
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% при истощении / 3% в 06–12 UTC / иначе 2.5%\n"
                 "Стоп: 1%, максимум 64 свечи\n"
@@ -2734,6 +2747,8 @@ def _venue_daily_loss_pause() -> bool:
 
 
 _NATIVE_XPERP_PAUSE_DAY_KEY = "native_xperp_daily_pause_day"
+_NATIVE_XPERP_PREMARKET_REGIME_DAY_KEY = (
+    "native_xperp_premarket_regime_new_york_day")
 
 
 def _native_xperp_daily_loss_pause() -> bool:
@@ -2766,6 +2781,17 @@ def _native_xperp_daily_loss_pause() -> bool:
     if paused:
         set_bot_state(_NATIVE_XPERP_PAUSE_DAY_KEY, str(day_start))
     return paused
+
+
+def _native_xperp_premarket_regime_pause(now: float | None = None) -> bool:
+    """Keep a triggered premarket stress pause through the New York day."""
+    stamp = time.time() if now is None else float(now)
+    try:
+        stored_day = str(get_bot_state(
+            _NATIVE_XPERP_PREMARKET_REGIME_DAY_KEY) or "")
+        return stored_day == new_york_calendar_day(stamp)
+    except (TypeError, ValueError, OverflowError):
+        return False
 
 
 # ── Reject cooldown ────────────────────────────────────────────────────────────
@@ -3592,7 +3618,10 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
             f"ATR14 {100 * atr_fraction:.2f}%",
             f"Basket trend 16 {100 * float(setup['basket_trend_16']):+.2f}%",
             f"Basket trend 32 {100 * float(setup['basket_trend_32']):+.2f}%",
+            f"Basket trend 64 {100 * float(setup['basket_trend_64']):+.2f}%",
             f"Basket trend 96 {100 * float(setup['basket_trend_96']):+.2f}%",
+            ("Liquid universe 8x6 "
+             f"{100 * float(setup['liquid_universe_ratio']):.1f}%"),
             (f"Backing level {int(setup['backing_level_lookback_bars'])} bars: "
              f"{float(setup['backing_level']):.8g}"),
             f"Universe {int(setup['universe_n'])}",
@@ -3707,6 +3736,14 @@ def _run_native_xperp_shadow_scan() -> None:
             "Native X-Perp shadow paused after %s consecutive UTC-day losses",
             NATIVE_XPERP_LOSS_PAUSE_STREAK)
         return
+    if _native_xperp_premarket_regime_pause():
+        _persist_native_scan_audit({
+            "ts": time.time(), "result": "premarket_liquidity_regime_pause",
+            "premarket_regime_new_york_day": new_york_calendar_day(time.time()),
+        })
+        log.warning("Native X-Perp shadow paused for the New York day after "
+                    "an illiquid premarket crash regime")
+        return
     available = set(get_xperp_instruments())
     targets = sorted(
         symbol for symbol in NATIVE_XPERP_SYMBOLS
@@ -3745,6 +3782,30 @@ def _run_native_xperp_shadow_scan() -> None:
     strategy_audit = {}
     setups = native_shadow_setups(
         fetched, now=now, diagnostics=strategy_audit)
+    if strategy_audit.get("premarket_regime_trigger"):
+        regime_day = str(strategy_audit["premarket_regime_new_york_day"])
+        set_bot_state(_NATIVE_XPERP_PREMARKET_REGIME_DAY_KEY, regime_day)
+        bar_lengths = [len(row.get("close") or [])
+                       for row in fetched.values()]
+        _persist_native_scan_audit({
+            "ts": now,
+            "result": "premarket_liquidity_regime_trigger",
+            "available_instruments": len(available),
+            "targets": len(targets),
+            "fetched": len(fetched),
+            "required_history_bars": NATIVE_XPERP_REQUIRED_HISTORY_BARS,
+            "minimum_fetched_bars": min(bar_lengths) if bar_lengths else 0,
+            "maximum_fetched_bars": max(bar_lengths) if bar_lengths else 0,
+            "strategy": strategy_audit,
+            "raw_setups": 0,
+            "portfolio_rejects": {},
+            "publish_rejects": {},
+            "publish_candidates": 0,
+            "published": 0,
+        })
+        log.warning("Native X-Perp shadow latched the illiquid premarket "
+                    "crash pause for New York day %s", regime_day)
+        return
     active_rows = get_open_signals()
     active = {row["symbol"] for row in active_rows}
     blocked = {row["symbol"] for row in get_active_symbol_blocks()}

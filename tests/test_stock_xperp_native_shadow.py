@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,8 +13,9 @@ from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
     LONG_MIN_BASKET_TREND, SHORT_MIN_BASKET_TREND,
     REQUIRED_HISTORY_BARS,
-    backing_level_allows_entry, basket_trend,
-    native_shadow_setups, normalized_atr14, routed_target_fraction,
+    active_volume_bars, backing_level_allows_entry, basket_trend,
+    native_shadow_setups, new_york_calendar_day, normalized_atr14,
+    premarket_regime_trigger, routed_target_fraction,
 )
 from src.telegram_notifier import bracket_for_analysis
 
@@ -161,6 +163,48 @@ def test_target_router_uses_exhaustion_before_utc_expansion():
     assert routed_target_fraction(-.02, 14 * 3600) == .025
 
 
+def test_premarket_regime_trigger_follows_new_york_dst_and_boundaries():
+    november = datetime(2026, 11, 3, 8, 30, tzinfo=timezone.utc).timestamp()
+    july = datetime(2026, 7, 3, 7, 30, tzinfo=timezone.utc).timestamp()
+    outside = datetime(2026, 11, 3, 9, 0, tzinfo=timezone.utc).timestamp()
+    assert premarket_regime_trigger(november, -.06, .55)
+    assert premarket_regime_trigger(july, -.07, .40)
+    assert not premarket_regime_trigger(outside, -.07, .40)
+    assert not premarket_regime_trigger(november, -.059, .40)
+    assert not premarket_regime_trigger(november, -.07, .56)
+    assert new_york_calendar_day(november) == "2026-11-03"
+
+
+def test_active_volume_bars_and_native_route_latch_illiquid_crash_regime():
+    signal_time = int(datetime(
+        2026, 11, 3, 8, 15, tzinfo=timezone.utc).timestamp())
+    times = [signal_time - (119 - index) * 900 for index in range(120)]
+    values = [100.0 * (.9995 ** index) for index in range(120)]
+    data = {}
+    for symbol in sorted(AUDITED_SYMBOLS)[:20]:
+        data[symbol] = {
+            "time": list(times),
+            "open": list(values),
+            "high": [value + .05 for value in values],
+            "low": [value - .05 for value in values],
+            "close": list(values),
+            "volume": [1000.0] * 112 + [0.0] * 8,
+        }
+    first = sorted(data)[0]
+    data[first]["close"][-1] *= 1.02
+    data[first]["open"][-1] = data[first]["close"][-1]
+    data[first]["high"][-1] = data[first]["close"][-1] + .05
+    data[first]["low"][-1] = data[first]["close"][-1] - .05
+    assert active_volume_bars(next(iter(data.values())), 119) == 0
+    audit = {}
+    assert native_shadow_setups(
+        data, now=signal_time + 901, diagnostics=audit) == []
+    assert audit["result"] == "premarket_liquidity_regime_trigger"
+    assert audit["premarket_regime_new_york_day"] == "2026-11-03"
+    assert audit["basket_trend_64_pct"] <= -6
+    assert audit["liquid_universe_ratio"] == 0
+
+
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
     analysis = main._native_xperp_analysis(setup, 100.0)
@@ -288,6 +332,55 @@ def test_native_scan_fetches_enough_bars_for_longest_regime_gate():
     assert fetch.call_count == len(symbols)
     assert all(call.kwargs["limit"] >= REQUIRED_HISTORY_BARS
                for call in fetch.call_args_list)
+
+
+def test_premarket_regime_latch_survives_restart_and_expires_next_ny_day():
+    current = datetime(2026, 11, 3, 12, 0, tzinfo=timezone.utc).timestamp()
+    next_day = datetime(2026, 11, 4, 12, 0, tzinfo=timezone.utc).timestamp()
+    with patch.object(main, "get_bot_state", return_value="2026-11-03"):
+        assert main._native_xperp_premarket_regime_pause(current)
+        assert not main._native_xperp_premarket_regime_pause(next_day)
+
+
+def test_native_scan_does_not_fetch_while_premarket_regime_is_latched():
+    with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
+            patch.object(main, "_native_xperp_premarket_regime_pause",
+                         return_value=True), \
+            patch.object(main, "get_xperp_instruments") as instruments, \
+            patch.object(main, "_persist_native_scan_audit") as persist:
+        main._run_native_xperp_shadow_scan()
+    instruments.assert_not_called()
+    assert persist.call_args.args[0]["result"] == (
+        "premarket_liquidity_regime_pause")
+
+
+def test_native_scan_persists_new_premarket_regime_trigger_before_publish():
+    symbols = sorted(AUDITED_SYMBOLS)[:10]
+
+    def trigger(_fetched, now=None, diagnostics=None):
+        diagnostics.update({
+            "result": "premarket_liquidity_regime_trigger",
+            "premarket_regime_trigger": True,
+            "premarket_regime_new_york_day": "2026-11-03",
+        })
+        return []
+
+    with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
+            patch.object(main, "_native_xperp_premarket_regime_pause",
+                         return_value=False), \
+            patch.object(main, "get_xperp_instruments",
+                         return_value={symbol[:-4]: "id" for symbol in symbols}), \
+            patch.object(main, "get_klines_xperp", return_value=candles()), \
+            patch.object(main, "native_shadow_setups", side_effect=trigger), \
+            patch.object(main, "set_bot_state") as set_state, \
+            patch.object(main, "get_open_signals") as open_signals, \
+            patch.object(main, "_persist_native_scan_audit") as persist:
+        main._run_native_xperp_shadow_scan()
+    set_state.assert_called_once_with(
+        main._NATIVE_XPERP_PREMARKET_REGIME_DAY_KEY, "2026-11-03")
+    open_signals.assert_not_called()
+    assert persist.call_args.args[0]["result"] == (
+        "premarket_liquidity_regime_trigger")
 
 
 def test_backing_level_blocks_crossed_short_resistance():
