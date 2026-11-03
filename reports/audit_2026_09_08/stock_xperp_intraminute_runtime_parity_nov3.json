@@ -1,0 +1,77 @@
+{
+  "created_at": "2026-11-03T19:17:51.080644+00:00",
+  "deployed_contract": {
+    "expiry": "original planned entry + 64x15m",
+    "monitor": "1m X-Perp bars from the signal publication minute",
+    "orders": "market only; shadow code still forbids real orders",
+    "position_fraction": "unchanged client setting",
+    "primary_scan": "+10 seconds after each 15m boundary",
+    "retry_scan": "+70 seconds after each 15m boundary"
+  },
+  "limitations": [
+    "The one-minute close is a proxy for the Telegram market price, not an exchange fill.",
+    "One-minute OHLC cannot order a stop and target touched inside the same minute.",
+    "The sample covers only the recent entries available in public one-minute history.",
+    "This audit fixes measurement parity and does not prove a profitability increase."
+  ],
+  "live_boundary_probe": {
+    "boundary_utc": "2026-11-03T19:15:00+00:00",
+    "forming_candle_confirm_flag": 0,
+    "instrument": "AAPL X-Perp",
+    "prior_15m_confirmed_at_plus_seconds": 2,
+    "prior_candle_confirm_flag": 1
+  },
+  "orders_possible": false,
+  "ready_for_live_orders": false,
+  "result": {
+    "adverse_reversal_drift_pct": {
+      "maximum": 0.903225806451613,
+      "mean": -0.12066906771189545,
+      "minimum": -0.7387949433590446
+    },
+    "changed_rows": [
+      {
+        "adverse_reversal_drift_pct": 0.17966903073286522,
+        "direction": "SHORT",
+        "entry_utc": "2026-11-03T01:15:00+00:00",
+        "one_minute_entry_proxy": 1055.6,
+        "outcome_changed": true,
+        "planned_entry": 1057.5,
+        "planned_outcome": "TP",
+        "post_publication_minute_outcome": "SL",
+        "prepublication_first_minute_touched_bracket": false,
+        "symbol": "SKHYNIXUSDT"
+      }
+    ],
+    "outcome_changes": 1,
+    "prepublication_bracket_touches": 0
+  },
+  "runtime_change_allowed": true,
+  "scope": {
+    "entries": 20,
+    "entry_proxy": "close of first 1m candle after planned 15m open",
+    "hold": "64 planned 15m bars",
+    "observable_path": "1m candles starting at planned entry + 60s",
+    "start_utc": "2026-11-01T00:00:00+00:00"
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_intraminute_runtime_parity_nov3_audit.py": "86b4c627e1745ced858b43f0a7626660bd5815640b7462ababff30b724503b4c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\AAOIUSDT_1min_current.pkl": "9993b3b4678429f4db18f3fcc6f41866d2cf07a593f73612947d5b3516596bf3",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\AMDUSDT_1min_current.pkl": "edf2339270b22041acbda58ac101c37a26911073e25ab6dd65da233a9a1cee77",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\AXTIUSDT_1min_current.pkl": "ff6f614298d6f1db78d26bab0969f44b132d462f5dc22c3b0fb403c0770e9316",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\BMNRUSDT_1min_current.pkl": "ab63bb902ac17ed500a6e69855211b5a72a7bf748769913489a075251eb07ac1",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\INTCUSDT_1min_current.pkl": "590e6713d0813e05341a28eb1e8a7f6f18f06a7c3db7d16356d25b92937276dd",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\LITEUSDT_1min_current.pkl": "d67e32c7d80e79053b0745a09afa9ae17347fa399fb9582fa0ad19b2896e7aa6",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\NBISUSDT_1min_current.pkl": "4b2bfff1e6995e81cdaf8efc052bf393c73a64972bd20a10f090629b6633690b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\OKTAUSDT_1min_current.pkl": "9ed49ef84dff3bc238af7f084b1452da200eb84d1ec841d77004665eff7dbbec",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\PLTRUSDT_1min_current.pkl": "61f7e219f60a4a7da0cef173d3b410c157f32fd0ff43610566c7394899b3b64b",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\SKHYNIXUSDT_1min_current.pkl": "ea1f16063d80328707f2be5adaa581a347acbef4463567121d83e67599c82908",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\SKHYUSDT_1min_current.pkl": "58751322f4cc247084196280ba8982be468ce63145595ea0f80b896a9a60a701",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\SNXXUSDT_1min_current.pkl": "a5afd6e34fc4e905ff260a8646da69d09f4473e5bedbfedae4ad1e7673579454",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\SOFTBANKUSDT_1min_current.pkl": "0de2ee1a0d10a57f74a957a1dfe4e3859b3307c6ae091b63e59a3d175bcc3b0d",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\SOXSUSDT_1min_current.pkl": "e0293f2d8cfb02319deed402d6c5a73b7c11834d2e4a0598197767b22fbdfc66",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov3_intraminute\\manifest.json": "29afb14d5a9280a82f4f76ca6aca7181a246736ddac2349a1487085605816bbf",
+    "reports\\audit_2026_09_08\\stock_xperp_premarket_liquidity_guard_nov3_baseline.csv": "4019f6648fe4d1106fda0c626f62087da11214c57e3f2009028efdd08eb53419"
+  },
+  "status": "RUNTIME_PARITY_FIX"
+}

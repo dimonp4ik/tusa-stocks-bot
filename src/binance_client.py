@@ -49,6 +49,7 @@ _working_host = {"url": None}
 # NOTE: OKX 1D default is UTC+8 aligned — "1Dutc" keeps daily candles on UTC
 # boundaries (same as the old Bybit feed, so the daily trend filter is unmoved).
 TIMEFRAME_MAP = {
+    "1m":    "1m",
     "5m":    "5m",
     "5min":  "5m",
     "15min": "15m",

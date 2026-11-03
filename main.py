@@ -473,6 +473,28 @@ def _active_strategy_label() -> str:
             else STOCK_VENUE_FILTER_PROFILE)
 
 
+def _scan_cadence_label() -> str:
+    return ("at each 15m close (+10s) with a one-minute retry"
+            if NATIVE_XPERP_SHADOW_ENABLED
+            else f"every {SCAN_INTERVAL_MINUTES} min")
+
+
+def _scan_cadence_ru() -> str:
+    return ("закрытие 15m: +10с, резервный повтор +70с"
+            if NATIVE_XPERP_SHADOW_ENABLED
+            else f"каждые {SCAN_INTERVAL_MINUTES} мин")
+
+
+def _is_native_xperp_signal(row: dict) -> bool:
+    """Recognize current one-minute monitors and legacy 15-minute rows."""
+    if row.get("source") == "stock_xperp_native_shadow":
+        return True
+    if str(row.get("reason") or "").startswith("Native stock X-Perp shadow"):
+        return True
+    return (row.get("strategy_runner_mode") == "single_target"
+            and int(row.get("strategy_bar_seconds") or 0) == 900)
+
+
 def _native_scan_status_text() -> str:
     try:
         now = time.time()
@@ -548,8 +570,7 @@ def _native_scan_status_text() -> str:
         closed_counts = {}
         recent_signals = get_recent_signals(40)
         native_recent = [item for item in recent_signals
-                         if (item.get("strategy_runner_mode") == "single_target"
-                             and int(item.get("strategy_bar_seconds") or 0) == 900
+                         if (_is_native_xperp_signal(item)
                              and item.get("closed_at")
                              and now - float(item["closed_at"]) <= 24 * 3600)]
         realized_rows = [
@@ -620,7 +641,7 @@ def status():
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Build: {deploy_sha}. "
-            f"Scanning every {SCAN_INTERVAL_MINUTES} min. "
+            f"Scanning {_scan_cadence_label()}. "
             f"Max entry delay: {NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS}s. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
             f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
@@ -2626,7 +2647,7 @@ def webhook():
         _reply(chat_id,
                f"🤖 *TUSA STOCKS BOT*\n"
                f"🧪 Режим: *{DEPLOYMENT_MODE.upper()}*\n"
-               f"⏱ Интервал: {SCAN_INTERVAL_MINUTES} мин\n"
+               f"⏱ Скан: {_scan_cadence_ru()}\n"
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
                f"🧩 Профиль: `{_active_strategy_label()}`\n"
@@ -2853,7 +2874,10 @@ def _deep_feed_breached(symbol: str, sl: float, direction: str,
     would answer a different, near-always-yes question.
     """
     try:
-        if int(bar_seconds) == 300:
+        if int(bar_seconds) == 60:
+            g = get_klines(symbol, interval="1m", limit=candle_lim,
+                           interval_sec=60)
+        elif int(bar_seconds) == 300:
             g = get_klines(symbol, interval="5m", limit=candle_lim,
                            interval_sec=300)
         else:
@@ -2886,7 +2910,10 @@ def _check_open_signals():
             age_hours  = (now - opened_at) / 3600
             bar_seconds = max(60, int(sig.get("strategy_bar_seconds") or 900))
             bars_per_hour = max(1, int(round(3600 / bar_seconds)))
-            candle_lim = max(8, min(620, int(age_hours * bars_per_hour) + 6))
+            maximum_candles = 1200 if bar_seconds == 60 else 620
+            candle_lim = max(
+                8, min(maximum_candles,
+                       int(age_hours * bars_per_hour) + 6))
             # Judge TP/SL on the X-Perp (user's actual market) — its wicks are
             # what the user's position really experiences. Global feed = fallback.
             # include_forming=True: catch SL/TP touches within the current still-
@@ -2894,7 +2921,8 @@ def _check_open_signals():
             # it to close — was causing SL_HIT notifications to lag the real
             # exchange-side stop fill by minutes (found 2026-07-22 in the sister
             # crypto bot, same code pattern here — ported fix).
-            interval = "5m" if bar_seconds == 300 else "15m"
+            interval = ("1m" if bar_seconds == 60 else
+                        "5m" if bar_seconds == 300 else "15m")
             df_all = get_klines_xperp(
                 sig["symbol"], limit=candle_lim, include_forming=True,
                 interval=interval)
@@ -2920,7 +2948,13 @@ def _check_open_signals():
             # Inspect only candles that opened after signal time (OPEN)
             # or after TP1 was recorded (TP1_PARTIAL) to avoid pre-entry moves
             if status == "OPEN":
-                monitor_from = float(sig.get("strategy_entry_bar_ts") or opened_at)
+                # Native signals are market entries. Their audited entry bar
+                # can precede Telegram publication, so including its earlier
+                # price path can invent a TP/SL before the user could enter.
+                monitor_from = (math.floor(opened_at / 60) * 60
+                                if _is_native_xperp_signal(sig)
+                                else float(sig.get("strategy_entry_bar_ts")
+                                           or opened_at))
             elif fixed_be_runner:
                 monitor_from = float(sig.get("runner_activation_bar_ts")
                                      or sig.get("tp1_hit_at") or opened_at)
@@ -3598,11 +3632,15 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "entry_source": "MARKET",
         "strategy_tp1_close_frac": 1.0,
         "strategy_runner_mode": "single_target",
-        "strategy_bar_seconds": 900,
+        # Observe market-entry paper signals from their actual publication
+        # time on one-minute X-Perp candles.  The old 15m monitor included the
+        # pre-publication part of the entry candle and could score a price
+        # touch that happened before the signal existed.
+        "strategy_bar_seconds": 60,
         "strategy_entry_bar_ts": signal_bar + 900,
         "strategy_stop_on_close": False,
-        "strategy_max_bars": int(setup["hold_bars"]),
-        "strategy_expire_at": None,
+        "strategy_max_bars": int(setup["hold_bars"]) * 15,
+        "strategy_expire_at": signal_bar + 900 * (int(setup["hold_bars"]) + 1),
         "entry_low": price,
         "entry_high": price,
         "mtf_score": 18,
@@ -3659,9 +3697,7 @@ def _publish_stock_venue_candidates(
                 int(float(row.get("opened_at") or 0) // 900) == scan_bucket
                 for row in recent_rows)
             native_recent_hour_count = sum(
-                (row.get("source") == "stock_xperp_native_shadow"
-                 or (row.get("strategy_runner_mode") == "single_target"
-                     and int(row.get("strategy_bar_seconds") or 0) == 900))
+                _is_native_xperp_signal(row)
                 and float(row.get("opened_at") or 0) > now - 3600
                 for row in recent_rows)
         except Exception as exc:
@@ -4212,8 +4248,8 @@ def start_bot():
             open(_flag, "w").close()
             send_status(
                 "🧪 *Stocks Bot Online — SHADOW*\n"
-                f"Профиль `{STOCK_VENUE_FILTER_PROFILE}`, скан каждые "
-                f"{SCAN_INTERVAL_MINUTES} мин в сессию США.\n"
+                f"Профиль `{_active_strategy_label()}`, "
+                f"скан: {_scan_cadence_ru()}.\n"
                 "Реальные ордера отключены. Нейросеть не принимает решений."
             )
     except Exception as e:
@@ -4243,11 +4279,15 @@ def start_bot():
                            EVENT_JOB_MISSED | EVENT_JOB_MAX_INSTANCES |
                            EVENT_JOB_ERROR)
 
-    # Signal scan — every 5 min aligned to candle closes.
-    # 15m candles close at :00/:15/:30/:45 → scan at :01/:16/:31/:46 (+1 min buffer).
+    # Native signal scan at +10s after each 15m close, then one retry at +70s.
+    # A live OKX boundary probe on 2026-11-03 found the prior X-Perp candle
+    # confirmed by +2s.  The old +60s first scan needlessly moved the market
+    # entry away from the audited next-bar open; unrelated +6/+11 minute scans
+    # could only return stale setups because MAX_SIGNAL_AGE_SECONDS is 180.
     scheduler.add_job(
         run_scan, "cron",
-        minute="1,6,11,16,21,26,31,36,41,46,51,56",
+        minute="0,1,15,16,30,31,45,46",
+        second=10,
         timezone="UTC",
     )
 

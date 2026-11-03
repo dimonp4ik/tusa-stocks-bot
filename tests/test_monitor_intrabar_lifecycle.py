@@ -91,6 +91,36 @@ def test_single_target_does_not_invent_intermediate_tp1_transition():
     assert [item.args[1] for item in mirror.call_args_list] == ["TP2_HIT"]
 
 
+def test_native_market_signal_ignores_price_path_before_publication():
+    row = signal(
+        source="stock_xperp_native_shadow",
+        reason="Native stock X-Perp shadow cross-sectional reversal",
+        opened_at=1081.0,
+        strategy_bar_seconds=60,
+        strategy_entry_bar_ts=1000.0,
+        strategy_runner_mode="single_target",
+        strategy_tp1_close_frac=1.0,
+    )
+    bars = {
+        "time": [1020.0, 1080.0, 1140.0],
+        "open": [100.0, 100.0, 100.0],
+        "high": [103.0, 100.2, 100.2],
+        "low": [98.0, 99.8, 99.8],
+        "close": [100.0, 100.0, 100.0],
+        "confirmed": [True, True, False],
+    }
+    with patch.object(main, "get_open_signals", return_value=[row]), \
+         patch.object(main, "get_klines_xperp", return_value=bars) as fetch, \
+         patch.object(main, "update_signal_status") as update, \
+         patch.object(main, "send_signal_update") as notify, \
+         patch.object(main.autotrader, "mirror_transition"), \
+         patch.object(main, "time", SimpleNamespace(time=lambda: 1200.0)):
+        main._check_open_signals()
+    assert fetch.call_args.kwargs["interval"] == "1m"
+    update.assert_not_called()
+    notify.assert_not_called()
+
+
 def test_single_target_update_uses_single_target_wording():
     sent = []
     row = signal(tp1=102.0, tp2=102.0,
