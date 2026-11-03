@@ -1,6 +1,8 @@
 import ast
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import types
 import unittest
@@ -183,6 +185,20 @@ class RiskTests(unittest.TestCase):
         self.assertFalse(account_position_count_allows(
             occupied_positions=11, max_positions=12,
             simultaneous_writers=2))
+
+    def test_environment_cannot_weaken_shared_account_contract(self):
+        env = {
+            **os.environ,
+            "AUTOTRADE_MAX_ACCOUNT_POSITIONS": "99",
+            "AUTOTRADE_ACCOUNT_WRITER_COUNT": "1",
+        }
+        output = subprocess.check_output(
+            [sys.executable, "-c",
+             "import config; print(config.AUTOTRADE_MAX_ACCOUNT_POSITIONS, "
+             "config.AUTOTRADE_ACCOUNT_WRITER_COUNT)"],
+            env=env, text=True,
+        ).strip()
+        self.assertEqual(output, "12 2")
 
 
 class ExchangeTests(unittest.TestCase):
