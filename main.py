@@ -241,6 +241,45 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
             A(f"  SHORT n={_sh.get('total', 0)} WR={_sh.get('win_rate', 0)}% R={_sh.get('total_r', 0)}")
             A("")
 
+        A("## ПАРИТЕТ ВХОДА NATIVE X-PERP")
+        try:
+            _signal_rows = get_all_signals_since(since_ts)
+            _native_rows = [row for row in _signal_rows
+                            if _is_native_xperp_signal(row)]
+            _timed = [row for row in _native_rows
+                      if row.get("strategy_entry_bar_ts") is not None
+                      and row.get("opened_at") is not None]
+            _delays = [float(row["opened_at"])
+                       - float(row["strategy_entry_bar_ts"])
+                       for row in _timed]
+            _priced = [row for row in _native_rows
+                       if float(row.get("zone_entry_price") or 0) > 0
+                       and float(row.get("entry_price") or 0) > 0]
+            _drifts = []
+            for row in _priced:
+                _reference = float(row["zone_entry_price"])
+                _actual = float(row["entry_price"])
+                _sign = 1.0 if row.get("direction") == "LONG" else -1.0
+                _drifts.append(_sign * (_actual / _reference - 1) * 100)
+            if _native_rows:
+                A(f"  сигналов: {len(_native_rows)}; с эталонной ценой: {len(_priced)}")
+                if _delays:
+                    _sorted_delay = sorted(_delays)
+                    A(f"  задержка публикации: медиана "
+                      f"{_sorted_delay[len(_sorted_delay)//2]:.1f}с; "
+                      f"min {min(_delays):.1f}с; max {max(_delays):.1f}с")
+                if _drifts:
+                    _adverse = sum(value > 0 for value in _drifts)
+                    A(f"  сдвиг против разворотного входа: средний "
+                      f"{sum(_drifts)/len(_drifts):+.3f}%; "
+                      f"ухудшился {_adverse}/{len(_drifts)}; "
+                      f"хуже 0.15% — {sum(value > .15 for value in _drifts)}")
+            else:
+                A("  данных нет")
+        except Exception as _entry_exc:
+            A(f"  ошибка расчёта: {_entry_exc}")
+        A("")
+
         A("## ПОСЛЕДНИЙ СКАН NATIVE X-PERP")
         try:
             _scan = json.loads(get_bot_state("native_scan_audit") or "{}")
@@ -3643,6 +3682,10 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "strategy_expire_at": signal_bar + 900 * (int(setup["hold_bars"]) + 1),
         "entry_low": price,
         "entry_high": price,
+        # Replayed next-bar price retained separately from the market quote.
+        # Future reports can now attribute a stop to the filter or to entry
+        # drift instead of treating both as the same failure.
+        "zone_entry_price": float(setup["entry"]),
         "mtf_score": 18,
         "mtf_score_max": 18,
         "rsi": 50,

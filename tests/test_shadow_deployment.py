@@ -87,6 +87,23 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("TP2, остаток 30%", sent[0])
         self.assertIn("`1.00R`", sent[0])
 
+    def test_shadow_reference_price_never_replaces_market_entry(self):
+        analysis = {
+            "symbol": "AAPLUSDT", "direction": "SHORT", "decision": "SHORT",
+            "current_price": 100.0, "zone_entry_price": 90.0,
+            "atr": 1.0, "fixed_stop_atr": 1.0, "fixed_target_r": 2.0,
+            "signals": ["Venue module native_xperp_quality_reversal"],
+            "_shadow_only": True,
+        }
+        sent = []
+        with patch.object(config, "LEVELS_FROM_STRUCTURE", True), \
+             patch.object(notifier, "_send_message",
+                          side_effect=lambda text: sent.append(text) or True), \
+             patch("src.db.log_signal", return_value=44):
+            self.assertTrue(notifier.send_signal(analysis))
+        self.assertIn("Вход по рынку: `100", sent[0])
+        self.assertNotIn("Вход по рынку: `90", sent[0])
+
     def test_session_helpers_exist(self):
         """The venue scan calls all three on a closed-market tick.
 

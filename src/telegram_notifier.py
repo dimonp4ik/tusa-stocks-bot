@@ -218,7 +218,8 @@ def send_signal(analysis: dict) -> bool:
 
     from config import LEVELS_FROM_STRUCTURE
     price = analysis["current_price"]
-    if LEVELS_FROM_STRUCTURE and analysis.get("zone_entry_price"):
+    if (LEVELS_FROM_STRUCTURE and analysis.get("zone_entry_price")
+            and not analysis.get("_shadow_only")):
         price = float(analysis["zone_entry_price"])
     direction = analysis["direction"]
     atr       = analysis.get("atr", 0.0)

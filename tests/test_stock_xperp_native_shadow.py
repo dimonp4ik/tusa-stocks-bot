@@ -213,6 +213,7 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     assert analysis["strategy_bar_seconds"] == 60
     assert analysis["strategy_max_bars"] == 64 * 15
     assert analysis["strategy_expire_at"] == 184 * 900
+    assert analysis["zone_entry_price"] == setup["entry"]
     assert any("Backing level 32 bars" in value
                for value in analysis["signals"])
     assert any("Basket trend 16" in value for value in analysis["signals"])
