@@ -543,6 +543,15 @@ def _native_scan_status_text() -> str:
                              and int(item.get("strategy_bar_seconds") or 0) == 900
                              and item.get("closed_at")
                              and now - float(item["closed_at"]) <= 24 * 3600)]
+        realized_rows = [
+            float(item["realized_r"])
+            for item in native_recent
+            if item.get("realized_r") is not None
+        ]
+        closed_r = sum(realized_rows)
+        profitable = sum(value > 0 for value in realized_rows)
+        closed_wr = ((profitable / len(realized_rows) * 100)
+                     if realized_rows else 0.0)
         for item in native_recent:
             status = str(item.get("status") or "UNKNOWN")
             closed_counts[status] = closed_counts.get(status, 0) + 1
@@ -558,6 +567,10 @@ def _native_scan_status_text() -> str:
                        + (", ".join(f"{key} {value}" for key, value
                                     in sorted(closed_counts.items()))
                           if closed_counts else "нет")
+                       + (f" · итог {closed_r:+.2f}R · прибыльных "
+                          f"{profitable}/{len(realized_rows)} "
+                          f"(WR {closed_wr:.1f}%)"
+                          if realized_rows else "")
                        + ("\nПоследние исходы: " + "; ".join(closed_parts)
                           if closed_parts else ""))
         return (

@@ -215,6 +215,12 @@ def test_native_status_explains_recent_decisions_and_open_rows():
                 "strategy_runner_mode": "single_target",
                 "strategy_bar_seconds": 900,
             }, {
+                "symbol": "WINUSDT", "direction": "LONG",
+                "status": "TP2_HIT", "realized_r": 2.0,
+                "opened_at": 1_999_996_400.0, "closed_at": 1_999_999_900.0,
+                "strategy_runner_mode": "single_target",
+                "strategy_bar_seconds": 900,
+            }, {
                 "symbol": "OLDUSDT", "direction": "LONG",
                 "status": "EXPIRED", "realized_r": -.2,
                 "opened_at": 1_999_800_000.0, "closed_at": 1_999_900_000.0,
@@ -225,7 +231,8 @@ def test_native_status_explains_recent_decisions_and_open_rows():
     assert "повтор свечи 1" in text
     assert "OPENUSDT LONG OPEN 0.0ч stock_xperp_native_shadow" in text
     assert "TESTUSDT SHORT dir_cap/SL" in text
-    assert "Закрыто 24ч: SL_HIT 1" in text
+    assert "Закрыто 24ч: SL_HIT 1, TP2_HIT 1" in text
+    assert "итог +1.00R · прибыльных 1/2 (WR 50.0%)" in text
     assert "STOPUSDT SHORT SL_HIT -1.00R 1.0ч" in text
     assert "OLDUSDT" not in text
 
