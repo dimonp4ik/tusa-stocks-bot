@@ -450,6 +450,12 @@ def init_db():
         """)
         _ensure_column(c, "autotrade_positions", "tp1_algo_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
+        _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
+        c.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_autotrade_client_order
+            ON autotrade_positions(user_id, client_order_id)
+            WHERE client_order_id IS NOT NULL AND client_order_id != ''
+        """)
 
 
 def get_bot_state(key: str) -> str | None:
@@ -2329,6 +2335,52 @@ def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
         return cur.lastrowid
 
 
+def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
+                           direction: str, sz: float, entry_px: float,
+                           margin_usd: float, sl_px: float,
+                           client_order_id: str) -> int:
+    """Persist an idempotent intent before any real order reaches OKX."""
+    with _conn() as c:
+        cur = c.execute("""
+            INSERT OR IGNORE INTO autotrade_positions
+                (signal_id, user_id, inst_id, direction, sz, entry_px,
+                 margin_usd, sl_algo_id, sl_px, status, opened_at,
+                 client_order_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 'ENTRY_PENDING', ?, ?)
+        """, (signal_id, user_id, inst_id, direction, sz, entry_px,
+              margin_usd, sl_px, time_mod.time(), client_order_id))
+        return int(cur.lastrowid or 0)
+
+
+def at_update_entry_intent_protection(pos_id: int, sl_algo_id: str,
+                                      sl_px: float,
+                                      tp1_algo_id: str = None,
+                                      tp1_sz: float = None) -> None:
+    with _conn() as c:
+        c.execute("""
+            UPDATE autotrade_positions
+            SET sl_algo_id = ?, sl_px = ?, tp1_algo_id = ?, tp1_sz = ?
+            WHERE id = ? AND status = 'ENTRY_PENDING'
+        """, (sl_algo_id, sl_px, tp1_algo_id, tp1_sz, pos_id))
+
+
+def at_activate_entry_intent(pos_id: int, sz: float, entry_px: float,
+                             margin_usd: float, sl_algo_id: str, sl_px: float,
+                             tp1_algo_id: str = None,
+                             tp1_sz: float = None) -> bool:
+    """Commit a pending entry only after exchange protection is installed."""
+    with _conn() as c:
+        cur = c.execute("""
+            UPDATE autotrade_positions
+            SET sz = ?, entry_px = ?, margin_usd = ?, sl_algo_id = ?,
+                sl_px = ?, tp1_algo_id = ?, tp1_sz = ?, status = 'OPEN',
+                error = NULL
+            WHERE id = ? AND status = 'ENTRY_PENDING'
+        """, (sz, entry_px, margin_usd, sl_algo_id, sl_px,
+              tp1_algo_id, tp1_sz, pos_id))
+        return cur.rowcount == 1
+
+
 def at_open_positions_for_signal(signal_id: int) -> list:
     with _conn() as c:
         rows = c.execute("""
@@ -2358,11 +2410,11 @@ def at_has_open_position(user_id: int, inst_id: str) -> bool:
 
 
 def at_all_open_positions() -> list:
-    """Every OPEN autotrade position across all users/signals — used by the
-    fast exchange-side close poll (doesn't wait for the signal engine)."""
+    """Every live or incomplete entry requiring exchange reconciliation."""
     with _conn() as c:
         rows = c.execute(
-            "SELECT * FROM autotrade_positions WHERE status = 'OPEN'"
+            "SELECT * FROM autotrade_positions "
+            "WHERE status IN ('OPEN', 'ENTRY_PENDING')"
         ).fetchall()
         return [dict(r) for r in rows]
 

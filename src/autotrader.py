@@ -47,7 +47,9 @@ from config import (
 from src.db import (
     get_bot_state, set_bot_state,
     at_get_active_traders, at_get, at_set_balance,
-    at_log_position, at_open_positions_for_signal, at_update_position_sl,
+    at_create_entry_intent,
+    at_update_entry_intent_protection, at_activate_entry_intent,
+    at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     at_has_open_position,
     get_signal_by_id,
@@ -78,6 +80,7 @@ _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
 # /account/positions can lag a fresh market fill. One monitor cycle is 60s, so
 # this costs at most one extra cycle of notification latency on a real close.
 _CLOSE_CONFIRM_MIN_AGE_SEC = 90
+_ENTRY_PENDING_GRACE_SEC = 90
 
 
 def _dm(user_id: int, text: str) -> None:
@@ -305,6 +308,20 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     client_order_id = _entry_client_order_id(uid, sig, inst_id)
+    try:
+        intent_id = at_create_entry_intent(
+            sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
+            float(sig["sl"]), client_order_id)
+    except Exception as intent_error:
+        log.error("autotrade entry intent failed %s %s: %s",
+                  uid, inst_id, intent_error)
+        _dm(uid, f"❌ Автотрейдинг: не смог безопасно записать вход по {disp}; "
+                 "ордер не отправлен.")
+        return
+    if not intent_id:
+        log.warning("autotrade duplicate client order refused %s %s %s",
+                    uid, inst_id, client_order_id)
+        return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id)
     if not ok:
@@ -327,37 +344,19 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                     # A transport timeout is not an exchange rejection. Keep a
                     # durable unprotected row so the minute reconciler will
                     # close a late-visible fill instead of forgetting it.
-                    tracked = True
-                    try:
-                        at_log_position(
-                            sig["id"], uid, inst_id, sig["direction"], sz, px,
-                            margin, "", float(sig["sl"]))
-                    except Exception as tracking_error:
-                        tracked = False
-                        log.critical(
-                            "ambiguous entry could not be persisted %s %s: %s",
-                            uid, inst_id, tracking_error)
-                    if tracked:
-                        _dm(uid, "\n".join([
-                            f"🚨 *Неопределённый ответ OKX по {disp}*",
-                            "",
-                            "Биржа не ответила на запрос открытия. Бот будет проверять "
-                            "счёт и автоматически закроет позицию, если она появилась.",
-                            "До проверки не открывай этот тикер вручную.",
-                            f"ID: `{client_order_id}`",
-                        ]))
-                    else:
-                        _dm(uid, "\n".join([
-                            f"🚨 *СРОЧНО: проверь {disp} на OKX*",
-                            "",
-                            "Ответ на открытие потерян, а сохранить проверку в базе не удалось.",
-                            "Если позиция появилась — закрой её вручную.",
-                            f"ID: `{client_order_id}`",
-                        ]))
+                    _dm(uid, "\n".join([
+                        f"🚨 *Неопределённый ответ OKX по {disp}*",
+                        "",
+                        "Биржа не ответила на запрос открытия. Бот будет проверять "
+                        "счёт и автоматически закроет позицию, если она появилась.",
+                        "До проверки не открывай этот тикер вручную.",
+                        f"ID: `{client_order_id}`",
+                    ]))
                     log.error("autotrade AMBIGUOUS ENTRY %s %s: %s; lookup=%s",
                               uid, inst_id, ord_id, order)
                     return
         if not ok:
+            at_close_position(intent_id, "ENTRY_REJECTED", error=str(ord_id))
             log.warning(f"autotrade entry failed for {uid} {inst_id}: {ord_id}")
             _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
             return
@@ -408,6 +407,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         if not _closed:
             _closed, _cerr = okx.close_position_market(creds, inst_id)
         if _closed:
+            at_close_position(
+                intent_id, "PROTECTION_FAILED_CLOSED", error=str(algo_id))
             log.warning(f"autotrade OCO failed for {uid} {inst_id}: {algo_id} — position closed")
             _dm(uid, f"❌ Автотрейдинг: не смог поставить стоп по {disp} — "
                      f"позиция закрыта для безопасности.\n`{algo_id}`")
@@ -416,10 +417,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                       f"AND close failed ({_cerr}) — position is open WITHOUT a stop")
             # Keep failed emergency closes discoverable by reconciliation.
             try:
-                at_log_position(sig["id"], uid, inst_id, sig["direction"],
-                                _pos_sz, _fill_px, margin, "", sl_px)
+                if not at_activate_entry_intent(
+                        intent_id, _pos_sz, _fill_px, margin, "", sl_px):
+                    log.critical("unprotected intent activation failed %s %s",
+                                 uid, inst_id)
             except Exception as tracking_error:
-                log.critical("unprotected position could not be persisted %s %s: %s",
+                log.critical("unprotected intent could not be activated %s %s: %s",
                              uid, inst_id, tracking_error)
             _msg = "\n".join([
                 f"🚨 *СРОЧНО: {disp} открыта БЕЗ СТОПА*",
@@ -432,6 +435,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             ])
             _dm(uid, _msg)
         return
+
+    try:
+        at_update_entry_intent_protection(intent_id, algo_id, sl_px)
+    except Exception as tracking_error:
+        log.error("protected entry intent update failed %s %s: %s",
+                  uid, inst_id, tracking_error)
 
     # Optional: pre-place the user's chosen TP1 partial-close as its OWN real
     # exchange order (fixed size, reduceOnly) right now — so the exchange
@@ -453,6 +462,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             ok, tp1_result = okx.place_tp1_partial(creds, inst_id, sig["direction"], tp1_px, raw_tp1_sz)
             if ok:
                 tp1_algo_id, tp1_sz = tp1_result, raw_tp1_sz
+                try:
+                    at_update_entry_intent_protection(
+                        intent_id, algo_id, sl_px, tp1_algo_id, tp1_sz)
+                except Exception as tracking_error:
+                    log.error("TP1 intent update failed %s %s: %s",
+                              uid, inst_id, tracking_error)
                 # Report the share that will REALLY close, not the setting.
                 # raw_tp1_sz is floored to lotSz, so "50%" of an odd contract
                 # count is never exactly 50% — 50% of 99 lots is 49, i.e. 49.5%.
@@ -473,18 +488,18 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # position size to report how much TP1 closed, so a requested size that never
     # filled would overstate that share to the owner.
     #
-    # This write is the LAST step, after the entry and its protection are already
-    # live on the exchange, and the caller only logs a warning on exception. So a
-    # failure here leaves a real position that this bot does not know about: the
-    # monitor never sees it, the trail never moves, and the owner is told nothing
-    # while the log says "open failed". The OCO still protects it, but nobody is
-    # managing it. Say so loudly instead, with what is needed to find it by hand.
+    # Promote the durable pre-order intent now that the real fill and protection
+    # are known. If this final write fails, ENTRY_PENDING remains visible to the
+    # reconciler after restart, while the exchange OCO still protects the fill.
     try:
-        at_log_position(sig["id"], uid, inst_id, sig["direction"], _pos_sz, _fill_px, margin,
-                        algo_id, sl_px, tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
+        activated = at_activate_entry_intent(
+            intent_id, _pos_sz, _fill_px, margin, algo_id, sl_px,
+            tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
+        if not activated:
+            raise RuntimeError("entry intent is missing or no longer pending")
     except Exception as _db_err:
-        log.error(f"autotrade UNTRACKED POSITION {uid} {inst_id}: entry and OCO are LIVE "
-                  f"but at_log_position failed ({_db_err}) — bot will not manage it")
+        log.error(f"autotrade POSITION ACTIVATION FAILED {uid} {inst_id}: entry and OCO are LIVE "
+                  f"but entry intent activation failed ({_db_err})")
         _dm(uid, "\n".join([
             f"🚨 *{disp}*: позиция открыта, но бот её НЕ ВЕДЁТ.",
             "",
@@ -732,9 +747,52 @@ def poll_exchange_closes() -> None:
             creds = _creds_of(u) if u else None
             if not creds:
                 continue
+            pending_entry = pos.get("status") == "ENTRY_PENDING"
+            pending_age = time.time() - float(pos.get("opened_at") or 0)
+            if pending_entry and pending_age < _ENTRY_PENDING_GRACE_SEC:
+                continue
             ok, size = okx.get_position_size(creds, pos["inst_id"])
             if not ok:
                 continue   # transient API error — retry next cycle
+            if pending_entry:
+                if size > 0:
+                    closed, err = okx.close_position_market(
+                        creds, pos["inst_id"])
+                    if not closed:
+                        closed, err = okx.close_position_market(
+                            creds, pos["inst_id"])
+                    if not closed:
+                        log.error("pending entry recovery close failed pos#%s: %s",
+                                  pos["id"], err)
+                        _dm(pos["user_id"], "\n".join([
+                            f"🚨 *СРОЧНО: {pos['inst_id']} осталась открыта*",
+                            "Незавершённый вход найден после сбоя, но закрытие не подтверждено.",
+                            "Закрой позицию вручную на OKX.",
+                            f"`{err}`",
+                        ]))
+                        continue
+                    if pos.get("sl_algo_id"):
+                        okx.cancel_protection(
+                            creds, pos["inst_id"], pos["sl_algo_id"])
+                    if pos.get("tp1_algo_id"):
+                        okx.cancel_protection(
+                            creds, pos["inst_id"], pos["tp1_algo_id"])
+                    at_close_position(pos["id"], "ENTRY_RECOVERY_CLOSED")
+                    _dm(pos["user_id"],
+                        f"🤖 *{pos['inst_id']}*: найден незавершённый вход после сбоя; "
+                        "позиция закрыта для безопасности.")
+                    continue
+                ok2, size2 = okx.get_position_size(creds, pos["inst_id"])
+                if not ok2 or size2 > 0:
+                    continue
+                if pos.get("sl_algo_id"):
+                    okx.cancel_protection(
+                        creds, pos["inst_id"], pos["sl_algo_id"])
+                if pos.get("tp1_algo_id"):
+                    okx.cancel_protection(
+                        creds, pos["inst_id"], pos["tp1_algo_id"])
+                at_close_position(pos["id"], "ENTRY_NOT_FILLED")
+                continue
             if size > 0:
                 # The engine marks a signal closed BEFORE mirroring that close
                 # to the exchange, and mirror_transition wraps each position in

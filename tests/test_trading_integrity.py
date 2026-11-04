@@ -236,7 +236,8 @@ class ExchangeTests(unittest.TestCase):
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                  ('at_set_balance',None),('get_bot_state',None),
-                 ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
+                 ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),
+                 ('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                  ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
@@ -343,6 +344,32 @@ class ExchangeTests(unittest.TestCase):
 
 
 class DatabaseTests(unittest.TestCase):
+    def test_entry_intent_is_durable_idempotent_and_activates(self):
+        from src import db
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / 'signals.db')
+            with patch.object(db, 'DB_PATH', path):
+                db.init_db()
+                intent_id = db.at_create_entry_intent(
+                    11, 7, 'TEST-X', 'LONG', .02, 100, 3, 94,
+                    'client-order-123')
+                self.assertGreater(intent_id, 0)
+                self.assertEqual(db.at_create_entry_intent(
+                    11, 7, 'TEST-X', 'LONG', .02, 100, 3, 94,
+                    'client-order-123'), 0)
+                pending = db.at_all_open_positions()
+                self.assertEqual(len(pending), 1)
+                self.assertEqual(pending[0]['status'], 'ENTRY_PENDING')
+                self.assertEqual(pending[0]['client_order_id'], 'client-order-123')
+                self.assertTrue(db.at_activate_entry_intent(
+                    intent_id, .019, 100.2, 3.1, 'stop-1', 94,
+                    tp1_algo_id='tp1-1', tp1_sz=.009))
+                active = db.at_all_open_positions()[0]
+                self.assertEqual(active['status'], 'OPEN')
+                self.assertEqual(active['sl_algo_id'], 'stop-1')
+                self.assertEqual(active['tp1_algo_id'], 'tp1-1')
+                self.assertAlmostEqual(active['sz'], .019)
+
     def test_live_rollout_requires_one_time_user_reconsent(self):
         from src import db
         with tempfile.TemporaryDirectory() as tmp:
