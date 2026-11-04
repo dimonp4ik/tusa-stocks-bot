@@ -42,6 +42,7 @@ from config import (
     TELEGRAM_TOKEN,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_CONTACT,
+    STOCK_LIVE_FORWARD_WINDOW, STOCK_LIVE_FORWARD_MIN_TOTAL_R,
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
@@ -53,6 +54,7 @@ from src.db import (
     at_close_position, at_all_open_positions, at_reduce_position_sz,
     at_has_open_position,
     get_signal_by_id,
+    get_route_live_readiness,
     set_signal_size_mult,
 )
 from src.keystore import decrypt_secret, keystore_ready
@@ -536,6 +538,20 @@ def open_positions_for_signal(sig: dict) -> None:
     if int(sig.get("autotrade_eligible", 1) or 0) != 1:
         log.info("autotrade: shadow-only signal %s refused", sig.get("id"))
         return
+    if sig.get("source") == "stock_xperp_native_shadow":
+        health = get_route_live_readiness(
+            "stock_xperp_native_shadow",
+            STOCK_LIVE_FORWARD_WINDOW,
+            STOCK_LIVE_FORWARD_MIN_TOTAL_R,
+        )
+        if not health["ready"]:
+            log.warning(
+                "autotrade: stock forward gate refused signal %s "
+                "(%s/%s resolved, %+.2fR, %.1f%% wins)",
+                sig.get("id"), health["resolved"], health["window"],
+                health["total_r"], health["win_rate"],
+            )
+            return
     traders = at_get_active_traders()
     if not traders:
         return

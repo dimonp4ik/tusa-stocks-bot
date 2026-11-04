@@ -2049,6 +2049,40 @@ def get_today_realized_r(day_start_ts: float,
                      for row in rows if row["realized_r"] is not None))
 
 
+def get_route_live_readiness(source: str, window: int = 20,
+                             min_total_r: float = 0.0) -> dict:
+    """Return a causal live-order gate from the route's latest paper outcomes.
+
+    The signal engine continues recording every setup while this gate is
+    closed.  Only exchange order creation is withheld.  A fresh database is
+    deliberately not considered evidence: at least ``window`` resolved rows
+    from the exact production source are required.
+    """
+    window = max(1, int(window))
+    placeholders = ",".join("?" for _ in FINAL_STATUSES)
+    query = (
+        "SELECT status, realized_r FROM signals "
+        f"WHERE source = ? AND status IN ({placeholders}) "
+        "AND closed_at IS NOT NULL ORDER BY closed_at DESC, id DESC LIMIT ?"
+    )
+    with _conn() as c:
+        rows = c.execute(
+            query, (str(source), *FINAL_STATUSES, window)).fetchall()
+    values = [_row_unit_r(row) for row in rows]
+    total_r = float(sum(values))
+    resolved = len(values)
+    ready = resolved >= window and total_r > float(min_total_r)
+    return {
+        "ready": ready,
+        "resolved": resolved,
+        "window": window,
+        "total_r": total_r,
+        "win_rate": (
+            100.0 * sum(value > 0 for value in values) / resolved
+            if resolved else 0.0),
+    }
+
+
 def get_calibration_rows(since_ts: float, limit: int = 800) -> list:
     """Resolved live Claude-evaluated setups for the SCORECARD block: does his
     risk_score / confidence scale actually separate outcomes. Backtest priors

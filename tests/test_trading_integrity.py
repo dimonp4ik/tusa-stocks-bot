@@ -210,6 +210,18 @@ class ExchangeTests(unittest.TestCase):
             at.open_positions_for_signal(sig)
         traders.assert_not_called()
 
+    def test_negative_stock_forward_window_cannot_reach_real_traders(self):
+        from src import autotrader as at
+        sig = dict(id=18, symbol='AAPLUSDT', direction='LONG',
+                   source='stock_xperp_native_shadow', autotrade_eligible=1)
+        health = dict(ready=False, resolved=20, window=20,
+                      total_r=-5.0, win_rate=25.0)
+        with patch.object(at, 'AUTOTRADE_ENABLED', True), \
+             patch.object(at, 'get_route_live_readiness', return_value=health), \
+             patch.object(at, 'at_get_active_traders') as traders:
+            at.open_positions_for_signal(sig)
+        traders.assert_not_called()
+
     def test_missing_protection_id_is_failure(self):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])

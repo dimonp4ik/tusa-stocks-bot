@@ -276,10 +276,23 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
 
 def test_native_analysis_becomes_autotrade_eligible_only_in_live_mode():
     setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
-    with patch.object(main, "DEPLOYMENT_MODE", "live"):
+    with patch.object(main, "DEPLOYMENT_MODE", "live"), \
+            patch.object(main, "AUTOTRADE_ENABLED", True), \
+            patch.object(main, "_stock_forward_health",
+                         return_value={"ready": True}):
         analysis = main._native_xperp_analysis(setup, 100.0)
     assert analysis["_shadow_only"] is False
     assert analysis["entry_source"] == "MARKET"
+
+
+def test_native_analysis_stays_paper_when_forward_gate_is_closed():
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
+    with patch.object(main, "DEPLOYMENT_MODE", "live"), \
+            patch.object(main, "AUTOTRADE_ENABLED", True), \
+            patch.object(main, "_stock_forward_health",
+                         return_value={"ready": False}):
+        analysis = main._native_xperp_analysis(setup, 100.0)
+    assert analysis["_shadow_only"] is True
 
 
 def test_native_scan_publishes_only_paper_candidate_contract():
@@ -531,3 +544,52 @@ def test_route_specific_max_loss_streak_survives_later_winner():
                 0, "Native stock X-Perp shadow") == 0
             assert db.get_today_max_loss_streak(
                 0, "Native stock X-Perp shadow") == 2
+
+
+def test_route_live_readiness_requires_full_positive_recent_window():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = str(Path(tmp) / "test.db")
+        with patch.object(db, "DB_PATH", path):
+            db.init_db()
+            connection = sqlite3.connect(path)
+            try:
+                for index in range(19):
+                    connection.execute(
+                        """INSERT INTO signals
+                           (symbol,direction,entry_price,tp1,tp2,sl,opened_at,
+                            status,closed_at,source,realized_r)
+                           VALUES ('AAPLUSDT','LONG',100,102,102,99,1,
+                                   'TP2_HIT',?,'stock_xperp_native_shadow',1)""",
+                        (index + 1,),
+                    )
+                connection.commit()
+                assert not db.get_route_live_readiness(
+                    "stock_xperp_native_shadow", 20)["ready"]
+                connection.execute(
+                    """INSERT INTO signals
+                       (symbol,direction,entry_price,tp1,tp2,sl,opened_at,
+                        status,closed_at,source,realized_r)
+                       VALUES ('AAPLUSDT','LONG',100,102,102,99,1,
+                               'TP2_HIT',20,'stock_xperp_native_shadow',1)"""
+                )
+                connection.commit()
+                healthy = db.get_route_live_readiness(
+                    "stock_xperp_native_shadow", 20)
+                assert healthy["ready"]
+                assert healthy["total_r"] == 20
+                for index in range(20):
+                    connection.execute(
+                        """INSERT INTO signals
+                           (symbol,direction,entry_price,tp1,tp2,sl,opened_at,
+                            status,closed_at,source,realized_r)
+                           VALUES ('AAPLUSDT','LONG',100,102,102,99,1,
+                                   'SL_HIT',?,'stock_xperp_native_shadow',-1)""",
+                        (100 + index,),
+                    )
+                connection.commit()
+            finally:
+                connection.close()
+            unhealthy = db.get_route_live_readiness(
+                "stock_xperp_native_shadow", 20)
+            assert not unhealthy["ready"]
+            assert unhealthy["total_r"] == -20

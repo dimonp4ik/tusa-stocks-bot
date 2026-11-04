@@ -2122,6 +2122,12 @@ AUTOTRADE_ENABLED           = (
 AUTOTRADE_LEVERAGE          = int(os.getenv("AUTOTRADE_LEVERAGE", "10"))
 AUTOTRADE_BALANCE_THRESHOLD = float(os.getenv("AUTOTRADE_BALANCE_THRESHOLD", "100"))
 AUTOTRADE_CONTACT           = os.getenv("AUTOTRADE_CONTACT", "@sanja_tusagang")
+# A live stock order needs forward evidence from the exact production route.
+# The current route already has more than this many resolved paper outcomes, so
+# the gate cannot be bypassed by a process restart.  Paper signals keep running
+# while the route is paused and can therefore earn live eligibility back.
+STOCK_LIVE_FORWARD_WINDOW = 20
+STOCK_LIVE_FORWARD_MIN_TOTAL_R = 0.0
 # Fernet key for encrypting user API keys at rest — generate once:
 #   python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 # and set AUTOTRADE_ENC_KEY on the host. Keys are unreadable without it.

@@ -1,9 +1,9 @@
-"""Stocks paper-trading bot driven by frozen X-Perp routes.
+"""Stocks signal bot driven by frozen X-Perp routes.
 
 The default shadow deployment scans the audited 44-instrument native X-Perp
 universe around the clock and publishes deterministic market-entry paper
-signals. No model decides whether a setup is accepted and this deployment
-cannot open an order.
+signals. No model decides whether a setup is accepted.  A live deployment can
+mirror an eligible signal for an opted-in user after the forward-health gate.
 """
 
 import json
@@ -37,6 +37,7 @@ from config import (
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
     AUTOTRADE_ACCOUNT_WRITER_COUNT,
     AUTOTRADE_MAX_ACCOUNT_POSITIONS,
+    STOCK_LIVE_FORWARD_WINDOW, STOCK_LIVE_FORWARD_MIN_TOTAL_R,
 )
 from src.binance_client import (
     get_klines, get_current_price, get_xperp_instruments, get_xperp_price, get_klines_xperp,
@@ -87,6 +88,7 @@ from src.db import (
     get_today_sl_streak, get_today_loss_streak, get_today_max_loss_streak,
     get_recent_signals,
     get_today_realized_r, get_signal_by_id,
+    get_route_live_readiness,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -129,6 +131,35 @@ _MODERATOR_ALLOWED_PREFIX = (
     "adm_users_p", "adm_users_q_",
     "adm_at_rm_",
 )
+
+
+def _stock_forward_health() -> dict:
+    """Fresh production-route evidence used by both UI and order creation."""
+    try:
+        return get_route_live_readiness(
+            "stock_xperp_native_shadow",
+            STOCK_LIVE_FORWARD_WINDOW,
+            STOCK_LIVE_FORWARD_MIN_TOTAL_R,
+        )
+    except Exception as exc:
+        log.warning("Stock forward-health read failed: %s", exc)
+        return {
+            "ready": False, "resolved": 0,
+            "window": STOCK_LIVE_FORWARD_WINDOW,
+            "total_r": 0.0, "win_rate": 0.0,
+        }
+
+
+def _execution_state_text() -> str:
+    if DEPLOYMENT_MODE != "live" or not AUTOTRADE_ENABLED:
+        return "PAPER: биржевые ордера выключены"
+    health = _stock_forward_health()
+    if health["ready"]:
+        return ("LIVE: реальные ордера доступны подключённым пользователям · "
+                f"forward {health['total_r']:+.2f}R/{health['resolved']}")
+    return ("ЗАЩИТНАЯ ПАУЗА: сигналы считаются в PAPER, реальные входы "
+            f"не открываются · forward {health['total_r']:+.2f}R/"
+            f"{health['resolved']} из {health['window']} требуемых")
 
 
 def _moderator_may(data: str) -> bool:
@@ -678,8 +709,10 @@ def status():
         regime_text = "Premarket regime audit unavailable. "
     deploy_sha = (os.getenv("RAILWAY_GIT_COMMIT_SHA")
                   or os.getenv("GIT_COMMIT_SHA") or "unknown")[:8]
+    execution_text = _execution_state_text()
     return (f"Mode: {DEPLOYMENT_MODE}. Strategy: {_active_strategy_label()}. "
             f"Build: {deploy_sha}. "
+            f"Execution: {execution_text}. "
             f"Scanning {_scan_cadence_label()}. "
             f"Max entry delay: {NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS}s. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
@@ -1280,11 +1313,10 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
         _edit_admin_text(
             chat_id, message_id,
             "🧩 *АКТИВНЫЕ ФИЛЬТРЫ*\n\n"
-            f"Режим: *SHADOW / PAPER*\n"
+            f"Исполнение: *{_execution_state_text()}*\n"
             f"{shadow_text}"
             f"За 15-минутное окно: максимум {VENUE_MAX_SIGNALS_PER_SCAN} сигнала\n"
-            "Нейросеть: отключена от решения\n"
-            "Реальные ордера: *ЗАПРЕЩЕНЫ КОДОМ*\n\n"
+            "Нейросеть: отключена от решения\n\n"
             "Все сигналы и исходы записываются для независимой forward-проверки.",
             _kb_settings(),
         )
@@ -1773,8 +1805,7 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
             lines_h.append("⏳ Скан ещё не отработал в этом процессе")
         lines_h.append("")
         lines_h.append(f"Профиль: `{_active_strategy_label()}` ({STOCK_VENUE_FILTER_MODE})")
-        from config import AUTOTRADE_ENABLED as _at_on
-        lines_h.append(f"Реальные ордера: {'РАЗРЕШЕНЫ' if _at_on else '*ЗАПРЕЩЕНЫ КОДОМ*'}")
+        lines_h.append(f"Исполнение: {_execution_state_text()}")
         _edit_admin_text(chat_id, message_id, chr(10).join(lines_h), _kb_settings())
 
     elif data == "adm_setups_date":
@@ -2624,11 +2655,11 @@ def webhook():
     # 🤖 Автотрейдинг — только в личке, только для допущенных админом
     elif text == "🛡 режим":
         _reply(chat_id,
-               "🛡 *ТЕНЕВОЙ РЕЖИМ*\n\n"
+               "🛡 *РЕЖИМ ИСПОЛНЕНИЯ*\n\n"
                f"Работает профиль `{_active_strategy_label()}`.\n"
-               "Сигналы входят по рынку и считаются виртуально.\n"
+               "Сигналы фиксируются по рынку и проверяются одинаково в PAPER и LIVE.\n"
                "Нейросеть не принимает торговых решений.\n"
-               "Реальные ордера отключены на уровне конфигурации и кода.\n\n"
+               f"{_execution_state_text()}.\n\n"
                f"🔎 {_native_scan_status_text()}")
 
     elif text == "🤖 автотрейдинг":
@@ -2713,7 +2744,7 @@ def webhook():
                f"📊 Сигналов в кэше: {len(_signal_cache)}\n"
                f"💾 Данные: OKX\n"
                f"🧩 Профиль: `{_active_strategy_label()}`\n"
-               f"🚫 Реальные ордера отключены\n\n"
+               f"🛡 {_execution_state_text()}\n\n"
                f"🔎 {_native_scan_status_text()}")
 
     # /stats — тот же проверяемый расчёт, что и у кнопки.
@@ -3678,6 +3709,11 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
     z_score = float(setup["cross_z"])
     atr_fraction = float(setup["atr14_fraction"])
     target_r = float(setup["target_r"])
+    live_ready = (
+        DEPLOYMENT_MODE == "live"
+        and AUTOTRADE_ENABLED
+        and _stock_forward_health()["ready"]
+    )
     return {
         "symbol": setup["symbol"],
         "direction": direction,
@@ -3734,7 +3770,10 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "source": "stock_xperp_native_shadow",
         "signal_bar_ts": signal_bar,
         "_quality_rank": float(setup["_quality_rank"]),
-        "_shadow_only": DEPLOYMENT_MODE != "live",
+        # A live deployment is necessary but insufficient: fresh forward
+        # outcomes from this exact route must still have positive expectancy.
+        # The signal remains observable in PAPER while that evidence recovers.
+        "_shadow_only": not live_ready,
         "_native_xperp_shadow": True,
     }
 
@@ -4319,10 +4358,11 @@ def start_bot():
         if not skip:
             open(_flag, "w").close()
             send_status(
-                "🧪 *Stocks Bot Online — SHADOW*\n"
+                "🤖 *Stocks Bot Online*\n"
                 f"Профиль `{_active_strategy_label()}`, "
                 f"скан: {_scan_cadence_ru()}.\n"
-                "Реальные ордера отключены. Нейросеть не принимает решений."
+                f"{_execution_state_text()}.\n"
+                "Нейросеть не принимает решений."
             )
     except Exception as e:
         log.warning(f"Could not send startup message: {e}")

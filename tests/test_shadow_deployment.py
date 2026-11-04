@@ -38,6 +38,18 @@ class ShadowDeploymentTests(unittest.TestCase):
         ).strip()
         self.assertEqual(value, "True")
 
+    def test_execution_label_reports_live_and_forward_pause_truthfully(self):
+        with patch.object(main, "DEPLOYMENT_MODE", "live"), \
+             patch.object(main, "AUTOTRADE_ENABLED", True), \
+             patch.object(main, "_stock_forward_health", return_value={
+                 "ready": False, "resolved": 20, "window": 20,
+                 "total_r": -5.0, "win_rate": 25.0,
+             }):
+            text = main._execution_state_text()
+        self.assertIn("ЗАЩИТНАЯ ПАУЗА", text)
+        self.assertIn("-5.00R", text)
+        self.assertIn("реальные входы не открываются", text)
+
     def test_scan_dispatches_only_native_shadow_router(self):
         calls = []
         with patch.object(main, "_check_open_signals",
@@ -151,7 +163,7 @@ class ShadowDeploymentTests(unittest.TestCase):
             main._handle_admin_callback("cb", 1, 1, "adm_health", user_id=671071896)
         self.assertTrue(shown, "health panel produced no text")
         self.assertIn("Проверка сервисов", shown[0])
-        self.assertIn("ЗАПРЕЩЕНЫ КОДОМ", shown[0])
+        self.assertIn("биржевые ордера выключены", shown[0])
 
     def test_autotrading_button_is_dm_only(self):
         dm_labels = str(main._USER_KB) + str(main._ADMIN_KB)
