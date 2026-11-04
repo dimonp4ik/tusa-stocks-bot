@@ -274,6 +274,14 @@ def test_native_analysis_is_market_only_shadow_with_exact_bracket():
     assert bracket_for_analysis(analysis, 100.0) == (97.0, 97.0, 101.0)
 
 
+def test_native_analysis_becomes_autotrade_eligible_only_in_live_mode():
+    setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]
+    with patch.object(main, "DEPLOYMENT_MODE", "live"):
+        analysis = main._native_xperp_analysis(setup, 100.0)
+    assert analysis["_shadow_only"] is False
+    assert analysis["entry_source"] == "MARKET"
+
+
 def test_native_scan_publishes_only_paper_candidate_contract():
     symbols = sorted(AUDITED_SYMBOLS)[:10]
     setup = native_shadow_setups(universe(), now=119 * 900 + 901)[0]

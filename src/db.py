@@ -412,6 +412,19 @@ def init_db():
                 mode_prompt_pending = 0
             WHERE size_mode = 'fixed'
         """)
+        # The first live rollout uses a new strategy route.  Clear any old
+        # activation exactly once so a persisted Railway volume cannot start
+        # placing orders before each user explicitly enables this rollout.
+        rollout_key = "autotrade_reconsent_20261104"
+        rollout = c.execute(
+            "SELECT value FROM bot_state WHERE key = ?", (rollout_key,)
+        ).fetchone()
+        if rollout is None:
+            c.execute("UPDATE autotrade_users SET active = 0")
+            c.execute(
+                "INSERT INTO bot_state (key, value) VALUES (?, ?)",
+                (rollout_key, "done"),
+            )
 
         # ── Autotrading: one row per live position per user per signal ───────
         c.execute("""

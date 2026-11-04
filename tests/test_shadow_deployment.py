@@ -28,7 +28,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertFalse(hasattr(config, "LEGACY_STRATEGY_ENABLED"))
         self.assertEqual(config.STOCK_VENUE_FILTER_MODE, "paper")
 
-    def test_native_candidate_cannot_be_enabled_in_live_mode(self):
+    def test_live_mode_keeps_the_same_native_route_enabled(self):
         env = {**os.environ, "DEPLOYMENT_MODE": "live",
                "NATIVE_XPERP_SHADOW_ENABLED": "1"}
         value = subprocess.check_output(
@@ -36,7 +36,7 @@ class ShadowDeploymentTests(unittest.TestCase):
              "import config; print(config.NATIVE_XPERP_SHADOW_ENABLED)"],
             env=env, text=True,
         ).strip()
-        self.assertEqual(value, "False")
+        self.assertEqual(value, "True")
 
     def test_scan_dispatches_only_native_shadow_router(self):
         calls = []
@@ -153,11 +153,61 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("Проверка сервисов", shown[0])
         self.assertIn("ЗАПРЕЩЕНЫ КОДОМ", shown[0])
 
-    def test_menu_has_no_autotrading_button(self):
-        labels = str(main._USER_KB) + str(main._ADMIN_KB) + str(main._KB_PEOPLE)
-        self.assertNotIn("Автотрейдинг", labels)
+    def test_autotrading_button_is_dm_only(self):
+        dm_labels = str(main._USER_KB) + str(main._ADMIN_KB)
+        group_labels = str(main._GROUP_KB) + str(main._GROUP_ADMIN_KB)
+        self.assertIn("Автотрейдинг", dm_labels)
+        self.assertNotIn("Автотрейдинг", group_labels)
+        labels = dm_labels + str(main._KB_PEOPLE)
         self.assertIn("Открытые сделки", labels)
         self.assertIn("Результаты", labels)
+
+    def test_live_native_candidate_reaches_autotrader_after_persistence(self):
+        analysis = {
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow", "_shadow_only": False,
+        }
+        persisted = {"id": 71, "symbol": "AAPLUSDT",
+                     "direction": "SHORT", "autotrade_eligible": 1}
+
+        def send(candidate):
+            candidate["_signal_id"] = 71
+            return True
+
+        with patch.object(main, "send_signal", side_effect=send), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "get_signal_by_id", return_value=persisted), \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "link_setup_to_signal"), \
+             patch.object(main, "_cache_signal"), \
+             patch.object(main.autotrader, "open_positions_for_signal") as open_live:
+            self.assertEqual(
+                main._publish_stock_venue_candidates([(analysis, 7)]), 1)
+
+        open_live.assert_called_once_with(persisted)
+
+    def test_shadow_candidate_never_reaches_autotrader(self):
+        analysis = {
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow", "_shadow_only": True,
+        }
+
+        def send(candidate):
+            candidate["_signal_id"] = 72
+            return True
+
+        with patch.object(main, "send_signal", side_effect=send), \
+             patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "get_signal_by_id") as read_signal, \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "link_setup_to_signal"), \
+             patch.object(main, "_cache_signal"), \
+             patch.object(main.autotrader, "open_positions_for_signal") as open_live:
+            self.assertEqual(
+                main._publish_stock_venue_candidates([(analysis, 8)]), 1)
+
+        read_signal.assert_not_called()
+        open_live.assert_not_called()
 
     def test_one_scan_cannot_publish_an_unbounded_signal_batch(self):
         self.assertLessEqual(config.VENUE_MAX_SIGNALS_PER_SCAN, 2)

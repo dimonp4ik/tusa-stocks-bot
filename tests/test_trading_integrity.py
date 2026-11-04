@@ -331,6 +331,25 @@ class ExchangeTests(unittest.TestCase):
 
 
 class DatabaseTests(unittest.TestCase):
+    def test_live_rollout_requires_one_time_user_reconsent(self):
+        from src import db
+        with tempfile.TemporaryDirectory() as tmp:
+            path = str(Path(tmp) / 'signals.db')
+            with patch.object(db, 'DB_PATH', path):
+                db.init_db()
+                db.at_add_allowed(7, 1)
+                db.at_set_active(7, True)
+                with db._conn() as connection:
+                    connection.execute(
+                        "DELETE FROM bot_state WHERE key = ?",
+                        ("autotrade_reconsent_20261104",))
+                db.init_db()
+                self.assertFalse(db.at_get(7)['active'])
+
+                db.at_set_active(7, True)
+                db.init_db()
+                self.assertTrue(db.at_get(7)['active'])
+
     def test_shadow_signal_persists_as_ineligible_for_autotrade(self):
         from src import db
         with tempfile.TemporaryDirectory() as tmp:

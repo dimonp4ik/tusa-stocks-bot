@@ -33,7 +33,7 @@ from config import (
     DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
     NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_DAILY_LOSS_R_CAP,
     NATIVE_XPERP_ROLLING_HOUR_CAP,
-    AUTOTRADE_LEVERAGE,
+    AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
     AUTOTRADE_ACCOUNT_WRITER_COUNT,
     AUTOTRADE_MAX_ACCOUNT_POSITIONS,
@@ -86,7 +86,7 @@ from src.db import (
     at_set_active, at_set_balance, at_set_tp1_close_pct,
     get_today_sl_streak, get_today_loss_streak, get_today_max_loss_streak,
     get_recent_signals,
-    get_today_realized_r,
+    get_today_realized_r, get_signal_by_id,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -697,6 +697,7 @@ def status():
 _USER_KB = {
     "keyboard": [
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🤖 Автотрейдинг"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
@@ -705,12 +706,26 @@ _ADMIN_KB = {
     "keyboard": [
         [{"text": "🛠 Админ панель"}],
         [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🤖 Автотрейдинг"}],
         [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
     ],
     "resize_keyboard": True, "is_persistent": True,
 }
-_GROUP_KB = _USER_KB
-_GROUP_ADMIN_KB = _ADMIN_KB
+_GROUP_KB = {
+    "keyboard": [
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True, "is_persistent": True,
+}
+_GROUP_ADMIN_KB = {
+    "keyboard": [
+        [{"text": "🛠 Админ панель"}],
+        [{"text": "📋 Открытые сделки"}, {"text": "📈 Результаты"}],
+        [{"text": "🛡 Режим"}, {"text": "❓ Помощь"}],
+    ],
+    "resize_keyboard": True, "is_persistent": True,
+}
 
 _ADMIN_KEYBOARD = {"inline_keyboard": [
     [{"text": "📊 Сигналы и сделки", "callback_data": "adm_sec_trading"},
@@ -2364,6 +2379,10 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         return True
 
     if data == "at_confirm":
+        if not AUTOTRADE_ENABLED:
+            _answer_callback(cb_id, "Живая торговля пока не включена.")
+            _reply(chat_id, "⏸ Живая торговля сейчас выключена глобально. Настройки сохранены, но новые позиции не откроются.")
+            return True
         at_set_active(user_id, True)
         _answer_callback(cb_id, "Автотрейдинг включён!")
         _reply(chat_id, "🟢 *Автотрейдинг включён.* Сделки будут открываться автоматически по сигналам бота.")
@@ -2372,6 +2391,10 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _reply(chat_id, "Ок, автотрейдинг не включён. Нажми «🤖 Автотрейдинг» когда будешь готов.")
     elif data == "at_toggle":
         newly_active = not u.get("active")
+        if newly_active and not AUTOTRADE_ENABLED:
+            _answer_callback(cb_id, "Живая торговля пока не включена.")
+            _reply(chat_id, "⏸ Живая торговля сейчас выключена глобально. Попробуй включить её позже.")
+            return True
         at_set_active(user_id, newly_active)
         _answer_callback(cb_id)
         if newly_active:
@@ -3711,7 +3734,7 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "source": "stock_xperp_native_shadow",
         "signal_bar_ts": signal_bar,
         "_quality_rank": float(setup["_quality_rank"]),
-        "_shadow_only": True,
+        "_shadow_only": DEPLOYMENT_MODE != "live",
         "_native_xperp_shadow": True,
     }
 
@@ -3786,6 +3809,12 @@ def _publish_stock_venue_candidates(
         signal_id = analysis.get("_signal_id")
         if signal_id:
             link_setup_to_signal(setup_id, signal_id)
+            if not analysis.get("_shadow_only", True):
+                signal = get_signal_by_id(signal_id)
+                if signal is None:
+                    log.error("Live signal %s disappeared before autotrade", signal_id)
+                else:
+                    autotrader.open_positions_for_signal(signal)
         published += 1
         scan_count += 1
         if native:
