@@ -15,7 +15,8 @@ from src.stock_xperp_native_shadow import (
     REQUIRED_HISTORY_BARS,
     active_volume_bars, backing_level_allows_entry, basket_trend,
     native_shadow_setups, new_york_calendar_day, normalized_atr14,
-    premarket_regime_trigger, routed_target_fraction,
+    premarket_regime_trigger, recover_premarket_regime,
+    routed_target_fraction,
 )
 from src.telegram_notifier import bracket_for_analysis
 
@@ -203,6 +204,57 @@ def test_active_volume_bars_and_native_route_latch_illiquid_crash_regime():
     assert audit["premarket_regime_new_york_day"] == "2026-11-03"
     assert audit["basket_trend_64_pct"] <= -6
     assert audit["liquid_universe_ratio"] == 0
+
+
+def test_premarket_regime_is_recovered_after_same_day_restart():
+    latest = int(datetime(
+        2026, 11, 3, 19, 15, tzinfo=timezone.utc).timestamp())
+    count = 180
+    times = [latest - (count - 1 - index) * 900
+             for index in range(count)]
+    values = [100.0 * (.9995 ** index) for index in range(count)]
+    data = {}
+    for symbol in sorted(AUDITED_SYMBOLS)[:20]:
+        data[symbol] = {
+            "time": list(times),
+            "open": list(values),
+            "high": [value + .01 for value in values],
+            "low": [value - .01 for value in values],
+            "close": list(values),
+            "volume": [0.0] * count,
+        }
+
+    recovered = recover_premarket_regime(data, now=latest + 901)
+    assert recovered is not None
+    assert recovered["premarket_regime_new_york_day"] == "2026-11-03"
+    assert recovered["basket_trend_64"] <= -.06
+    assert recovered["liquid_universe_ratio"] == 0
+
+    audit = {}
+    assert native_shadow_setups(
+        data, now=latest + 901, diagnostics=audit) == []
+    assert audit["result"] == "premarket_liquidity_regime_trigger"
+    assert audit["premarket_regime_recovered_from_history"] is True
+
+
+def test_premarket_regime_recovery_never_carries_into_next_new_york_day():
+    latest = int(datetime(
+        2026, 11, 3, 19, 15, tzinfo=timezone.utc).timestamp())
+    count = 180
+    times = [latest - (count - 1 - index) * 900
+             for index in range(count)]
+    values = [100.0 * (.9995 ** index) for index in range(count)]
+    data = {
+        symbol: {
+            "time": list(times), "open": list(values),
+            "high": [value + .01 for value in values],
+            "low": [value - .01 for value in values],
+            "close": list(values), "volume": [0.0] * count,
+        }
+        for symbol in sorted(AUDITED_SYMBOLS)[:20]
+    }
+    next_day = datetime(2026, 11, 4, 12, 0, tzinfo=timezone.utc).timestamp()
+    assert recover_premarket_regime(data, now=next_day) is None
 
 
 def test_native_analysis_is_market_only_shadow_with_exact_bracket():

@@ -40,10 +40,6 @@ BACKING_LEVEL_LOOKBACK_BARS = 32
 # setup into a materially later entry that the replay never measured.
 MAX_SIGNAL_AGE_SECONDS = 180
 BASKET_TREND_BARS = 96
-# ``basket_trends`` needs the full regime window plus the two bars used by each
-# cross-sectional return.  Keep this public so the runtime fetch and tests use
-# the same requirement instead of repeating a smaller magic limit.
-REQUIRED_HISTORY_BARS = BASKET_TREND_BARS + LOOKBACK_BARS + 1
 LONG_MIN_BASKET_TREND = -0.005626823134606253
 SHORT_EXHAUSTION_BARS = 16
 # Promoted in shadow after the pre-declared Oct-30 robustness grid was replayed
@@ -63,6 +59,16 @@ PREMARKET_REGIME_LIQUIDITY_LOOKBACK_BARS = 8
 PREMARKET_REGIME_MIN_ACTIVE_BARS = 6
 PREMARKET_REGIME_MAX_LIQUID_UNIVERSE_RATIO = .55
 PREMARKET_REGIME_MAX_BASKET_TREND_64 = -.06
+# A Railway restart after the 03:15-04:00 New York trigger window must not
+# forget a stress regime that happened earlier in the same local day.  Keep a
+# full day of extra 15-minute bars so every later scan can reconstruct that
+# window from closed candles instead of depending only on in-memory state.
+PREMARKET_REGIME_RECOVERY_BARS = 96
+REQUIRED_HISTORY_BARS = max(
+    BASKET_TREND_BARS + LOOKBACK_BARS + 1,
+    PREMARKET_REGIME_BASKET_BARS + LOOKBACK_BARS + 1
+    + PREMARKET_REGIME_RECOVERY_BARS,
+)
 _NEW_YORK = ZoneInfo(PREMARKET_REGIME_TIMEZONE)
 
 
@@ -259,6 +265,73 @@ def premarket_regime_trigger(entry_time: float, basket_trend_64: float,
     )
 
 
+def recover_premarket_regime(candles_by_symbol: dict[str, dict],
+                             now: float | None = None) -> dict | None:
+    """Recover today's premarket trigger after a process restart.
+
+    The persistent latch is written by ``main`` after this function reports a
+    trigger.  Rebuilding it from closed candles makes the latch independent of
+    whether the worker happened to be alive during the three trigger bars.
+    Only the current New York calendar day is eligible; an old crash cannot
+    pause the following day.
+    """
+    current_time = time.time() if now is None else float(now)
+    if not math.isfinite(current_time):
+        raise ValueError("now must be finite")
+    current_day = new_york_calendar_day(current_time)
+    candidate_signal_times: set[int] = set()
+    for symbol in AUDITED_SYMBOLS & set(candles_by_symbol):
+        for raw_stamp in candles_by_symbol[symbol].get("time") or []:
+            try:
+                signal_time = int(raw_stamp)
+                entry_time = signal_time + 900
+                local = datetime.fromtimestamp(
+                    entry_time, tz=timezone.utc).astimezone(_NEW_YORK)
+            except (TypeError, ValueError, OverflowError):
+                continue
+            minute = local.hour * 60 + local.minute
+            if (local.date().isoformat() == current_day
+                    and PREMARKET_REGIME_TRIGGER_START_MINUTE <= minute
+                    < PREMARKET_REGIME_TRIGGER_END_MINUTE):
+                candidate_signal_times.add(signal_time)
+
+    for signal_time in sorted(candidate_signal_times, reverse=True):
+        sliced = {}
+        for symbol in AUDITED_SYMBOLS & set(candles_by_symbol):
+            series = candles_by_symbol[symbol]
+            times = series.get("time") or []
+            try:
+                end = times.index(signal_time) + 1
+            except ValueError:
+                continue
+            sliced[symbol] = {
+                key: (list(values[:end]) if isinstance(values, (list, tuple))
+                      else values)
+                for key, values in series.items()
+            }
+        found = _latest_rows(sliced)
+        if found is None or int(found[0]) != signal_time:
+            continue
+        _, rows = found
+        trends = basket_trends(
+            sliced, signal_time, (PREMARKET_REGIME_BASKET_BARS,))
+        if trends is None:
+            continue
+        trend = trends[PREMARKET_REGIME_BASKET_BARS]
+        liquidity = liquid_universe_ratio(rows)
+        entry_time = signal_time + 900
+        if premarket_regime_trigger(entry_time, trend, liquidity):
+            return {
+                "signal_time": signal_time,
+                "entry_time": entry_time,
+                "premarket_regime_new_york_day": current_day,
+                "basket_trend_64": trend,
+                "liquid_universe_ratio": liquidity,
+                "aligned_symbols": len(rows),
+            }
+    return None
+
+
 def routed_target_fraction(basket_trend_32: float,
                            entry_time: float) -> float:
     """Choose the audited shadow target from causal basket state and UTC hour."""
@@ -298,6 +371,26 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
     diag.update(signal_time=signal_time, aligned_symbols=len(rows))
     entry_time = signal_time + 900
     current_time = time.time() if now is None else float(now)
+    recovered_regime = recover_premarket_regime(
+        candles_by_symbol, now=current_time)
+    if recovered_regime is not None:
+        diag.update({
+            "result": "premarket_liquidity_regime_trigger",
+            "premarket_regime_trigger": True,
+            "premarket_regime_recovered_from_history": (
+                int(recovered_regime["signal_time"]) != int(signal_time)),
+            "premarket_regime_new_york_day":
+                recovered_regime["premarket_regime_new_york_day"],
+            "premarket_regime_signal_time":
+                recovered_regime["signal_time"],
+            "basket_trend_64_pct":
+                float(recovered_regime["basket_trend_64"]) * 100,
+            "liquid_universe_ratio":
+                recovered_regime["liquid_universe_ratio"],
+            "liquid_universe_symbols":
+                recovered_regime["aligned_symbols"],
+        })
+        return []
     if current_time < entry_time or current_time - entry_time > MAX_SIGNAL_AGE_SECONDS:
         diag.update(
             result="stale_or_unclosed_bar",
