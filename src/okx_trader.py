@@ -287,17 +287,21 @@ def get_position_avg_px(creds: dict, inst_id: str) -> float | None:
 
 # ── Orders ────────────────────────────────────────────────────────────────────
 
-def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> tuple:
+def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float,
+                       client_order_id: str = "") -> tuple:
     """Market entry, isolated margin, net (one-way) position mode.
     direction LONG→buy, SHORT→sell. Returns (ok, ordId | error)."""
     side = "buy" if str(direction).upper() == "LONG" else "sell"
-    ok, data = _request(creds, "POST", "/api/v5/trade/order", body={
+    body = {
         "instId":  inst_id,
         "tdMode":  "isolated",
         "side":    side,
         "ordType": "market",
         "sz":      _fmt_sz(sz),
-    })
+    }
+    if client_order_id:
+        body["clOrdId"] = str(client_order_id)
+    ok, data = _request(creds, "POST", "/api/v5/trade/order", body=body)
     if not ok:
         return False, data
     try:
@@ -311,6 +315,31 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float) -> 
         # be reachable; say so loudly if it ever is.
         _log.error(f"OKX response parsed empty, order id lost: {e}")
         return True, ""
+
+
+def get_order_by_client_id(creds: dict, inst_id: str,
+                           client_order_id: str) -> tuple:
+    """Recover a recent order after a lost place-order response."""
+    ok, data = _request(
+        creds, "GET", "/api/v5/trade/order",
+        params={"instId": inst_id, "clOrdId": client_order_id},
+    )
+    if not ok:
+        return False, data
+    try:
+        row = data[0]
+        if not row.get("ordId"):
+            raise ValueError("missing ordId")
+        if str(row.get("clOrdId") or "") != str(client_order_id):
+            raise ValueError("client order id mismatch")
+        return True, row
+    except (TypeError, ValueError, KeyError, IndexError) as exc:
+        return False, f"order lookup parse failed: {exc}"
+
+
+def is_ambiguous_request_error(error) -> bool:
+    """True only when transport failed and exchange acceptance is unknown."""
+    return str(error or "").lower().startswith("request failed:")
 
 
 def place_protection_oco(creds: dict, inst_id: str, direction: str,

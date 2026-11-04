@@ -25,6 +25,7 @@ Fail-safe rules:
 """
 import logging
 import json
+import hashlib
 from datetime import datetime, timezone
 import threading
 from collections import defaultdict
@@ -129,6 +130,15 @@ def _margin_for(u: dict, balance: float) -> float:
 
 
 _entry_locks = defaultdict(threading.Lock)
+
+
+def _entry_client_order_id(user_id: int, sig: dict, inst_id: str) -> str:
+    """Stable 32-char OKX id for recovering a lost market-order response."""
+    material = "|".join((
+        "stock-v1", str(user_id), str(sig.get("id") or ""), inst_id,
+        str(sig.get("opened_at") or ""), str(sig.get("source") or ""),
+    ))
+    return "s1" + hashlib.sha256(material.encode("utf-8")).hexdigest()[:30]
 
 
 def _open_for_user(u: dict, sig: dict, inst_id: str, disp: str) -> None:
@@ -294,11 +304,63 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
         return
 
-    ok, ord_id = okx.place_market_entry(creds, inst_id, sig["direction"], sz)
+    client_order_id = _entry_client_order_id(uid, sig, inst_id)
+    ok, ord_id = okx.place_market_entry(
+        creds, inst_id, sig["direction"], sz, client_order_id)
     if not ok:
-        log.warning(f"autotrade entry failed for {uid} {inst_id}: {ord_id}")
-        _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
-        return
+        ambiguous = okx.is_ambiguous_request_error(ord_id)
+        if ambiguous:
+            recovered, order = okx.get_order_by_client_id(
+                creds, inst_id, client_order_id)
+            if (recovered and str(order.get("state") or "").lower()
+                    in {"live", "partially_filled", "filled"}):
+                ok, ord_id = True, str(order.get("ordId") or client_order_id)
+                log.warning("autotrade recovered lost entry response %s %s: %s",
+                            uid, inst_id, ord_id)
+            else:
+                pos_ok, current_size = okx.get_position_size(creds, inst_id)
+                if pos_ok and current_size > 0:
+                    ok, ord_id = True, client_order_id
+                    log.warning("autotrade recovered ambiguous entry from position %s %s",
+                                uid, inst_id)
+                else:
+                    # A transport timeout is not an exchange rejection. Keep a
+                    # durable unprotected row so the minute reconciler will
+                    # close a late-visible fill instead of forgetting it.
+                    tracked = True
+                    try:
+                        at_log_position(
+                            sig["id"], uid, inst_id, sig["direction"], sz, px,
+                            margin, "", float(sig["sl"]))
+                    except Exception as tracking_error:
+                        tracked = False
+                        log.critical(
+                            "ambiguous entry could not be persisted %s %s: %s",
+                            uid, inst_id, tracking_error)
+                    if tracked:
+                        _dm(uid, "\n".join([
+                            f"🚨 *Неопределённый ответ OKX по {disp}*",
+                            "",
+                            "Биржа не ответила на запрос открытия. Бот будет проверять "
+                            "счёт и автоматически закроет позицию, если она появилась.",
+                            "До проверки не открывай этот тикер вручную.",
+                            f"ID: `{client_order_id}`",
+                        ]))
+                    else:
+                        _dm(uid, "\n".join([
+                            f"🚨 *СРОЧНО: проверь {disp} на OKX*",
+                            "",
+                            "Ответ на открытие потерян, а сохранить проверку в базе не удалось.",
+                            "Если позиция появилась — закрой её вручную.",
+                            f"ID: `{client_order_id}`",
+                        ]))
+                    log.error("autotrade AMBIGUOUS ENTRY %s %s: %s; lookup=%s",
+                              uid, inst_id, ord_id, order)
+                    return
+        if not ok:
+            log.warning(f"autotrade entry failed for {uid} {inst_id}: {ord_id}")
+            _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
+            return
 
     tick  = (spec or {}).get("tickSz", 0)
     # Close-confirmed stop: the bot closes the position itself once a 15m candle

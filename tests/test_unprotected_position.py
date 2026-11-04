@@ -6,6 +6,53 @@ from unittest.mock import patch
 from src import autotrader as at
 
 class UnprotectedPositionTests(unittest.TestCase):
+    def test_lost_market_response_is_persisted_for_reconciliation(self):
+        spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
+        sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+        with ExitStack() as stack:
+            for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
+                ('at_set_balance',None),('get_bot_state',None),
+                ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
+                stack.enter_context(patch.object(at,name,return_value=value))
+            for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+                ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
+                ('ensure_leverage',(True,None)),
+                ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
+                ('place_market_entry',(False,'request failed: timed out')),
+                ('get_order_by_client_id',(False,'not found'))]:
+                stack.enter_context(patch.object(at.okx,name,return_value=value))
+            stack.enter_context(patch.object(
+                at.okx,'get_position_size',side_effect=[(True,0),(True,0)]))
+            record=stack.enter_context(patch.object(at,'at_log_position',return_value=1))
+            at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
+        record.assert_called_once()
+        self.assertEqual(record.call_args.args[7], '')
+
+    def test_lost_market_response_recovers_order_and_places_protection(self):
+        spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
+        sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+        with ExitStack() as stack:
+            for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
+                ('at_set_balance',None),('get_bot_state',None),('set_bot_state',None),
+                ('set_signal_size_mult',None),('_dm',None)]:
+                stack.enter_context(patch.object(at,name,return_value=value))
+            for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+                ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
+                ('ensure_leverage',(True,None)),('get_position_avg_px',100),
+                ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
+                ('place_market_entry',(False,'request failed: timed out')),
+                ('get_order_by_client_id',(True,{'ordId':'42','state':'filled'})),
+                ('place_protection_oco',(True,'algo'))]:
+                stack.enter_context(patch.object(at.okx,name,return_value=value))
+            stack.enter_context(patch.object(
+                at.okx,'get_position_size',side_effect=[(True,0),(True,.01)]))
+            record=stack.enter_context(patch.object(at,'at_log_position',return_value=1))
+            protect=at.okx.place_protection_oco
+            at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
+        protect.assert_called_once()
+        record.assert_called_once()
+        self.assertEqual(record.call_args.args[7], 'algo')
+
     def test_failed_protection_and_close_remains_tracked(self):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)

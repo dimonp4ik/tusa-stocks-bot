@@ -253,9 +253,11 @@ class ExchangeTests(unittest.TestCase):
                     at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
                 order.assert_called_once()  # No additional market entry on refused depth.
         order.assert_called_once()
-        quantity=order.call_args.args[-1]
+        quantity=order.call_args.args[3]
         self.assertEqual(quantity, okx.calc_contracts(
             3.84, at.AUTOTRADE_LEVERAGE, 100, spec))
+        self.assertEqual(len(order.call_args.args[4]), 32)
+        self.assertTrue(order.call_args.args[4].startswith('s1'))
 
     def test_live_entry_refuses_shared_account_position_overflow(self):
         from src import autotrader as at
@@ -291,8 +293,18 @@ class ExchangeTests(unittest.TestCase):
 
     def test_entry_order_is_market(self):
         with patch.object(okx, '_request', return_value=(True, [{'ordId': '42'}])) as request:
-            self.assertEqual(okx.place_market_entry({}, 'TEST', 'LONG', 1), (True, '42'))
+            self.assertEqual(okx.place_market_entry(
+                {}, 'TEST', 'LONG', 1, 'stock123'), (True, '42'))
         self.assertEqual(request.call_args.kwargs['body']['ordType'], 'market')
+        self.assertEqual(request.call_args.kwargs['body']['clOrdId'], 'stock123')
+
+    def test_order_lookup_requires_matching_client_id(self):
+        row = {'ordId': '42', 'clOrdId': 'stock123', 'state': 'filled'}
+        with patch.object(okx, '_request', return_value=(True, [row])) as request:
+            self.assertEqual(
+                okx.get_order_by_client_id({}, 'TEST', 'stock123'),
+                (True, row))
+        self.assertEqual(request.call_args.kwargs['params']['clOrdId'], 'stock123')
 
     def test_order_item_error_is_failure_even_with_top_code_zero(self):
         response=Mock()
