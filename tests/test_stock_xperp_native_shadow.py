@@ -11,7 +11,8 @@ import main
 from src import db
 from src.stock_xperp_native_shadow import (
     AUDITED_SYMBOLS, BACKING_LEVEL_LOOKBACK_BARS, HOLD_BARS,
-    LONG_MIN_BASKET_TREND, SHORT_MIN_BASKET_TREND,
+    LONG_MIN_BASKET_TREND, LONG_MIN_BASKET_TREND_64,
+    SHORT_MIN_BASKET_TREND,
     REQUIRED_HISTORY_BARS,
     active_volume_bars, backing_level_allows_entry, basket_trend,
     native_shadow_setups, new_york_calendar_day, normalized_atr14,
@@ -156,6 +157,34 @@ def test_promoted_short_exhaustion_guard_catches_moderate_basket_decline():
     assert trend is not None
     assert -.01 < trend <= SHORT_MIN_BASKET_TREND
     assert native_shadow_setups(data, now=119 * 900 + 901) == []
+
+
+def test_long_stress_guard_rejects_reversal_during_broad_64_bar_decline():
+    data = universe()
+    # Earlier strength keeps the existing 96-bar LONG regime positive while
+    # the newest 64-bar basket sum falls through the dedicated stress guard.
+    for values in data.values():
+        price = 100.0
+        for index in range(24, 56):
+            price *= 1.0015
+            values["open"][index] = values["close"][index] = price
+            values["high"][index], values["low"][index] = price + .05, price - .05
+        for index in range(56, 120):
+            price *= .9995
+            values["open"][index] = values["close"][index] = price
+            values["high"][index], values["low"][index] = price + .05, price - .05
+    first = sorted(data)[0]
+    data[first]["close"][-1] *= .98
+    data[first]["open"][-1] = data[first]["close"][-1]
+    data[first]["high"][-1] = data[first]["close"][-1] + .05
+    data[first]["low"][-1] = data[first]["close"][-1] - .05
+
+    assert basket_trend(data, 119 * 900, 96) >= LONG_MIN_BASKET_TREND
+    assert basket_trend(data, 119 * 900, 64) < LONG_MIN_BASKET_TREND_64
+    audit = {}
+    assert native_shadow_setups(
+        data, now=119 * 900 + 901, diagnostics=audit) == []
+    assert audit["rejected"]["long_basket_trend_64"] == 1
 
 
 def test_target_router_uses_exhaustion_before_utc_expansion():

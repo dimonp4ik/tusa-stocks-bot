@@ -1,0 +1,431 @@
+{
+  "baseline": {
+    "2026-07": {
+      "dd_pct": 2.6736,
+      "max_loss_streak": 9,
+      "n": 201,
+      "profitable_exit_rate_pct": 46.7662,
+      "return_pct": 47.1887,
+      "trades_per_active_day": 7.1786
+    },
+    "2026-08": {
+      "dd_pct": 3.4276,
+      "max_loss_streak": 7,
+      "n": 218,
+      "profitable_exit_rate_pct": 44.4954,
+      "return_pct": 23.1389,
+      "trades_per_active_day": 7.0323
+    },
+    "2026-09": {
+      "dd_pct": 2.4767,
+      "max_loss_streak": 8,
+      "n": 235,
+      "profitable_exit_rate_pct": 43.8298,
+      "return_pct": 30.0491,
+      "trades_per_active_day": 7.8333
+    },
+    "2026-10": {
+      "dd_pct": 2.4299,
+      "max_loss_streak": 7,
+      "n": 226,
+      "profitable_exit_rate_pct": 44.2478,
+      "return_pct": 23.3132,
+      "trades_per_active_day": 7.5333
+    },
+    "2026-11": {
+      "dd_pct": 1.8116,
+      "max_loss_streak": 5,
+      "n": 22,
+      "profitable_exit_rate_pct": 36.3636,
+      "return_pct": 2.2744,
+      "trades_per_active_day": 4.4
+    }
+  },
+  "created_at": "2026-11-05T20:33:05.782446+00:00",
+  "fresh_removed": [
+    {
+      "basket_trend_64": -0.09152817134670925,
+      "direction": "LONG",
+      "entry_utc": "2026-11-05T02:45:00+00:00",
+      "net_r": -1.3234781935683615,
+      "outcome": "SL",
+      "symbol": "MRNAUSDT"
+    },
+    {
+      "basket_trend_64": -0.0991992524627318,
+      "direction": "LONG",
+      "entry_utc": "2026-11-05T03:30:00+00:00",
+      "net_r": -1.0932105868814546,
+      "outcome": "SL",
+      "symbol": "SKHYUSDT"
+    }
+  ],
+  "limitations": [
+    "The rule was formulated after observing the Nov-5 LONG stop pair.",
+    "November cannot authorize live orders and is diagnostic only.",
+    "Native stock X-Perp history begins in 2026, so this is a shadow candidate.",
+    "Public OHLC replay cannot reproduce account fill latency or slippage.",
+    "Gross results exclude fees at the account owner's request."
+  ],
+  "neighbor_thresholds_historically_safe": true,
+  "orders_possible": false,
+  "protocol": {
+    "complete_month_safety": [
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10"
+    ],
+    "fresh_diagnostic": "2026-11 through the Nov-5 snapshot",
+    "leverage": 10,
+    "orders": "market only",
+    "portfolio_replayed_after_each_filter": true,
+    "position_fraction": "client setting; evaluated at 3%"
+  },
+  "ready_for_live_orders": false,
+  "rule": {
+    "basket_horizon_closed_bars": 64,
+    "direction": "LONG",
+    "interpretation": "reject LONG while the broad 64-bar basket sum is below -4%",
+    "reject_below_sum": -0.04
+  },
+  "runtime_change_allowed": true,
+  "selected": {
+    "added_by_portfolio_replacement": 5,
+    "historical_safe": true,
+    "monthly": {
+      "2026-07": {
+        "dd_pct": 2.6736,
+        "max_loss_streak": 9,
+        "n": 202,
+        "profitable_exit_rate_pct": 47.0297,
+        "return_pct": 48.129,
+        "trades_per_active_day": 7.2143
+      },
+      "2026-08": {
+        "dd_pct": 3.4276,
+        "max_loss_streak": 7,
+        "n": 218,
+        "profitable_exit_rate_pct": 44.4954,
+        "return_pct": 23.1389,
+        "trades_per_active_day": 7.0323
+      },
+      "2026-09": {
+        "dd_pct": 2.4767,
+        "max_loss_streak": 8,
+        "n": 235,
+        "profitable_exit_rate_pct": 43.8298,
+        "return_pct": 30.0491,
+        "trades_per_active_day": 7.8333
+      },
+      "2026-10": {
+        "dd_pct": 2.4299,
+        "max_loss_streak": 7,
+        "n": 223,
+        "profitable_exit_rate_pct": 44.3946,
+        "return_pct": 23.6832,
+        "trades_per_active_day": 7.4333
+      },
+      "2026-11": {
+        "dd_pct": 1.8116,
+        "max_loss_streak": 4,
+        "n": 21,
+        "profitable_exit_rate_pct": 38.0952,
+        "return_pct": 2.7089,
+        "trades_per_active_day": 4.2
+      }
+    },
+    "removed": 8
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_long_stress_guard_nov5_audit.py": "8a0a6b8e6a87353ccc27550f7155f5f6d2fb52d5f52428b0ebc7825262f5902c",
+    "reports\\audit_2026_09_08\\stock_xperp_forward_nov5\\manifest.json": "31bcd2b18a3c3c2e98b8950126a4d9d93c54bc4b615ea82ab212cede006bb493",
+    "reports\\audit_2026_09_08\\stock_xperp_nov5_routed_preportfolio.pkl": "1e9466a289206d967ecebf8e90eda8133b22b518191a786d4478fda23df01861",
+    "src\\stock_xperp_native_shadow.py": "13d4976a85995fe421dbd84d853c4646b99c797e60aca14ca5bd871739feeeef"
+  },
+  "status": "FORWARD_ONLY_SHADOW_EXPERIMENT",
+  "variants": {
+    "-0.02": {
+      "added_by_portfolio_replacement": 39,
+      "historical_safe": false,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.0297,
+          "return_pct": 48.1262,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 215,
+          "profitable_exit_rate_pct": 44.6512,
+          "return_pct": 22.9349,
+          "trades_per_active_day": 6.9355
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 225,
+          "profitable_exit_rate_pct": 42.2222,
+          "return_pct": 25.9462,
+          "trades_per_active_day": 7.5
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 224,
+          "profitable_exit_rate_pct": 44.6429,
+          "return_pct": 25.4826,
+          "trades_per_active_day": 7.4667
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 54
+    },
+    "-0.03": {
+      "added_by_portfolio_replacement": 5,
+      "historical_safe": true,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.0297,
+          "return_pct": 48.129,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 223,
+          "profitable_exit_rate_pct": 44.3946,
+          "return_pct": 23.6832,
+          "trades_per_active_day": 7.4333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 8
+    },
+    "-0.04": {
+      "added_by_portfolio_replacement": 5,
+      "historical_safe": true,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.0297,
+          "return_pct": 48.129,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 223,
+          "profitable_exit_rate_pct": 44.3946,
+          "return_pct": 23.6832,
+          "trades_per_active_day": 7.4333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 8
+    },
+    "-0.05": {
+      "added_by_portfolio_replacement": 3,
+      "historical_safe": true,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.0297,
+          "return_pct": 48.1319,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 226,
+          "profitable_exit_rate_pct": 44.2478,
+          "return_pct": 23.3132,
+          "trades_per_active_day": 7.5333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 3
+    },
+    "-0.06": {
+      "added_by_portfolio_replacement": 1,
+      "historical_safe": true,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 201,
+          "profitable_exit_rate_pct": 46.7662,
+          "return_pct": 47.1887,
+          "trades_per_active_day": 7.1786
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 226,
+          "profitable_exit_rate_pct": 44.2478,
+          "return_pct": 23.3132,
+          "trades_per_active_day": 7.5333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 2
+    },
+    "-0.08": {
+      "added_by_portfolio_replacement": 1,
+      "historical_safe": true,
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 201,
+          "profitable_exit_rate_pct": 46.7662,
+          "return_pct": 47.1887,
+          "trades_per_active_day": 7.1786
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 226,
+          "profitable_exit_rate_pct": 44.2478,
+          "return_pct": 23.3132,
+          "trades_per_active_day": 7.5333
+        },
+        "2026-11": {
+          "dd_pct": 1.8116,
+          "max_loss_streak": 4,
+          "n": 21,
+          "profitable_exit_rate_pct": 38.0952,
+          "return_pct": 2.7089,
+          "trades_per_active_day": 4.2
+        }
+      },
+      "removed": 2
+    }
+  }
+}

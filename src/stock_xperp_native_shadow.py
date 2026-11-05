@@ -41,6 +41,13 @@ BACKING_LEVEL_LOOKBACK_BARS = 32
 MAX_SIGNAL_AGE_SECONDS = 180
 BASKET_TREND_BARS = 96
 LONG_MIN_BASKET_TREND = -0.005626823134606253
+# Forward-only Nov-5 shadow guard.  Two LONG reversals were admitted while the
+# broader 64-bar stock basket was down roughly 9-10% and both stopped.  Exact
+# portfolio replay at a -4% threshold left every complete Jul-Oct month no
+# worse (Jul +47.19 -> +48.13%, Aug/Sep unchanged, Oct +23.31 -> +23.68%) and
+# the neighbouring -3%/-5% thresholds passed the same safety gate.  November
+# is diagnostic, so live-order readiness must still recover on new outcomes.
+LONG_MIN_BASKET_TREND_64 = -.04
 SHORT_EXHAUSTION_BARS = 16
 # Promoted in shadow after the pre-declared Oct-30 robustness grid was replayed
 # through Nov-3.  The -0.75% variant improved aggregate return and reduced the
@@ -432,7 +439,8 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
     target_fraction = routed_target_fraction(target_trend, entry_time)
     rejected = {
         "abs_z": 0, "minimum_move": 0, "atr_missing": 0, "atr_too_high": 0,
-        "long_basket_trend": 0, "short_basket_trend": 0, "backing_level": 0,
+        "long_basket_trend": 0, "long_basket_trend_64": 0,
+        "short_basket_trend": 0, "backing_level": 0,
     }
     output = []
     for row in rows:
@@ -454,6 +462,10 @@ def native_shadow_setups(candles_by_symbol: dict[str, dict],
         direction = "SHORT" if move > 0 else "LONG"
         if direction == "LONG" and long_trend < LONG_MIN_BASKET_TREND:
             rejected["long_basket_trend"] += 1
+            continue
+        if (direction == "LONG"
+                and premarket_trend < LONG_MIN_BASKET_TREND_64):
+            rejected["long_basket_trend_64"] += 1
             continue
         if direction == "SHORT" and short_trend <= SHORT_MIN_BASKET_TREND:
             rejected["short_basket_trend"] += 1
