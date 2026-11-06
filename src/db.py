@@ -348,6 +348,14 @@ def init_db():
             # authoritative outcome; it must not also run an independent
             # simulation that can contradict it.
             "signal_id":    "INTEGER",
+            # Public decision-time book for PAPER/rejected setups, or the exact
+            # executable pre-entry book for a real fill. The kind field keeps
+            # those two observation contracts separate during research.
+            "book_spread_bps":  "REAL",
+            "book_depth_usd":   "REAL",
+            "book_imbalance":   "REAL",
+            "book_sample_kind": "TEXT",
+            "book_observed_ts": "REAL",
         }.items():
             _ensure_column(c, "setup_log", col, ddl)
 
@@ -1690,12 +1698,34 @@ def record_signal_execution_book(signal_id: int, *, spread_bps: float,
     with _conn() as c:
         cur = c.execute("""
             UPDATE setup_log
-               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?
+               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
+                   book_sample_kind='live_execution', book_observed_ts=?
              WHERE signal_id=?
                AND book_spread_bps IS NULL
                AND book_depth_usd IS NULL
                AND book_imbalance IS NULL
-        """, (*values, int(signal_id)))
+        """, (*values, time_mod.time(), int(signal_id)))
+        return bool(cur.rowcount)
+
+
+def record_setup_decision_book(setup_id: int, *, spread_bps: float,
+                               depth_usd: float, imbalance: float) -> bool:
+    """Attach a public decision-time book to a paper or rejected setup."""
+    values = (float(spread_bps), float(depth_usd), float(imbalance))
+    if (not setup_id or any(not math.isfinite(value) for value in values)
+            or values[0] < 0 or values[1] <= 0
+            or not -1.0 <= values[2] <= 1.0):
+        return False
+    with _conn() as c:
+        cur = c.execute("""
+            UPDATE setup_log
+               SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
+                   book_sample_kind='decision_snapshot', book_observed_ts=?
+             WHERE id=?
+               AND book_spread_bps IS NULL
+               AND book_depth_usd IS NULL
+               AND book_imbalance IS NULL
+        """, (*values, time_mod.time(), int(setup_id)))
         return bool(cur.rowcount)
 
 

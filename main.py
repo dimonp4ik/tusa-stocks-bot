@@ -90,10 +90,12 @@ from src.db import (
     get_recent_signals,
     get_today_realized_r, get_signal_by_id,
     get_route_live_readiness,
+    record_setup_decision_book,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
 from src import okx_trader as _okx_trade
+from src.execution_guard import order_book_snapshot
 from config import ADMIN_IDS, AUTOTRADE_CONTACT
 
 # ── Admin helpers ─────────────────────────────────────────────────────────────
@@ -3898,6 +3900,42 @@ def _publish_stock_venue_candidates(
     return published
 
 
+def _record_candidate_decision_books(
+        candidates: list[tuple[dict, int]]) -> None:
+    """Collect public books for PAPER and rejected candidates after publishing.
+
+    Live published signals are left to the account thread, which records the
+    exact executable pre-entry book. This post-publish path cannot delay entry.
+    """
+    if not candidates:
+        return
+    try:
+        instruments = get_xperp_instruments()
+    except Exception as exc:
+        log.warning("Decision-book instrument map unavailable: %s", exc)
+        return
+    for analysis, setup_id in candidates:
+        if (analysis.get("_signal_id")
+                and not analysis.get("_shadow_only", True)):
+            continue
+        symbol = str(analysis.get("symbol") or "")
+        base = symbol[:-4] if symbol.endswith("USDT") else symbol
+        inst_id = instruments.get(base)
+        if not setup_id or not inst_id:
+            continue
+        try:
+            spec = _okx_trade.get_xperp_spec(inst_id)
+            book = _okx_trade.get_order_book(inst_id)
+            if not spec or not book:
+                continue
+            snap = order_book_snapshot(book, spec["ctVal"])
+            record_setup_decision_book(
+                setup_id, spread_bps=snap.spread_bps,
+                depth_usd=snap.depth_usd, imbalance=snap.imbalance)
+        except Exception as exc:
+            log.warning("Decision-book snapshot failed for %s: %s", symbol, exc)
+
+
 def _persist_native_scan_audit(payload: dict) -> None:
     """Keep the latest scan explainable after a worker restart or quiet week."""
     try:
@@ -4033,6 +4071,7 @@ def _run_native_xperp_shadow_scan() -> None:
     publish_rejects = {}
     published = _publish_stock_venue_candidates(
         candidates, open_direction_counts, publish_rejects)
+    _record_candidate_decision_books(candidates)
     bar_lengths = [len(row.get("close") or []) for row in fetched.values()]
     audit = {
         "ts": now,
@@ -4164,6 +4203,7 @@ def _run_stock_venue_strategy_scan() -> None:
         except Exception as exc:
             log.warning("Stock venue strategy failed for %s: %s", symbol, exc)
     published = _publish_stock_venue_candidates(candidates, open_direction_counts)
+    _record_candidate_decision_books(candidates)
     _last_scan_stats.update(coins=len(targets), setups=published, fresh=published,
                             ts=time.time())
     log.info("Stock venue scan complete: %s symbols, %s candidates, %s paper signals",
