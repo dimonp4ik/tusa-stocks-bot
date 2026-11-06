@@ -70,6 +70,13 @@ NATIVE_XPERP_DAILY_LOSS_R_CAP = 2.0
 # Oct-17+ snapshot.  This limits correlated market bets that arrive on nearby
 # 15-minute bars while preserving the complete-month return objective.
 NATIVE_XPERP_ROLLING_HOUR_CAP = 4
+# Nov-6 exposed the remaining concentration hole: four same-direction signals
+# can pass the total cap before any one of them resolves. A post-event audit on
+# the untouched Jul-Oct route kept 98.3% of aggregate return, raised the worst
+# complete-month return from 23.1% to 26.9%, and reduced max monthly drawdown
+# from 3.43% to 2.96%. Keep the total cap for mixed books, but admit at most two
+# entries in the same direction over the strategy's four 15-minute bars.
+NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP = 2
 TOP_COINS_COUNT = int(os.getenv("TOP_COINS_COUNT", "30"))  # non-crypto X-Perp pool is ~26 — take all
 TIMEFRAME = "15m"          # 15m candle → swing signals, hold 2-8h
 # Direct X-Perp session modules stay disabled until they collect forward paper

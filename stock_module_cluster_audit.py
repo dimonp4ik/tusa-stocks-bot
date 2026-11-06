@@ -17,6 +17,7 @@ from stock_forward_monitor import metrics
 def portfolio_gate(rows: list[dict], module_cap: int | None,
                    hour_cap: int | None = None,
                    rolling_hour_cap: int | None = None,
+                   rolling_direction_hour_cap: int | None = None,
                    weak_index_max_ratio: float | None = None,
                    rank_key: Callable[[dict], object] | None = None,
                    loss_streak_cap: int = 3,
@@ -32,6 +33,9 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
     per_module: collections.Counter[tuple[int, str]] = collections.Counter()
     per_hour: collections.Counter[int] = collections.Counter()
     recent_entries: collections.deque[float] = collections.deque()
+    recent_direction_entries = {
+        "LONG": collections.deque(), "SHORT": collections.deque(),
+    }
     output: list[dict] = []
     day = None
     streak = 0
@@ -43,6 +47,9 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
         now = float(row["entry_time"])
         while recent_entries and recent_entries[0] <= now - 3600:
             recent_entries.popleft()
+        for stamps in recent_direction_entries.values():
+            while stamps and stamps[0] <= now - 3600:
+                stamps.popleft()
         new_day = int(now // 86400)
         if new_day != day:
             day, streak, paused = new_day, 0, False
@@ -72,6 +79,10 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
             continue
         if rolling_hour_cap is not None and len(recent_entries) >= rolling_hour_cap:
             continue
+        if (rolling_direction_hour_cap is not None
+                and len(recent_direction_entries[row["direction"]])
+                >= rolling_direction_hour_cap):
+            continue
         if module_cap is not None and per_module[module_key] >= module_cap:
             continue
         if weak_index_max_ratio is not None:
@@ -89,6 +100,7 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
         per_scan[scan] += 1
         per_hour[hour] += 1
         recent_entries.append(now)
+        recent_direction_entries[row["direction"]].append(now)
         per_module[module_key] += 1
         output.append(row)
         heapq.heappush(pending, (float(row["exit_time"]), len(output), row))

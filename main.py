@@ -33,6 +33,7 @@ from config import (
     DEPLOYMENT_MODE, NATIVE_XPERP_SHADOW_ENABLED,
     NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_DAILY_LOSS_R_CAP,
     NATIVE_XPERP_ROLLING_HOUR_CAP,
+    NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP,
     AUTOTRADE_ENABLED, AUTOTRADE_LEVERAGE,
     AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
     AUTOTRADE_ACCOUNT_WRITER_COUNT,
@@ -373,6 +374,8 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         for code, title in (("dir_cap", f"лимит одной стороны ({MAX_SAME_DIRECTION_POSITIONS})"),
                             ("scan_cap", f"лимит {VENUE_MAX_SIGNALS_PER_SCAN} за 15 мин"),
                             ("rolling_hour_cap", f"лимит {NATIVE_XPERP_ROLLING_HOUR_CAP} за скользящий час"),
+                            ("rolling_direction_hour_cap",
+                             f"лимит {NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP} одного направления за час"),
                             ("cooldown", f"повтор того же направления (<{SIGNAL_COOLDOWN_HOURS:g}ч)"),
                             ("earnings_blackout", "отчёт компании сегодня или завтра"),
                             ("send_failed", "⚠️ СБОЙ ОТПРАВКИ (баг, не лимит — должно быть 0)")):
@@ -594,6 +597,7 @@ def _native_scan_status_text() -> str:
             "cooldown": "кулдаун",
             "earnings_blackout": "отчётность",
             "rolling_hour_cap": "лимит за час",
+            "rolling_direction_hour_cap": "лимит направления за час",
             "scan_cap": "лимит на свечу",
             "dir_cap": "лимит направления",
             "send_failed": "ошибка отправки",
@@ -716,7 +720,8 @@ def status():
             f"Scanning {_scan_cadence_label()}. "
             f"Max entry delay: {NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS}s. "
             f"Max signals/15m: {VENUE_MAX_SIGNALS_PER_SCAN}. "
-            f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP}. "
+            f"Native rolling-hour cap: {NATIVE_XPERP_ROLLING_HOUR_CAP} total / "
+            f"{NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP} per direction. "
             f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
             f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
@@ -1301,7 +1306,8 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
                 "Рынок: 24/7, вход по текущей цене\n"
                 "Цель: 2% при истощении / 3% в 06–12 UTC / иначе 2.5%\n"
                 "Стоп: 1%, максимум 64 свечи\n"
-                f"За скользящий час: максимум {NATIVE_XPERP_ROLLING_HOUR_CAP} входа\n"
+                f"За скользящий час: максимум {NATIVE_XPERP_ROLLING_HOUR_CAP} входа, "
+                f"из них не более {NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP} в одну сторону\n"
                 f"Пауза: после {NATIVE_XPERP_LOSS_PAUSE_STREAK} закрытых убытков за UTC-день\n"
             )
         else:
@@ -3806,6 +3812,7 @@ def _publish_stock_venue_candidates(
     direction_counts = dict(open_direction_counts or {})
     scan_count = 0
     native_recent_hour_count = 0
+    native_recent_direction_counts = {"LONG": 0, "SHORT": 0}
     if candidates:
         try:
             now = time.time()
@@ -3818,10 +3825,20 @@ def _publish_stock_venue_candidates(
                 _is_native_xperp_signal(row)
                 and float(row.get("opened_at") or 0) > now - 3600
                 for row in recent_rows)
+            for row in recent_rows:
+                direction = str(row.get("direction") or "")
+                if (direction in native_recent_direction_counts
+                        and _is_native_xperp_signal(row)
+                        and float(row.get("opened_at") or 0) > now - 3600):
+                    native_recent_direction_counts[direction] += 1
         except Exception as exc:
             log.warning("Stock venue persistent scan count unavailable: %s", exc)
             scan_count = VENUE_MAX_SIGNALS_PER_SCAN
             native_recent_hour_count = NATIVE_XPERP_ROLLING_HOUR_CAP
+            native_recent_direction_counts = {
+                "LONG": NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP,
+                "SHORT": NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP,
+            }
     source_priority = {
         "stock_xperp_native_shadow": 0,
         "stock_venue_regime": 1,
@@ -3833,6 +3850,7 @@ def _publish_stock_venue_candidates(
         item[0].get("symbol", ""), item[0].get("direction", "")))
     for analysis, setup_id in ordered:
         native = analysis.get("source") == "stock_xperp_native_shadow"
+        direction = analysis.get("direction", "")
         blackout, blackout_reason = is_earnings_blackout(
             analysis.get("symbol", ""))
         if blackout:
@@ -3844,12 +3862,15 @@ def _publish_stock_venue_candidates(
                 and native_recent_hour_count >= NATIVE_XPERP_ROLLING_HOUR_CAP):
             reject(setup_id, "rolling_hour_cap")
             continue
+        if (native and native_recent_direction_counts.get(direction, 0)
+                >= NATIVE_XPERP_ROLLING_DIRECTION_HOUR_CAP):
+            reject(setup_id, "rolling_direction_hour_cap")
+            continue
         if scan_count >= VENUE_MAX_SIGNALS_PER_SCAN:
             # This persistent block prevents the same 15m candle from being
             # offered again by the next five-minute scheduler tick.
             reject(setup_id, "scan_cap")
             continue
-        direction = analysis.get("direction", "")
         if direction_counts.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS:
             reject(setup_id, "dir_cap")
             continue
@@ -3871,6 +3892,8 @@ def _publish_stock_venue_candidates(
         scan_count += 1
         if native:
             native_recent_hour_count += 1
+            native_recent_direction_counts[direction] = (
+                native_recent_direction_counts.get(direction, 0) + 1)
         direction_counts[direction] = direction_counts.get(direction, 0) + 1
     return published
 

@@ -258,6 +258,44 @@ class ShadowDeploymentTests(unittest.TestCase):
         send.assert_not_called()
         blocked.assert_called_once_with(9, "rolling_hour_cap")
 
+    def test_native_direction_hour_cap_blocks_third_aligned_entry(self):
+        candidate = ({
+            "symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow",
+        }, 9)
+        recent = [{
+            "source": "stock_xperp_native_shadow", "opened_at": stamp,
+            "direction": "SHORT",
+        } for stamp in (8000, 9000)]
+        with patch.object(main.time, "time", return_value=10000), \
+             patch.object(main, "get_recent_signals", return_value=recent), \
+             patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as blocked:
+            published = main._publish_stock_venue_candidates([candidate])
+        self.assertEqual(published, 0)
+        send.assert_not_called()
+        blocked.assert_called_once_with(9, "rolling_direction_hour_cap")
+
+    def test_native_direction_hour_cap_keeps_opposite_side_available(self):
+        candidate = ({
+            "symbol": "AAPLUSDT", "direction": "LONG",
+            "source": "stock_xperp_native_shadow",
+        }, 9)
+        recent = [{
+            "source": "stock_xperp_native_shadow", "opened_at": stamp,
+            "direction": "SHORT",
+        } for stamp in (8000, 9000)]
+        with patch.object(main.time, "time", return_value=10000), \
+             patch.object(main, "get_recent_signals", return_value=recent), \
+             patch.object(main, "send_signal", return_value=True) as send, \
+             patch.object(main, "mark_setup_sent"), \
+             patch.object(main, "mark_setup_blocked") as blocked, \
+             patch.object(main, "_cache_signal"):
+            published = main._publish_stock_venue_candidates([candidate])
+        self.assertEqual(published, 1)
+        send.assert_called_once()
+        blocked.assert_not_called()
+
     def test_native_hour_cap_recognizes_legacy_rows_missing_source(self):
         candidate = ({
             "symbol": "AAPLUSDT", "direction": "SHORT",

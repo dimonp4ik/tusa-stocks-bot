@@ -25,6 +25,19 @@ def test_rolling_hour_guard_counts_portfolio_entries_across_scans():
     assert [item["symbol"] for item in accepted] == ["A", "B", "C"]
 
 
+def test_rolling_direction_hour_guard_preserves_opposite_side_capacity():
+    rows = [
+        {**row("S1", 900), "direction": "SHORT"},
+        {**row("S2", 1800), "direction": "SHORT"},
+        {**row("S3", 2700), "direction": "SHORT"},
+        row("L1", 2700),
+    ]
+    accepted = portfolio_gate(
+        rows, None, rolling_hour_cap=4, rolling_direction_hour_cap=2)
+    assert [(item["symbol"], item["direction"]) for item in accepted] == [
+        ("S1", "SHORT"), ("S2", "SHORT"), ("L1", "LONG")]
+
+
 def test_loss_streak_cap_pauses_later_entries_same_day():
     rows = [
         {**row("A", 100, 200), "outcome": "TIME", "signed_return": -0.002},

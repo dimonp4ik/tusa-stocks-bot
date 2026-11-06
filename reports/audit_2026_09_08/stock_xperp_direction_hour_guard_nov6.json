@@ -1,0 +1,299 @@
+{
+  "baseline": {
+    "monthly": {
+      "2026-07": {
+        "dd_pct": 2.6736,
+        "max_loss_streak": 9,
+        "n": 202,
+        "profitable_exit_rate_pct": 47.0297,
+        "return_pct": 48.129,
+        "trades_per_active_day": 7.2143
+      },
+      "2026-08": {
+        "dd_pct": 3.4276,
+        "max_loss_streak": 7,
+        "n": 218,
+        "profitable_exit_rate_pct": 44.4954,
+        "return_pct": 23.1389,
+        "trades_per_active_day": 7.0323
+      },
+      "2026-09": {
+        "dd_pct": 2.4767,
+        "max_loss_streak": 8,
+        "n": 235,
+        "profitable_exit_rate_pct": 43.8298,
+        "return_pct": 30.0491,
+        "trades_per_active_day": 7.8333
+      },
+      "2026-10": {
+        "dd_pct": 2.4299,
+        "max_loss_streak": 7,
+        "n": 223,
+        "profitable_exit_rate_pct": 44.3946,
+        "return_pct": 23.6832,
+        "trades_per_active_day": 7.4333
+      }
+    },
+    "summary": {
+      "max_loss_streak": 9,
+      "max_monthly_drawdown_pct": 3.4276,
+      "n": 878,
+      "sum_monthly_return_pct": 125.0002,
+      "worst_month_return_pct": 23.1389
+    }
+  },
+  "created_at": "2026-11-06T16:01:58.436070+00:00",
+  "fresh_november_used_for_acceptance": false,
+  "historical_pass": true,
+  "limitations": [
+    "The direct native X-Perp history begins in July 2026.",
+    "November motivated the rule and is excluded from acceptance.",
+    "The stock route remains PAPER until its independent forward-health gate recovers.",
+    "Returns are gross of fees at the user's instruction."
+  ],
+  "protocol": {
+    "acceptance": "retain at least 95% aggregate monthly return, improve the worst month, do not worsen maximum monthly drawdown, add at most one loss to the worst streak, remain profitable with at least three trades per active day in every complete month",
+    "fixed_loss_streak_cap": 2,
+    "fixed_open_direction_cap": 4,
+    "fixed_ranker": "z_high",
+    "fixed_total_rolling_hour_cap": 4,
+    "money": "3% current-equity margin per trade; fixed 10x",
+    "motivation": "Nov-6 same-direction forward stop cluster",
+    "verification_periods": [
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10"
+    ]
+  },
+  "ready_for_live_orders": false,
+  "rule": {
+    "bar_seconds": 900,
+    "interpretation": "keep mixed LONG/SHORT capacity but cap one-way correlated exposure at two entries over four closed 15-minute bars",
+    "same_direction_entries_per_rolling_hour": 2,
+    "total_entries_per_rolling_hour": 4
+  },
+  "runtime_change_allowed": true,
+  "selected": {
+    "monthly": {
+      "2026-07": {
+        "dd_pct": 2.9583,
+        "max_loss_streak": 10,
+        "n": 187,
+        "profitable_exit_rate_pct": 47.0588,
+        "return_pct": 38.417,
+        "trades_per_active_day": 6.6786
+      },
+      "2026-08": {
+        "dd_pct": 2.8581,
+        "max_loss_streak": 9,
+        "n": 226,
+        "profitable_exit_rate_pct": 44.2478,
+        "return_pct": 26.9228,
+        "trades_per_active_day": 7.2903
+      },
+      "2026-09": {
+        "dd_pct": 2.3578,
+        "max_loss_streak": 7,
+        "n": 242,
+        "profitable_exit_rate_pct": 42.9752,
+        "return_pct": 28.5209,
+        "trades_per_active_day": 8.0667
+      },
+      "2026-10": {
+        "dd_pct": 2.7164,
+        "max_loss_streak": 8,
+        "n": 218,
+        "profitable_exit_rate_pct": 47.2477,
+        "return_pct": 28.9794,
+        "trades_per_active_day": 7.2667
+      }
+    },
+    "summary": {
+      "max_loss_streak": 10,
+      "max_monthly_drawdown_pct": 2.9583,
+      "n": 873,
+      "sum_monthly_return_pct": 122.8401,
+      "worst_month_return_pct": 26.9228
+    }
+  },
+  "sources": {
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_xperp_direction_hour_guard_nov6_audit.py": "9653e0e81da1cbb41a46696a166fdc671f210a78929bdb1c3faccb78d603f612",
+    "reports\\audit_2026_09_08\\stock_xperp_nov5_routed_preportfolio.pkl": "1e9466a289206d967ecebf8e90eda8133b22b518191a786d4478fda23df01861"
+  },
+  "status": "PAPER_GUARD_ACCEPTED",
+  "variants": {
+    "baseline": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.0297,
+          "return_pct": 48.129,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.4276,
+          "max_loss_streak": 7,
+          "n": 218,
+          "profitable_exit_rate_pct": 44.4954,
+          "return_pct": 23.1389,
+          "trades_per_active_day": 7.0323
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 235,
+          "profitable_exit_rate_pct": 43.8298,
+          "return_pct": 30.0491,
+          "trades_per_active_day": 7.8333
+        },
+        "2026-10": {
+          "dd_pct": 2.4299,
+          "max_loss_streak": 7,
+          "n": 223,
+          "profitable_exit_rate_pct": 44.3946,
+          "return_pct": 23.6832,
+          "trades_per_active_day": 7.4333
+        }
+      },
+      "summary": {
+        "max_loss_streak": 9,
+        "max_monthly_drawdown_pct": 3.4276,
+        "n": 878,
+        "sum_monthly_return_pct": 125.0002,
+        "worst_month_return_pct": 23.1389
+      }
+    },
+    "direction_cap_1": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 3.1371,
+          "max_loss_streak": 9,
+          "n": 161,
+          "profitable_exit_rate_pct": 45.3416,
+          "return_pct": 27.1279,
+          "trades_per_active_day": 5.75
+        },
+        "2026-08": {
+          "dd_pct": 4.2794,
+          "max_loss_streak": 12,
+          "n": 220,
+          "profitable_exit_rate_pct": 40.4545,
+          "return_pct": 13.8417,
+          "trades_per_active_day": 7.0968
+        },
+        "2026-09": {
+          "dd_pct": 4.4041,
+          "max_loss_streak": 9,
+          "n": 225,
+          "profitable_exit_rate_pct": 41.3333,
+          "return_pct": 20.5804,
+          "trades_per_active_day": 7.5
+        },
+        "2026-10": {
+          "dd_pct": 4.8723,
+          "max_loss_streak": 8,
+          "n": 209,
+          "profitable_exit_rate_pct": 41.6268,
+          "return_pct": 12.3339,
+          "trades_per_active_day": 6.9667
+        }
+      },
+      "summary": {
+        "max_loss_streak": 12,
+        "max_monthly_drawdown_pct": 4.8723,
+        "n": 815,
+        "sum_monthly_return_pct": 73.8839,
+        "worst_month_return_pct": 12.3339
+      }
+    },
+    "direction_cap_2": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.9583,
+          "max_loss_streak": 10,
+          "n": 187,
+          "profitable_exit_rate_pct": 47.0588,
+          "return_pct": 38.417,
+          "trades_per_active_day": 6.6786
+        },
+        "2026-08": {
+          "dd_pct": 2.8581,
+          "max_loss_streak": 9,
+          "n": 226,
+          "profitable_exit_rate_pct": 44.2478,
+          "return_pct": 26.9228,
+          "trades_per_active_day": 7.2903
+        },
+        "2026-09": {
+          "dd_pct": 2.3578,
+          "max_loss_streak": 7,
+          "n": 242,
+          "profitable_exit_rate_pct": 42.9752,
+          "return_pct": 28.5209,
+          "trades_per_active_day": 8.0667
+        },
+        "2026-10": {
+          "dd_pct": 2.7164,
+          "max_loss_streak": 8,
+          "n": 218,
+          "profitable_exit_rate_pct": 47.2477,
+          "return_pct": 28.9794,
+          "trades_per_active_day": 7.2667
+        }
+      },
+      "summary": {
+        "max_loss_streak": 10,
+        "max_monthly_drawdown_pct": 2.9583,
+        "n": 873,
+        "sum_monthly_return_pct": 122.8401,
+        "worst_month_return_pct": 26.9228
+      }
+    },
+    "direction_cap_3": {
+      "monthly": {
+        "2026-07": {
+          "dd_pct": 2.6736,
+          "max_loss_streak": 9,
+          "n": 202,
+          "profitable_exit_rate_pct": 47.5248,
+          "return_pct": 48.192,
+          "trades_per_active_day": 7.2143
+        },
+        "2026-08": {
+          "dd_pct": 3.3991,
+          "max_loss_streak": 8,
+          "n": 226,
+          "profitable_exit_rate_pct": 43.3628,
+          "return_pct": 22.1413,
+          "trades_per_active_day": 7.2903
+        },
+        "2026-09": {
+          "dd_pct": 2.4767,
+          "max_loss_streak": 8,
+          "n": 240,
+          "profitable_exit_rate_pct": 44.1667,
+          "return_pct": 31.6658,
+          "trades_per_active_day": 8.0
+        },
+        "2026-10": {
+          "dd_pct": 3.0118,
+          "max_loss_streak": 9,
+          "n": 216,
+          "profitable_exit_rate_pct": 43.0556,
+          "return_pct": 18.3348,
+          "trades_per_active_day": 7.2
+        }
+      },
+      "summary": {
+        "max_loss_streak": 9,
+        "max_monthly_drawdown_pct": 3.3991,
+        "n": 884,
+        "sum_monthly_return_pct": 120.3339,
+        "worst_month_return_pct": 18.3348
+      }
+    }
+  }
+}
