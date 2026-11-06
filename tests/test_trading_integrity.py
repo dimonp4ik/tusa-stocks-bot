@@ -241,12 +241,28 @@ class ExchangeTests(unittest.TestCase):
         self.assertEqual(value['inst_ids'], ('AAPL-X', 'BTC-X'))
 
     def test_position_mode_is_parsed_fail_closed(self):
-        with patch.object(okx, '_request', return_value=(True, [{'posMode': 'net_mode'}])):
+        with patch.object(okx, '_request', return_value=(True, [{
+                'posMode': 'net_mode', 'perm': 'read_only,trade'}])):
             self.assertEqual(okx.get_position_mode({}), (True, 'net_mode'))
         with patch.object(okx, '_request', return_value=(True, [{'posMode': 'surprise'}])):
             good, error = okx.get_position_mode({})
         self.assertFalse(good)
         self.assertIn('unknown position mode', error)
+
+    def test_autotrade_account_requires_trade_and_rejects_withdraw(self):
+        for permission, expected in [
+                ('read_only', 'trade_permission_missing'),
+                ('read_only,trade,withdraw', 'withdraw_permission_present')]:
+            with patch.object(okx, '_request', return_value=(True, [{
+                    'posMode': 'net_mode', 'perm': permission}])):
+                good, detail = okx.validate_autotrade_account({})
+            self.assertFalse(good)
+            self.assertEqual(detail['reason'], expected)
+        with patch.object(okx, '_request', return_value=(True, [{
+                'posMode': 'net_mode', 'perm': 'read_only,trade'}])):
+            good, detail = okx.validate_autotrade_account({})
+        self.assertTrue(good)
+        self.assertEqual(detail['permissions'], ('read_only', 'trade'))
 
     def test_live_entry_uses_client_margin_without_strategy_resizing(self):
         from src import autotrader as at
@@ -259,7 +275,7 @@ class ExchangeTests(unittest.TestCase):
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),
                  ('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('get_position_mode',(True,'net_mode')),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                  ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                  ('get_position_size',(True,0)),('ensure_leverage',(True,None)),
                  ('get_order_book',{'ts':at.time.time()*1000,'bids':[['99.99','1000']],
@@ -293,7 +309,8 @@ class ExchangeTests(unittest.TestCase):
                                 ('set_signal_size_mult', None), ('_dm', None)]:
                 stack.enter_context(patch.object(at, name, return_value=value))
             stack.enter_context(patch.object(
-                at.okx, 'get_position_mode', return_value=(True, 'net_mode')))
+                at.okx, 'validate_autotrade_account', return_value=(True, {
+                    'position_mode': 'net_mode', 'permissions': ('read_only', 'trade')})))
             stack.enter_context(patch.object(
                 at.okx, 'get_balance', return_value=(True, 128)))
             stack.enter_context(patch.object(
@@ -318,7 +335,8 @@ class ExchangeTests(unittest.TestCase):
                                 ('set_bot_state', None), ('_dm', None)]:
                 stack.enter_context(patch.object(at, name, return_value=value))
             stack.enter_context(patch.object(
-                at.okx, 'get_position_mode', return_value=(True, 'long_short_mode')))
+                at.okx, 'validate_autotrade_account', return_value=(False, {
+                    'reason': 'long_short_mode'})))
             balance = stack.enter_context(patch.object(at.okx, 'get_balance'))
             order = stack.enter_context(patch.object(at.okx, 'place_market_entry'))
             at._open_for_user(

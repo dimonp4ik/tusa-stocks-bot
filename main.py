@@ -2353,6 +2353,23 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
                    f"❌ Не получилось подключиться к OKX:\n`{balance}`\n\n"
                    f"Проверь ключи и нажми «🤖 Автотрейдинг» чтобы попробовать заново.")
             return True
+        account_ok, account_check = _okx_trade.validate_autotrade_account(creds)
+        if not account_ok:
+            _at_onboarding.pop(chat_id, None)
+            reason = str((account_check or {}).get("reason") or "config_unavailable")
+            message = {
+                "long_short_mode": (
+                    "Аккаунт использует режим *Long/Short*. Закрой открытые "
+                    "позиции и переключи режим позиций OKX на *Net* (односторонний)."),
+                "trade_permission_missing": (
+                    "У ключа нет права *Trade*. Создай новый ключ с правами "
+                    "*Read + Trade*."),
+                "withdraw_permission_present": (
+                    "У ключа включено право *Withdraw*. Такой ключ бот не "
+                    "принимает — создай новый только с *Read + Trade*."),
+            }.get(reason, "Не удалось проверить конфигурацию API-ключа OKX.")
+            _reply(chat_id, f"❌ Ключи не сохранены.\n\n{message}")
+            return True
         try:
             at_set_keys(user_id,
                         encrypt_secret(creds["api_key"]),

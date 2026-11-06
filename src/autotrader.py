@@ -194,23 +194,32 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                  f"повторный сигнал пропущен.")
         return
 
-    mode_ok, position_mode = okx.get_position_mode(creds)
-    if not mode_ok:
-        log.warning("autotrade position mode unavailable for %s: %s",
-                    uid, position_mode)
+    account_ok, account_check = okx.validate_autotrade_account(creds)
+    if not account_ok:
+        reason = str((account_check or {}).get("reason") or "config_unavailable")
+        log.warning("autotrade account incompatible for %s: %s", uid, account_check)
+        messages = {
+            "long_short_mode": (
+                "режим позиций Long/Short",
+                f"⚠️ Автотрейдинг: {disp} пропущен — аккаунт OKX работает в "
+                "режиме Long/Short. Закрой открытые позиции и переключи режим "
+                "позиций на Net (односторонний)."),
+            "trade_permission_missing": (
+                "у API-ключа нет права Trade",
+                f"⚠️ Автотрейдинг: {disp} пропущен — у API-ключа OKX нет права "
+                "Trade. Создай ключ с правами Read + Trade."),
+            "withdraw_permission_present": (
+                "API-ключ имеет запрещённое право Withdraw",
+                f"⚠️ Автотрейдинг: {disp} пропущен — подключённый API-ключ имеет "
+                "право Withdraw. Замени его ключом только с Read + Trade."),
+        }
+        audit_reason, message = messages.get(reason, (
+            "конфигурацию API-ключа OKX не удалось проверить",
+            f"⚠️ Автотрейдинг: {disp} пропущен — не удалось проверить "
+            "конфигурацию API-ключа OKX."))
         _entry_skip(
-            uid, sig, inst_id, "режим позиций OKX не удалось проверить",
-            f"⚠️ Автотрейдинг: {disp} пропущен — не удалось проверить режим "
-            "позиций OKX. Бот отказался от входа для безопасности.")
-        return
-    if position_mode != "net_mode":
-        log.warning("autotrade unsupported position mode for %s: %s",
-                    uid, position_mode)
-        _entry_skip(
-            uid, sig, inst_id, f"неподдерживаемый режим позиций: {position_mode}",
-            f"⚠️ Автотрейдинг: {disp} пропущен — аккаунт OKX работает в "
-            "режиме Long/Short. Закрой открытые позиции и переключи режим "
-            "позиций на Net (односторонний), затем следующий сигнал сможет открыться.")
+            uid, sig, inst_id, audit_reason,
+            message + " Бот отказался от входа для безопасности.")
         return
 
     ok, balance = okx.get_balance(creds)

@@ -150,13 +150,8 @@ def round_to_tick(px: float, tick: float) -> float:
 
 # ── Account ───────────────────────────────────────────────────────────────────
 
-def get_position_mode(creds: dict) -> tuple:
-    """Return the account position mode or a parse/API error.
-
-    All entry, protection and close requests in this client use OKX net mode.
-    In long/short mode OKX requires ``posSide`` and the same request shapes are
-    rejected, so callers must check this before opening a position.
-    """
+def get_account_configuration(creds: dict) -> tuple:
+    """Return the position mode and permissions of the requesting API key."""
     ok, data = _request(creds, "GET", "/api/v5/account/config")
     if not ok:
         return False, data
@@ -166,9 +161,36 @@ def get_position_mode(creds: dict) -> tuple:
         mode = str(data[0].get("posMode") or "").strip()
         if mode not in {"net_mode", "long_short_mode"}:
             raise ValueError(f"unknown position mode: {mode or 'missing'}")
-        return True, mode
+        permissions = tuple(sorted({
+            value.strip() for value in str(data[0].get("perm") or "").split(",")
+            if value.strip()
+        }))
+        return True, {"position_mode": mode, "permissions": permissions}
     except (TypeError, ValueError, KeyError, AttributeError) as exc:
-        return False, f"position mode parse failed: {exc}"
+        return False, f"account configuration parse failed: {exc}"
+
+
+def get_position_mode(creds: dict) -> tuple:
+    """Compatibility wrapper for callers that only need the position mode."""
+    ok, config = get_account_configuration(creds)
+    if not ok:
+        return False, config
+    return True, config["position_mode"]
+
+
+def validate_autotrade_account(creds: dict) -> tuple:
+    """Fail closed unless this key and account match the bot's order contract."""
+    ok, config = get_account_configuration(creds)
+    if not ok:
+        return False, {"reason": "config_unavailable", "detail": str(config)}
+    permissions = set(config["permissions"])
+    if config["position_mode"] != "net_mode":
+        return False, {"reason": "long_short_mode", "detail": config}
+    if "trade" not in permissions:
+        return False, {"reason": "trade_permission_missing", "detail": config}
+    if "withdraw" in permissions:
+        return False, {"reason": "withdraw_permission_present", "detail": config}
+    return True, config
 
 def get_balance(creds: dict) -> tuple:
     """(ok, total_equity_usd | error). Used for both key validation and sizing."""
