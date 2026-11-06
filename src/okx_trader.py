@@ -150,6 +150,26 @@ def round_to_tick(px: float, tick: float) -> float:
 
 # ── Account ───────────────────────────────────────────────────────────────────
 
+def get_position_mode(creds: dict) -> tuple:
+    """Return the account position mode or a parse/API error.
+
+    All entry, protection and close requests in this client use OKX net mode.
+    In long/short mode OKX requires ``posSide`` and the same request shapes are
+    rejected, so callers must check this before opening a position.
+    """
+    ok, data = _request(creds, "GET", "/api/v5/account/config")
+    if not ok:
+        return False, data
+    try:
+        if not isinstance(data, list) or not data or not isinstance(data[0], dict):
+            raise ValueError("account config response is empty")
+        mode = str(data[0].get("posMode") or "").strip()
+        if mode not in {"net_mode", "long_short_mode"}:
+            raise ValueError(f"unknown position mode: {mode or 'missing'}")
+        return True, mode
+    except (TypeError, ValueError, KeyError, AttributeError) as exc:
+        return False, f"position mode parse failed: {exc}"
+
 def get_balance(creds: dict) -> tuple:
     """(ok, total_equity_usd | error). Used for both key validation and sizing."""
     ok, data = _request(creds, "GET", "/api/v5/account/balance")

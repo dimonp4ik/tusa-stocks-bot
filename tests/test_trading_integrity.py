@@ -240,6 +240,14 @@ class ExchangeTests(unittest.TestCase):
         self.assertEqual(value['margin_usd'], 16)
         self.assertEqual(value['inst_ids'], ('AAPL-X', 'BTC-X'))
 
+    def test_position_mode_is_parsed_fail_closed(self):
+        with patch.object(okx, '_request', return_value=(True, [{'posMode': 'net_mode'}])):
+            self.assertEqual(okx.get_position_mode({}), (True, 'net_mode'))
+        with patch.object(okx, '_request', return_value=(True, [{'posMode': 'surprise'}])):
+            good, error = okx.get_position_mode({})
+        self.assertFalse(good)
+        self.assertIn('unknown position mode', error)
+
     def test_live_entry_uses_client_margin_without_strategy_resizing(self):
         from src import autotrader as at
         from contextlib import ExitStack
@@ -251,7 +259,7 @@ class ExchangeTests(unittest.TestCase):
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),
                  ('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('get_position_mode',(True,'net_mode')),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                  ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                  ('get_position_size',(True,0)),('ensure_leverage',(True,None)),
                  ('get_order_book',{'ts':at.time.time()*1000,'bids':[['99.99','1000']],
@@ -285,6 +293,8 @@ class ExchangeTests(unittest.TestCase):
                                 ('set_signal_size_mult', None), ('_dm', None)]:
                 stack.enter_context(patch.object(at, name, return_value=value))
             stack.enter_context(patch.object(
+                at.okx, 'get_position_mode', return_value=(True, 'net_mode')))
+            stack.enter_context(patch.object(
                 at.okx, 'get_balance', return_value=(True, 128)))
             stack.enter_context(patch.object(
                 at.okx, 'get_open_position_margin', return_value=(True, {
@@ -295,6 +305,26 @@ class ExchangeTests(unittest.TestCase):
             at._open_for_user(
                 dict(user_id=7, size_mode='percent', size_value=3),
                 sig, 'TEST', 'TEST')
+        order.assert_not_called()
+
+    def test_live_entry_refuses_long_short_position_mode(self):
+        from src import autotrader as at
+        from contextlib import ExitStack
+        sig = dict(id=1, symbol='TEST', direction='LONG', entry_price=100,
+                   sl=98, tp1=102, tp2=110)
+        with ExitStack() as stack:
+            for name, value in [('_creds_of', {'test': True}),
+                                ('at_has_open_position', False),
+                                ('set_bot_state', None), ('_dm', None)]:
+                stack.enter_context(patch.object(at, name, return_value=value))
+            stack.enter_context(patch.object(
+                at.okx, 'get_position_mode', return_value=(True, 'long_short_mode')))
+            balance = stack.enter_context(patch.object(at.okx, 'get_balance'))
+            order = stack.enter_context(patch.object(at.okx, 'place_market_entry'))
+            at._open_for_user(
+                dict(user_id=7, size_mode='percent', size_value=3),
+                sig, 'TEST', 'TEST')
+        balance.assert_not_called()
         order.assert_not_called()
 
     def test_client_percentage_uses_latest_balance(self):

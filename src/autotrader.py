@@ -194,6 +194,25 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                  f"повторный сигнал пропущен.")
         return
 
+    mode_ok, position_mode = okx.get_position_mode(creds)
+    if not mode_ok:
+        log.warning("autotrade position mode unavailable for %s: %s",
+                    uid, position_mode)
+        _entry_skip(
+            uid, sig, inst_id, "режим позиций OKX не удалось проверить",
+            f"⚠️ Автотрейдинг: {disp} пропущен — не удалось проверить режим "
+            "позиций OKX. Бот отказался от входа для безопасности.")
+        return
+    if position_mode != "net_mode":
+        log.warning("autotrade unsupported position mode for %s: %s",
+                    uid, position_mode)
+        _entry_skip(
+            uid, sig, inst_id, f"неподдерживаемый режим позиций: {position_mode}",
+            f"⚠️ Автотрейдинг: {disp} пропущен — аккаунт OKX работает в "
+            "режиме Long/Short. Закрой открытые позиции и переключи режим "
+            "позиций на Net (односторонний), затем следующий сигнал сможет открыться.")
+        return
+
     ok, balance = okx.get_balance(creds)
     if not ok:
         log.warning(f"autotrade balance failed for {uid}: {balance}")
