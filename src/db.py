@@ -1686,9 +1686,9 @@ def record_signal_execution_book(signal_id: int, *, spread_bps: float,
                                  depth_usd: float, imbalance: float) -> bool:
     """Attach the first real pre-entry X-Perp book to its published setup.
 
-    The setup is linked before autotrading starts. Keep the first snapshot when
-    several users mirror the same signal so the research row has one stable,
-    causal observation rather than whichever account happened to enter last.
+    The setup is linked before autotrading starts. Replace a background
+    decision snapshot, then keep the first real execution snapshot when several
+    users mirror the same signal.
     """
     values = (float(spread_bps), float(depth_usd), float(imbalance))
     if (not signal_id or any(not math.isfinite(value) for value in values)
@@ -1701,16 +1701,14 @@ def record_signal_execution_book(signal_id: int, *, spread_bps: float,
                SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
                    book_sample_kind='live_execution', book_observed_ts=?
              WHERE signal_id=?
-               AND book_spread_bps IS NULL
-               AND book_depth_usd IS NULL
-               AND book_imbalance IS NULL
+               AND COALESCE(book_sample_kind, '') != 'live_execution'
         """, (*values, time_mod.time(), int(signal_id)))
         return bool(cur.rowcount)
 
 
 def record_setup_decision_book(setup_id: int, *, spread_bps: float,
                                depth_usd: float, imbalance: float) -> bool:
-    """Attach a public decision-time book to a paper or rejected setup."""
+    """Attach a public decision-time book unless a live fill already won."""
     values = (float(spread_bps), float(depth_usd), float(imbalance))
     if (not setup_id or any(not math.isfinite(value) for value in values)
             or values[0] < 0 or values[1] <= 0
@@ -1722,11 +1720,74 @@ def record_setup_decision_book(setup_id: int, *, spread_bps: float,
                SET book_spread_bps=?, book_depth_usd=?, book_imbalance=?,
                    book_sample_kind='decision_snapshot', book_observed_ts=?
              WHERE id=?
+               AND COALESCE(book_sample_kind, '') != 'live_execution'
                AND book_spread_bps IS NULL
                AND book_depth_usd IS NULL
                AND book_imbalance IS NULL
         """, (*values, time_mod.time(), int(setup_id)))
         return bool(cur.rowcount)
+
+
+def get_book_factor_stats(since_ts: float = 0.0) -> dict:
+    """Summarize causal order-book coverage and resolved outcome buckets."""
+    with _conn() as c:
+        total = c.execute("""
+            SELECT COUNT(*) FROM setup_log
+             WHERE ts >= ? AND COALESCE(source, '') != 'backtest'
+        """, (float(since_ts),)).fetchone()[0]
+        rows = [dict(row) for row in c.execute("""
+            SELECT direction, resolved, net_r, book_spread_bps,
+                   book_depth_usd, book_imbalance, book_sample_kind
+              FROM setup_log
+             WHERE ts >= ? AND COALESCE(source, '') != 'backtest'
+               AND book_spread_bps IS NOT NULL
+               AND book_depth_usd IS NOT NULL
+               AND book_imbalance IS NOT NULL
+        """, (float(since_ts),)).fetchall()]
+
+    def median(values: list[float]) -> float | None:
+        values = sorted(values)
+        if not values:
+            return None
+        middle = len(values) // 2
+        return (values[middle] if len(values) % 2
+                else (values[middle - 1] + values[middle]) / 2)
+
+    def summarize(group: list[dict]) -> dict:
+        directional = [
+            float(row["book_imbalance"])
+            * (1.0 if str(row.get("direction")) == "LONG" else -1.0)
+            for row in group
+        ]
+        returns = [float(row["net_r"]) for row in group
+                   if row.get("net_r") is not None]
+        return {
+            "n": len(group),
+            "median_spread_bps": median([
+                float(row["book_spread_bps"]) for row in group]),
+            "median_depth_usd": median([
+                float(row["book_depth_usd"]) for row in group]),
+            "median_directional_imbalance": median(directional),
+            "mean_net_r": (sum(returns) / len(returns) if returns else None),
+        }
+
+    resolved = [row for row in rows
+                if int(row.get("resolved") or 0) == 1
+                and row.get("net_r") is not None]
+    kinds = {}
+    for row in rows:
+        kind = str(row.get("book_sample_kind") or "unlabeled")
+        kinds[kind] = int(kinds.get(kind, 0)) + 1
+    return {
+        "total": int(total), "sampled": len(rows), "kinds": kinds,
+        "resolved": summarize(resolved),
+        "positive": summarize([row for row in resolved
+                               if float(row["net_r"]) > 0]),
+        "negative": summarize([row for row in resolved
+                               if float(row["net_r"]) < 0]),
+        "flat": summarize([row for row in resolved
+                           if float(row["net_r"]) == 0]),
+    }
 
 
 _SIGNAL_STATUS_TO_OUTCOME = {

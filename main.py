@@ -90,7 +90,7 @@ from src.db import (
     get_recent_signals,
     get_today_realized_r, get_signal_by_id,
     get_route_live_readiness,
-    record_setup_decision_book,
+    record_setup_decision_book, get_book_factor_stats,
 )
 from src import autotrader
 from src.keystore import keystore_ready, encrypt_secret
@@ -240,6 +240,32 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         A("  unit R не использует старые внутренние size_mult: размер задаёт клиент")
         A("  доходность сделки = маржа% × плечо × unit_R × |вход-стоп| / вход")
         A("  доходность окна и max DD считаются последовательным реинвестированием")
+        A("")
+
+        A(f"## СТАКАН В МОМЕНТ РЕШЕНИЯ ({window_label})")
+        try:
+            _books = get_book_factor_stats(since_ts)
+            _total = int(_books.get("total") or 0)
+            _sampled = int(_books.get("sampled") or 0)
+            _coverage = 100 * _sampled / _total if _total else 0.0
+            A(f"  покрытие: {_sampled}/{_total} ({_coverage:.1f}%); "
+              f"типы {json.dumps(_books.get('kinds') or {}, ensure_ascii=False, sort_keys=True)}")
+            for _key, _title in (("positive", "прибыльные"),
+                                 ("negative", "убыточные"),
+                                 ("flat", "нулевые")):
+                _b = _books.get(_key) or {}
+                if not _b.get("n"):
+                    A(f"  {_title}: данных пока нет")
+                    continue
+                A(f"  {_title}: n={_b['n']} · медиана спреда "
+                  f"{_b['median_spread_bps']:.2f} бп · глубина "
+                  f"${_b['median_depth_usd']:,.0f} · дисбаланс по направлению "
+                  f"{_b['median_directional_imbalance']:+.3f} · "
+                  f"средний итог {_b['mean_net_r']:+.3f}R")
+            if int((_books.get("resolved") or {}).get("n") or 0) < 30:
+                A("  выборка меньше 30 исходов: это диагностика, торговый фильтр ещё не разрешён")
+        except Exception as _book_exc:
+            A(f"  ошибка расчёта: {_book_exc}")
         A("")
 
         # Same-named windows print the same block twice: when the report's own
@@ -3904,8 +3930,9 @@ def _record_candidate_decision_books(
         candidates: list[tuple[dict, int]]) -> None:
     """Collect public books for PAPER and rejected candidates after publishing.
 
-    Live published signals are left to the account thread, which records the
-    exact executable pre-entry book. This post-publish path cannot delay entry.
+    The account thread may later replace this with the exact executable
+    pre-entry book after a protected fill. Recording every decision first keeps
+    skipped live entries measurable without delaying entry.
     """
     if not candidates:
         return
@@ -3915,9 +3942,6 @@ def _record_candidate_decision_books(
         log.warning("Decision-book instrument map unavailable: %s", exc)
         return
     for analysis, setup_id in candidates:
-        if (analysis.get("_signal_id")
-                and not analysis.get("_shadow_only", True)):
-            continue
         symbol = str(analysis.get("symbol") or "")
         base = symbol[:-4] if symbol.endswith("USDT") else symbol
         inst_id = instruments.get(base)
