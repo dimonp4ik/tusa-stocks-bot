@@ -1,5 +1,5 @@
 import unittest
-from src.execution_guard import execution_quote
+from src.execution_guard import execution_quote, order_book_snapshot
 
 class ExecutionGuardTests(unittest.TestCase):
     def book(self):return {'ts':10000,'bids':[[99.99,2],[99.98,3]],'asks':[[100.01,2],[100.02,3]]}
@@ -25,3 +25,11 @@ class ExecutionGuardTests(unittest.TestCase):
     def test_depth_slippage_rejected_even_with_tight_top_spread(self):
         b=self.book();b['asks']=[[100.01,1],[101,10]]
         with self.assertRaises(ValueError):execution_quote(b,'LONG',2,11000)
+
+    def test_snapshot_converts_contract_depth_to_usd_and_imbalance(self):
+        snap = order_book_snapshot(self.book(), .01)
+        bid = (99.99 * 2 + 99.98 * 3) * .01
+        ask = (100.01 * 2 + 100.02 * 3) * .01
+        self.assertAlmostEqual(snap.spread_bps, 2.0)
+        self.assertAlmostEqual(snap.depth_usd, bid + ask)
+        self.assertAlmostEqual(snap.imbalance, (bid - ask) / (bid + ask))

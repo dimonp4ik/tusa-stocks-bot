@@ -11,6 +11,52 @@ class ExecutionQuote:
     slippage_fraction: float
 
 
+@dataclass(frozen=True)
+class OrderBookSnapshot:
+    spread_bps: float
+    depth_usd: float
+    imbalance: float
+
+
+def order_book_snapshot(book, contract_value):
+    """Summarise the already-fetched execution book for forward diagnostics.
+
+    OKX X-Perp quantities are contracts, so visible USD depth is
+    ``price * contracts * ctVal``. This performs no network I/O and stays
+    separate from the execution gate: an audit write must never decide whether
+    an otherwise valid market order is sent.
+    """
+    ct_val = float(contract_value)
+    if not math.isfinite(ct_val) or ct_val <= 0:
+        raise ValueError('invalid contract value')
+    sides = {}
+    for key in ('bids', 'asks'):
+        levels = [(float(row[0]), float(row[1])) for row in book[key]]
+        if not levels or any(
+                not math.isfinite(price) or not math.isfinite(quantity)
+                or price <= 0 or quantity <= 0
+                for price, quantity in levels):
+            raise ValueError('invalid depth')
+        sides[key] = levels
+    bid = sides['bids'][0][0]
+    ask = sides['asks'][0][0]
+    if ask <= bid:
+        raise ValueError('crossed order book')
+    midpoint = (ask + bid) / 2.0
+    bid_usd = sum(price * quantity * ct_val
+                  for price, quantity in sides['bids'])
+    ask_usd = sum(price * quantity * ct_val
+                  for price, quantity in sides['asks'])
+    total = bid_usd + ask_usd
+    if not math.isfinite(total) or total <= 0:
+        raise ValueError('empty notional depth')
+    return OrderBookSnapshot(
+        spread_bps=(ask - bid) / midpoint * 10_000.0,
+        depth_usd=total,
+        imbalance=(bid_usd - ask_usd) / total,
+    )
+
+
 def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=3000,
                     max_spread=.0005, max_slippage=.0005):
     if direction not in ('LONG','SHORT'):raise ValueError('invalid direction')

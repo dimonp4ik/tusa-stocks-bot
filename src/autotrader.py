@@ -56,6 +56,7 @@ from src.db import (
     get_signal_by_id,
     get_route_live_readiness,
     set_signal_size_mult,
+    record_signal_execution_book,
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
@@ -137,6 +138,26 @@ def _margin_for(u: dict, balance: float) -> float:
 _entry_locks = defaultdict(threading.Lock)
 
 
+def _entry_skip(user_id: int, sig: dict, inst_id: str, reason: str,
+                message: str | None = None) -> None:
+    """Persist a user-visible reason whenever a published signal cannot open."""
+    payload = {
+        "ts": time.time(),
+        "signal_id": sig.get("id"),
+        "symbol": sig.get("symbol"),
+        "direction": sig.get("direction"),
+        "inst_id": inst_id,
+        "reason": reason,
+    }
+    try:
+        set_bot_state(f"autotrade_last_skip:{user_id}", json.dumps(payload))
+    except Exception as exc:
+        log.warning("autotrade skip audit failed %s %s: %s",
+                    user_id, sig.get("id"), exc)
+    if message:
+        _dm(user_id, message)
+
+
 def _entry_client_order_id(user_id: int, sig: dict, inst_id: str) -> str:
     """Stable 32-char OKX id for recovering a lost market-order response."""
     material = "|".join((
@@ -156,6 +177,10 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     uid = u["user_id"]
     creds = _creds_of(u)
     if not creds:
+        _entry_skip(
+            uid, sig, inst_id, "API-ключи не удалось расшифровать",
+            f"⚠️ Автотрейдинг: {disp} пропущен — не удалось прочитать "
+            "подключённые API-ключи. Открой настройки и замени ключи.")
         return
 
     # One instrument, one position. A second entry on the same instId cannot be
@@ -178,7 +203,6 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     try:
         state_key = f"risk_guard:{uid}"
         state = json.loads(get_bot_state(state_key) or '{}')
-        previous_block = state.get('last_block')
         previous_balance = float(u.get('last_balance') or 0)
         peak_floor = max(previous_balance, AUTOTRADE_EQUITY_PEAK_FLOOR)
         state, blocked = equity_guard(state, equity=balance,
@@ -188,14 +212,19 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         state["last_block"] = blocked
         set_bot_state(state_key, json.dumps(state))
         if blocked:
-            if blocked != previous_block:
-                _dm(uid, "Автотрейдинг: новые входы приостановлены по лимиту потерь. "
-                         "Открытые позиции продолжают сопровождаться. "
-                         "Причина: " + blocked)
+            _entry_skip(
+                uid, sig, inst_id, f"лимит потерь: {blocked}",
+                f"⏸ Автотрейдинг: {disp} пропущен по лимиту потерь. "
+                "Открытые позиции продолжают сопровождаться. "
+                f"Причина: {blocked}")
             log.warning("autotrade risk guard %s: %s", uid, blocked)
             return
     except Exception as exc:
         log.error("autotrade risk state unavailable; entry refused: %s", exc)
+        _entry_skip(
+            uid, sig, inst_id, "проверка лимита потерь недоступна",
+            f"⚠️ Автотрейдинг: {disp} пропущен — временно не удалось "
+            "проверить лимит потерь. Бот отказался от входа для безопасности.")
         return
 
     # The client owns position sizing. Strategy/regime fields may decide
@@ -208,6 +237,10 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                     sig.get("id"), _sm_err)
     margin = _margin_for(u, balance)
     if margin <= 0:
+        _entry_skip(
+            uid, sig, inst_id, "неверно задан процент сделки",
+            f"⚠️ Автотрейдинг: {disp} пропущен — процент сделки не задан "
+            "или находится вне диапазона 1–10%. Проверь настройки.")
         return
     if margin > balance:
         _dm(uid, f"⚠️ Автотрейдинг: на балансе ${balance:.2f} меньше, чем размер сделки ${margin:.2f} — {disp} пропущен.")
@@ -271,6 +304,18 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         distance = abs(planned-original_sl)*max(1.,STOP_EXCHANGE_BACKSTOP_R)
     except (TypeError, ValueError, KeyError) as exc:
         log.warning("autotrade risk validation refused %s: %s", inst_id, exc)
+        detail = str(exc)
+        friendly = {
+            "current exchange price or contract specification unavailable":
+                "биржа не отдала актуальную цену или параметры контракта",
+            "exchange instrument is not confirmed flat":
+                "по инструменту уже есть позиция либо биржа не подтвердила нулевой остаток",
+            "entry has crossed the original stop or first target":
+                "цена уже вышла за диапазон между стопом и TP1",
+        }.get(detail, "вход не прошёл проверку цены и риска")
+        _entry_skip(
+            uid, sig, inst_id, friendly,
+            f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")
         return
     sz = okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, px, spec or {})
     if sz <= 0:
@@ -294,7 +339,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     # Refresh executable depth after leverage setup; last-trade prices may be stale.
-    from src.execution_guard import execution_quote
+    from src.execution_guard import execution_quote, order_book_snapshot
+    book_snapshot = None
     try:
         book = okx.get_order_book(inst_id)
         if not book:
@@ -307,7 +353,27 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         px = quote.average
     except (TypeError, ValueError, KeyError, IndexError) as exc:
         log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
+        detail = str(exc)
+        friendly = {
+            "order book unavailable": "стакан OKX недоступен",
+            "stale order book": "стакан OKX устарел",
+            "spread exceeds limit": "спред в стакане слишком широкий",
+            "insufficient displayed depth": "в стакане недостаточно объёма",
+            "depth slippage exceeds limit": "ожидаемое проскальзывание слишком большое",
+            "executable price outside signal bracket":
+                "исполняемая цена уже вышла за диапазон сигнала",
+        }.get(detail, "стакан или исполняемая цена не прошли проверку")
+        _entry_skip(
+            uid, sig, inst_id, friendly,
+            f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")
         return
+
+    try:
+        book_snapshot = order_book_snapshot(book, spec["ctVal"])
+    except (TypeError, ValueError, KeyError, IndexError) as exc:
+        # The book already passed the execution gate. Losing a diagnostic must
+        # never turn a valid entry into a skipped trade.
+        log.warning("autotrade book snapshot unavailable %s: %s", inst_id, exc)
 
     client_order_id = _entry_client_order_id(uid, sig, inst_id)
     try:
@@ -513,6 +579,20 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             f"ошибка: `{_db_err}`",
         ]))
         raise
+    # Diagnostics come strictly after the live fill has both exchange protection
+    # and durable OPEN tracking. SQLite must never delay the protective OCO.
+    if book_snapshot is not None:
+        try:
+            recorded = record_signal_execution_book(
+                sig["id"], spread_bps=book_snapshot.spread_bps,
+                depth_usd=book_snapshot.depth_usd,
+                imbalance=book_snapshot.imbalance)
+            if not recorded:
+                log.info("autotrade book snapshot had no linked setup for signal %s",
+                         sig.get("id"))
+        except Exception as exc:
+            log.warning("autotrade book snapshot write failed signal %s: %s",
+                        sig.get("id"), exc)
     lev = AUTOTRADE_LEVERAGE
     # Report what was actually BOUGHT, not what was requested. Size is in
     # contracts and OKX floors to lotSz, so the real notional is
