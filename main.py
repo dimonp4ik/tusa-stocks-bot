@@ -4025,6 +4025,7 @@ def _run_native_xperp_shadow_scan() -> None:
         log.warning("Native X-Perp shadow paused for the New York day after "
                     "an illiquid premarket crash regime")
         return
+    scan_started = time.monotonic()
     available = set(get_xperp_instruments())
     targets = sorted(
         symbol for symbol in NATIVE_XPERP_SYMBOLS
@@ -4060,9 +4061,15 @@ def _run_native_xperp_shadow_scan() -> None:
                 log.warning("Native X-Perp candle fetch failed: %s", exc)
 
     now = time.time()
+    fetch_finished = time.monotonic()
     strategy_audit = {}
     setups = native_shadow_setups(
         fetched, now=now, diagnostics=strategy_audit)
+    strategy_audit["timing"] = {
+        "load_seconds": round(fetch_finished - scan_started, 3),
+        "setup_seconds": round(time.monotonic() - fetch_finished, 3),
+        "setup_ready_at": time.time(),
+    }
     if strategy_audit.get("premarket_regime_trigger"):
         regime_day = str(strategy_audit["premarket_regime_new_york_day"])
         set_bot_state(_NATIVE_XPERP_PREMARKET_REGIME_DAY_KEY, regime_day)
