@@ -3102,6 +3102,10 @@ def _check_open_signals():
             df_all = get_klines_xperp(
                 sig["symbol"], limit=candle_lim, include_forming=True,
                 interval=interval)
+            if not df_all and _is_native_xperp_signal(sig):
+                log.warning("Native exit data unavailable for %s; retrying on OKX",
+                            sig["symbol"])
+                continue
             if not df_all:
                 df_all = (get_klines(sig["symbol"], interval="5m",
                                      limit=candle_lim, interval_sec=300,

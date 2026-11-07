@@ -622,3 +622,17 @@ def test_route_live_readiness_requires_full_positive_recent_window():
                 "stock_xperp_native_shadow", 20)
             assert not unhealthy["ready"]
             assert unhealthy["total_r"] == -20
+
+
+def test_native_monitor_does_not_use_other_venue_when_okx_is_unavailable():
+    signal = {"id": 1, "symbol": "TESTUSDT", "opened_at": 1_999_999_900,
+              "source": "stock_xperp_native_shadow", "strategy_bar_seconds": 60}
+    with patch.object(main.time, "time", return_value=2_000_000_000), \
+            patch.object(main, "get_open_signals", return_value=[signal]), \
+            patch.object(main, "get_klines_xperp", return_value={}) as native, \
+            patch.object(main, "get_klines") as fallback, \
+            patch.object(main, "update_signal_status") as update:
+        main._check_open_signals()
+    assert native.call_args.kwargs["interval"] == "1m"
+    fallback.assert_not_called()
+    update.assert_not_called()
