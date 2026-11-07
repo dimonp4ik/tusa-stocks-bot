@@ -436,15 +436,19 @@ def place_protection_oco(creds: dict, inst_id: str, direction: str,
         "tpTriggerPxType": "last",
         "tpOrdPx":         "-1",
     })
+    return _algo_placement_result(ok, data)
+
+
+def _algo_placement_result(ok: bool, data) -> tuple:
     if not ok:
         return False, data
     if (not isinstance(data, list) or len(data) != 1
             or not isinstance(data[0], dict)
             or str(data[0].get("sCode")) != "0"):
-        return False, "unconfirmed protection acknowledgement"
+        return False, "unconfirmed algo order acknowledgement"
     algo_id = data[0].get("algoId")
     if not isinstance(algo_id, str) or not algo_id.strip():
-        return False, "protection acknowledgement missing algoId"
+        return False, "algo order acknowledgement missing algoId"
     return True, algo_id
 
 
@@ -464,24 +468,10 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
         "reduceOnly":  "true",
         "sz":          _fmt_sz(sz),
         "tpTriggerPx": _fmt_px(tp1_px),
+        "tpTriggerPxType": "last",
         "tpOrdPx":     "-1",
     })
-    if not ok:
-        return False, data
-    try:
-        algo_id = data[0].get("algoId")
-        if not algo_id:
-            raise ValueError("missing algoId")
-        return True, algo_id
-    except Exception as e:
-        # The exchange call itself SUCCEEDED (outer code 0) - only pulling
-        # the id out of the response failed. Keeping True is right: the
-        # order exists. But an empty id means this order can never be
-        # amended or cancelled again, which for a protection order means
-        # its trail silently freezes for the life of the trade. Should not
-        # be reachable; say so loudly if it ever is.
-        _log.error(f"OKX response parsed empty, order id lost: {e}")
-        return True, ""
+    return _algo_placement_result(ok, data)
 
 
 def amend_protection_sl(creds: dict, inst_id: str, algo_id: str, new_sl_px: float) -> tuple:

@@ -244,6 +244,14 @@ class ExchangeTests(unittest.TestCase):
                 self.assertEqual(okx.amend_protection_sl(
                     {}, "TEST", "123", 100)[0], accepted)
 
+    def test_tp1_placement_uses_last_price_and_requires_confirmation(self):
+        with patch.object(okx, "_request",
+                          return_value=(True, [{"algoId": "123"}])) as request:
+            self.assertFalse(okx.place_tp1_partial({}, "TEST", "LONG", 110, 1)[0])
+            body = request.call_args.kwargs["body"]
+            self.assertEqual(body["tpTriggerPxType"], "last")
+            self.assertEqual(body["tpOrdPx"], "-1")
+
     def test_oco_placement_requires_order_id_and_success_code(self):
         for rows, expected in [
                 ([], False), ([{"algoId": "", "sCode": "0"}], False),
