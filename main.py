@@ -706,15 +706,18 @@ def _native_scan_status_text() -> str:
                        + ("\nПоследние исходы: " + "; ".join(closed_parts)
                           if closed_parts else ""))
         timing = (row.get("strategy") or {}).get("timing") or {}
+        if not timing:
+            timing = json.loads(get_bot_state("native_scan_last_timing") or "{}")
         timing_text = ""
-        if timing:
+        if {"load_seconds", "setup_seconds", "setup_ready_at"} <= timing.keys():
             load = float(timing["load_seconds"])
             setup = float(timing["setup_seconds"])
             ready = float(timing["setup_ready_at"])
             offset = ready - int(ready // 900) * 900
             timing_text = (
                 f"\nScan timing: load {load:.2f}s, setup {setup:.2f}s, "
-                f"ready +{offset:.2f}s after quarter-hour"
+                f"ready +{offset:.2f}s after quarter-hour "
+                f"({max(0, int((now - ready) / 60))} min ago)"
             )
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
@@ -4012,6 +4015,9 @@ def _persist_native_scan_audit(payload: dict) -> None:
     """Keep the latest scan explainable after a worker restart or quiet week."""
     try:
         set_bot_state("native_scan_audit", json.dumps(payload, ensure_ascii=False))
+        timing = (payload.get("strategy") or {}).get("timing")
+        if {"load_seconds", "setup_seconds", "setup_ready_at"} <= timing.keys():
+            set_bot_state("native_scan_last_timing", json.dumps(timing))
     except Exception as exc:
         log.warning("Native scan audit persistence failed: %s", exc)
 
