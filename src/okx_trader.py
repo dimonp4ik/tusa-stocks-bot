@@ -269,17 +269,19 @@ def get_open_position_margin(creds: dict) -> tuple:
     # is still visible in either the order list or the position snapshot.
     ok, orders = _request(
         creds, "GET", "/api/v5/trade/orders-pending",
-        params={"instType": "FUTURES", "limit": "100"},
+        params={"limit": "100"},
     )
     if not ok:
         return False, orders
     if not isinstance(orders, list) or len(orders) >= 100:
-        return False, "pending futures orders response invalid or incomplete"
+        return False, "pending account orders response invalid or incomplete"
     for order in orders:
         if not isinstance(order, dict):
-            return False, "pending futures order response invalid"
+            return False, "pending account order response invalid"
+        if order.get("instType") == "SPOT":
+            continue
         if str(order.get("reduceOnly")).lower() != "true":
-            return False, "pending futures entry occupies unconfirmed account capacity"
+            return False, "pending leveraged entry occupies unconfirmed account capacity"
     ok, data = _request(creds, "GET", "/api/v5/account/positions")
     if not ok:
         return False, data

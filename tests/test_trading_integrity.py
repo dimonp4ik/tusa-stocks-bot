@@ -280,8 +280,9 @@ class ExchangeTests(unittest.TestCase):
                 if expected:
                     self.assertEqual(result, "123")
 
-    def test_pending_futures_entry_blocks_capacity_check(self):
-        for orders in ([{"reduceOnly": "false"}], [{}], [None],
+    def test_pending_leveraged_entry_blocks_capacity_check(self):
+        for orders in ([{"instType": "FUTURES", "reduceOnly": "false"}],
+                       [{"instType": "SWAP", "reduceOnly": "false"}], [{}], [None],
                        [{"reduceOnly": "true"}] * 100):
             with self.subTest(orders=len(orders)), patch.object(
                     okx, "_request", return_value=(True, orders)) as request:
@@ -289,7 +290,7 @@ class ExchangeTests(unittest.TestCase):
                 self.assertFalse(allowed)
                 request.assert_called_once_with(
                     {}, "GET", "/api/v5/trade/orders-pending",
-                    params={"instType": "FUTURES", "limit": "100"})
+                    params={"limit": "100"})
 
     def test_exchange_position_margin_uses_conservative_estimate(self):
         rows = [
@@ -300,7 +301,8 @@ class ExchangeTests(unittest.TestCase):
             {'instId':'FLAT-X','pos':'0'},
         ]
         with patch.object(okx, '_request', side_effect=[
-                (True, [{'reduceOnly': 'true'}]), (True, rows)]):
+                (True, [{'reduceOnly': 'true'}, {'instType': 'SPOT'}]),
+                (True, rows)]):
             good, value = okx.get_open_position_margin({})
         self.assertTrue(good)
         self.assertEqual(value['margin_usd'], 16)
