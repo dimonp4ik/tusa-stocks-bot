@@ -308,6 +308,14 @@ class ExchangeTests(unittest.TestCase):
         self.assertEqual(value['margin_usd'], 16)
         self.assertEqual(value['inst_ids'], ('AAPL-X', 'BTC-X'))
 
+    def test_okx_identity_uses_subaccount_uid_not_main_uid(self):
+        with patch.object(okx, "_request", return_value=(True, [{
+                "posMode": "net_mode", "perm": "read_only,trade",
+                "uid": "123", "mainUid": "456"}])):
+            ok, config = okx.validate_autotrade_account({})
+        self.assertTrue(ok)
+        self.assertEqual(config["account_uid"], "123")
+
     def test_position_mode_is_parsed_fail_closed(self):
         with patch.object(okx, '_request', return_value=(True, [{
                 'posMode': 'net_mode', 'perm': 'read_only,trade'}])):
@@ -480,7 +488,7 @@ class DatabaseTests(unittest.TestCase):
                 db.init_db()
                 intent_id = db.at_create_entry_intent(
                     11, 7, 'TEST-X', 'LONG', .02, 100, 3, 94,
-                    'client-order-123')
+                    'client-order-123', account_key='okx-account-test')
                 self.assertGreater(intent_id, 0)
                 self.assertEqual(db.at_create_entry_intent(
                     11, 7, 'TEST-X', 'LONG', .02, 100, 3, 94,
@@ -494,6 +502,7 @@ class DatabaseTests(unittest.TestCase):
                     tp1_algo_id='tp1-1', tp1_sz=.009))
                 active = db.at_all_open_positions()[0]
                 self.assertEqual(active['status'], 'OPEN')
+                self.assertEqual(active['account_key'], 'okx-account-test')
                 self.assertEqual(active['sl_algo_id'], 'stop-1')
                 self.assertEqual(active['tp1_algo_id'], 'tp1-1')
                 self.assertAlmostEqual(active['sz'], .019)

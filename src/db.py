@@ -459,6 +459,7 @@ def init_db():
         _ensure_column(c, "autotrade_positions", "tp1_algo_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
         _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
+        _ensure_column(c, "autotrade_positions", "account_key", "TEXT")
         c.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS idx_autotrade_client_order
             ON autotrade_positions(user_id, client_order_id)
@@ -2492,17 +2493,17 @@ def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
 def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
                            direction: str, sz: float, entry_px: float,
                            margin_usd: float, sl_px: float,
-                           client_order_id: str) -> int:
+                           client_order_id: str, *, account_key: str | None = None) -> int:
     """Persist an idempotent intent before any real order reaches OKX."""
     with _conn() as c:
         cur = c.execute("""
             INSERT OR IGNORE INTO autotrade_positions
                 (signal_id, user_id, inst_id, direction, sz, entry_px,
                  margin_usd, sl_algo_id, sl_px, status, opened_at,
-                 client_order_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 'ENTRY_PENDING', ?, ?)
+                 client_order_id, account_key)
+            VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 'ENTRY_PENDING', ?, ?, ?)
         """, (signal_id, user_id, inst_id, direction, sz, entry_px,
-              margin_usd, sl_px, time_mod.time(), client_order_id))
+              margin_usd, sl_px, time_mod.time(), client_order_id, account_key))
         return int(cur.lastrowid or 0)
 
 

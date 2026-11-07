@@ -223,6 +223,10 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             message + " Бот отказался от входа для безопасности.")
         return
 
+    account_uid = account_check.get("account_uid")
+    account_key = (hashlib.sha256(f"okx:{account_uid}".encode("ascii")).hexdigest()
+                   if account_uid else None)
+
     ok, balance = okx.get_balance(creds)
     if not ok:
         log.warning(f"autotrade balance failed for {uid}: {balance}")
@@ -291,7 +295,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # A visible partial fill may still have an unresolved entry intent.
     unresolved = [
         row for row in at_all_open_positions()
-        if row["user_id"] == uid
+        if (row["user_id"] == uid
+            or (account_key and row.get("account_key") == account_key))
         and (row.get("status") == "ENTRY_PENDING"
              or row["inst_id"] not in account_positions["inst_ids"])
     ]
@@ -422,7 +427,7 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     try:
         intent_id = at_create_entry_intent(
             sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
-            float(sig["sl"]), client_order_id)
+            float(sig["sl"]), client_order_id, account_key=account_key)
     except Exception as intent_error:
         log.error("autotrade entry intent failed %s %s: %s",
                   uid, inst_id, intent_error)

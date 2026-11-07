@@ -168,7 +168,9 @@ def get_account_configuration(creds: dict) -> tuple:
             value.strip() for value in str(data[0].get("perm") or "").split(",")
             if value.strip()
         }))
-        return True, {"position_mode": mode, "permissions": permissions}
+        uid = str(data[0].get("uid") or "").strip()
+        return True, {"position_mode": mode, "permissions": permissions,
+                      "account_uid": uid if uid.isascii() and uid.isdecimal() else None}
     except (TypeError, ValueError, KeyError, AttributeError) as exc:
         return False, f"account configuration parse failed: {exc}"
 
