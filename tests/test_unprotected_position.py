@@ -29,6 +29,33 @@ class UnprotectedPositionTests(unittest.TestCase):
         create.assert_called_once()
         activate.assert_not_called()
 
+    def test_invisible_pending_entry_reserves_position_slot(self):
+        spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
+        sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+        with ExitStack() as stack:
+            for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
+                ('at_set_balance',None),('get_bot_state',None),
+                ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
+                stack.enter_context(patch.object(at,name,return_value=value))
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+                ('get_open_position_margin',(True,{'margin_usd':0,'count':10,'inst_ids':()})),
+                ('ensure_leverage',(True,None)),
+                ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
+                ('place_market_entry',(False,'request failed: timed out')),
+                ('get_order_by_client_id',(False,'not found'))]:
+                stack.enter_context(patch.object(at.okx,name,return_value=value))
+            stack.enter_context(patch.object(
+                at.okx,'get_position_size',side_effect=[(True,0),(True,0)]))
+            stack.enter_context(patch.object(at, 'at_all_open_positions',
+                return_value=[dict(user_id=7, inst_id='PENDING', margin_usd=4)]))
+            stack.enter_context(patch.object(at, 'AUTOTRADE_MAX_ACCOUNT_POSITIONS', 12))
+            stack.enter_context(patch.object(at, 'AUTOTRADE_ACCOUNT_WRITER_COUNT', 2))
+            create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
+            activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
+            at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
+        create.assert_not_called()
+        activate.assert_not_called()
+
     def test_lost_market_response_recovers_order_and_places_protection(self):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
