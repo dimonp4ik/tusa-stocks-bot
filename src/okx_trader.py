@@ -495,10 +495,21 @@ def amend_protection_sl(creds: dict, inst_id: str, algo_id: str, new_sl_px: floa
 def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
     ok, data = _request(creds, "POST", "/api/v5/trade/cancel-algos",
                         body=[{"instId": inst_id, "algoId": algo_id}])
-    # Already triggered/cancelled → treat as done
-    if not ok and any(s in str(data).lower() for s in ("not exist", "canceled", "cancelled", "state")):
+    accepted, order = _algo_placement_result(ok, data)
+    if accepted and order == algo_id:
         return True, data
-    return ok, data
+
+    # A triggered or already cancelled algo may reject the cancel request.
+    # Confirm its exact state rather than matching error-message substrings.
+    found, details = _request(creds, "GET", "/api/v5/trade/order-algo",
+                              params={"algoId": algo_id})
+    if (found and isinstance(details, list) and len(details) == 1
+            and isinstance(details[0], dict)):
+        row = details[0]
+        if (row.get("algoId") == algo_id and row.get("instId") == inst_id
+                and row.get("state") in {"effective", "canceled", "order_failed"}):
+            return True, row["state"]
+    return False, "algo cancellation unconfirmed" if ok else data
 
 
 def get_last_fill_px(creds: dict, inst_id: str, *, since_ts=None,

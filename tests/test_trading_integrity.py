@@ -233,6 +233,21 @@ class ExchangeTests(unittest.TestCase):
         self.assertEqual(post.call_args.kwargs["headers"]["expTime"], "1800123")
         self.assertNotIn("expTime", post.call_args.kwargs["data"])
 
+    def test_algo_cancel_needs_matching_ack_or_terminal_state(self):
+        cases = (
+            ([(True, [{"algoId": "123", "sCode": "0"}])], True),
+            ([(True, []), (False, "missing")], False),
+            ([(False, "invalid state"), (True, [
+                {"algoId": "123", "instId": "TEST", "state": "live"}])], False),
+            ([(False, "invalid state"), (True, [
+                {"algoId": "123", "instId": "TEST", "state": "effective"}])], True),
+        )
+        for responses, expected in cases:
+            with self.subTest(responses=responses), patch.object(
+                    okx, "_request", side_effect=responses):
+                self.assertEqual(okx.cancel_protection({}, "TEST", "123")[0],
+                                 expected)
+
     def test_stop_amendment_requires_matching_acknowledgement(self):
         for row, accepted in [
                 ([], False), ([{"algoId": "123"}], False),
