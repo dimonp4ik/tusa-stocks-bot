@@ -908,6 +908,11 @@ def poll_exchange_closes() -> None:
                             f"`{err}`",
                         ]))
                         continue
+                    # A close acknowledgement does not confirm flatness.
+                    # Keep the intent and protection until a later poll
+                    # sees the entry order terminal and OKX flat.
+                    if pos.get("client_order_id"):
+                        continue
                     if pos.get("sl_algo_id"):
                         okx.cancel_protection(
                             creds, pos["inst_id"], pos["sl_algo_id"])

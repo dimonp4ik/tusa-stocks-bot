@@ -156,19 +156,30 @@ class UnprotectedPositionTests(unittest.TestCase):
     def test_reconciler_closes_stale_pending_fill(self):
         pos=dict(id=2,user_id=7,inst_id='TEST',signal_id=3,
                  status='ENTRY_PENDING',opened_at=0,sl_algo_id='',
-                 tp1_algo_id=None,sz=.01)
+                 tp1_algo_id=None,sz=.01,client_order_id='entry123')
         with ExitStack() as stack:
             stack.enter_context(patch.object(at,'AUTOTRADE_ENABLED',True))
             stack.enter_context(patch.object(at,'at_all_open_positions',return_value=[pos]))
             stack.enter_context(patch.object(at,'at_get',return_value={'user_id':7}))
             stack.enter_context(patch.object(at,'_creds_of',return_value={'test':True}))
             stack.enter_context(patch.object(at,'_dm'))
-            stack.enter_context(patch.object(at.okx,'get_position_size',return_value=(True,.01)))
+            stack.enter_context(patch.object(at.okx,'get_position_size',side_effect=[(True,.01), (True,0), (True,0), (True,0)]))
             close=stack.enter_context(patch.object(at.okx,'close_position_market',return_value=(True,None)))
             record=stack.enter_context(patch.object(at,'at_close_position'))
+            lookup = stack.enter_context(patch.object(
+                at.okx, 'get_order_by_client_id',
+                side_effect=[(True, {'state': 'partially_filled'}),
+                             (True, {'state': 'filled'})]))
             at.poll_exchange_closes()
-        close.assert_called_once()
-        record.assert_called_once_with(2,'ENTRY_RECOVERY_CLOSED')
+            close.assert_called_once()
+            record.assert_not_called()
+            lookup.assert_not_called()
+
+            at.poll_exchange_closes()
+            record.assert_not_called()
+
+            at.poll_exchange_closes()
+        record.assert_called_once_with(2, 'ENTRY_TERMINAL_FLAT')
 
     def test_reconciler_retires_stale_pending_nonfill(self):
         pos=dict(id=2,user_id=7,inst_id='TEST',signal_id=3,
