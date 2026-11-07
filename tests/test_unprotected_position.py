@@ -12,7 +12,11 @@ class UnprotectedPositionTests(unittest.TestCase):
     def test_market_entry_expires_after_intent_before_submit(self):
         self._check_market_submission(True)
 
-    def _check_market_submission(self, expired):
+    def test_expired_account_snapshot_blocks_market_submission(self):
+        with patch.object(at.time, "monotonic", side_effect=[100, 116]):
+            self._check_market_submission(False, stale_snapshot=True)
+
+    def _check_market_submission(self, expired, stale_snapshot=False):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         if expired:
@@ -43,6 +47,9 @@ class UnprotectedPositionTests(unittest.TestCase):
         if expired:
             place.assert_not_called()
             close.assert_called_once_with(91, "ENTRY_EXPIRED")
+        elif stale_snapshot:
+            place.assert_not_called()
+            close.assert_called_once_with(91, "ENTRY_SNAPSHOT_EXPIRED")
         else:
             place.assert_called_once()
             close.assert_not_called()

@@ -84,6 +84,7 @@ _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
 # this costs at most one extra cycle of notification latency on a real close.
 _CLOSE_CONFIRM_MIN_AGE_SEC = 90
 _ENTRY_PENDING_GRACE_SEC = 90
+_ACCOUNT_SNAPSHOT_MAX_AGE_SEC = 15
 
 
 def _dm(user_id: int, text: str) -> None:
@@ -278,6 +279,7 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # Refuse on read/parse failure: proceeding would make the 90% account cap a
     # guess. Reserve one same-sized peer entry so simultaneous crypto + stock
     # decisions cannot both pass from an 87%-occupied snapshot and reach 93%.
+    account_snapshot_started = time.monotonic()
     margin_ok, account_positions = okx.get_open_position_margin(creds)
     if not margin_ok:
         log.warning("autotrade account margin unavailable for %s: %s",
@@ -443,6 +445,11 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             return
         if entry_bar:
             deadline_ms = int((float(entry_bar) + MAX_SIGNAL_AGE_SECONDS) * 1000)
+    if time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC:
+        at_close_position(intent_id, "ENTRY_SNAPSHOT_EXPIRED")
+        _entry_skip(uid, sig, inst_id, "данные общего счёта устарели",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — данные общего счёта устарели.")
+        return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id,
         deadline_ms=deadline_ms)
