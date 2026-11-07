@@ -2432,13 +2432,23 @@ def at_get_active_traders() -> list:
 
 
 def at_set_keys(user_id: int, api_key_enc: str, api_secret_enc: str,
-                passphrase_enc: str) -> None:
+                passphrase_enc: str, *, account_key: str | None = None) -> bool:
     with _conn() as c:
+        c.execute("BEGIN IMMEDIATE")
+        conflict = c.execute("""
+            SELECT 1 FROM autotrade_positions
+            WHERE user_id = ? AND status IN ('OPEN', 'ENTRY_PENDING')
+              AND (account_key IS NULL OR ? IS NULL OR account_key <> ?)
+            LIMIT 1
+        """, (user_id, account_key, account_key)).fetchone()
+        if conflict:
+            return False
         c.execute("""
             UPDATE autotrade_users
             SET api_key_enc = ?, api_secret_enc = ?, passphrase_enc = ?
             WHERE user_id = ?
         """, (api_key_enc, api_secret_enc, passphrase_enc, user_id))
+    return True
 
 
 def at_set_mode(user_id: int, size_mode: str, size_value: float) -> None:
@@ -2494,11 +2504,18 @@ def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
                            direction: str, sz: float, entry_px: float,
                            margin_usd: float, sl_px: float,
                            client_order_id: str, *, account_key: str | None = None,
-                           slot_limit: int | None = None) -> int:
+                           slot_limit: int | None = None,
+                           expected_api_key_enc: str | None = None) -> int:
     """Persist an idempotent intent before any real order reaches OKX."""
     with _conn() as c:
         if slot_limit is not None:
             c.execute("BEGIN IMMEDIATE")
+            if expected_api_key_enc is not None:
+                saved = c.execute(
+                    "SELECT api_key_enc FROM autotrade_users WHERE user_id = ?",
+                    (user_id,)).fetchone()
+                if not saved or saved[0] != expected_api_key_enc:
+                    return 0
             occupied, same_instrument = c.execute("""
                 SELECT COUNT(*), MAX(inst_id = ?)
                 FROM autotrade_positions

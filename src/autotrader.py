@@ -224,9 +224,7 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             message + " Бот отказался от входа для безопасности.")
         return
 
-    account_uid = account_check.get("account_uid")
-    account_key = (hashlib.sha256(f"okx:{account_uid}".encode("ascii")).hexdigest()
-                   if account_uid else None)
+    account_key = okx.account_key(account_check)
 
     ok, balance = okx.get_balance(creds)
     if not ok:
@@ -429,7 +427,7 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         intent_id = at_create_entry_intent(
             sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
             float(sig["sl"]), client_order_id, account_key=account_key,
-            slot_limit=_LOCAL_ACCOUNT_SLOTS)
+            slot_limit=_LOCAL_ACCOUNT_SLOTS, expected_api_key_enc=u.get("api_key_enc"))
     except Exception as intent_error:
         log.error("autotrade entry intent failed %s %s: %s",
                   uid, inst_id, intent_error)

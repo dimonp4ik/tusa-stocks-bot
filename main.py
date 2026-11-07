@@ -2390,10 +2390,16 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
             _reply(chat_id, f"❌ Ключи не сохранены.\n\n{message}")
             return True
         try:
-            at_set_keys(user_id,
-                        encrypt_secret(creds["api_key"]),
-                        encrypt_secret(creds["api_secret"]),
-                        encrypt_secret(creds["passphrase"]))
+            saved = at_set_keys(
+                user_id, encrypt_secret(creds["api_key"]),
+                encrypt_secret(creds["api_secret"]),
+                encrypt_secret(creds["passphrase"]),
+                account_key=_okx_trade.account_key(account_check))
+            if not saved:
+                _at_onboarding.pop(chat_id, None)
+                _reply(chat_id, "❌ Ключи не сохранены. Сначала дождись закрытия "
+                       "позиций и незавершённых входов со старыми ключами.")
+                return True
             at_set_balance(user_id, balance)
         except Exception as e:
             _at_onboarding.pop(chat_id, None)

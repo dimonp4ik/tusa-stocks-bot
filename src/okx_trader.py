@@ -175,6 +175,11 @@ def get_account_configuration(creds: dict) -> tuple:
         return False, f"account configuration parse failed: {exc}"
 
 
+def account_key(config: dict) -> str | None:
+    uid = config.get("account_uid")
+    return hashlib.sha256(f"okx:{uid}".encode("ascii")).hexdigest() if uid else None
+
+
 def get_position_mode(creds: dict) -> tuple:
     """Compatibility wrapper for callers that only need the position mode."""
     ok, config = get_account_configuration(creds)
