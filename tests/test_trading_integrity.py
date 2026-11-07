@@ -244,9 +244,18 @@ class ExchangeTests(unittest.TestCase):
                 self.assertEqual(okx.amend_protection_sl(
                     {}, "TEST", "123", 100)[0], accepted)
 
-    def test_missing_protection_id_is_failure(self):
-        with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
-            self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])
+    def test_oco_placement_requires_order_id_and_success_code(self):
+        for rows, expected in [
+                ([], False), ([{"algoId": "", "sCode": "0"}], False),
+                ([{"algoId": "123"}], False),
+                ([{"algoId": "123", "sCode": "51000"}], False),
+                ([{"algoId": "123", "sCode": "0"}], True)]:
+            with self.subTest(rows=rows), patch.object(
+                    okx, "_request", return_value=(True, rows)):
+                ok, result = okx.place_protection_oco({}, "TEST", "LONG", 90, 120)
+                self.assertEqual(ok, expected)
+                if expected:
+                    self.assertEqual(result, "123")
 
     def test_pending_futures_entry_blocks_capacity_check(self):
         for orders in ([{"reduceOnly": "false"}], [{}], [None],
