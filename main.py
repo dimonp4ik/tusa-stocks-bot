@@ -4130,7 +4130,7 @@ def _run_native_xperp_shadow_scan() -> None:
     candidates = []
     portfolio_rejects = {
         "already_open": 0, "symbol_blocked": 0, "duplicate_bar": 0,
-        "backing_level_crossed": 0, "cooldown": 0,
+        "backing_level_crossed": 0, "cooldown": 0, "market_unavailable": 0,
     }
     for setup in setups:
         symbol = setup["symbol"]
@@ -4143,7 +4143,8 @@ def _run_native_xperp_shadow_scan() -> None:
         try:
             market = get_xperp_price(symbol)
             if market is None:
-                market = float(fetched[symbol]["close"][-1])
+                portfolio_rejects["market_unavailable"] += 1
+                continue
             analysis = _native_xperp_analysis(setup, float(market))
             setup_id = log_setup_candidate_once(analysis)
             if not setup_id:
