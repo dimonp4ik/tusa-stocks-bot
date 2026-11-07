@@ -705,12 +705,24 @@ def _native_scan_status_text() -> str:
                           if realized_rows else "")
                        + ("\nПоследние исходы: " + "; ".join(closed_parts)
                           if closed_parts else ""))
+        timing = (row.get("strategy") or {}).get("timing") or {}
+        timing_text = ""
+        if timing:
+            load = float(timing["load_seconds"])
+            setup = float(timing["setup_seconds"])
+            ready = float(timing["setup_ready_at"])
+            offset = ready - int(ready // 900) * 900
+            timing_text = (
+                f"\nScan timing: load {load:.2f}s, setup {setup:.2f}s, "
+                f"ready +{offset:.2f}s after quarter-hour"
+            )
         return (
             f"Последний скан: {age_minutes} мин назад · {result}\n"
             f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
             f"инструментов · сетапов {int(row.get('raw_setups') or 0)} · "
             f"к отправке {int(row.get('publish_candidates') or 0)} · "
             f"отправлено {int(row.get('published') or 0)}"
+            f"{timing_text}"
             f"{reject_text}"
             f"{open_text}"
             f"{closed_text}"
