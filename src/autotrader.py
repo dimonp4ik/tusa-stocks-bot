@@ -286,13 +286,14 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                  f"сделка по {disp} пропущена.\n`{account_positions}`")
         return
     # A submitted local entry can be absent from a lagging OKX snapshot.
-    # Count it until the exchange sees it or reconciliation closes the intent.
-    invisible = [
+    # A visible partial fill may still have an unresolved entry intent.
+    unresolved = [
         row for row in at_all_open_positions()
         if row["user_id"] == uid
-        and row["inst_id"] not in account_positions["inst_ids"]
+        and (row.get("status") == "ENTRY_PENDING"
+             or row["inst_id"] not in account_positions["inst_ids"])
     ]
-    if invisible:
+    if unresolved:
         reason = "OKX ещё не подтвердил предыдущий вход в списке позиций"
         _entry_skip(uid, sig, inst_id, reason,
                     f"Автотрейдинг: {disp} пропущен. {reason}.")
