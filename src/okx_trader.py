@@ -49,7 +49,8 @@ def _sign(secret: str, ts: str, method: str, path: str, body: str) -> str:
 
 
 def _request(creds: dict, method: str, path: str, params: dict = None,
-             body: dict = None, timeout: int = 15) -> tuple:
+             body: dict = None, timeout: int = 15, *,
+             deadline_ms: int | None = None) -> tuple:
     """Signed request. creds = {api_key, api_secret, passphrase}.
     Returns (ok, data-list-or-error-string)."""
     try:
@@ -66,6 +67,8 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
             "OK-ACCESS-PASSPHRASE": creds["passphrase"],
             "Content-Type":         "application/json",
         }
+        if deadline_ms is not None:
+            headers['expTime'] = str(deadline_ms)
         url = _base_url() + sign_path
         if method == "GET":
             resp = requests.get(url, headers=headers, timeout=timeout)
@@ -345,7 +348,8 @@ def get_position_avg_px(creds: dict, inst_id: str) -> float | None:
 # ── Orders ────────────────────────────────────────────────────────────────────
 
 def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float,
-                       client_order_id: str = "") -> tuple:
+                       client_order_id: str = "", *,
+                       deadline_ms: int | None = None) -> tuple:
     """Market entry, isolated margin, net (one-way) position mode.
     direction LONG→buy, SHORT→sell. Returns (ok, ordId | error)."""
     side = "buy" if str(direction).upper() == "LONG" else "sell"
@@ -358,7 +362,8 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float,
     }
     if client_order_id:
         body["clOrdId"] = str(client_order_id)
-    ok, data = _request(creds, "POST", "/api/v5/trade/order", body=body)
+    ok, data = _request(creds, "POST", "/api/v5/trade/order",
+                        body=body, deadline_ms=deadline_ms)
     if not ok:
         return False, data
     try:

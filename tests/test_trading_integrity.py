@@ -222,6 +222,17 @@ class ExchangeTests(unittest.TestCase):
             at.open_positions_for_signal(sig)
         traders.assert_not_called()
 
+    def test_market_entry_sends_exchange_deadline_in_header(self):
+        creds = {"api_key": "test", "api_secret": "test", "passphrase": "test"}
+        with patch.object(okx.requests, "post") as post:
+            post.return_value.json.return_value = {
+                "code": "0", "data": [{"ordId": "order", "sCode": "0"}]}
+            ok, order = okx.place_market_entry(
+                creds, "TEST", "LONG", 1, deadline_ms=1800123)
+        self.assertEqual((ok, order), (True, "order"))
+        self.assertEqual(post.call_args.kwargs["headers"]["expTime"], "1800123")
+        self.assertNotIn("expTime", post.call_args.kwargs["data"])
+
     def test_missing_protection_id_is_failure(self):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])
