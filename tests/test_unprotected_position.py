@@ -102,9 +102,17 @@ class UnprotectedPositionTests(unittest.TestCase):
         activate.assert_not_called()
 
     def test_lost_market_response_recovers_order_and_places_protection(self):
+        for mode, stop in ((None, 97), (False, 98), (True, 97)):
+            with self.subTest(mode=mode):
+                self._check_recovered_order_protection(mode, stop)
+
+    def _check_recovered_order_protection(self, mode, stop):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+        sig["strategy_stop_on_close"] = mode
         with ExitStack() as stack:
+            stack.enter_context(patch.object(at, "STOP_CLOSE_CONFIRM", True))
+            stack.enter_context(patch.object(at, "STOP_EXCHANGE_BACKSTOP_R", 1.5))
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                 ('at_set_balance',None),('get_bot_state',None),('set_bot_state',None),
                 ('set_signal_size_mult',None),('_dm',None)]:
@@ -127,7 +135,8 @@ class UnprotectedPositionTests(unittest.TestCase):
         protect.assert_called_once()
         update.assert_called_once()
         self.assertEqual(update.call_args.args[:2], (91, 'algo'))
-        self.assertLess(update.call_args.args[2], 100)
+        self.assertEqual(update.call_args.args[2], stop)
+        self.assertEqual(protect.call_args.args[3], stop)
         activate.assert_called_once()
         self.assertEqual(activate.call_args.args[4], 'algo')
 

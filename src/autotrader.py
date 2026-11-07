@@ -509,7 +509,9 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.warning(f"autotrade partial fill {uid} {inst_id}: asked {sz}, got {_pos_sz}")
     _fill_px = _avg_px or px
     _sl_level = float(sig["sl"])
-    if STOP_CLOSE_CONFIRM:
+    strategy_stop = sig.get("strategy_stop_on_close")
+    close_confirm = STOP_CLOSE_CONFIRM if strategy_stop is None else bool(strategy_stop)
+    if close_confirm:
         # Risk distance stays the signal's (that is the strategy's 1R); only the
         # point it is measured FROM moves to the real fill.
         _risk = abs(float(sig["entry_price"]) - _sl_level)
