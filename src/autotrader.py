@@ -516,11 +516,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         if not _closed:
             _closed, _cerr = okx.close_position_market(creds, inst_id)
         if _closed:
-            at_close_position(
-                intent_id, "PROTECTION_FAILED_CLOSED", error=str(algo_id))
-            log.warning(f"autotrade OCO failed for {uid} {inst_id}: {algo_id} — position closed")
+            # Keep the intent until reconciliation confirms that the entry
+            # order is terminal and the position is flat.
+            log.warning("autotrade OCO failed for %s %s: %s — close submitted",
+                        uid, inst_id, algo_id)
             _dm(uid, f"❌ Автотрейдинг: не смог поставить стоп по {disp} — "
-                     f"позиция закрыта для безопасности.\n`{algo_id}`")
+                     f"отправлено аварийное закрытие. Бот проверит исполнение.\n`{algo_id}`")
         else:
             log.error(f"autotrade NAKED POSITION {uid} {inst_id}: OCO failed ({algo_id}) "
                       f"AND close failed ({_cerr}) — position is open WITHOUT a stop")

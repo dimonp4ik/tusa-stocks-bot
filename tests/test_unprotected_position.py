@@ -113,7 +113,12 @@ class UnprotectedPositionTests(unittest.TestCase):
         activate.assert_called_once()
         self.assertEqual(activate.call_args.args[4], 'algo')
 
-    def test_failed_protection_and_close_remains_tracked(self):
+    def test_failed_protection_remains_tracked(self):
+        for close_accepted in (True, False):
+            with self.subTest(close_accepted=close_accepted):
+                self._check_failed_protection_tracking(close_accepted)
+
+    def _check_failed_protection_tracking(self, close_accepted):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         with ExitStack() as stack:
@@ -126,12 +131,17 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('ensure_leverage',(True,None)),('get_position_avg_px',100),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
                 ('place_market_entry',(True,'order')),('place_protection_oco',(False,'protection rejected')),
-                ('close_position_market',(False,'still open'))]:
+                ('close_position_market',(close_accepted,'close response'))]:
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(at.okx,'get_position_size',side_effect=[(True,0),(True,.01)]))
             stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
+            retire=stack.enter_context(patch.object(at,'at_close_position'))
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
+        retire.assert_not_called()
+        if close_accepted:
+            activate.assert_not_called()
+            return
         activate.assert_called_once()
         self.assertEqual(activate.call_args.args[4],'')
         self.assertEqual(activate.call_args.args[1],.01)
