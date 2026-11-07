@@ -814,6 +814,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                             "Проверь открытые алго-ордера на бирже.",
                             f"`{_c_err}`",
                         ]))
+                        continue
                 # The protection was cancelled a few lines up, so if this
                 # close does not go through the position is sitting on the
                 # exchange with NOTHING under it. Marking the record closed
@@ -1045,6 +1046,7 @@ def poll_exchange_closes() -> None:
                         "Проверь открытые алго-ордера на бирже.",
                         f"`{_c_err}`",
                     ]))
+                    continue
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
             # Report the REAL fill. The signal engine sends its own message
