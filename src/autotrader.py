@@ -285,6 +285,19 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         _dm(uid, "⚠️ Автотрейдинг: не смог проверить общую загрузку счёта OKX — "
                  f"сделка по {disp} пропущена.\n`{account_positions}`")
         return
+    # A submitted local entry can be absent from a lagging OKX snapshot.
+    # Count it until the exchange sees it or reconciliation closes the intent.
+    invisible = [
+        row for row in at_all_open_positions()
+        if row["user_id"] == uid
+        and row["inst_id"] not in account_positions["inst_ids"]
+    ]
+    account_positions = {
+        **account_positions,
+        "count": account_positions["count"] + len(invisible),
+        "margin_usd": account_positions["margin_usd"] + sum(
+            float(row["margin_usd"]) for row in invisible),
+    }
     if inst_id in account_positions["inst_ids"]:
         log.warning("autotrade: %s already holds %s on exchange — entry refused",
                     uid, inst_id)
