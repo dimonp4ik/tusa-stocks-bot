@@ -233,6 +233,17 @@ class ExchangeTests(unittest.TestCase):
         self.assertEqual(post.call_args.kwargs["headers"]["expTime"], "1800123")
         self.assertNotIn("expTime", post.call_args.kwargs["data"])
 
+    def test_stop_amendment_requires_matching_acknowledgement(self):
+        for row, accepted in [
+                ([], False), ([{"algoId": "123"}], False),
+                ([{"algoId": "456", "sCode": "0"}], False),
+                ([{"algoId": "123", "sCode": "51000"}], False),
+                ([{"algoId": "123", "sCode": "0"}], True)]:
+            with self.subTest(row=row), patch.object(
+                    okx, "_request", return_value=(True, row)):
+                self.assertEqual(okx.amend_protection_sl(
+                    {}, "TEST", "123", 100)[0], accepted)
+
     def test_missing_protection_id_is_failure(self):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])

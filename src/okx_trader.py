@@ -492,12 +492,20 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
 
 def amend_protection_sl(creds: dict, inst_id: str, algo_id: str, new_sl_px: float) -> tuple:
     """Move the OCO's SL trigger (trailing after TP1)."""
-    return _request(creds, "POST", "/api/v5/trade/amend-algos", body={
+    ok, data = _request(creds, "POST", "/api/v5/trade/amend-algos", body={
         "instId":         inst_id,
         "algoId":         algo_id,
         "newSlTriggerPx": _fmt_px(new_sl_px),
         "newSlOrdPx":     "-1",
     })
+    if not ok:
+        return False, data
+    if (not isinstance(data, list) or len(data) != 1
+            or not isinstance(data[0], dict)
+            or data[0].get("algoId") != algo_id
+            or str(data[0].get("sCode")) != "0"):
+        return False, "unconfirmed stop amendment"
+    return True, data
 
 
 def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
