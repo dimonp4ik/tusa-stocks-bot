@@ -292,12 +292,11 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         if row["user_id"] == uid
         and row["inst_id"] not in account_positions["inst_ids"]
     ]
-    account_positions = {
-        **account_positions,
-        "count": account_positions["count"] + len(invisible),
-        "margin_usd": account_positions["margin_usd"] + sum(
-            float(row["margin_usd"]) for row in invisible),
-    }
+    if invisible:
+        reason = "OKX ещё не подтвердил предыдущий вход в списке позиций"
+        _entry_skip(uid, sig, inst_id, reason,
+                    f"Автотрейдинг: {disp} пропущен. {reason}.")
+        return
     if inst_id in account_positions["inst_ids"]:
         log.warning("autotrade: %s already holds %s on exchange — entry refused",
                     uid, inst_id)

@@ -29,7 +29,7 @@ class UnprotectedPositionTests(unittest.TestCase):
         create.assert_called_once()
         activate.assert_not_called()
 
-    def test_invisible_pending_entry_reserves_position_slot(self):
+    def test_invisible_pending_entry_blocks_next_entry(self):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         with ExitStack() as stack:
@@ -38,7 +38,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('set_bot_state',None),('set_signal_size_mult',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
-                ('get_open_position_margin',(True,{'margin_usd':0,'count':10,'inst_ids':()})),
+                ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
                 ('place_market_entry',(False,'request failed: timed out')),
