@@ -431,6 +431,15 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.warning("autotrade duplicate client order refused %s %s %s",
                     uid, inst_id, client_order_id)
         return
+    if sig.get("source") == "stock_xperp_native_shadow":
+        from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS
+
+        entry_bar = sig.get("strategy_entry_bar_ts")
+        if entry_bar and time.time() - float(entry_bar) > MAX_SIGNAL_AGE_SECONDS:
+            at_close_position(intent_id, "ENTRY_EXPIRED")
+            _entry_skip(uid, sig, inst_id, "истёк срок входа",
+                        f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
+            return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id)
     if not ok:

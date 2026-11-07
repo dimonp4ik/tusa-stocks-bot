@@ -3961,6 +3961,11 @@ def _publish_stock_venue_candidates(
         if direction_counts.get(direction, 0) >= MAX_SAME_DIRECTION_POSITIONS:
             reject(setup_id, "dir_cap")
             continue
+        entry_bar = analysis.get("strategy_entry_bar_ts")
+        if (native and entry_bar
+                and time.time() - float(entry_bar) > MAX_SIGNAL_AGE_SECONDS):
+            reject(setup_id, "stale_at_publish")
+            continue
         if not send_signal(analysis):
             reject(setup_id, "send_failed")
             continue

@@ -7,8 +7,17 @@ from src import autotrader as at
 
 class UnprotectedPositionTests(unittest.TestCase):
     def test_lost_market_response_is_persisted_for_reconciliation(self):
+        self._check_market_submission(False)
+
+    def test_market_entry_expires_after_intent_before_submit(self):
+        self._check_market_submission(True)
+
+    def _check_market_submission(self, expired):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+        if expired:
+            sig["source"] = "stock_xperp_native_shadow"
+            sig["strategy_entry_bar_ts"] = at.time.time() - 181
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                 ('at_set_balance',None),('get_bot_state',None),
@@ -25,9 +34,18 @@ class UnprotectedPositionTests(unittest.TestCase):
                 at.okx,'get_position_size',side_effect=[(True,0),(True,0)]))
             create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
+            close = stack.enter_context(patch.object(at, "at_close_position"))
+            stack.enter_context(patch.object(at, "_entry_skip"))
+            place = at.okx.place_market_entry
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
         create.assert_called_once()
         activate.assert_not_called()
+        if expired:
+            place.assert_not_called()
+            close.assert_called_once_with(91, "ENTRY_EXPIRED")
+        else:
+            place.assert_called_once()
+            close.assert_not_called()
 
     def test_invisible_pending_entry_blocks_next_entry(self):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
