@@ -3187,6 +3187,7 @@ def _check_open_signals():
                         tp1_fraction=tp1_close_frac, reached_tp1=True)
             _conf_flags = df.get("confirmed") or []
             for i in range(0 if status == "TP1_PARTIAL" and use_trail else len(df.get("close", []))):
+                opening = float(df["open"][i])
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
                 close = float(df["close"][i])
@@ -3222,12 +3223,30 @@ def _check_open_signals():
                         else high >= _hard_stop)
                 _close_stop_breached = stop_close_confirm and _is_confirmed and (
                     close <= sl if direction == "LONG" else close >= sl)
+                # A resting stop-market cannot fill at its trigger after the
+                # next candle opens beyond it.  The frozen X-Perp audit already
+                # prices this as a gap fill at the candle open; the live PAPER
+                # monitor used to award an impossible exact -1R instead.  Never
+                # use the first observed candle's open: for market signals that
+                # open can predate Telegram publication by part of one minute.
+                _post_entry_bar = float(df["time"][i]) > monitor_from
+                _gap_stop_breached = (
+                    not stop_close_confirm and _post_entry_bar and (
+                        opening <= sl if direction == "LONG" else opening >= sl))
                 _sl_breached = (_hard_stop_breached or _close_stop_breached
                                 if stop_close_confirm else
-                                (low <= sl if direction == "LONG" else high >= sl))
+                                (_gap_stop_breached or
+                                 (low <= sl if direction == "LONG" else high >= sl)))
                 _sl_exit_px = (_hard_stop if _hard_stop_breached else
                                close if stop_close_confirm else sl)
                 _sl_r = -1.0
+                if _gap_stop_breached and risk > 0:
+                    _sl_exit_px = opening
+                    _sl_r = round(
+                        ((_sl_exit_px - entry) if direction == "LONG" else
+                         (entry - _sl_exit_px)) / risk,
+                        4,
+                    )
                 if stop_close_confirm and risk > 0:
                     _sl_r = round(
                         ((_sl_exit_px - entry) if direction == "LONG" else (entry - _sl_exit_px)) / risk,

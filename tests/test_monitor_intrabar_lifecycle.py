@@ -121,6 +121,40 @@ def test_native_market_signal_ignores_price_path_before_publication():
     notify.assert_not_called()
 
 
+def test_native_gap_through_stop_uses_next_bar_open_and_real_loss_r():
+    row = signal(
+        source="stock_xperp_native_shadow",
+        reason="Native stock X-Perp shadow cross-sectional reversal",
+        direction="SHORT", entry_price=100.0, sl=101.0,
+        tp1=97.5, tp2=97.5, opened_at=1081.0,
+        strategy_bar_seconds=60, strategy_entry_bar_ts=1000.0,
+        strategy_runner_mode="single_target", strategy_tp1_close_frac=1.0,
+    )
+    bars = {
+        "time": [1080.0, 1140.0],
+        "open": [100.0, 102.5], "high": [100.4, 103.0],
+        "low": [99.8, 102.0], "close": [100.1, 102.7],
+        "confirmed": [True, False],
+    }
+    update, notify, mirror = run_monitor(row, bars)
+
+    assert update.call_args.args[1] == "SL_HIT"
+    assert update.call_args.args[2] == 102.5
+    assert update.call_args.kwargs["realized_r"] == -2.5
+    assert notify.call_args.args[2] == 102.5
+    assert mirror.call_args.args[2] == 102.5
+
+
+def test_stop_notification_shows_gap_adjusted_r():
+    sent = []
+    row = signal(direction="SHORT", entry_price=100.0, sl=101.0)
+    with patch.object(notifier, "_send_message",
+                      side_effect=lambda message: sent.append(message) or True):
+        assert notifier.send_signal_update(row, "SL_HIT", 102.5)
+
+    assert "-2.50R" in sent[0]
+
+
 def test_single_target_update_uses_single_target_wording():
     sent = []
     row = signal(tp1=102.0, tp2=102.0,

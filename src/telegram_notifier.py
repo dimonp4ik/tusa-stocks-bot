@@ -450,9 +450,15 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
     elif new_status == "SL_HIT":
         icon  = "❌"
         title = "СТОП ЛОСС"
+        risk = abs(entry - sl)
+        realized_r = ((exit_price - entry) / risk
+                      if direction == "LONG" and risk > 0 else
+                      (entry - exit_price) / risk
+                      if direction == "SHORT" and risk > 0 else -1.0)
         body  = (
             f"Закрыто по `{_format_price(exit_price)}`\n"
-            f"Движение: `{move_pct:.2f}%`  (x{lev}: `{lev_profit:.0f}%`)"
+            f"Движение: `{move_pct:.2f}%`  (x{lev}: `{lev_profit:.0f}%`)\n"
+            f"Итог сигнала: `{realized_r:+.2f}R`"
         )
     elif new_status == "EXPIRED":
         # A time exit can be profitable even when the full target was not
