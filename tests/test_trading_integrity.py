@@ -480,6 +480,25 @@ class ExchangeTests(unittest.TestCase):
 
 
 class DatabaseTests(unittest.TestCase):
+    def test_account_slots_are_atomic_across_telegram_users(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from src import db
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+                db, "DB_PATH", str(Path(tmp) / "signals.db")):
+            db.init_db()
+
+            def reserve(user_id):
+                return db.at_create_entry_intent(
+                    user_id, user_id, f"TEST-{user_id}", "LONG", .02, 100,
+                    3, 94, f"order-{user_id}", account_key="same-account",
+                    slot_limit=1)
+
+            with ThreadPoolExecutor(max_workers=2) as workers:
+                reservations = list(workers.map(reserve, (1, 2)))
+            self.assertEqual(sum(bool(value) for value in reservations), 1)
+            self.assertEqual(len(db.at_all_open_positions()), 1)
+
     def test_entry_intent_is_durable_idempotent_and_activates(self):
         from src import db
         with tempfile.TemporaryDirectory() as tmp:

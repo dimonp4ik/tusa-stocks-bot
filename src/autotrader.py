@@ -85,6 +85,7 @@ _CLOSE_STATUSES = ("TP2_HIT", "TP1_TRAIL", "SL_HIT", "BREAKEVEN",
 _CLOSE_CONFIRM_MIN_AGE_SEC = 90
 _ENTRY_PENDING_GRACE_SEC = 90
 _ACCOUNT_SNAPSHOT_MAX_AGE_SEC = 15
+_LOCAL_ACCOUNT_SLOTS = 8
 
 
 def _dm(user_id: int, text: str) -> None:
@@ -427,7 +428,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     try:
         intent_id = at_create_entry_intent(
             sig["id"], uid, inst_id, sig["direction"], sz, px, margin,
-            float(sig["sl"]), client_order_id, account_key=account_key)
+            float(sig["sl"]), client_order_id, account_key=account_key,
+            slot_limit=_LOCAL_ACCOUNT_SLOTS)
     except Exception as intent_error:
         log.error("autotrade entry intent failed %s %s: %s",
                   uid, inst_id, intent_error)
@@ -435,7 +437,7 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                  "ордер не отправлен.")
         return
     if not intent_id:
-        log.warning("autotrade duplicate client order refused %s %s %s",
+        log.warning("autotrade entry reservation refused (duplicate or slot limit) %s %s %s",
                     uid, inst_id, client_order_id)
         return
     deadline_ms = None

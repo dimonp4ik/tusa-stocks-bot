@@ -2493,9 +2493,20 @@ def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
 def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
                            direction: str, sz: float, entry_px: float,
                            margin_usd: float, sl_px: float,
-                           client_order_id: str, *, account_key: str | None = None) -> int:
+                           client_order_id: str, *, account_key: str | None = None,
+                           slot_limit: int | None = None) -> int:
     """Persist an idempotent intent before any real order reaches OKX."""
     with _conn() as c:
+        if slot_limit is not None:
+            c.execute("BEGIN IMMEDIATE")
+            occupied, same_instrument = c.execute("""
+                SELECT COUNT(*), MAX(inst_id = ?)
+                FROM autotrade_positions
+                WHERE status IN ('OPEN', 'ENTRY_PENDING')
+                  AND (user_id = ? OR account_key = ?)
+            """, (inst_id, user_id, account_key)).fetchone()
+            if occupied >= slot_limit or same_instrument:
+                return 0
         cur = c.execute("""
             INSERT OR IGNORE INTO autotrade_positions
                 (signal_id, user_id, inst_id, direction, sz, entry_px,
