@@ -906,6 +906,16 @@ def poll_exchange_closes() -> None:
                         f"🤖 *{pos['inst_id']}*: найден незавершённый вход после сбоя; "
                         "позиция закрыта для безопасности.")
                     continue
+                # A flat position does not prove that an ambiguous market
+                # order cannot still fill. Keep the intent until OKX confirms
+                # a terminal order state, then recheck the position.
+                client_id = pos.get("client_order_id")
+                if not client_id:
+                    continue
+                found, order = okx.get_order_by_client_id(
+                    creds, pos["inst_id"], client_id)
+                if not found or order.get("state") not in {"filled", "canceled"}:
+                    continue
                 ok2, size2 = okx.get_position_size(creds, pos["inst_id"])
                 if not ok2 or size2 > 0:
                     continue
@@ -915,7 +925,7 @@ def poll_exchange_closes() -> None:
                 if pos.get("tp1_algo_id"):
                     okx.cancel_protection(
                         creds, pos["inst_id"], pos["tp1_algo_id"])
-                at_close_position(pos["id"], "ENTRY_NOT_FILLED")
+                at_close_position(pos["id"], "ENTRY_TERMINAL_FLAT")
                 continue
             if size > 0:
                 # The engine marks a signal closed BEFORE mirroring that close

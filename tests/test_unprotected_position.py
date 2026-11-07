@@ -119,7 +119,7 @@ class UnprotectedPositionTests(unittest.TestCase):
     def test_reconciler_retires_stale_pending_nonfill(self):
         pos=dict(id=2,user_id=7,inst_id='TEST',signal_id=3,
                  status='ENTRY_PENDING',opened_at=0,sl_algo_id='',
-                 tp1_algo_id=None,sz=.01)
+                 tp1_algo_id=None,sz=.01,client_order_id='entry123')
         with ExitStack() as stack:
             stack.enter_context(patch.object(at,'AUTOTRADE_ENABLED',True))
             stack.enter_context(patch.object(at,'at_all_open_positions',return_value=[pos]))
@@ -129,7 +129,12 @@ class UnprotectedPositionTests(unittest.TestCase):
             size=stack.enter_context(patch.object(at.okx,'get_position_size',return_value=(True,0)))
             close=stack.enter_context(patch.object(at.okx,'close_position_market'))
             record=stack.enter_context(patch.object(at,'at_close_position'))
+            lookup=stack.enter_context(patch.object(
+                at.okx, 'get_order_by_client_id', return_value=(False, 'unknown')))
             at.poll_exchange_closes()
-        self.assertEqual(size.call_count,2)
+            record.assert_not_called()
+            lookup.return_value = (True, {'state': 'canceled'})
+            at.poll_exchange_closes()
+        self.assertEqual(size.call_count,3)
         close.assert_not_called()
-        record.assert_called_once_with(2,'ENTRY_NOT_FILLED')
+        record.assert_called_once_with(2,'ENTRY_TERMINAL_FLAT')
