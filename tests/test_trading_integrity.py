@@ -226,6 +226,17 @@ class ExchangeTests(unittest.TestCase):
         with patch.object(okx,'_request',return_value=(True,[{'algoId':''}])):
             self.assertFalse(okx.place_protection_oco({},'TEST','LONG',90,120)[0])
 
+    def test_pending_futures_entry_blocks_capacity_check(self):
+        for orders in ([{"reduceOnly": "false"}], [{}], [None],
+                       [{"reduceOnly": "true"}] * 100):
+            with self.subTest(orders=len(orders)), patch.object(
+                    okx, "_request", return_value=(True, orders)) as request:
+                allowed, _ = okx.get_open_position_margin({})
+                self.assertFalse(allowed)
+                request.assert_called_once_with(
+                    {}, "GET", "/api/v5/trade/orders-pending",
+                    params={"instType": "FUTURES", "limit": "100"})
+
     def test_exchange_position_margin_uses_conservative_estimate(self):
         rows = [
             {'instId':'BTC-X','pos':'2','margin':'9','imr':'8',
@@ -234,7 +245,8 @@ class ExchangeTests(unittest.TestCase):
              'notionalUsd':'60','lever':'10'},
             {'instId':'FLAT-X','pos':'0'},
         ]
-        with patch.object(okx, '_request', return_value=(True, rows)):
+        with patch.object(okx, '_request', side_effect=[
+                (True, [{'reduceOnly': 'true'}]), (True, rows)]):
             good, value = okx.get_open_position_margin({})
         self.assertTrue(good)
         self.assertEqual(value['margin_usd'], 16)

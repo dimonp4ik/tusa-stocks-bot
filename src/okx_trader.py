@@ -262,6 +262,21 @@ def get_open_position_margin(creds: dict) -> tuple:
     estimate: isolated margin, initial-margin requirement, or notional/leverage.
     A non-flat row without a usable estimate fails closed.
     """
+    # Read pending entries first so an order that fills between the reads
+    # is still visible in either the order list or the position snapshot.
+    ok, orders = _request(
+        creds, "GET", "/api/v5/trade/orders-pending",
+        params={"instType": "FUTURES", "limit": "100"},
+    )
+    if not ok:
+        return False, orders
+    if not isinstance(orders, list) or len(orders) >= 100:
+        return False, "pending futures orders response invalid or incomplete"
+    for order in orders:
+        if not isinstance(order, dict):
+            return False, "pending futures order response invalid"
+        if str(order.get("reduceOnly")).lower() != "true":
+            return False, "pending futures entry occupies unconfirmed account capacity"
     ok, data = _request(creds, "GET", "/api/v5/account/positions")
     if not ok:
         return False, data
