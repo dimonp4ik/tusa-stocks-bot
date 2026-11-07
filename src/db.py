@@ -2194,6 +2194,9 @@ def get_route_live_readiness(source: str, window: int = 20,
         "resolved": resolved,
         "window": window,
         "total_r": total_r,
+        "wins": sum(v > 0 for v in values),
+        "losses": sum(v < 0 for v in values),
+        "flat": sum(v == 0 for v in values),
         "win_rate": (
             100.0 * sum(value > 0 for value in values) / resolved
             if resolved else 0.0),

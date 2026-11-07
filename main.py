@@ -157,12 +157,16 @@ def _execution_state_text() -> str:
     if DEPLOYMENT_MODE != "live" or not AUTOTRADE_ENABLED:
         return "PAPER: биржевые ордера выключены"
     health = _stock_forward_health()
+    breakdown = (
+        f" · W/L/BE {health['wins']}/{health['losses']}/{health['flat']}"
+        if "wins" in health else ""
+    )
     if health["ready"]:
         return ("LIVE: реальные ордера доступны подключённым пользователям · "
-                f"forward {health['total_r']:+.2f}R/{health['resolved']}")
+                f"forward {health['total_r']:+.2f}R/{health['resolved']}{breakdown}")
     return ("ЗАЩИТНАЯ ПАУЗА: сигналы считаются в PAPER, реальные входы "
             f"не открываются · forward {health['total_r']:+.2f}R/"
-            f"{health['resolved']} из {health['window']} требуемых")
+            f"{health['resolved']} из {health['window']} требуемых{breakdown}")
 
 
 def _moderator_may(data: str) -> bool:
