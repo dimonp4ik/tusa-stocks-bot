@@ -480,6 +480,22 @@ class ExchangeTests(unittest.TestCase):
 
 
 class DatabaseTests(unittest.TestCase):
+    def test_removal_keeps_credentials_until_pending_entry_is_closed(self):
+        from src import db
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+                db, "DB_PATH", str(Path(tmp) / "signals.db")):
+            db.init_db()
+            db.at_add_allowed(7, 1)
+            db.at_set_keys(7, "key", "secret", "pass")
+            intent = db.at_create_entry_intent(
+                1, 7, "TEST", "LONG", .02, 100, 3, 94, "order-1")
+            self.assertFalse(db.at_remove(7))
+            self.assertEqual(db.at_get(7)["api_key_enc"], "key")
+            db.at_close_position(intent, "TEST_CLOSED")
+            self.assertTrue(db.at_remove(7))
+            self.assertIsNone(db.at_get(7)["api_key_enc"])
+
     def test_key_rotation_cannot_reassign_pending_order(self):
         from src import db
 

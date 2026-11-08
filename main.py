@@ -1735,15 +1735,18 @@ def _handle_admin_callback(callback_id: str, chat_id: int,
     elif data.startswith("adm_at_rm_"):
         try:
             rm_id = int(data[len("adm_at_rm_"):])
-            at_remove(rm_id)
-            txt = (f"✅ Пользователь `{rm_id}` убран из автотрейдинга.\n"
-                   f"Его API-ключи удалены из базы. Открытые позиции (если есть) "
-                   f"остаются на бирже — управлять ими бот больше не будет.")
-            try:
-                autotrader._dm(rm_id, "🤖 Автотрейдинг отключён администратором. "
-                                      f"Вопросы — {AUTOTRADE_CONTACT}.")
-            except Exception:
-                pass
+            if at_remove(rm_id):
+                txt = (f"✅ Пользователь `{rm_id}` убран из автотрейдинга.\n"
+                       "API-ключи удалены из базы.")
+                try:
+                    autotrader._dm(rm_id, "🤖 Автотрейдинг отключён администратором. "
+                                          f"Вопросы — `{AUTOTRADE_CONTACT}`.")
+                except Exception:
+                    pass
+            else:
+                txt = ("⚠️ У пользователя есть открытые позиции или незавершённые входы. "
+                       "Доступ и ключи сохранены для сопровождения. "
+                       "Повтори удаление после закрытия сделок.")
         except Exception as e:
             txt = f"Ошибка: {e}"
         _edit_message(chat_id, message_id, txt)

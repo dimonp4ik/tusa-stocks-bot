@@ -2393,15 +2393,23 @@ def at_add_allowed(user_id: int, added_by: int) -> None:
         """, (user_id, added_by, time_mod.time()))
 
 
-def at_remove(user_id: int) -> None:
-    """Admin removes a user: wipe keys, deactivate, drop from allow-list."""
+def at_remove(user_id: int) -> bool:
+    """Remove access and keys only when no tracked position needs them."""
     with _conn() as c:
+        c.execute("BEGIN IMMEDIATE")
+        pending = c.execute(
+            "SELECT 1 FROM autotrade_positions WHERE user_id = ? "
+            "AND status IN ('OPEN', 'ENTRY_PENDING') LIMIT 1", (user_id,)
+        ).fetchone()
+        if pending:
+            return False
         c.execute("""
             UPDATE autotrade_users
             SET allowed = 0, active = 0,
                 api_key_enc = NULL, api_secret_enc = NULL, passphrase_enc = NULL
             WHERE user_id = ?
         """, (user_id,))
+    return True
 
 
 def at_get(user_id: int) -> dict | None:
