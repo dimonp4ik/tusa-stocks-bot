@@ -514,7 +514,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         if not ok:
             at_close_position(intent_id, "ENTRY_REJECTED", error=str(ord_id))
             log.warning(f"autotrade entry failed for {uid} {inst_id}: {ord_id}")
-            _dm(uid, f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
+            _entry_skip(uid, sig, inst_id, "OKX rejected the market entry",
+                        f"❌ Автотрейдинг: не смог открыть {disp} {sig['direction']}.\n`{ord_id}`\nЕсли не понимаешь причину — напиши `{AUTOTRADE_CONTACT}`.")
             return
 
     tick  = (spec or {}).get("tickSz", 0)
