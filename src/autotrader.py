@@ -151,6 +151,8 @@ def _entry_skip(user_id: int, sig: dict, inst_id: str, reason: str,
         "inst_id": inst_id,
         "reason": reason,
     }
+    log.info("autotrade entry skipped: signal=%s instrument=%s direction=%s reason=%s",
+             payload["signal_id"], inst_id, payload["direction"], reason)
     try:
         set_bot_state(f"autotrade_last_skip:{user_id}", json.dumps(payload))
     except Exception as exc:
