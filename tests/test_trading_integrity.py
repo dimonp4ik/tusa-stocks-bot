@@ -504,6 +504,10 @@ class DatabaseTests(unittest.TestCase):
             db.init_db()
             db.at_add_allowed(7, 1)
             self.assertTrue(db.at_set_keys(7, "old", "secret", "pass"))
+            self.assertEqual(db.at_create_entry_intent(
+                1, 7, "TEST", "LONG", .02, 100, 3, 94, "order-1",
+                account_key="account-a", slot_limit=4, expected_api_key_enc="old"), 0)
+            db.at_set_active(7, True)
             self.assertTrue(db.at_create_entry_intent(
                 1, 7, "TEST", "LONG", .02, 100, 3, 94, "order-1",
                 account_key="account-a", slot_limit=4, expected_api_key_enc="old"))

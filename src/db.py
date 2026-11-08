@@ -2520,7 +2520,8 @@ def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
             c.execute("BEGIN IMMEDIATE")
             if expected_api_key_enc is not None:
                 saved = c.execute(
-                    "SELECT api_key_enc FROM autotrade_users WHERE user_id = ?",
+                    "SELECT api_key_enc FROM autotrade_users "
+                    "WHERE user_id = ? AND allowed = 1 AND active = 1",
                     (user_id,)).fetchone()
                 if not saved or saved[0] != expected_api_key_enc:
                     return 0
