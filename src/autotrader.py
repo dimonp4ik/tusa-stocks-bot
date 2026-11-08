@@ -282,7 +282,6 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     # Refuse on read/parse failure: proceeding would make the 90% account cap a
     # guess. Reserve one same-sized peer entry so simultaneous crypto + stock
     # decisions cannot both pass from an 87%-occupied snapshot and reach 93%.
-    account_snapshot_started = time.monotonic()
     margin_ok, account_positions = okx.get_open_position_margin(creds)
     if not margin_ok:
         log.warning("autotrade account margin unavailable for %s: %s",
@@ -450,10 +449,23 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             return
         if entry_bar:
             deadline_ms = int((float(entry_bar) + MAX_SIGNAL_AGE_SECONDS) * 1000)
-    if time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC:
+    account_snapshot_started = time.monotonic()
+    margin_ok, latest_positions = okx.get_open_position_margin(creds)
+    if (not margin_ok or inst_id in latest_positions["inst_ids"]
+            or not account_position_count_allows(
+                occupied_positions=latest_positions["count"],
+                max_positions=AUTOTRADE_MAX_ACCOUNT_POSITIONS,
+                simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT)
+            or not account_margin_allows(
+                equity=balance,
+                occupied_margin=latest_positions["margin_usd"],
+                requested_margin=margin,
+                max_fraction=AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
+                simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT)
+            or time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC):
         at_close_position(intent_id, "ENTRY_SNAPSHOT_EXPIRED")
-        _entry_skip(uid, sig, inst_id, "данные общего счёта устарели",
-                    f"ℹ️ Автотрейдинг: {disp} пропущен — данные общего счёта устарели.")
+        _entry_skip(uid, sig, inst_id, "общий лимит OKX не подтверждён перед отправкой",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — общий лимит OKX не подтверждён.")
         return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id,
