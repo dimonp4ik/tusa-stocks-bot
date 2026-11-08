@@ -297,11 +297,12 @@ def get_open_position_margin(creds: dict) -> tuple:
             raise ValueError('positions response must be a list')
         total = 0.0
         instruments = []
+        short_count = unknown_side_count = 0
         for row in data:
             raw_pos = row.get('pos')
             if raw_pos in ('', None):
                 raise ValueError('position size missing')
-            position = abs(float(raw_pos))
+            position = float(raw_pos)
             if not math.isfinite(position):
                 raise ValueError('position size non-finite')
             if position == 0:
@@ -309,6 +310,11 @@ def get_open_position_margin(creds: dict) -> tuple:
             inst_id = str(row.get('instId') or '').strip()
             if not inst_id:
                 raise ValueError('position instrument missing')
+            side = row.get("posSide")
+            if side == "net" and row.get("instType") in {"FUTURES", "SWAP", "OPTION"}:
+                side = "short" if position < 0 else "long"
+            short_count += side == "short"
+            unknown_side_count += side not in {"short", "long"}
             estimates = []
             for field in ('margin', 'imr'):
                 raw = row.get(field)
@@ -329,6 +335,8 @@ def get_open_position_margin(creds: dict) -> tuple:
         return True, {
             'margin_usd': total,
             'count': len(instruments),
+            'short_count': short_count,
+            'unknown_side_count': unknown_side_count,
             'inst_ids': tuple(sorted(set(instruments))),
         }
     except (TypeError, ValueError, KeyError, AttributeError) as exc:
