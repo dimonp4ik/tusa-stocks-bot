@@ -371,7 +371,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
     sz = okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, px, spec or {})
     if sz <= 0:
-        _dm(uid, f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
+        _entry_skip(uid, sig, inst_id, "order size below contract minimum",
+                    f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
         return
 
     # The order size above was computed FOR this leverage. The result used to
@@ -383,7 +384,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     _lev_ok, _lev_err = okx.ensure_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
     if not _lev_ok:
         log.warning(f"autotrade leverage set failed {uid} {inst_id}: {_lev_err}")
-        _dm(uid, "\n".join([
+        _entry_skip(uid, sig, inst_id, "OKX leverage setup failed",
+                    "\n".join([
             f"⚠️ Автотрейдинг: не смог выставить плечо {AUTOTRADE_LEVERAGE}x по {disp}.",
             "Сделка пропущена — иначе размер позиции не соответствовал бы риску.",
             f"`{_lev_err}`",
