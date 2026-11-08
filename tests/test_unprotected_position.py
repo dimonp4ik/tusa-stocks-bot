@@ -16,12 +16,19 @@ class UnprotectedPositionTests(unittest.TestCase):
         with patch.object(at.time, "monotonic", side_effect=[100, 116]):
             self._check_market_submission(False, stale_snapshot=True)
 
-    def _check_market_submission(self, expired, stale_snapshot=False):
+    def test_market_entry_expires_during_final_snapshot(self):
+        self._check_market_submission(False, expires_during_snapshot=True)
+
+    def _check_market_submission(self, expired, stale_snapshot=False,
+                                 expires_during_snapshot=False):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         if expired:
             sig["source"] = "stock_xperp_native_shadow"
             sig["strategy_entry_bar_ts"] = at.time.time() - 181
+        if expires_during_snapshot:
+            sig["source"] = "stock_xperp_native_shadow"
+            sig["strategy_entry_bar_ts"] = at.time.time() - 175
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                 ('at_set_balance',None),('get_bot_state',None),
@@ -40,11 +47,22 @@ class UnprotectedPositionTests(unittest.TestCase):
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             close = stack.enter_context(patch.object(at, "at_close_position"))
             stack.enter_context(patch.object(at, "_entry_skip"))
+            if expires_during_snapshot:
+                clock = stack.enter_context(patch.object(at.time, "time", wraps=at.time.time))
+                snapshot = at.okx.get_open_position_margin
+                response = snapshot.return_value
+
+                def get_snapshot(*args):
+                    if snapshot.call_count == 2:
+                        clock.return_value = sig["strategy_entry_bar_ts"] + 181
+                    return response
+
+                snapshot.side_effect = get_snapshot
             place = at.okx.place_market_entry
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
         create.assert_called_once()
         activate.assert_not_called()
-        if expired:
+        if expired or expires_during_snapshot:
             place.assert_not_called()
             close.assert_called_once_with(91, "ENTRY_EXPIRED")
         elif stale_snapshot:
