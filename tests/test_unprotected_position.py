@@ -43,6 +43,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(
                 at.okx,'get_position_size',side_effect=[(True,0),(True,0)]))
+            stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             close = stack.enter_context(patch.object(at, "at_close_position"))
@@ -93,6 +94,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 return_value=[dict(user_id=7, inst_id='PENDING', margin_usd=4)]))
             stack.enter_context(patch.object(at, 'AUTOTRADE_MAX_ACCOUNT_POSITIONS', 12))
             stack.enter_context(patch.object(at, 'AUTOTRADE_ACCOUNT_WRITER_COUNT', 2))
+            stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
@@ -120,6 +122,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 return_value=[dict(user_id=7, inst_id='PENDING', status='ENTRY_PENDING', margin_usd=4)]))
             stack.enter_context(patch.object(at, 'AUTOTRADE_MAX_ACCOUNT_POSITIONS', 12))
             stack.enter_context(patch.object(at, 'AUTOTRADE_ACCOUNT_WRITER_COUNT', 2))
+            stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
@@ -152,6 +155,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(
                 at.okx,'get_position_size',side_effect=[(True,0),(True,.01)]))
+            stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             update=stack.enter_context(patch.object(at,'at_update_entry_intent_protection'))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
@@ -186,6 +190,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('close_position_market',(close_accepted,'close response'))]:
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(at.okx,'get_position_size',side_effect=[(True,0),(True,.01)]))
+            stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             retire=stack.enter_context(patch.object(at,'at_close_position'))

@@ -48,7 +48,7 @@ from config import (
 from src.db import (
     get_bot_state, set_bot_state,
     at_get_active_traders, at_get, at_set_balance,
-    at_create_entry_intent,
+    at_create_entry_intent, at_mark_entry_submitting, at_release_unsent_entry,
     at_update_entry_intent_protection, at_activate_entry_intent,
     at_open_positions_for_signal, at_update_position_sl,
     at_close_position, at_all_open_positions, at_reduce_position_sz,
@@ -479,6 +479,9 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         log.info("shared OKX short exposure before %s: shorts=%d unknown_sides=%d total=%d",
                  inst_id, latest_positions["short_count"],
                  latest_positions["unknown_side_count"], latest_positions["count"])
+    if not at_mark_entry_submitting(intent_id):
+        _entry_skip(uid, sig, inst_id, "entry reservation is no longer available")
+        return
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id,
         deadline_ms=deadline_ms)
@@ -934,13 +937,17 @@ def poll_exchange_closes() -> None:
         return
     for pos in positions:
         try:
+            pending_entry = pos.get("status") == "ENTRY_PENDING"
+            submitted_at = pos.get("entry_submit_started_at")
+            pending_age = time.time() - float(submitted_at or pos.get("opened_at") or 0)
+            if pending_entry and pending_age < _ENTRY_PENDING_GRACE_SEC:
+                continue
+            if pending_entry and submitted_at == 0:
+                at_release_unsent_entry(pos["id"])
+                continue
             u = at_get(pos["user_id"])
             creds = _creds_of(u) if u else None
             if not creds:
-                continue
-            pending_entry = pos.get("status") == "ENTRY_PENDING"
-            pending_age = time.time() - float(pos.get("opened_at") or 0)
-            if pending_entry and pending_age < _ENTRY_PENDING_GRACE_SEC:
                 continue
             ok, size = okx.get_position_size(creds, pos["inst_id"])
             if not ok:

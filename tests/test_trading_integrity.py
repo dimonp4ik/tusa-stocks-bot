@@ -349,7 +349,7 @@ class ExchangeTests(unittest.TestCase):
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                  ('at_set_balance',None),('get_bot_state',None),
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),
-                 ('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
+                 ('at_mark_entry_submitting',True),('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
             for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                  ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
@@ -519,6 +519,22 @@ class DatabaseTests(unittest.TestCase):
             self.assertEqual(db.at_create_entry_intent(
                 2, 7, "OTHER", "LONG", .02, 100, 3, 94, "order-2",
                 account_key="account-a", slot_limit=4, expected_api_key_enc="old"), 0)
+
+    def test_only_unclaimed_entry_reservations_can_be_released(self):
+        from src import db
+
+        with tempfile.TemporaryDirectory() as tmp, patch.object(
+                db, "DB_PATH", str(Path(tmp) / "signals.db")):
+            db.init_db()
+            unsent = db.at_create_entry_intent(
+                1, 7, "TEST", "LONG", 1, 100, 3, 98, "unsent")
+            claimed = db.at_create_entry_intent(
+                2, 7, "TEST2", "LONG", 1, 100, 3, 98, "claimed")
+            self.assertTrue(db.at_mark_entry_submitting(claimed))
+            self.assertFalse(db.at_release_unsent_entry(claimed))
+            self.assertTrue(db.at_release_unsent_entry(unsent))
+            self.assertFalse(db.at_mark_entry_submitting(unsent))
+            self.assertEqual([row["id"] for row in db.at_all_open_positions()], [claimed])
 
     def test_account_slots_are_atomic_across_telegram_users(self):
         from concurrent.futures import ThreadPoolExecutor
