@@ -286,7 +286,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     if not margin_ok:
         log.warning("autotrade account margin unavailable for %s: %s",
                     uid, account_positions)
-        _dm(uid, "⚠️ Автотрейдинг: не смог проверить общую загрузку счёта OKX — "
+        _entry_skip(uid, sig, inst_id, "OKX account snapshot unavailable",
+                    "⚠️ Автотрейдинг: не смог проверить общую загрузку счёта OKX — "
                  f"сделка по {disp} пропущена.\n`{account_positions}`")
         return
     # A submitted local entry can be absent from a lagging OKX snapshot.
@@ -306,7 +307,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
     if inst_id in account_positions["inst_ids"]:
         log.warning("autotrade: %s already holds %s on exchange — entry refused",
                     uid, inst_id)
-        _dm(uid, f"ℹ️ Автотрейдинг: по {disp} уже есть позиция на общем счёте — "
+        _entry_skip(uid, sig, inst_id, "instrument already open on shared account",
+                    f"ℹ️ Автотрейдинг: по {disp} уже есть позиция на общем счёте — "
                  "повторный сигнал пропущен.")
         return
     if not account_position_count_allows(
@@ -316,7 +318,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         count = int(account_positions["count"])
         log.warning("autotrade shared position cap %s: open %s, limit %s",
                     uid, count, AUTOTRADE_MAX_ACCOUNT_POSITIONS)
-        _dm(uid, f"ℹ️ Автотрейдинг: на общем счёте уже {count} "
+        _entry_skip(uid, sig, inst_id, "shared account position cap",
+                    f"ℹ️ Автотрейдинг: на общем счёте уже {count} "
                  f"открытых позиций. Лимит {AUTOTRADE_MAX_ACCOUNT_POSITIONS}; "
                  f"сделка по {disp} пропущена.")
         return
@@ -330,7 +333,8 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         limit = 100*AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION
         log.warning("autotrade shared margin cap %s: used %.2f%%, request %.2f%%",
                     uid, used, 100*margin/balance)
-        _dm(uid, f"ℹ️ Автотрейдинг: общая загрузка счёта уже {used:.1f}%. "
+        _entry_skip(uid, sig, inst_id, "shared account margin cap",
+                    f"ℹ️ Автотрейдинг: общая загрузка счёта уже {used:.1f}%. "
                  f"Для безопасного лимита {limit:.0f}% сделка по {disp} пропущена.")
         return
 
