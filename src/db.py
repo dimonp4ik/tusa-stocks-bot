@@ -458,6 +458,7 @@ def init_db():
         """)
         _ensure_column(c, "autotrade_positions", "tp1_algo_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
+        _ensure_column(c, "autotrade_positions", "entry_filled_sz", "REAL")
         _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "entry_submit_started_at", "REAL")
         _ensure_column(c, "autotrade_positions", "entry_account_short_count", "INTEGER")
@@ -2610,17 +2611,18 @@ def at_update_entry_intent_protection(pos_id: int, sl_algo_id: str,
 def at_activate_entry_intent(pos_id: int, sz: float, entry_px: float,
                              margin_usd: float, sl_algo_id: str, sl_px: float,
                              tp1_algo_id: str = None,
-                             tp1_sz: float = None) -> bool:
+                             tp1_sz: float = None, *,
+                             entry_filled_sz: float | None = None) -> bool:
     """Commit a pending entry only after exchange protection is installed."""
     with _conn() as c:
         cur = c.execute("""
             UPDATE autotrade_positions
             SET sz = ?, entry_px = ?, margin_usd = ?, sl_algo_id = ?,
                 sl_px = ?, tp1_algo_id = ?, tp1_sz = ?, status = 'OPEN',
-                error = NULL
+                entry_filled_sz = ?, error = NULL
             WHERE id = ? AND status = 'ENTRY_PENDING'
         """, (sz, entry_px, margin_usd, sl_algo_id, sl_px,
-              tp1_algo_id, tp1_sz, pos_id))
+              tp1_algo_id, tp1_sz, entry_filled_sz, pos_id))
         return cur.rowcount == 1
 
 

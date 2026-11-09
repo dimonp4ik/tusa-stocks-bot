@@ -532,13 +532,36 @@ def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
     return False, "algo cancellation unconfirmed" if ok else data
 
 
+def get_protection_order_ids(creds: dict, inst_id: str, algo_id: str) -> tuple[str, ...] | None:
+    """Look up regular orders created by a specific TP/SL or OCO."""
+    ok, rows = _request(creds, "GET", "/api/v5/trade/orders-algo-history",
+                        params={"instId": inst_id, "algoId": algo_id,
+                                "ordType": "conditional,oco"})
+    if not ok or not isinstance(rows, list) or len(rows) != 1:
+        return None
+    row = rows[0]
+    if (not isinstance(row, dict) or row.get("instId") != inst_id
+            or row.get("algoId") != algo_id):
+        return None
+    order_ids = row.get("ordIdList")
+    if not isinstance(order_ids, list) or any(
+            not isinstance(order_id, str) or not order_id.isdecimal()
+            for order_id in order_ids):
+        return None
+    return tuple(dict.fromkeys(order_ids))
+
+
 def get_last_fill_px(creds: dict, inst_id: str, *, since_ts=None,
-                     side: str = None) -> float | None:
+                     side: str = None, order_ids: tuple[str, ...] | None = None,
+                     expected_size: float | None = None) -> float | None:
     """VWAP of latest matching order in a complete recent fill page.
 
     Not whole-position PnL. Decline truncated pages, missing identifiers and
     ambiguous rows rather than report an unrelated entry fill as the exit.
     """
+    requested = set(order_ids) if order_ids is not None else None
+    if requested is not None and (not requested or expected_size is None):
+        return None
     ok,data=_request(creds,"GET","/api/v5/trade/fills",
                      params={"instId":inst_id,"limit":"100"})
     if not ok or not data or len(data)>=100:
@@ -548,6 +571,8 @@ def get_last_fill_px(creds: dict, inst_id: str, *, since_ts=None,
         rows=[]
         for f in data:
             if f.get("instId")!=inst_id or (side and f.get("side")!=side):continue
+            if requested is not None and f.get("ordId") not in requested:
+                continue
             ts=int(f.get("ts") or 0)
             if since_ts is not None and ts<float(since_ts)*1000:continue
             px=float(f.get("fillPx") or 0);sz=float(f.get("fillSz") or 0)
@@ -555,9 +580,15 @@ def get_last_fill_px(creds: dict, inst_id: str, *, since_ts=None,
                 return None
             rows.append((ts,str(f['ordId']),px,sz))
         if not rows:return None
-        order=max(rows,key=lambda r:r[0])[1]
-        selected=[r for r in rows if r[1]==order]
-        return sum(r[2]*r[3] for r in selected)/sum(r[3] for r in selected)
+        if requested is None:
+            order = max(rows, key=lambda row: row[0])[1]
+            rows = [row for row in rows if row[1] == order]
+        elif {row[1] for row in rows} != requested:
+            return None
+        size = math.fsum(row[3] for row in rows)
+        if expected_size is not None and not math.isclose(size, expected_size, rel_tol=1e-9):
+            return None
+        return math.fsum(row[2] * row[3] for row in rows) / size
     except (TypeError,ValueError,OverflowError):
         return None
 

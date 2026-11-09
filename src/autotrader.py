@@ -672,7 +672,8 @@ def _open_for_account_locked(
     try:
         activated = at_activate_entry_intent(
             intent_id, _pos_sz, _fill_px, margin, algo_id, sl_px,
-            tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz)
+            tp1_algo_id=tp1_algo_id, tp1_sz=tp1_sz,
+            entry_filled_sz=_filled_sz if _sz_ok and _filled_sz and _filled_sz > 0 else None)
         if not activated:
             raise RuntimeError("entry intent is missing or no longer pending")
     except Exception as _db_err:
@@ -1137,5 +1138,20 @@ def poll_exchange_closes() -> None:
                 f"{_px_line}\n"
                 f"_Это реальная цена сделки. Сообщение по сигналу придёт позже "
                 f"и покажет цену закрытия свечи — она может отличаться._")
+            if pos.get("entry_filled_sz") and pos.get("sl_algo_id"):
+                algo_ids = [pos["sl_algo_id"]]
+                if pos.get("tp1_algo_id"):
+                    algo_ids.append(pos["tp1_algo_id"])
+                orders = [okx.get_protection_order_ids(creds, pos["inst_id"], algo_id)
+                          for algo_id in algo_ids]
+                if all(group is not None for group in orders):
+                    order_ids = tuple(order_id for group in orders for order_id in group)
+                    matched = okx.get_last_fill_px(
+                        creds, pos["inst_id"], since_ts=pos.get("opened_at"),
+                        side="sell" if pos["direction"] == "LONG" else "buy",
+                        order_ids=order_ids, expected_size=pos["entry_filled_sz"])
+                    if matched is not None:
+                        log.info("matched protective exit signal=%s inst=%s size=%s vwap=%s",
+                                 pos["signal_id"], pos["inst_id"], pos["entry_filled_sz"], matched)
         except Exception as e:
             log.warning(f"autotrade exchange-close poll failed pos#{pos['id']}: {e}")
