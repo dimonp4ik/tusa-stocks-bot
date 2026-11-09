@@ -7,7 +7,9 @@ from src import autotrader as at
 
 class UnprotectedPositionTests(unittest.TestCase):
     def test_lost_market_response_is_persisted_for_reconciliation(self):
-        self._check_market_submission(False)
+        for error in ("request failed: timed out", "Request timeout (code 50004)"):
+            with self.subTest(error=error):
+                self._check_market_submission(False, order_error=error)
 
     def test_market_entry_expires_after_intent_before_submit(self):
         self._check_market_submission(True)
@@ -20,7 +22,8 @@ class UnprotectedPositionTests(unittest.TestCase):
         self._check_market_submission(False, expires_during_snapshot=True)
 
     def _check_market_submission(self, expired, stale_snapshot=False,
-                                 expires_during_snapshot=False):
+                                 expires_during_snapshot=False,
+                                 order_error="request failed: timed out"):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         if expired:
@@ -38,7 +41,7 @@ class UnprotectedPositionTests(unittest.TestCase):
                 ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                 ('ensure_leverage',(True,None)),
                 ('get_order_book',{'ts':at.time.time()*1000,'bids':[[99.99,1000]],'asks':[[100.01,1000]]}),
-                ('place_market_entry',(False,'request failed: timed out')),
+                ('place_market_entry',(False,order_error)),
                 ('get_order_by_client_id',(False,'not found'))]:
                 stack.enter_context(patch.object(at.okx,name,return_value=value))
             stack.enter_context(patch.object(
