@@ -303,14 +303,14 @@ def _open_for_account_locked(
         return
     # A submitted local entry can be absent from a lagging OKX snapshot.
     # A visible partial fill may still have an unresolved entry intent.
-    unresolved = [
+    local_positions = [
         row for row in at_all_open_positions()
         if (row["user_id"] == uid
             or (account_key and row.get("account_key") == account_key))
-        and (row.get("status") == "ENTRY_PENDING"
-             or row["inst_id"] not in account_positions["inst_ids"])
     ]
-    if unresolved:
+    local_instruments = {row["inst_id"] for row in local_positions}
+    if (any(row.get("status") == "ENTRY_PENDING" for row in local_positions)
+            or not local_instruments.issubset(account_positions["inst_ids"])):
         reason = "OKX ещё не подтвердил предыдущий вход в списке позиций"
         _entry_skip(uid, sig, inst_id, reason,
                     f"Автотрейдинг: {disp} пропущен. {reason}.")
@@ -469,6 +469,7 @@ def _open_for_account_locked(
                     f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
         return
     if (not margin_ok or inst_id in latest_positions["inst_ids"]
+            or not local_instruments.issubset(latest_positions["inst_ids"])
             or not account_position_count_allows(
                 occupied_positions=latest_positions["count"],
                 max_positions=AUTOTRADE_MAX_ACCOUNT_POSITIONS,
