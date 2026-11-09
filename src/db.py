@@ -2570,7 +2570,11 @@ def at_short_exposure_audit(since_ts: float) -> dict:
                    COUNT(CASE WHEN entry_account_short_count >= 2 THEN 1 END)
                        AS at_or_above_two,
                    COUNT(CASE WHEN entry_account_unknown_side_count > 0 THEN 1 END)
-                       AS with_unknown_side
+                       AS with_unknown_side,
+                   COUNT(CASE WHEN status = 'ENTRY_PENDING' THEN 1 END)
+                       AS unresolved_attempts,
+                   MIN(CASE WHEN status = 'ENTRY_PENDING'
+                            THEN entry_submit_started_at END) AS oldest_unresolved_at
             FROM autotrade_positions
             WHERE direction = 'SHORT' AND entry_submit_started_at > 0
               AND entry_submit_started_at >= ?

@@ -245,6 +245,10 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
           f"со снимком позиций: {exposure['observed']}")
         A(f"  Уже открыто два шорта или больше: {exposure['at_or_above_two']}")
         A(f"  Есть позиции с неизвестным направлением: {exposure['with_unknown_side']}")
+        A(f"  Попыток входа без подтверждённого исхода: {exposure['unresolved_attempts']}")
+        if exposure["oldest_unresolved_at"] is not None:
+            age_minutes = max(0, (now - exposure["oldest_unresolved_at"]) / 60)
+            A(f"  Возраст самой старой попытки: {age_minutes:.0f} мин")
         A("")
         A("## МЕТОДИКА РАСЧЁТА")
         A("  доля прибыльных = закрытые сделки с realized_r > 0 / все закрытые")
