@@ -170,6 +170,13 @@ class RiskTests(unittest.TestCase):
                               max_drawdown=.03,peak_floor=140)
         self.assertEqual(state['peak'],150)
 
+    def test_entry_sizing_preserves_exact_minimum_lot(self):
+        from src import okx_trader
+
+        spec = {"ctVal": 1, "lotSz": .1, "minSz": .3}
+        self.assertEqual(okx_trader.calc_contracts(.03, 10, 1, spec), .3)
+        self.assertEqual(okx_trader.calc_contracts(.0299, 10, 1, spec), 0)
+
     def test_shared_account_margin_reserves_sister_bot_race(self):
         self.assertTrue(account_margin_allows(
             equity=100, occupied_margin=84, requested_margin=3,

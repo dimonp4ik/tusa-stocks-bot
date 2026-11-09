@@ -617,13 +617,13 @@ def calc_contracts(margin_usd: float, leverage: float, price: float, spec: dict)
     """margin*leverage → notional → contracts, floored to lotSz. 0 if below minSz."""
     if price <= 0 or not spec:
         return 0.0
-    notional = margin_usd * leverage
-    raw = notional / (spec["ctVal"] * price)
-    lot = spec["lotSz"] or 1.0
-    sz = int(raw / lot) * lot
-    if sz < spec["minSz"]:
+    notional = Decimal(str(margin_usd)) * Decimal(str(leverage))
+    lot = Decimal(str(spec["lotSz"] or 1.0))
+    lot_value = Decimal(str(spec["ctVal"])) * Decimal(str(price)) * lot
+    size = (notional // lot_value) * lot
+    if size < Decimal(str(spec["minSz"])):
         return 0.0
-    return sz
+    return float(size)
 
 
 def get_order_book(inst_id: str) -> dict | None:
