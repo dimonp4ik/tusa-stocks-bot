@@ -484,13 +484,14 @@ def _open_for_account_locked(
         _entry_skip(uid, sig, inst_id, "общий лимит OKX не подтверждён перед отправкой",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — общий лимит OKX не подтверждён.")
         return
-    if sig["direction"] == "SHORT" and latest_positions.get("short_count", 0) >= 2:
-        log.info("shared OKX short exposure before %s: shorts=%d unknown_sides=%d total=%d",
-                 inst_id, latest_positions["short_count"],
-                 latest_positions["unknown_side_count"], latest_positions["count"])
     if not at_mark_entry_submitting(intent_id):
         _entry_skip(uid, sig, inst_id, "entry reservation is no longer available")
         return
+    if sig["direction"] == "SHORT":
+        log.info(
+            "shared short-cap audit signal_id=%s inst=%s shorts=%d unknown_sides=%d total=%d",
+            sig["id"], inst_id, latest_positions.get("short_count", 0),
+            latest_positions.get("unknown_side_count", 0), latest_positions["count"])
     ok, ord_id = okx.place_market_entry(
         creds, inst_id, sig["direction"], sz, client_order_id,
         deadline_ms=deadline_ms)
