@@ -417,8 +417,11 @@ def get_order_by_client_id(creds: dict, inst_id: str,
 
 
 def is_ambiguous_request_error(error) -> bool:
-    """True only when transport failed and exchange acceptance is unknown."""
-    return str(error or "").lower().startswith("request failed:")
+    """Whether an order can have reached OKX despite the error."""
+    message = str(error or "").lower()
+    return (message.startswith("request failed:")
+            or "(code 50004)" in message or "(code 50004," in message
+            or "(scode 50004)" in message)
 
 
 def place_protection_oco(creds: dict, inst_id: str, direction: str,
