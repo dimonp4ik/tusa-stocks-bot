@@ -2561,6 +2561,23 @@ def at_mark_entry_submitting(
         ).rowcount == 1
 
 
+def at_short_exposure_audit(since_ts: float) -> dict:
+    """Summarize short submission claims without exposing account identifiers."""
+    with _conn() as c:
+        row = c.execute("""
+            SELECT COUNT(*) AS attempts,
+                   COUNT(entry_account_short_count) AS observed,
+                   COUNT(CASE WHEN entry_account_short_count >= 2 THEN 1 END)
+                       AS at_or_above_two,
+                   COUNT(CASE WHEN entry_account_unknown_side_count > 0 THEN 1 END)
+                       AS with_unknown_side
+            FROM autotrade_positions
+            WHERE direction = 'SHORT' AND entry_submit_started_at > 0
+              AND entry_submit_started_at >= ?
+        """, (since_ts,)).fetchone()
+        return dict(row)
+
+
 def at_release_unsent_entry(pos_id: int) -> bool:
     """Release a reservation only if no worker claimed it for submission."""
     with _conn() as c:

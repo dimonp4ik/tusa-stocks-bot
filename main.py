@@ -238,6 +238,14 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         else:
             A("  всё, что есть в базе")
         A("")
+        from src.db import at_short_exposure_audit
+        exposure = at_short_exposure_audit(since_ts)
+        A("## ШОРТЫ НА ОБЩЕМ СЧЁТЕ OKX")
+        A(f"  Попыток отправки: {exposure['attempts']}, "
+          f"со снимком позиций: {exposure['observed']}")
+        A(f"  Уже открыто два шорта или больше: {exposure['at_or_above_two']}")
+        A(f"  Есть позиции с неизвестным направлением: {exposure['with_unknown_side']}")
+        A("")
         A("## МЕТОДИКА РАСЧЁТА")
         A("  доля прибыльных = закрытые сделки с realized_r > 0 / все закрытые")
         A("  открытые сделки не входят ни в результат, ни в долю прибыльных")
