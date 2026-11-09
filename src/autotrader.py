@@ -469,7 +469,7 @@ def _open_for_account_locked(
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
         return
-    if (not margin_ok or not latest_balance_ok
+    if (not margin_ok or not latest_balance_ok or latest_balance <= 0
             or inst_id in latest_positions["inst_ids"]
             or not local_instruments.issubset(latest_positions["inst_ids"])
             or not account_position_count_allows(

@@ -208,7 +208,9 @@ def get_balance(creds: dict) -> tuple:
     if not ok:
         return False, data
     try:
-        total = float(data[0].get("totalEq") or 0.0)
+        total = float(data[0]["totalEq"])
+        if not math.isfinite(total):
+            return False, "balance parse failed: non-finite totalEq"
         return True, total
     except Exception as e:
         return False, f"balance parse failed: {e}"
