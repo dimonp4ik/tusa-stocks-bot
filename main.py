@@ -457,18 +457,19 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         # whose own tp1_close_pct is non-zero banks part of it instead, so their
         # live results are not the ones any backtest figure describes. Surface it
         # rather than let the two quietly disagree.
-        A("## ФИКСАЦИЯ НА TP1 (модель держит ВСЮ позицию)")
+        A("## TP1")
         try:
-            from src.db import at_get_active_traders as _agt
-            _tr = _agt() or []
-            _bad = [t for t in _tr if float(t.get("tp1_close_pct") or 0) != 0]
-            A(f"  автотрейдеров {len(_tr)}, с ненулевой фиксацией {len(_bad)}")
-            if _bad:
-                _vals = sorted({float(t.get("tp1_close_pct") or 0) for t in _bad})
-                A(f"  ⚠️ РАСХОЖДЕНИЕ С МОДЕЛЬЮ: фиксируют на TP1 {_vals}%")
-                A("     модель держит всю позицию до трейлинга — цифры бэктеста им не подходят")
-        except Exception as _te:
-            A(f"  ошибка чтения: {_te}")
+            from src.db import at_get_active_traders
+            traders = at_get_active_traders() or []
+            configured = sorted({float(t.get("tp1_close_pct") or 0) for t in traders})
+            A(f"  Активных автотрейдеров: {len(traders)}")
+            if configured:
+                A("  Пользовательские настройки фиксации: "
+                  + ", ".join(f"{value:g}%" for value in configured))
+            A("  Доля фиксации модели по каждому сигналу указана в CSV "
+              "(strategy_tp1_close_frac).")
+        except Exception as exc:
+            A(f"  Не удалось прочитать настройки: {exc}")
         A("")
 
         A("## ЗАДЕРЖКА ПУБЛИКАЦИИ (последние сканы)")
@@ -508,7 +509,7 @@ def _build_and_send_report(chat_id: int, message_id, since_ts: float,
         if message_id:
             _edit_admin_text(chat_id, message_id,
                              f"📦 *Полный отчёт* — {window_label}\n"
-                             "Отправляю файлы, перешли их Клоду.", _KB_ANALYTICS)
+                             "Отправляю отчёт и таблицы для анализа.", _KB_ANALYTICS)
 
         import csv as _csv, io as _io
         stamp = datetime.now(rz).strftime("%Y%m%d")
