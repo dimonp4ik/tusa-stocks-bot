@@ -44,7 +44,7 @@ def test_autotrade_menu_shows_last_skip_reason():
 
 
 def test_book_audit_runs_only_after_protection_and_position_activation():
-    source = inspect.getsource(autotrader._open_for_user_locked)
+    source = inspect.getsource(autotrader._open_for_account_locked)
     assert source.index("place_protection_oco") < source.index("at_activate_entry_intent")
     assert source.index("at_activate_entry_intent") < source.rindex(
         "record_signal_execution_book")

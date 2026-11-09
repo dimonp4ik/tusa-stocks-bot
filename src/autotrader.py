@@ -138,6 +138,7 @@ def _margin_for(u: dict, balance: float) -> float:
 
 
 _entry_locks = defaultdict(threading.Lock)
+_account_entry_locks = defaultdict(threading.Lock)
 
 
 def _entry_skip(user_id: int, sig: dict, inst_id: str, reason: str,
@@ -227,7 +228,15 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     account_key = okx.account_key(account_check)
+    with _account_entry_locks[account_key]:
+        _open_for_account_locked(u, sig, inst_id, disp, creds, account_key)
 
+
+def _open_for_account_locked(
+    u: dict, sig: dict, inst_id: str, disp: str, creds: dict,
+    account_key: str | None,
+) -> None:
+    uid = u["user_id"]
     ok, balance = okx.get_balance(creds)
     if not ok:
         log.warning(f"autotrade balance failed for {uid}: {balance}")
