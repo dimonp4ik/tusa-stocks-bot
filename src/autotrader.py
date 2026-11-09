@@ -484,7 +484,9 @@ def _open_for_account_locked(
         _entry_skip(uid, sig, inst_id, "общий лимит OKX не подтверждён перед отправкой",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — общий лимит OKX не подтверждён.")
         return
-    if not at_mark_entry_submitting(intent_id):
+    if not at_mark_entry_submitting(
+            intent_id, account_short_count=latest_positions.get("short_count"),
+            account_unknown_side_count=latest_positions.get("unknown_side_count")):
         _entry_skip(uid, sig, inst_id, "entry reservation is no longer available")
         return
     if sig["direction"] == "SHORT":

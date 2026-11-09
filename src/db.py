@@ -460,6 +460,8 @@ def init_db():
         _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
         _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "entry_submit_started_at", "REAL")
+        _ensure_column(c, "autotrade_positions", "entry_account_short_count", "INTEGER")
+        _ensure_column(c, "autotrade_positions", "entry_account_unknown_side_count", "INTEGER")
         _ensure_column(c, "autotrade_positions", "account_key", "TEXT")
         c.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS idx_autotrade_client_order
@@ -2545,13 +2547,17 @@ def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
         return int(cur.lastrowid or 0)
 
 
-def at_mark_entry_submitting(pos_id: int) -> bool:
+def at_mark_entry_submitting(
+    pos_id: int, *, account_short_count: int | None = None,
+    account_unknown_side_count: int | None = None,
+) -> bool:
     """Claim the reserved row before any request to place the order."""
     with _conn() as c:
         return c.execute(
-            "UPDATE autotrade_positions SET entry_submit_started_at = ? "
+            "UPDATE autotrade_positions SET entry_submit_started_at = ?, "
+            "entry_account_short_count = ?, entry_account_unknown_side_count = ? "
             "WHERE id = ? AND status = 'ENTRY_PENDING' AND entry_submit_started_at = 0",
-            (time_mod.time(), pos_id),
+            (time_mod.time(), account_short_count, account_unknown_side_count, pos_id),
         ).rowcount == 1
 
 
