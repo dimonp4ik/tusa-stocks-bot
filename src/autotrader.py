@@ -451,8 +451,8 @@ def _open_for_account_locked(
                  "ордер не отправлен.")
         return
     if not intent_id:
-        log.warning("autotrade entry reservation refused (duplicate or slot limit) %s %s %s",
-                    uid, inst_id, client_order_id)
+        _entry_skip(uid, sig, inst_id,
+                    "локальная бронь входа отклонена")
         return
     deadline_ms = None
     if sig.get("source") == "stock_xperp_native_shadow":

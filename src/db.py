@@ -2545,7 +2545,7 @@ def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
             VALUES (?, ?, ?, ?, ?, ?, ?, '', ?, 'ENTRY_PENDING', ?, ?, ?, 0)
         """, (signal_id, user_id, inst_id, direction, sz, entry_px,
               margin_usd, sl_px, time_mod.time(), client_order_id, account_key))
-        return int(cur.lastrowid or 0)
+        return int(cur.lastrowid) if cur.rowcount == 1 else 0
 
 
 def at_mark_entry_submitting(
