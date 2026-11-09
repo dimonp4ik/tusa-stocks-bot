@@ -334,6 +334,8 @@ def get_open_position_margin(creds: dict) -> tuple:
                 raise ValueError(f'position margin unavailable for {inst_id}')
             total += max(estimates)
             instruments.append(inst_id)
+        if not math.isfinite(total):
+            raise ValueError('total occupied margin non-finite')
         return True, {
             'margin_usd': total,
             'count': len(instruments),
