@@ -625,7 +625,7 @@ def _native_scan_status_text() -> str:
             "published": "сигнал опубликован",
             "no_candidate_passed": "рынок проверен, сетапов нет",
             "qualified_but_not_published": "сетап отфильтрован портфелем",
-            "daily_loss_pause": "пауза после серии убытков",
+            "daily_loss_pause": "дневная пауза по убыткам",
             "premarket_liquidity_regime_trigger": "защита от тонкого падающего рынка",
             "premarket_liquidity_regime_pause": "дневная пауза тонкого падающего рынка",
             "insufficient_instruments": "не хватает инструментов",
@@ -4066,10 +4066,11 @@ def _run_native_xperp_shadow_scan() -> None:
         _persist_native_scan_audit({
             "ts": time.time(), "result": "daily_loss_pause",
             "loss_pause_streak": NATIVE_XPERP_LOSS_PAUSE_STREAK,
+            "daily_loss_r_cap": NATIVE_XPERP_DAILY_LOSS_R_CAP,
         })
         log.warning(
-            "Native X-Perp shadow paused after %s consecutive UTC-day losses",
-            NATIVE_XPERP_LOSS_PAUSE_STREAK)
+            "Native X-Perp daily loss pause active (streak cap %s, daily loss cap %s R)",
+            NATIVE_XPERP_LOSS_PAUSE_STREAK, NATIVE_XPERP_DAILY_LOSS_R_CAP)
         return
     if _native_xperp_premarket_regime_pause():
         _persist_native_scan_audit({
