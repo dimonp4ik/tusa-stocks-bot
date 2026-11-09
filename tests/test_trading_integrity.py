@@ -372,6 +372,14 @@ class ExchangeTests(unittest.TestCase):
                 with patch.object(at.okx,'get_order_book',return_value=bad_book):
                     at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
                 order.assert_called_once()  # No additional market entry on refused depth.
+            with patch.object(at.okx, "get_balance", side_effect=[
+                (True, 128), (False, "snapshot unavailable"),
+            ]) as balances, patch.object(at, "at_close_position") as close:
+                at._open_for_user(dict(user_id=7, size_mode="percent", size_value=3),
+                                  sig, "TEST", "TEST")
+                self.assertEqual(balances.call_count, 2)
+                close.assert_called_once_with(91, "ENTRY_SNAPSHOT_EXPIRED")
+                order.assert_called_once()
             visible = dict(margin_usd=5, count=1, inst_ids=("OTHER",))
             missing = dict(margin_usd=0, count=0, inst_ids=())
             with patch.object(at, "at_all_open_positions", return_value=[
