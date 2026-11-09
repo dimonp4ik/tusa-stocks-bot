@@ -689,6 +689,14 @@ def _open_for_account_locked(
             f"ошибка: `{_db_err}`",
         ]))
         raise
+    if _avg_px and planned > 0:
+        sign = 1 if sig["direction"] == "LONG" else -1
+        log.info(
+            "entry execution signal=%s inst=%s adverse_vs_signal_bps=%.2f "
+            "adverse_vs_book_bps=%.2f",
+            sig["id"], inst_id, sign * (_avg_px / planned - 1) * 10_000,
+            sign * (_avg_px / px - 1) * 10_000,
+        )
     # Diagnostics come strictly after the live fill has both exchange protection
     # and durable OPEN tracking. SQLite must never delay the protective OCO.
     if book_snapshot is not None:
