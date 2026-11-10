@@ -677,3 +677,51 @@ def get_order_book(inst_id: str) -> dict | None:
     except Exception as exc:
         _log.warning("order book unavailable %s: %s", inst_id, exc)
         return None
+
+
+def calc_partial_close(position_sz: float, close_pct: float, spec: dict) -> dict:
+    """Plan a fixed-size partial close without overstating what OKX can place.
+
+    X-Perp partial TP orders use a concrete contract quantity.  Percentages
+    smaller than one contract lot are therefore not valid orders.  Decimal is
+    used here because binary float flooring can turn an exact lot (for example
+    0.1) into zero or one lot too few.
+
+    The returned ``size`` is zero when the requested percentage is below the
+    instrument minimum.  Callers must keep the full position under the normal
+    runner protection in that case rather than silently rounding the client's
+    percentage upward.
+    """
+    empty = {
+        "size": 0.0,
+        "actual_pct": 0.0,
+        "minimum_size": 0.0,
+        "minimum_pct": 0.0,
+    }
+    try:
+        position = Decimal(str(position_sz))
+        requested_pct = Decimal(str(close_pct))
+        lot = Decimal(str((spec or {}).get("lotSz") or 1))
+        minimum = Decimal(str((spec or {}).get("minSz") or lot))
+    except (ValueError, TypeError, ArithmeticError):
+        return empty
+    if any(not value.is_finite() or value <= 0
+           for value in (position, requested_pct, lot, minimum)):
+        return empty
+
+    minimum = max(lot, minimum)
+    minimum_pct = minimum / position * Decimal("100")
+    if requested_pct >= 100:
+        size = position
+    else:
+        requested_size = position * requested_pct / Decimal("100")
+        size = (requested_size // lot) * lot
+    if size < minimum:
+        size = Decimal("0")
+    actual_pct = size / position * Decimal("100") if size > 0 else Decimal("0")
+    return {
+        "size": float(size),
+        "actual_pct": float(actual_pct),
+        "minimum_size": float(minimum),
+        "minimum_pct": float(minimum_pct),
+    }

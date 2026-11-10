@@ -645,9 +645,8 @@ def _open_for_account_locked(
         close_pct = 0.0
     tp1_line = "TP1 и трейлинг ведёт бот автоматически."
     if close_pct > 0:
-        lot = (spec or {}).get("lotSz") or 1.0
-        raw_tp1_sz = (_pos_sz if close_pct >= 100
-                      else int((_pos_sz * close_pct / 100.0) / lot) * lot)
+        partial = okx.calc_partial_close(_pos_sz, close_pct, spec or {})
+        raw_tp1_sz = partial["size"]
         if raw_tp1_sz > 0:
             tp1_px = okx.round_to_tick(float(sig["tp1"]), tick)
             ok, tp1_result = okx.place_tp1_partial(creds, inst_id, sig["direction"], tp1_px, raw_tp1_sz)
@@ -662,7 +661,7 @@ def _open_for_account_locked(
                 # Report the share that will REALLY close, not the setting.
                 # raw_tp1_sz is floored to lotSz, so "50%" of an odd contract
                 # count is never exactly 50% — 50% of 99 lots is 49, i.e. 49.5%.
-                _act_pct = raw_tp1_sz / _pos_sz * 100.0 if _pos_sz else close_pct
+                _act_pct = partial["actual_pct"]
                 _pct_s = (f"{_act_pct:.0f}%" if abs(_act_pct - close_pct) < 0.5
                           else f"{_act_pct:.1f}% (просил {close_pct:.0f}%, "
                                f"ровно не делится на контракты)")
@@ -672,6 +671,14 @@ def _open_for_account_locked(
             else:
                 log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
                 tp1_line = "⚠️ Не смог поставить ордер на частичное закрытие TP1 — весь объём пойдёт под трейлинг."
+        else:
+            minimum_pct = partial["minimum_pct"]
+            tp1_line = (
+                f"На TP1 выбрано {close_pct:g}%, минимум для позиции "
+                f"{minimum_pct:.2f}%. Весь объём остаётся под защитой."
+                if minimum_pct else
+                "Не удалось рассчитать объём TP1. Весь объём остаётся под защитой."
+            )
 
     # Record the REAL fill, not the pre-entry quote used for sizing — this is
     # what "breakeven" is later measured against.
