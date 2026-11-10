@@ -321,9 +321,10 @@ def _open_for_account_locked(
             or (account_key and row.get("account_key") == account_key))
     ]
     local_instruments = {row["inst_id"] for row in local_positions}
-    if (any(row.get("status") == "ENTRY_PENDING" for row in local_positions)
-            or not local_instruments.issubset(account_positions["inst_ids"])):
-        reason = "OKX ещё не подтвердил предыдущий вход в списке позиций"
+    pending_entry = any(row.get("status") == "ENTRY_PENDING" for row in local_positions)
+    if pending_entry or not local_instruments.issubset(account_positions["inst_ids"]):
+        reason = ("предыдущая заявка ещё сверяется с OKX" if pending_entry else
+                  "локальный список позиций расходится со снимком OKX")
         _entry_skip(uid, sig, inst_id, reason,
                     f"Автотрейдинг: {disp} пропущен. {reason}.")
         return
