@@ -498,6 +498,25 @@ def place_tp1_partial(creds: dict, inst_id: str, direction: str,
     return _algo_placement_result(ok, data)
 
 
+def get_live_protection_sl(creds: dict, inst_id: str, algo_id: str) -> tuple:
+    """Read the active stop trigger for the exact protective algo."""
+    ok, data = _request(creds, "GET", "/api/v5/trade/order-algo",
+                        params={"algoId": algo_id})
+    if not ok:
+        return False, data
+    try:
+        row, = data
+        if (row["algoId"] != algo_id or row["instId"] != inst_id
+                or row["state"] != "live"):
+            raise ValueError("protection identity or state mismatch")
+        price = float(row["slTriggerPx"])
+        if not math.isfinite(price) or price <= 0:
+            raise ValueError("invalid SL trigger price")
+        return True, price
+    except (TypeError, ValueError, KeyError):
+        return False, "unconfirmed protective algo stop"
+
+
 def amend_protection_sl(creds: dict, inst_id: str, algo_id: str, new_sl_px: float) -> tuple:
     """Move the OCO's SL trigger (trailing after TP1)."""
     ok, data = _request(creds, "POST", "/api/v5/trade/amend-algos", body={

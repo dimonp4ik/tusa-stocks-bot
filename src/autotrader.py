@@ -924,11 +924,21 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                     already_protected = old > 0 and (
                         old >= be_px if pos["direction"] == "LONG" else old <= be_px)
                     if not already_protected:
-                        ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
-                        if ok:
-                            at_update_position_sl(pos["id"], be_px)
+                        ok, live = okx.get_live_protection_sl(
+                            creds, pos["inst_id"], pos["sl_algo_id"])
+                        if not ok:
+                            log.warning("autotrade breakeven lookup failed pos#%s: %s",
+                                        pos["id"], live)
+                        elif (live >= be_px if pos["direction"] == "LONG" else live <= be_px):
+                            at_update_position_sl(pos["id"], live)
                         else:
-                            log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
+                            ok, err = okx.amend_protection_sl(
+                                creds, pos["inst_id"], pos["sl_algo_id"], be_px)
+                            if ok:
+                                at_update_position_sl(pos["id"], be_px)
+                            else:
+                                log.warning("autotrade breakeven amend failed pos#%s: %s",
+                                            pos["id"], err)
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
 
