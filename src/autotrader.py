@@ -920,11 +920,15 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                     # not the signal's global-feed entry.
                     _be_src = float(pos.get("entry_px") or sig["entry_price"])
                     be_px = okx.round_to_tick(_be_src, tick)
-                    ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
-                    if ok:
-                        at_update_position_sl(pos["id"], be_px)
-                    else:
-                        log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
+                    old = float(pos.get("sl_px") or 0)
+                    already_protected = old > 0 and (
+                        old >= be_px if pos["direction"] == "LONG" else old <= be_px)
+                    if not already_protected:
+                        ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], be_px)
+                        if ok:
+                            at_update_position_sl(pos["id"], be_px)
+                        else:
+                            log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {err}")
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
 
