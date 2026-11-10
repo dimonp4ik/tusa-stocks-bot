@@ -438,6 +438,18 @@ def _open_for_account_locked(
         # never turn a valid entry into a skipped trade.
         log.warning("autotrade book snapshot unavailable %s: %s", inst_id, exc)
 
+    deadline_ms = None
+    if sig.get("source") == "stock_xperp_native_shadow":
+        from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS
+
+        entry_bar = sig.get("strategy_entry_bar_ts")
+        if entry_bar:
+            deadline_ms = int((float(entry_bar) + MAX_SIGNAL_AGE_SECONDS) * 1000)
+    if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
+        _entry_skip(uid, sig, inst_id, "истёк срок входа",
+                    f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
+        return
+
     client_order_id = _entry_client_order_id(uid, sig, inst_id)
     try:
         intent_id = at_create_entry_intent(
@@ -454,13 +466,6 @@ def _open_for_account_locked(
         _entry_skip(uid, sig, inst_id,
                     "локальная бронь входа отклонена")
         return
-    deadline_ms = None
-    if sig.get("source") == "stock_xperp_native_shadow":
-        from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS
-
-        entry_bar = sig.get("strategy_entry_bar_ts")
-        if entry_bar:
-            deadline_ms = int((float(entry_bar) + MAX_SIGNAL_AGE_SECONDS) * 1000)
     account_snapshot_started = time.monotonic()
     margin_ok, latest_positions = okx.get_open_position_margin(creds)
     latest_balance_ok, latest_balance = okx.get_balance(creds)
