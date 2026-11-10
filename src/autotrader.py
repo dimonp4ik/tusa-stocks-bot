@@ -828,6 +828,16 @@ def update_trailing(sig: dict, stop_px: float) -> None:
             creds = _creds_of(u) if u else None
             if not creds:
                 continue
+            ok, live = okx.get_live_protection_sl(
+                creds, pos["inst_id"], pos["sl_algo_id"])
+            if not ok:
+                log.warning("autotrade trail lookup failed pos#%s: %s", pos["id"], live)
+                continue
+            is_long = pos["direction"] == "LONG"
+            if (live >= new if is_long else live <= new):
+                if live != old:
+                    at_update_position_sl(pos["id"], live)
+                continue
             ok, err = okx.amend_protection_sl(creds, pos["inst_id"], pos["sl_algo_id"], new)
             if ok:
                 at_update_position_sl(pos["id"], new)
