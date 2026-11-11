@@ -626,7 +626,12 @@ def close_position_market(creds: dict, inst_id: str) -> tuple:
                         body={"instId": inst_id, "mgnMode": "isolated"})
     read_ok, size = get_position_size(creds, inst_id)
     if read_ok and size == 0:
-        return True, data if ok else "confirmed flat"
+        # A transient empty positions response must not retire local tracking
+        # and cancel the protective orders of a position that is still open.
+        # Match the ordinary exchange-close reconciler's two-read contract.
+        read_ok, size = get_position_size(creds, inst_id)
+        if read_ok and size == 0:
+            return True, data if ok else "confirmed flat"
     return False, data if not ok else f"close pending: position confirmation {size}"
 
 

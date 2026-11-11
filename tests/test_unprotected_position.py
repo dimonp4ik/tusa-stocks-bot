@@ -28,7 +28,7 @@ class UnprotectedPositionTests(unittest.TestCase):
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
         if expired:
             sig["source"] = "stock_xperp_native_shadow"
-            sig["strategy_entry_bar_ts"] = at.time.time() - 181
+            sig["strategy_entry_bar_ts"] = at.time.time() - 175
         if expires_during_snapshot:
             sig["source"] = "stock_xperp_native_shadow"
             sig["strategy_entry_bar_ts"] = at.time.time() - 175
@@ -48,6 +48,14 @@ class UnprotectedPositionTests(unittest.TestCase):
                 at.okx,'get_position_size',side_effect=[(True,0),(True,0)]))
             stack.enter_context(patch.object(at, 'at_mark_entry_submitting', return_value=True))
             create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
+            if expired:
+                clock = stack.enter_context(patch.object(at.time, "time", wraps=at.time.time))
+
+                def reserve_then_expire(*args, **kwargs):
+                    clock.return_value = sig["strategy_entry_bar_ts"] + 181
+                    return 91
+
+                create.side_effect = reserve_then_expire
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             close = stack.enter_context(patch.object(at, "at_close_position"))
             stack.enter_context(patch.object(at, "_entry_skip"))

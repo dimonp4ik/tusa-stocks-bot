@@ -498,6 +498,21 @@ class ExchangeTests(unittest.TestCase):
         with patch.object(okx,'_request',return_value=(True,[])),patch.object(okx,'get_position_size',return_value=(True,0)):
             self.assertTrue(okx.close_position_market({},'TEST')[0])
 
+    def test_close_requires_two_flat_reads_before_releasing_protection(self):
+        cases = (
+            ([(True, 0), (True, 2)], False),
+            ([(True, 0), (False, "timeout")], False),
+            ([(True, 0), (True, 0)], True),
+        )
+        for request_ok in (True, False):
+            for reads, expected in cases:
+                with self.subTest(request_ok=request_ok, reads=reads), patch.object(
+                        okx, '_request', return_value=(request_ok, 'close response')) as request, patch.object(
+                        okx, 'get_position_size', side_effect=reads) as position:
+                    self.assertEqual(okx.close_position_market({}, 'TEST')[0], expected)
+                    self.assertEqual(position.call_count, 2)
+                    request.assert_called_once()
+
     def test_position_response_counts_all_rows(self):
         with patch.object(okx,'_request',return_value=(True,[{'pos':'0'},{'pos':'-2'}])):
             self.assertEqual(okx.get_position_size({},'TEST'),(True,2))
