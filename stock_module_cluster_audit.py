@@ -21,7 +21,8 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                    weak_index_max_ratio: float | None = None,
                    rank_key: Callable[[dict], object] | None = None,
                    loss_streak_cap: int = 3,
-                   direction_cap: int = 4) -> list[dict]:
+                   direction_cap: int = 4,
+                   daily_loss_r_cap: float | None = None) -> list[dict]:
     if loss_streak_cap < 1:
         raise ValueError("loss_streak_cap must be positive")
     if direction_cap < 1:
@@ -52,7 +53,7 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                 stamps.popleft()
         new_day = int(now // 86400)
         if new_day != day:
-            day, streak, paused = new_day, 0, False
+            day, streak, paused, daily_r = new_day, 0, False, 0.0
         while pending and pending[0][0] < now:
             _, _, done = heapq.heappop(pending)
             opened.pop(done["symbol"], None)
@@ -63,7 +64,12 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                     and not math.isnan(float(signed_return))
                     and float(signed_return) < 0)
                 streak = streak + 1 if realized_loss else 0
-                if streak >= loss_streak_cap:
+                if daily_loss_r_cap is not None:
+                    realized_r = float(done["net_r"])
+                    if math.isfinite(realized_r):
+                        daily_r += realized_r
+                if (streak >= loss_streak_cap or
+                        (daily_loss_r_cap is not None and daily_r <= -daily_loss_r_cap)):
                     paused = True
         if paused or row["symbol"] in opened:
             continue
