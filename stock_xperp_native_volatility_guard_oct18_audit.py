@@ -37,14 +37,14 @@ def digest(path: Path) -> str:
 def add_atr14(frame: pd.DataFrame, candles: dict) -> pd.DataFrame:
     """Attach the 14-bar normalized ATR from bars closed before entry."""
     output = []
+    arrays = {symbol:tuple(np.asarray(candle[key],dtype=float) for key in ('high','low','close'))
+              for symbol,candle in candles.items()}
     for row in frame.to_dict("records"):
         candle = candles[row["symbol"]]
         index = int(row["entry_index"]) - 1
         if index < 14:
             continue
-        high = np.asarray(candle["high"], dtype=float)
-        low = np.asarray(candle["low"], dtype=float)
-        close = np.asarray(candle["close"], dtype=float)
+        high,low,close = arrays[row["symbol"]]
         current_high = high[index - 13:index + 1]
         current_low = low[index - 13:index + 1]
         previous_close = close[index - 14:index]

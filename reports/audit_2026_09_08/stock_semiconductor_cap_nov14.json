@@ -1,0 +1,150 @@
+{
+  "status": "RESEARCH_ONLY_NOT_LIVE_POLICY",
+  "objective_verified": false,
+  "reference": "https://www.direxion.com/product/daily-semiconductor-bull-bear-3x-etfs",
+  "historical_prefix_parity": {
+    "start_utc": "2026-07-05T05:30:00+00:00",
+    "cutoff_utc": "2026-11-10T12:45:00+00:00",
+    "expected_rows": 11048,
+    "actual_rows": 11048,
+    "matched_rows": 11048,
+    "only_expected": 0,
+    "only_actual": 0,
+    "value_mismatches": {
+      "signal_return": 0,
+      "cross_z": 0,
+      "atr14_fraction": 0,
+      "basket_trend_16": 0,
+      "basket_trend_32": 0,
+      "basket_trend_64": 0,
+      "basket_trend_96": 0,
+      "audited_target_pct": 0,
+      "signed_return": 0,
+      "net_r": 0,
+      "outcome": 0,
+      "exit_time": 0,
+      "liquid_universe_ratio_8x6": 0
+    },
+    "passes": true
+  },
+  "note": "SOXL/SOXS mapping uses daily benchmark direction, not a guaranteed intraday hedge or beta estimate",
+  "limitations": [
+    "Purged nominal standalone stock cohorts, not shared account PnL",
+    "Hypothesis uses previously inspected eras; no pristine forward approval",
+    "Historical order-book spread, exact publication latency and lot rounding not simulated"
+  ],
+  "results": {
+    "baseline": {
+      "july": {
+        "n": 179,
+        "resolved": 179,
+        "pending": 0,
+        "return_pct": 40.9034,
+        "dd_pct": 2.9505,
+        "profitable_exit_rate_pct": 48.0447,
+        "max_loss_streak": 7,
+        "trades_per_active_day": 6.6296
+      },
+      "august": {
+        "n": 226,
+        "resolved": 226,
+        "pending": 0,
+        "return_pct": 26.9228,
+        "dd_pct": 2.8581,
+        "profitable_exit_rate_pct": 44.2478,
+        "max_loss_streak": 9,
+        "trades_per_active_day": 7.2903
+      },
+      "september": {
+        "n": 242,
+        "resolved": 242,
+        "pending": 0,
+        "return_pct": 28.5209,
+        "dd_pct": 2.3578,
+        "profitable_exit_rate_pct": 42.9752,
+        "max_loss_streak": 7,
+        "trades_per_active_day": 8.0667
+      },
+      "october": {
+        "n": 212,
+        "resolved": 212,
+        "pending": 0,
+        "return_pct": 28.9408,
+        "dd_pct": 2.7164,
+        "profitable_exit_rate_pct": 47.6415,
+        "max_loss_streak": 8,
+        "trades_per_active_day": 7.0667
+      },
+      "november_partial": {
+        "n": 69,
+        "resolved": 69,
+        "pending": 0,
+        "return_pct": 0.7898,
+        "dd_pct": 5.1491,
+        "profitable_exit_rate_pct": 34.7826,
+        "max_loss_streak": 8,
+        "trades_per_active_day": 4.9286
+      }
+    },
+    "etf_same_benchmark_cap1": {
+      "july": {
+        "n": 179,
+        "resolved": 179,
+        "pending": 0,
+        "return_pct": 40.9034,
+        "dd_pct": 2.9505,
+        "profitable_exit_rate_pct": 48.0447,
+        "max_loss_streak": 7,
+        "trades_per_active_day": 6.6296
+      },
+      "august": {
+        "n": 226,
+        "resolved": 226,
+        "pending": 0,
+        "return_pct": 26.9228,
+        "dd_pct": 2.8581,
+        "profitable_exit_rate_pct": 44.2478,
+        "max_loss_streak": 9,
+        "trades_per_active_day": 7.2903
+      },
+      "september": {
+        "n": 235,
+        "resolved": 235,
+        "pending": 0,
+        "return_pct": 24.176,
+        "dd_pct": 2.8916,
+        "profitable_exit_rate_pct": 41.2766,
+        "max_loss_streak": 7,
+        "trades_per_active_day": 8.1034
+      },
+      "october": {
+        "n": 204,
+        "resolved": 204,
+        "pending": 0,
+        "return_pct": 26.2682,
+        "dd_pct": 3.2154,
+        "profitable_exit_rate_pct": 46.5686,
+        "max_loss_streak": 8,
+        "trades_per_active_day": 6.8
+      },
+      "november_partial": {
+        "n": 68,
+        "resolved": 68,
+        "pending": 0,
+        "return_pct": 1.1001,
+        "dd_pct": 4.8945,
+        "profitable_exit_rate_pct": 35.2941,
+        "max_loss_streak": 8,
+        "trades_per_active_day": 4.8571
+      }
+    }
+  },
+  "removed": 47,
+  "added_by_replacement": 31,
+  "sources": {
+    "reports\\audit_2026_09_08\\stock_xperp_nov14_preportfolio.pkl": "1c25b7bed52366b0bc655e14ec3adbf54bcd1f8335c93efb6d54d0b67f04a8f6",
+    "C:\\Users\\Lenovo\\Desktop\\tusa stocks\\stock_semiconductor_cap_nov14_audit.py": "8207544b470d5ba3c1864b2574711045d1e1af8cf9c5ffc50efdef62eaaf97c6",
+    "stock_factor_exposure_research.py": "0afec351086cfa1b59b5988875c7038db1ed1e562f168bb8749b339953d606c6",
+    "stock_module_cluster_audit.py": "213a4d59bc9e85847e8a099394b1c3c3463c7d513e9883c6187affaa6d9ddf23"
+  }
+}

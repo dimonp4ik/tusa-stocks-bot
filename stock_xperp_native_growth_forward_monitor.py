@@ -154,9 +154,11 @@ def resolve_row(row: dict, candle: dict, target_pct: float, stop_pct: float,
 def resolve_entries(entries: pd.DataFrame, candles: dict,
                     parameters: dict) -> list[dict]:
     output = []
+    arrays = {symbol:{key:np.asarray(candle[key]) for key in ('time','open','high','low','close')}
+              for symbol,candle in candles.items()}
     for row in entries.to_dict("records"):
         output.append(resolve_row(
-            row, candles[row["symbol"]],
+            row, arrays[row["symbol"]],
             float(parameters["target_pct"]),
             float(parameters["stop_pct"]),
             int(parameters["hold_bars"])))

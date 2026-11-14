@@ -22,11 +22,15 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
                    rank_key: Callable[[dict], object] | None = None,
                    loss_streak_cap: int = 3,
                    direction_cap: int = 4,
-                   daily_loss_r_cap: float | None = None) -> list[dict]:
+                   daily_loss_r_cap: float | None = None,
+                   exposure_key: Callable[[dict], object] | None = None,
+                   exposure_cap: int | None = None) -> list[dict]:
     if loss_streak_cap < 1:
         raise ValueError("loss_streak_cap must be positive")
     if direction_cap < 1:
         raise ValueError("direction_cap must be positive")
+    if exposure_cap is not None and (exposure_key is None or exposure_cap < 1):
+        raise ValueError("exposure cap requires a key and positive limit")
     pending: list[tuple[float, int, dict]] = []
     opened: dict[str, dict] = {}
     last: dict[tuple[str, str], float] = {}
@@ -101,6 +105,10 @@ def portfolio_gate(rows: list[dict], module_cap: int | None,
         if (sum(item["direction"] == row["direction"]
                 for item in opened.values()) >= direction_cap):
             continue
+        if exposure_cap is not None:
+            factor=exposure_key(row)
+            if factor is not None and sum(exposure_key(other)==factor for other in opened.values()) >= exposure_cap:
+                continue
         opened[row["symbol"]] = row
         last[key] = now
         per_scan[scan] += 1
