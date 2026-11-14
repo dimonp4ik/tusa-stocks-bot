@@ -415,13 +415,12 @@ def _open_for_account_locked(
         return
 
     # Refresh executable depth after leverage setup; last-trade prices may be stale.
-    from src.execution_guard import execution_quote, order_book_snapshot
+    from src.execution_guard import execution_quote_with_retry, order_book_snapshot, SpreadLimitError
     book_snapshot = None
     try:
-        book = okx.get_order_book(inst_id)
-        if not book:
-            raise ValueError("order book unavailable")
-        quote = execution_quote(book, direction, sz, time.time()*1000)
+        book, quote = execution_quote_with_retry(
+            lambda: okx.get_order_book(inst_id), direction, sz,
+            clock_ms=lambda: time.time()*1000)
         executable = quote.worst
         if not (original_sl < executable < float(sig['tp1']) if direction == 'LONG'
                 else float(sig['tp1']) < executable < original_sl):
@@ -439,6 +438,9 @@ def _open_for_account_locked(
             "executable price outside signal bracket":
                 "исполняемая цена уже вышла за диапазон сигнала",
         }.get(detail, "стакан или исполняемая цена не прошли проверку")
+        if isinstance(exc, SpreadLimitError):
+            friendly += (f" ({exc.measured * 100:.4f}%, лимит "
+                         f"{exc.limit * 100:.4f}%; 3 проверки)")
         _entry_skip(
             uid, sig, inst_id, friendly,
             f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")

@@ -1,6 +1,31 @@
 """Executable order-book checks, independent of signal profitability estimates."""
 from dataclasses import dataclass
 import math
+import time
+
+
+class SpreadLimitError(ValueError):
+    def __init__(self, measured, limit):
+        super().__init__('spread exceeds limit')
+        self.measured = measured
+        self.limit = limit
+
+
+def execution_quote_with_retry(fetch_book, direction, contracts, *, clock_ms,
+                               sleep=time.sleep, attempts=3, retry_delay=.2):
+    """Retry only a wide spread; each fresh book must pass every original gate."""
+    if attempts not in (1, 2, 3):
+        raise ValueError('invalid execution attempts')
+    for attempt in range(attempts):
+        book = fetch_book()
+        if not book:
+            raise ValueError('order book unavailable')
+        try:
+            return book, execution_quote(book, direction, contracts, clock_ms())
+        except SpreadLimitError:
+            if attempt + 1 == attempts:
+                raise
+            sleep(retry_delay)
 
 @dataclass(frozen=True)
 class ExecutionQuote:
@@ -74,7 +99,7 @@ def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=3000,
     bid=sides['bids'][0][0];ask=sides['asks'][0][0]
     if ask<=bid:raise ValueError('crossed order book')
     spread=(ask-bid)/((ask+bid)/2)
-    if spread>max_spread:raise ValueError('spread exceeds limit')
+    if spread>max_spread:raise SpreadLimitError(spread, max_spread)
     levels=sides['asks' if direction=='LONG' else 'bids'];best=levels[0][0]
     remaining=contracts;value=0.;worst=best
     for price,quantity in levels:
