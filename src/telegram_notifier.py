@@ -486,11 +486,18 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             f"полная цель не была достигнута"
         )
     elif new_status == "TP1_EXPIRED":
+        from src.live_accounting import marked_r
+        from config import TP1_CLOSE_FRAC
+        fraction=TP1_CLOSE_FRAC if strategy_frac is None else float(strategy_frac)
+        result_r=marked_r(direction=direction,entry=entry,exit_price=exit_price,
+            sl=sl,tp1=tp1,tp1_fraction=fraction,reached_tp1=True)
         icon  = "⏳"
-        title = "TP1 ИСТЁК"
+        title = "ЗАКРЫТО ПО ВРЕМЕНИ ПОСЛЕ TP1"
         body  = (
-            f"TP1 был взят, TP2 не достигнут до окончания стратегии\n"
-            f"Цена: `{_format_price(exit_price)}`"
+            f"TP1 достигнут, срок удержания остатка завершён\n"
+            f"Расчётная цена: `{_format_price(exit_price)}`\n"
+            f"Итог сигнала: `{result_r:+.4f}R`\n"
+            "Исполнение на вашем счёте — в уведомлении автотрейдинга."
         )
     elif new_status == "TP1_STOP":
         icon = "🟠"

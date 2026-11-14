@@ -3174,13 +3174,14 @@ def _check_open_signals():
                       for key, values in df.items()}
             max_bars = int(sig.get("strategy_max_bars") or 0)
             max_bars_reached = False
-            if max_bars > 0 and len(df.get("time", [])) >= max_bars:
-                last_i = max_bars - 1
-                flags = df.get("confirmed") or []
-                max_bars_reached = (
-                    bool(flags[last_i]) if last_i < len(flags)
-                    else float(df["time"][last_i]) + bar_seconds <= now)
-                df = {key: values[:max_bars] for key, values in df.items()}
+            if max_bars > 0:
+                strategy_start = float(sig.get("strategy_entry_bar_ts")
+                                       or math.floor(opened_at / bar_seconds) * bar_seconds)
+                strategy_end = strategy_start + max_bars * bar_seconds
+                max_bars_reached = now >= strategy_end
+                keep = [i for i, stamp in enumerate(df.get("time", []))
+                        if float(stamp) < strategy_end]
+                df = {key: [values[i] for i in keep] for key, values in df.items()}
 
             new_status   = None
             realized_r   = None
