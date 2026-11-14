@@ -3987,7 +3987,7 @@ def _publish_stock_venue_candidates(
             continue
         entry_bar = analysis.get("strategy_entry_bar_ts")
         if (native and entry_bar
-                and time.time() - float(entry_bar) > MAX_SIGNAL_AGE_SECONDS):
+                and time.time() - float(entry_bar) > NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS):
             reject(setup_id, "stale_at_publish")
             continue
         if not send_signal(analysis):

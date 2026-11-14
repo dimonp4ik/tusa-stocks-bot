@@ -202,6 +202,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         analysis = {
             "symbol": "AAPLUSDT", "direction": "SHORT",
             "source": "stock_xperp_native_shadow", "_shadow_only": True,
+            "strategy_entry_bar_ts": main.time.time() - 10,
         }
 
         def send(candidate):
@@ -223,6 +224,21 @@ class ShadowDeploymentTests(unittest.TestCase):
 
     def test_one_scan_cannot_publish_an_unbounded_signal_batch(self):
         self.assertLessEqual(config.VENUE_MAX_SIGNALS_PER_SCAN, 2)
+
+    def test_expired_native_candidate_is_blocked_before_telegram_or_orders(self):
+        candidate = ({"symbol": "AAPLUSDT", "direction": "SHORT",
+            "source": "stock_xperp_native_shadow", "_shadow_only": True,
+            "strategy_entry_bar_ts": main.time.time() - main.NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS - 1}, 9)
+        diagnostics = {}
+        with patch.object(main, "get_recent_signals", return_value=[]), \
+             patch.object(main, "send_signal") as send, \
+             patch.object(main, "mark_setup_blocked") as block, \
+             patch.object(main.autotrader, "open_positions_for_signal") as orders:
+            self.assertEqual(main._publish_stock_venue_candidates([candidate], diagnostics=diagnostics), 0)
+        send.assert_not_called()
+        orders.assert_not_called()
+        block.assert_called_once_with(9, "stale_at_publish")
+        self.assertEqual(diagnostics, {"stale_at_publish": 1})
         self.assertLessEqual(config.MAX_SAME_DIRECTION_POSITIONS, 4)
         candidates = [
             ({"symbol": f"S{i}USDT", "direction": "SHORT"}, i + 1)
