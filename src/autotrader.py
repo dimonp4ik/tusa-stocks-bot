@@ -228,6 +228,11 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
         return
 
     account_key = okx.account_key(account_check)
+    if not account_key:
+        _entry_skip(uid, sig, inst_id, "OKX account identity unavailable",
+                    f"⚠️ Автотрейдинг: {disp} пропущен — OKX не подтвердил "
+                    "идентификатор счёта для проверки общего лимита позиций.")
+        return
     with _account_entry_locks[account_key]:
         _open_for_account_locked(u, sig, inst_id, disp, creds, account_key)
 

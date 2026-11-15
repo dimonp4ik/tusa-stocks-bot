@@ -200,6 +200,8 @@ def validate_autotrade_account(creds: dict) -> tuple:
         return False, {"reason": "trade_permission_missing", "detail": config}
     if "withdraw" in permissions:
         return False, {"reason": "withdraw_permission_present", "detail": config}
+    if not config.get("account_uid"):
+        return False, {"reason": "account_identity_missing", "detail": config}
     return True, config
 
 def get_balance(creds: dict) -> tuple:

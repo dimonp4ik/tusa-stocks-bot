@@ -325,7 +325,7 @@ class ExchangeTests(unittest.TestCase):
 
     def test_position_mode_is_parsed_fail_closed(self):
         with patch.object(okx, '_request', return_value=(True, [{
-                'posMode': 'net_mode', 'perm': 'read_only,trade'}])):
+                'posMode': 'net_mode', 'perm': 'read_only,trade', 'uid': '123'}])):
             self.assertEqual(okx.get_position_mode({}), (True, 'net_mode'))
         with patch.object(okx, '_request', return_value=(True, [{'posMode': 'surprise'}])):
             good, error = okx.get_position_mode({})
@@ -342,7 +342,7 @@ class ExchangeTests(unittest.TestCase):
             self.assertFalse(good)
             self.assertEqual(detail['reason'], expected)
         with patch.object(okx, '_request', return_value=(True, [{
-                'posMode': 'net_mode', 'perm': 'read_only,trade'}])):
+                'posMode': 'net_mode', 'perm': 'read_only,trade', 'uid': '123'}])):
             good, detail = okx.validate_autotrade_account({})
         self.assertTrue(good)
         self.assertEqual(detail['permissions'], ('read_only', 'trade'))
@@ -358,7 +358,7 @@ class ExchangeTests(unittest.TestCase):
                  ('set_bot_state',None),('set_signal_size_mult',None),('at_all_open_positions',[]),
                  ('at_mark_entry_submitting',True),('at_create_entry_intent',91),('at_close_position',None),('_dm',None)]:
                 stack.enter_context(patch.object(at,name,return_value=value))
-            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade')})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
+            for name,value in [('validate_autotrade_account',(True,{'position_mode':'net_mode','permissions':('read_only','trade'),'account_uid':'123'})),('get_balance',(True,128)),('get_xperp_spec',spec),('get_last_price',100),
                  ('get_open_position_margin',(True,{'margin_usd':0,'count':0,'inst_ids':()})),
                  ('get_position_size',(True,0)),('ensure_leverage',(True,None)),
                  ('get_order_book',{'ts':at.time.time()*1000,'bids':[['99.99','1000']],
@@ -422,7 +422,7 @@ class ExchangeTests(unittest.TestCase):
                 stack.enter_context(patch.object(at, name, return_value=value))
             stack.enter_context(patch.object(
                 at.okx, 'validate_autotrade_account', return_value=(True, {
-                    'position_mode': 'net_mode', 'permissions': ('read_only', 'trade')})))
+                    'position_mode': 'net_mode', 'permissions': ('read_only', 'trade'), 'account_uid': '123'})))
             stack.enter_context(patch.object(
                 at.okx, 'get_balance', return_value=(True, 128)))
             stack.enter_context(patch.object(
