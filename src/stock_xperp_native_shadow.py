@@ -9,6 +9,7 @@ from __future__ import annotations
 import math
 import statistics
 import time
+from bisect import bisect_right
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -168,26 +169,40 @@ def basket_trends(candles_by_symbol: dict[str, dict], signal_time: int,
     wanted_periods = tuple(sorted(set(int(value) for value in periods)))
     if not wanted_periods or wanted_periods[0] <= 0:
         raise ValueError("basket trend periods must be positive")
+    # Histories can finish on different candles after a delayed feed response.
+    # Match each observation by timestamp rather than its distance from the
+    # end of that instrument's array. Never validate/read future prices while
+    # evaluating a historical basket observation.
+    prepared = []
+    for symbol in sorted(AUDITED_SYMBOLS & set(candles_by_symbol)):
+        candles = candles_by_symbol[symbol]
+        times = candles.get("time") or []
+        prices = candles.get("close") or []
+        if len(times) != len(prices):
+            continue
+        try:
+            stamps = [int(stamp) for stamp in times]
+            stop = bisect_right(stamps, int(signal_time))
+            stamps = stamps[:stop]
+            if (len(stamps) < LOOKBACK_BARS + 1
+                    or any(b <= a for a, b in zip(stamps, stamps[1:]))):
+                continue
+        except (TypeError, ValueError, OverflowError):
+            continue
+        close = _finite_series({"close": prices[:stop]}, "close")
+        if close is not None:
+            prepared.append((close, stamps, {stamp: i for i, stamp in enumerate(stamps)}))
     means = []
     output = {}
     for offset in range(wanted_periods[-1]):
         wanted = int(signal_time) - 900 * offset
         moves = []
-        for symbol in AUDITED_SYMBOLS & set(candles_by_symbol):
-            candles = candles_by_symbol[symbol]
-            times = candles.get("time") or []
-            close = _finite_series(candles, "close")
-            if close is None or len(times) != len(close):
+        for close, stamps, lookup in prepared:
+            index = lookup.get(wanted)
+            if index is None or index < LOOKBACK_BARS:
                 continue
-            index = len(times) - 1 - offset
-            if index < LOOKBACK_BARS:
-                continue
-            try:
-                if (int(times[index]) != wanted
-                        or int(times[index]) - int(times[index - LOOKBACK_BARS])
-                        != 900 * LOOKBACK_BARS):
-                    continue
-            except (TypeError, ValueError):
+            window = stamps[index - LOOKBACK_BARS:index + 1]
+            if any(b - a != 900 for a, b in zip(window, window[1:])):
                 continue
             move = close[index] / close[index - LOOKBACK_BARS] - 1
             if math.isfinite(move):
