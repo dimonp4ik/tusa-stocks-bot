@@ -148,6 +148,23 @@ def test_invalid_enabled_configuration_never_falls_back_to_independent_entries(m
     assert 'не готова' in runtime.status_text()
 
 
+def test_successful_eu_probe_does_not_authorize_entry_on_wrong_order_host(runtime):
+    pos_id=db.at_create_entry_intent(1,7,'TEST-X','LONG',1.,100.,3.,99.,'old-entry')
+    assert db.at_mark_entry_submitting(pos_id)
+    def config(creds,**kwargs):
+        if kwargs.get('base_url')=='https://eea.okx.com':
+            return True,{'account_uid':'123'}
+        return False,"API key doesn't exist (code 50119)"
+    with patch.object(okx,'get_account_configuration',side_effect=config) as calls,\
+            patch.object(okx,'_base_url',return_value='https://my.okx.com'):
+        runtime.maintenance(lambda _:{'test':True})
+        assert calls.call_count==2
+        assert not runtime.ready and runtime.error
+        runtime.maintenance(lambda _:{'test':True})
+        assert calls.call_count==3  # probe is throttled; config still checked
+    assert runtime.transport.store.status()['active_claims']==0
+
+
 def test_definitive_balance_rejection_does_not_leave_a_permanent_claim(runtime):
     pos_id=intent();begin(runtime,pos_id);db.at_mark_entry_submitting(pos_id)
     db.at_close_position(pos_id,'ENTRY_REJECTED',error='Order failed (sCode 51008)')

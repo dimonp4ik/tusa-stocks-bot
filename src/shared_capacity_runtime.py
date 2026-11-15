@@ -27,6 +27,7 @@ class SharedCapacityRuntime:
         self.initialized=transport is not None
         self.epoch=None;self.ready=False;self.last_sync=0.;self.error=None
         self.lock=threading.RLock();self.cursor=0
+        self.last_region_probe=0.
 
     def initialize(self,app=None):
         if not self.initialized:
@@ -77,6 +78,14 @@ class SharedCapacityRuntime:
             code=re.search(r'\((?:sCode|code) ([0-9]{5})(?:[,\)])',str(config))
             log.warning('shared legacy account lookup refused for %s (exchange code %s)',
                 self.owner,code.group(1) if code else 'unknown')
+            if (code and code.group(1)=='50119' and okx._base_url()=='https://my.okx.com'
+                    and self.clock()-self.last_region_probe>=300):
+                self.last_region_probe=self.clock()
+                # Read only. A successful probe does not authorize entry or
+                # redirect an order; deployment config must be corrected.
+                good_eu,config_eu=okx.get_account_configuration(creds,base_url='https://eea.okx.com')
+                log.warning('shared EU read-only region probe for %s: %s',
+                    self.owner,bool(good_eu and okx.account_key(config_eu)))
             raise CapacityError('position exchange configuration unavailable')
         account=okx.account_key(config)
         if not account:

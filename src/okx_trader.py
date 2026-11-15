@@ -50,7 +50,7 @@ def _sign(secret: str, ts: str, method: str, path: str, body: str) -> str:
 
 def _request(creds: dict, method: str, path: str, params: dict = None,
              body: dict = None, timeout: int = 15, *,
-             deadline_ms: int | None = None) -> tuple:
+             deadline_ms: int | None = None, base_url: str | None = None) -> tuple:
     """Signed request. creds = {api_key, api_secret, passphrase}.
     Returns (ok, data-list-or-error-string)."""
     try:
@@ -69,7 +69,12 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
         }
         if deadline_ms is not None:
             headers['expTime'] = str(deadline_ms)
-        url = _base_url() + sign_path
+        # Explicit override is confined to the official EU read-only
+        # configuration diagnostic. Order paths never retry on another host.
+        if base_url is not None and (base_url!='https://eea.okx.com'
+                or method!='GET' or path!='/api/v5/account/config'):
+            return False,'unsupported regional diagnostic'
+        url = (base_url or _base_url()) + sign_path
         if method == "GET":
             resp = requests.get(url, headers=headers, timeout=timeout)
         else:
@@ -162,9 +167,10 @@ def round_to_tick(px: float, tick: float) -> float:
 
 # ── Account ───────────────────────────────────────────────────────────────────
 
-def get_account_configuration(creds: dict) -> tuple:
+def get_account_configuration(creds: dict, *, base_url: str | None = None) -> tuple:
     """Return the position mode and permissions of the requesting API key."""
-    ok, data = _request(creds, "GET", "/api/v5/account/config")
+    kwargs={'base_url':base_url} if base_url is not None else {}
+    ok, data = _request(creds, "GET", "/api/v5/account/config", **kwargs)
     if not ok:
         return False, data
     try:
