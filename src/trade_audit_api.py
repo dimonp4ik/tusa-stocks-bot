@@ -11,7 +11,7 @@ SIGNAL_FIELDS=frozenset('id symbol direction entry_price tp1 tp2 sl status opene
 SETUP_FIELDS=frozenset('id ts symbol direction entry_price tp1 tp2 sl sent source signal_id '
     'signal_bar_ts block_reason outcome net_r resolved_ts decision_spread_bps '
     'decision_depth_usd decision_imbalance book_spread_bps book_depth_usd '
-    'book_imbalance book_sample_kind book_observed_ts'.split())
+    'book_imbalance book_sample_kind book_observed_ts decision_context_json'.split())
 
 
 def register_trade_audit_api(app,token):

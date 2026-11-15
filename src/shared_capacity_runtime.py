@@ -66,9 +66,12 @@ class SharedCapacityRuntime:
     def _account(self,row,credentials):
         if row.get('account_key'):
             return row['account_key']
-        user=db.at_get(row['user_id']);creds=credentials(user) if user else None
+        user=db.at_get(row['user_id'])
+        if not user:
+            raise CapacityError('position user missing')
+        creds=credentials(user)
         if not creds:
-            raise CapacityError('position account identity unavailable')
+            raise CapacityError('position credentials unavailable')
         good,config=okx.get_account_configuration(creds)
         account=okx.account_key(config) if good else None
         if not account:
@@ -130,6 +133,8 @@ class SharedCapacityRuntime:
                 # Only fixed diagnostics from our validation code, never the
                 # exception payload (which could contain private identifiers).
                 reasons={'position account identity unavailable':'account_identity_unavailable',
+                    'position user missing':'legacy_user_missing',
+                    'position credentials unavailable':'legacy_credentials_unavailable',
                     'invalid account identity':'account_identity_invalid',
                     'invalid number':'numeric_field_invalid',
                     'invalid identifier':'identifier_invalid',

@@ -19,6 +19,7 @@ import json
 import sys
 import os
 from contextlib import contextmanager
+from src.decision_context import context_json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (
@@ -322,6 +323,7 @@ def init_db():
             # historical outcome (Claude memory prior, excluded from stats).
             "source":       "TEXT NOT NULL DEFAULT 'live'",
             "signal_bar_ts": "REAL",
+            "decision_context_json": "TEXT",
             # Realised R of the trade (backtest: real net_r incl. trailed
             # runner; live: left NULL, derived from bracket at read time).
             # Powers expectancy (avg R) in Claude's self-feedback block.
@@ -1401,6 +1403,7 @@ def _prepared_setup_candidate(analysis: dict) -> tuple:
             analysis.get("funding_rate"),
             analysis.get("source") or "live",
             analysis.get("signal_bar_ts"),
+            context_json(analysis.get('_decision_context')),
         )
 
 
@@ -1411,8 +1414,8 @@ def _insert_setup_candidate(c, values: tuple) -> int:
              mtf_score, decision, confidence, risk_score, reason, sent,
              session, entry_source, atr, trend,
              oi_delta_pct, oi_regime, oi_confirms, counter, open_same_dir,
-             funding_rate, source, signal_bar_ts)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             funding_rate, source, signal_bar_ts, decision_context_json)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, values)
     return cur.lastrowid
 

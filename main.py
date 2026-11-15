@@ -3863,6 +3863,7 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
         "confidence": "HIGH",
         "risk_score": 1,
         "reason": "Native stock X-Perp shadow cross-sectional reversal",
+        "_decision_context": setup,
         "counter": "A cross-sectional extreme can continue before reverting",
         "current_price": price,
         "market_price": price,
