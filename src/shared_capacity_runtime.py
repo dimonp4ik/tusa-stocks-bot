@@ -85,6 +85,7 @@ class SharedCapacityRuntime:
                 self.ready=False
                 return
             try:
+                stage='local_intents'
                 items=[];local={}
                 for row in db.at_shared_positions():
                     # No market request can precede the local submission CAS.
@@ -100,7 +101,9 @@ class SharedCapacityRuntime:
                     else:
                         payload['state']='OPEN' if row['status']=='OPEN' else 'SUBMITTING'
                     items.append(payload);local[identity]=(row,payload['account'])
+                stage='peer_sync'
                 answer=self.transport.call('sync',dict(owner=self.owner,instance=db.at_shared_instance_id(),positions=items))
+                stage='local_binding'
                 epoch=opaque(answer['epoch']);mapping=answer['claims']
                 released=answer.get('released',[])
                 if (not isinstance(mapping,dict) or not isinstance(released,list)
@@ -124,7 +127,17 @@ class SharedCapacityRuntime:
             except Exception as exc:
                 self.ready=False;self.error='synchronization_unavailable'
                 # Never log payloads, account identities, keys or HTTP errors.
-                log.warning('shared capacity synchronization refused for %s (%s)',self.owner,type(exc).__name__)
+                # Only fixed diagnostics from our validation code, never the
+                # exception payload (which could contain private identifiers).
+                reasons={'position account identity unavailable':'account_identity_unavailable',
+                    'invalid account identity':'account_identity_invalid',
+                    'invalid number':'numeric_field_invalid',
+                    'invalid identifier':'identifier_invalid',
+                    'instrument already claimed by another intent':'duplicate_instrument',
+                    'service instance already active':'duplicate_instance',
+                    'local claim binding refused':'binding_refused'}
+                reason=reasons.get(str(exc),'unclassified') if type(exc) is CapacityError else type(exc).__name__
+                log.warning('shared capacity synchronization refused for %s (%s; %s)',self.owner,stage,reason)
         # Read-only exchange evidence can be slow. Do not hold the entry/sync
         # mutex while collecting it, and never run it in the TP/SL job.
         for row in checks:
