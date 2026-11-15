@@ -464,6 +464,9 @@ def init_db():
         _ensure_column(c, "autotrade_positions", "entry_account_short_count", "INTEGER")
         _ensure_column(c, "autotrade_positions", "entry_account_unknown_side_count", "INTEGER")
         _ensure_column(c, "autotrade_positions", "account_key", "TEXT")
+        _ensure_column(c, "autotrade_positions", "shared_claim_id", "TEXT")
+        _ensure_column(c, "autotrade_positions", "shared_epoch", "TEXT")
+        _ensure_column(c, "autotrade_positions", "shared_released_at", "REAL DEFAULT 0")
         c.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS idx_autotrade_client_order
             ON autotrade_positions(user_id, client_order_id)
@@ -2662,6 +2665,36 @@ def at_all_open_positions() -> list:
             "WHERE status IN ('OPEN', 'ENTRY_PENDING')"
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+def at_shared_positions() -> list:
+    """Keep closed, not-yet-released claims available for safe reconciliation."""
+    with _conn() as c:
+        rows=c.execute("SELECT * FROM autotrade_positions WHERE status IN ('OPEN','ENTRY_PENDING') "
+            "OR (shared_claim_id IS NOT NULL AND COALESCE(shared_released_at,0)=0) ORDER BY id").fetchall()
+        return [dict(r) for r in rows]
+
+
+def at_set_shared_claim(pos_id: int,claim_id: str,epoch: str,account_key: str) -> bool:
+    with _conn() as c:
+        return c.execute("UPDATE autotrade_positions SET shared_claim_id=?,shared_epoch=?, "
+            "account_key=COALESCE(account_key,?) WHERE id=? AND COALESCE(shared_released_at,0)=0 "
+            "AND (account_key IS NULL OR account_key=?)",(claim_id,epoch,account_key,pos_id,account_key)).rowcount==1
+
+
+def at_mark_shared_released(pos_id: int,claim_id: str,epoch: str) -> bool:
+    with _conn() as c:
+        return c.execute("UPDATE autotrade_positions SET shared_released_at=? WHERE id=? "
+            "AND status='CLOSED' AND shared_claim_id=? AND shared_epoch=?",
+            (time_mod.time(),pos_id,claim_id,epoch)).rowcount==1
+
+
+def at_shared_instance_id() -> str:
+    import uuid
+    with _conn() as c:
+        c.execute('BEGIN IMMEDIATE')
+        c.execute("INSERT OR IGNORE INTO bot_state(key,value) VALUES('shared_capacity_instance',?)",(uuid.uuid4().hex,))
+        return c.execute("SELECT value FROM bot_state WHERE key='shared_capacity_instance'").fetchone()[0]
 
 
 def at_update_position_sl(pos_id: int, sl_px: float) -> None:

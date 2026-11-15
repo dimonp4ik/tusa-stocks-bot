@@ -575,6 +575,9 @@ log = logging.getLogger(__name__)
 
 # ── Flask (keeps Render dyno alive) ──────────────────────────────────────────
 app = Flask(__name__)
+autotrader._shared_capacity.initialize(app)
+from src.trade_audit_api import register_trade_audit_api
+register_trade_audit_api(app,os.getenv('SHARED_CAPACITY_TOKEN'))
 ADMIN_PANEL_IMAGE_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "assets",
@@ -725,6 +728,7 @@ def _native_scan_status_text() -> str:
                        + ("\nПоследние исходы: " + "; ".join(closed_parts)
                           if closed_parts else ""))
         timing = (row.get("strategy") or {}).get("timing") or {}
+        timing_from_previous = not bool(timing)
         if not timing:
             timing = json.loads(get_bot_state("native_scan_last_timing") or "{}")
         timing_text = ""
@@ -733,17 +737,21 @@ def _native_scan_status_text() -> str:
             setup = float(timing["setup_seconds"])
             ready = float(timing["setup_ready_at"])
             offset = ready - int(ready // 900) * 900
-            timing_text = (
-                f"\nScan timing: load {load:.2f}s, setup {setup:.2f}s, "
-                f"ready +{offset:.2f}s after quarter-hour "
-                f"({max(0, int((now - ready) / 60))} min ago)"
-            )
+            label = (f"Последний полный скан: {max(0, int((now-ready)/60))} мин назад"
+                     if timing_from_previous else "Время скана")
+            timing_text = (f"\n{label} · загрузка {load:.2f}с, подготовка {setup:.2f}с, "
+                           f"готовность +{offset:.2f}с после закрытия 15m")
+        skipped_data = (row.get("result") in {"daily_loss_pause", "premarket_liquidity_regime_pause"}
+                        and not row.get("targets"))
+        data_text = ("Данные не запрашивались: действует защитная пауза."
+                     if skipped_data else
+                     f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
+                     f"инструментов · сетапов {int(row.get('raw_setups') or 0)} · "
+                     f"к отправке {int(row.get('publish_candidates') or 0)} · "
+                     f"отправлено {int(row.get('published') or 0)}")
         return (
-            f"Последний скан: {age_minutes} мин назад · {result}\n"
-            f"Данные: {int(row.get('fetched') or 0)}/{int(row.get('targets') or 0)} "
-            f"инструментов · сетапов {int(row.get('raw_setups') or 0)} · "
-            f"к отправке {int(row.get('publish_candidates') or 0)} · "
-            f"отправлено {int(row.get('published') or 0)}"
+            f"{'Проверка запуска' if skipped_data else 'Последний скан'}: "
+            f"{age_minutes} мин назад · {result}\n{data_text}"
             f"{timing_text}"
             f"{reject_text}"
             f"{open_text}"
@@ -787,6 +795,8 @@ def status():
             f"Shared account cap: {AUTOTRADE_MAX_ACCOUNT_POSITIONS} positions / "
             f"{100 * AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION:g}% margin / "
             f"{AUTOTRADE_ACCOUNT_WRITER_COUNT} writers. "
+            f"{autotrader._shared_capacity.status_text()} "
+            f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. {risk_text}{regime_text}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
@@ -2766,7 +2776,8 @@ def webhook():
                f"Работает профиль `{_active_strategy_label()}`.\n"
                "Сигналы фиксируются по рынку и проверяются одинаково в PAPER и LIVE.\n"
                "Нейросеть не принимает торговых решений.\n"
-               f"{_execution_state_text()}.\n\n"
+               f"{_execution_state_text()}.\n"
+               f"{autotrader._shared_capacity.status_text()}\n\n"
                f"🔎 {_native_scan_status_text()}")
 
     elif text == "🤖 автотрейдинг":
@@ -4053,7 +4064,7 @@ def _persist_native_scan_audit(payload: dict) -> None:
     """Keep the latest scan explainable after a worker restart or quiet week."""
     try:
         set_bot_state("native_scan_audit", json.dumps(payload, ensure_ascii=False))
-        timing = (payload.get("strategy") or {}).get("timing")
+        timing = (payload.get("strategy") or {}).get("timing") or {}
         if {"load_seconds", "setup_seconds", "setup_ready_at"} <= timing.keys():
             set_bot_state("native_scan_last_timing", json.dumps(timing))
     except Exception as exc:
@@ -4658,6 +4669,10 @@ def start_bot():
         timezone="Europe/Riga",
     )
     scheduler.start()
+    if autotrader._shared_capacity.enabled:
+        scheduler.add_job(autotrader.maintain_shared_capacity,'interval',seconds=60,
+                          id='shared_capacity_maintenance',max_instances=1,coalesce=True)
+        threading.Thread(target=autotrader.maintain_shared_capacity,daemon=True).start()
     log.info("Scheduler: venue scan every 5 min (:01/:06/...), paper monitor every 1 min")
 
     # Register Telegram webhook

@@ -60,6 +60,7 @@ from src.db import (
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src import okx_trader as okx
+from src.shared_capacity_runtime import SharedCapacityRuntime
 from src.binance_client import get_xperp_instruments
 
 log = logging.getLogger(__name__)
@@ -86,6 +87,15 @@ _CLOSE_CONFIRM_MIN_AGE_SEC = 90
 _ENTRY_PENDING_GRACE_SEC = 90
 _ACCOUNT_SNAPSHOT_MAX_AGE_SEC = 15
 _LOCAL_ACCOUNT_SLOTS = 8
+_shared_capacity = SharedCapacityRuntime('stocks')
+
+
+def maintain_shared_capacity() -> None:
+    """Independent job: coordinator outages must not delay TP/SL monitoring."""
+    try:
+        _shared_capacity.maintenance(_creds_of)
+    except Exception as exc:
+        log.warning('shared capacity maintenance deferred (%s)',type(exc).__name__)
 
 
 def _dm(user_id: int, text: str) -> None:
@@ -242,6 +252,12 @@ def _open_for_account_locked(
     account_key: str | None,
 ) -> None:
     uid = u["user_id"]
+    if not _shared_capacity.prepare(_creds_of):
+        _entry_skip(uid, sig, inst_id, "shared reservation is not ready",
+                    f"⏸ Автотрейдинг: {disp} пропущен — общая бронь счёта "
+                    "ещё не готова. Открытые позиции продолжают сопровождаться.")
+        return
+    _writers = 1 if _shared_capacity.enabled else AUTOTRADE_ACCOUNT_WRITER_COUNT
     deadline_ms = None
     if sig.get("source") == "stock_xperp_native_shadow":
         from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS
@@ -343,7 +359,7 @@ def _open_for_account_locked(
     if not account_position_count_allows(
             occupied_positions=account_positions["count"],
             max_positions=AUTOTRADE_MAX_ACCOUNT_POSITIONS,
-            simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT):
+            simultaneous_writers=_writers):
         count = int(account_positions["count"])
         log.warning("autotrade shared position cap %s: open %s, limit %s",
                     uid, count, AUTOTRADE_MAX_ACCOUNT_POSITIONS)
@@ -357,7 +373,7 @@ def _open_for_account_locked(
             occupied_margin=account_positions["margin_usd"],
             requested_margin=margin,
             max_fraction=AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
-            simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT):
+            simultaneous_writers=_writers):
         used = 100*float(account_positions["margin_usd"])/balance
         limit = 100*AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION
         log.warning("autotrade shared margin cap %s: used %.2f%%, request %.2f%%",
@@ -480,6 +496,7 @@ def _open_for_account_locked(
                     "локальная бронь входа отклонена")
         return
     account_snapshot_started = time.monotonic()
+    account_snapshot_at = time.time()
     margin_ok, latest_positions = okx.get_open_position_margin(creds)
     latest_balance_ok, latest_balance = okx.get_balance(creds)
     if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
@@ -493,17 +510,35 @@ def _open_for_account_locked(
             or not account_position_count_allows(
                 occupied_positions=latest_positions["count"],
                 max_positions=AUTOTRADE_MAX_ACCOUNT_POSITIONS,
-                simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT)
+                simultaneous_writers=_writers)
             or not account_margin_allows(
                 equity=min(balance, latest_balance),
                 occupied_margin=latest_positions["margin_usd"],
                 requested_margin=margin,
                 max_fraction=AUTOTRADE_MAX_ACCOUNT_MARGIN_FRACTION,
-                simultaneous_writers=AUTOTRADE_ACCOUNT_WRITER_COUNT)
+                simultaneous_writers=_writers)
             or time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC):
         at_close_position(intent_id, "ENTRY_SNAPSHOT_EXPIRED")
         _entry_skip(uid, sig, inst_id, "общий лимит OKX не подтверждён перед отправкой",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — общий лимит OKX не подтверждён.")
+        return
+    try:
+        shared_claim = _shared_capacity.reserve(
+            intent_id, account_key, inst_id, client_order_id, margin,
+            latest_positions, min(balance, latest_balance), account_snapshot_at)
+        _shared_capacity.begin(shared_claim, latest_positions,
+                               min(balance, latest_balance), account_snapshot_at)
+    except Exception:
+        at_close_position(intent_id, "ENTRY_SHARED_REFUSED")
+        _entry_skip(uid, sig, inst_id, "shared account reservation refused",
+                    f"⏸ Автотрейдинг: {disp} пропущен — общая бронь входа "
+                    "не подтверждена. Ордер не отправлен.")
+        return
+    if _shared_capacity.enabled and (
+            time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC
+            or (deadline_ms is not None and time.time() * 1000 >= deadline_ms)):
+        at_close_position(intent_id, "ENTRY_SHARED_EXPIRED")
+        _entry_skip(uid, sig, inst_id, "entry expired during shared reservation")
         return
     if not at_mark_entry_submitting(
             intent_id, account_short_count=latest_positions.get("short_count"),

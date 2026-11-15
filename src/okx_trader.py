@@ -81,6 +81,15 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
                 if isinstance(item, dict) and str(item.get("sCode", "0")) != "0":
                     return False, f"{item.get('sMsg') or 'order rejected'} (sCode {item['sCode']})"
             return True, data
+        # Preserve the actual rejection code for a single rejected request;
+        # the outer 1/2 only says that the operation failed.
+        rejected = j.get("data")
+        if (str(j.get("code")) in {"1", "2"} and isinstance(rejected,list)
+                and len(rejected)==1 and isinstance(rejected[0],dict)
+                and str(rejected[0].get("sCode")) in {"51007", "51008"}
+                and not rejected[0].get("ordId")):
+            item=rejected[0]
+            return False,f"{item.get('sMsg') or 'order rejected'} (sCode {item['sCode']})"
         # Per-order errors sit inside data[0].sMsg with outer code 1/2
         detail = ""
         try:
@@ -301,6 +310,7 @@ def get_open_position_margin(creds: dict) -> tuple:
             raise ValueError('positions response must be a list')
         total = 0.0
         instruments = []
+        margin_by_inst = {}
         short_count = unknown_side_count = 0
         for row in data:
             raw_pos = row.get('pos')
@@ -334,7 +344,9 @@ def get_open_position_margin(creds: dict) -> tuple:
                     estimates.append(notional/leverage)
             if not estimates:
                 raise ValueError(f'position margin unavailable for {inst_id}')
-            total += max(estimates)
+            estimate = max(estimates)
+            total += estimate
+            margin_by_inst[inst_id] = margin_by_inst.get(inst_id, 0.0) + estimate
             instruments.append(inst_id)
         if not math.isfinite(total):
             raise ValueError('total occupied margin non-finite')
@@ -344,6 +356,7 @@ def get_open_position_margin(creds: dict) -> tuple:
             'short_count': short_count,
             'unknown_side_count': unknown_side_count,
             'inst_ids': tuple(sorted(set(instruments))),
+            'margin_by_inst': margin_by_inst,
         }
     except (TypeError, ValueError, KeyError, AttributeError) as exc:
         return False, f'position margin parse failed: {exc}'
