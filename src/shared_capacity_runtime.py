@@ -73,9 +73,14 @@ class SharedCapacityRuntime:
         if not creds:
             raise CapacityError('position credentials unavailable')
         good,config=okx.get_account_configuration(creds)
-        account=okx.account_key(config) if good else None
+        if not good:
+            code=re.search(r'\((?:sCode|code) ([0-9]{5})(?:[,\)])',str(config))
+            log.warning('shared legacy account lookup refused for %s (exchange code %s)',
+                self.owner,code.group(1) if code else 'unknown')
+            raise CapacityError('position exchange configuration unavailable')
+        account=okx.account_key(config)
         if not account:
-            raise CapacityError('position account identity unavailable')
+            raise CapacityError('position exchange uid unavailable')
         return account
 
     def maintenance(self,credentials,*,reconcile=True):
@@ -135,6 +140,8 @@ class SharedCapacityRuntime:
                 reasons={'position account identity unavailable':'account_identity_unavailable',
                     'position user missing':'legacy_user_missing',
                     'position credentials unavailable':'legacy_credentials_unavailable',
+                    'position exchange configuration unavailable':'exchange_configuration_unavailable',
+                    'position exchange uid unavailable':'exchange_uid_missing',
                     'invalid account identity':'account_identity_invalid',
                     'invalid number':'numeric_field_invalid',
                     'invalid identifier':'identifier_invalid',
