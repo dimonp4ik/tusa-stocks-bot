@@ -3233,6 +3233,18 @@ def _check_open_signals():
             if not df_all.get('close'):
                 continue
             latest_quote = float(df_all['close'][-1])
+            if status == 'OPEN' and bar_seconds == 60 and _is_native_xperp_signal(sig):
+                from src.entry_window import clip_native_entry_minute, EntryWindowUnavailable
+                from src.binance_client import get_xperp_entry_seconds, get_xperp_entry_second_trades
+                try:
+                    df=clip_native_entry_minute(df,opened_at=opened_at,direction=direction,
+                        sl=sl,tp1=tp1,tp2=tp2,now=time.time(),
+                        load_seconds=lambda stamp:get_xperp_entry_seconds(sig['symbol'],stamp),
+                        load_second_trades=lambda stamp:get_xperp_entry_second_trades(sig['symbol'],stamp))
+                except Exception as exc:
+                    reason=str(exc) if type(exc) is EntryWindowUnavailable else type(exc).__name__
+                    log.warning('Native entry-window verification deferred #%s (%s)',sig['id'],reason)
+                    continue
             if status == 'TP1_PARTIAL' and use_trail:
                 live_trail_stop, crossed = trailing_observation(df, direction=direction,
                     entry=entry, atr=atr, multiple=trail_atr_mult, quote=latest_quote)

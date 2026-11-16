@@ -145,6 +145,32 @@ def test_native_gap_through_stop_uses_next_bar_open_and_real_loss_r():
     assert mirror.call_args.args[2] == 102.5
 
 
+def test_native_publication_minute_pre_entry_wicks_cannot_close_or_notify():
+    from test_entry_window import seconds,frame
+    raw=seconds({5:(100,104,98,100,1)})
+    row=signal(source='stock_xperp_native_shadow',opened_at=10.5,
+        strategy_entry_bar_ts=0,strategy_bar_seconds=60,strategy_runner_mode='single_target',
+        strategy_tp1_close_frac=1.,tp1=102,tp2=102)
+    with patch('src.binance_client.get_xperp_entry_seconds',return_value=raw),\
+            patch('src.binance_client.get_xperp_entry_second_trades') as ticks:
+        update,notify,mirror=run_monitor(row,frame(raw))
+    update.assert_not_called();notify.assert_not_called();mirror.assert_not_called()
+    ticks.assert_not_called()
+
+
+def test_native_post_publication_second_gap_keeps_observed_loss():
+    from test_entry_window import seconds,frame
+    raw=seconds({0:(100,100,100,100,1),20:(98,98,98,98,1)})
+    row=signal(source='stock_xperp_native_shadow',opened_at=10.5,
+        strategy_entry_bar_ts=0,strategy_bar_seconds=60,strategy_runner_mode='single_target',
+        strategy_tp1_close_frac=1.,tp1=102,tp2=102)
+    with patch('src.binance_client.get_xperp_entry_seconds',return_value=raw):
+        update,notify,mirror=run_monitor(row,frame(raw))
+    assert update.call_args.args[1:3]==('SL_HIT',98)
+    assert update.call_args.kwargs['realized_r']==-2
+    assert notify.call_args.args[2]==98 and mirror.call_args.args[2]==98
+
+
 def test_stop_notification_shows_gap_adjusted_r():
     sent = []
     row = signal(direction="SHORT", entry_price=100.0, sl=101.0)

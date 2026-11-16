@@ -47,3 +47,30 @@ def test_trade_audit_rejects_arbitrary_queries_and_unbounded_requests(api,body):
 def test_audit_endpoint_is_absent_without_private_token():
     app=Flask(__name__);register_trade_audit_api(app,None)
     assert app.test_client().post('/internal/trade-audit/v1/signals',json={}).status_code==404
+
+
+def test_capacity_summary_distinguishes_unbound_old_owner_without_exporting_it(api):
+    app,_=api
+    position=db.at_create_entry_intent(1,7,'TEST-X','LONG',1.,100.,3.,99.,'PRIVATE_ORDER')
+    assert db.at_mark_entry_submitting(position)
+    with app.test_client() as c:
+        assert c.post('/internal/trade-audit/v1/capacity-summary',json={}).status_code==401
+        response=c.post('/internal/trade-audit/v1/capacity-summary',json={},
+            headers={'Authorization':'Bearer '+TOKEN})
+    data=response.get_json()['summary']
+    assert data['unknown_account_intents']==1
+    assert data['first_unknown_owner_connected'] is False
+    assert 'PRIVATE_ORDER' not in response.get_data(as_text=True)
+    assert 'NEVER_EXPORT' not in response.get_data(as_text=True)
+    assert 'user_id' not in response.get_data(as_text=True)
+    # Audit is read-only; an unsubmitted/unknown record is never released.
+    assert len(db.at_shared_positions())==1
+
+
+def test_capacity_summary_cannot_accept_queries_or_mutations(api):
+    app,_=api
+    with app.test_client() as c:
+        for body in ({'query':'SELECT * FROM autotrade_users'},{'release':True},[],None):
+            response=c.post('/internal/trade-audit/v1/capacity-summary',json=body,
+                headers={'Authorization':'Bearer '+TOKEN})
+            assert response.status_code in (400,413)
