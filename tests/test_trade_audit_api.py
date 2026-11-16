@@ -74,3 +74,22 @@ def test_capacity_summary_cannot_accept_queries_or_mutations(api):
             response=c.post('/internal/trade-audit/v1/capacity-summary',json=body,
                 headers={'Authorization':'Bearer '+TOKEN})
             assert response.status_code in (400,413)
+
+
+def test_capacity_summary_counts_only_the_exact_retained_legacy_shape(api):
+    app,_=api
+    old=db.at_log_position(99,7,'OLD-X','LONG',1.,100.,3.,'PRIVATE_OLD_STOP',99.)
+    with app.test_client() as c:
+        for marked,expected in ((None,1),(1,0)):
+            with db._conn() as conn:
+                conn.execute('UPDATE autotrade_positions SET entry_submit_started_at=? WHERE id=?',(marked,old))
+            response=c.post('/internal/trade-audit/v1/capacity-summary',json={},
+                headers={'Authorization':'Bearer '+TOKEN})
+            assert response.status_code==200
+            data=response.get_json()['summary']
+            assert data['inactive_unbound_legacy_rows']==expected
+            assert data['unknown_account_owner_inactive']==1
+            assert data['unknown_account_owner_disallowed']==0
+            assert 'PRIVATE' not in response.get_data(as_text=True)
+            assert 'NEVER_EXPORT' not in response.get_data(as_text=True)
+    assert db.at_shared_positions()[0]['status']=='OPEN'

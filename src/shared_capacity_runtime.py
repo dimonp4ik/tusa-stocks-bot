@@ -28,6 +28,7 @@ class SharedCapacityRuntime:
         self.epoch=None;self.ready=False;self.last_sync=0.;self.error=None
         self.lock=threading.RLock();self.cursor=0
         self.last_region_probe=0.
+        self.legacy_unbound_count=0
 
     def initialize(self,app=None):
         if not self.initialized:
@@ -45,7 +46,11 @@ class SharedCapacityRuntime:
             return 'Общая бронь: не настроена; работают локальные и биржевые проверки.'
         if self.error or not self.ready or self.clock()-self.last_sync>180:
             return 'Общая бронь: не готова; новые входы запрещены, сопровождение продолжается.'
-        return 'Общая бронь: включена; последняя синхронизация успешна.'
+        result='Общая бронь: включена; последняя синхронизация успешна.'
+        if self.legacy_unbound_count:
+            result+=(f' Старых записей отключённых подключений без привязки: {self.legacy_unbound_count}.'
+                     ' Перед входом обязателен свежий снимок счёта OKX.')
+        return result
 
     def persistent_storage_ready(self):
         """Non-secret deployment diagnostic; never exposes a file path."""
@@ -92,6 +97,22 @@ class SharedCapacityRuntime:
             raise CapacityError('position exchange uid unavailable')
         return account
 
+    def _inactive_unbound_legacy(self,row):
+        """Retain historical rows without pretending they identify an account.
+
+        Only pre-intent OPEN rows of explicitly inactive connections qualify.
+        No existing account/claim, order ID, or submission evidence is ignored.
+        This does not declare a position flat: reserve/begin still require the
+        complete current account snapshot, including pending-entry checks.
+        Any real position on that account counts even without a local claim.
+        """
+        if row.get('status')!='OPEN' or row.get('entry_submit_started_at') is not None:
+            return False
+        if any(row.get(key) for key in ('account_key','client_order_id','shared_claim_id','shared_epoch')):
+            return False
+        user=db.at_get(row['user_id'])
+        return user is not None and user.get('active')==0
+
     def maintenance(self,credentials,*,reconcile=True):
         if not self.enabled:
             return
@@ -103,12 +124,15 @@ class SharedCapacityRuntime:
                 return
             try:
                 stage='local_intents'
-                items=[];local={}
+                items=[];local={};legacy_unbound=0
                 for row in db.at_shared_positions():
                     # No market request can precede the local submission CAS.
                     # An in-flight, unsubmitted reservation already exists at
                     # the coordinator and must not be seeded as a real fill.
                     if row['status']=='ENTRY_PENDING' and row.get('entry_submit_started_at')==0:
+                        continue
+                    if self._inactive_unbound_legacy(row):
+                        legacy_unbound+=1
                         continue
                     identity=self._intent(row)
                     payload=dict(account=self._account(row,credentials),instrument=row['inst_id'],
@@ -134,6 +158,10 @@ class SharedCapacityRuntime:
                     if identity in released:
                         db.at_mark_shared_released(row['id'],claim_id,epoch)
                 self.epoch=epoch;self.ready=answer.get('ready') is True
+                if legacy_unbound!=self.legacy_unbound_count:
+                    log.info('shared capacity retained %d inactive unbound legacy rows for %s; '
+                             'current broker snapshot remains mandatory',legacy_unbound,self.owner)
+                self.legacy_unbound_count=legacy_unbound
                 self.last_sync=self.clock();self.error=None
                 closed=[r for r in db.at_shared_positions() if r['status']=='CLOSED'] if reconcile else []
                 if closed:

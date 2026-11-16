@@ -44,6 +44,14 @@ def register_trade_audit_api(app,token):
                     p.client_order_id IS NOT NULL AND p.client_order_id!='' AS has_client_order,
                     p.entry_submit_started_at,
                     u.user_id IS NOT NULL AS owner_exists,
+                    u.active AS owner_active,
+                    u.allowed AS owner_allowed,
+                    p.status='OPEN' AND p.entry_submit_started_at IS NULL
+                      AND COALESCE(p.account_key,'')=''
+                      AND COALESCE(p.client_order_id,'')=''
+                      AND COALESCE(p.shared_claim_id,'')=''
+                      AND COALESCE(p.shared_epoch,'')=''
+                      AND u.active=0 AS inactive_unbound_legacy,
                     COALESCE(u.allowed,0)=1 AND COALESCE(u.active,0)=1
                       AND COALESCE(u.api_key_enc,'')!=''
                       AND COALESCE(u.api_secret_enc,'')!=''
@@ -63,6 +71,9 @@ def register_trade_audit_api(app,token):
                 unknown_account_with_connected_owner=sum(bool(r['owner_connected']) for r in unknown),
                 unknown_account_missing_owner=sum(not r['owner_exists'] for r in unknown),
                 unknown_account_without_order_id=sum(not r['has_client_order'] for r in unknown),
+                unknown_account_owner_inactive=sum(r['owner_active']==0 for r in unknown),
+                unknown_account_owner_disallowed=sum(r['owner_allowed']==0 for r in unknown),
+                inactive_unbound_legacy_rows=sum(bool(r['inactive_unbound_legacy']) for r in rows),
                 first_unknown_owner_connected=bool(first['owner_connected']) if first else None,
                 first_unknown_age_over_seven_days=(time.time()-float(first['opened_at'])>7*86400) if first else None,
                 statuses={state:sum(r['status']==state for r in rows) for state in ('OPEN','ENTRY_PENDING','CLOSED')}))

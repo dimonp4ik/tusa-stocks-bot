@@ -185,3 +185,68 @@ def test_nested_okx_balance_error_preserves_rejection_code():
         allowed,error=okx.place_market_entry(dict(api_key='test',api_secret='test',passphrase='test'),
             'TEST-X','LONG',1,'test-order')
     assert not allowed and error.endswith('(sCode 51008)')
+
+
+def inactive_legacy_position():
+    db.at_add_allowed(8, 1)
+    db.at_set_active(8, False)
+    return db.at_log_position(99, 8, 'LEGACY-X', 'LONG', 1., 100., 3., 'old-stop', 99.)
+
+
+def test_inactive_unbound_legacy_key_cannot_block_a_current_account(runtime):
+    old_id = inactive_legacy_position()
+    before = next(r for r in db.at_shared_positions() if r['id'] == old_id)
+    with patch.object(okx, 'get_account_configuration') as lookup:
+        runtime.maintenance(lambda _: None)
+    lookup.assert_not_called()
+    assert runtime.ready and runtime.legacy_unbound_count == 1
+    after = next(r for r in db.at_shared_positions() if r['id'] == old_id)
+    assert after == before  # no invented UID, closure, claim or release
+    assert begin(runtime, intent())
+    assert runtime.transport.store.status()['active_claims'] == 1
+
+
+def test_broker_positions_still_count_when_legacy_rows_cannot_be_identified(runtime):
+    inactive_legacy_position()
+    runtime.maintenance(lambda _: None)
+    assert runtime.ready
+    view = dict(count=11, margin_usd=33., inst_ids=['LEGACY-X'] + [f'OTHER-{i}' for i in range(10)],
+                margin_by_inst={'LEGACY-X': 3.} | {f'OTHER-{i}': 3. for i in range(10)})
+    store = runtime.transport.store
+    snapshot = dict(view, equity=100., captured_at=runtime.clock())
+    duplicate = store.reserve('crypto', runtime.epoch,
+        dict(account=account(), instrument='LEGACY-X', intent='duplicate', margin=3.), snapshot)
+    assert duplicate['reason'] == 'instrument_occupied'
+    claim = runtime.reserve(intent(), account(), 'TEST-X', 'entry-1', 3., view, 100., runtime.clock())
+    runtime.begin(claim, view, 100., runtime.clock())
+    overflow = store.reserve('stocks', runtime.epoch,
+        dict(account=account(), instrument='STOCK-X', intent='stock-entry', margin=3.), snapshot)
+    assert overflow['reason'] == 'position_limit'
+
+
+@pytest.mark.parametrize('kind', ['active', 'missing_user', 'submission_marker', 'claim_binding'])
+def test_uncertain_live_or_submitted_intent_is_not_excluded_from_migration(runtime, kind):
+    old_id = inactive_legacy_position()
+    if kind == 'active':
+        db.at_set_active(8, True)
+    else:
+        with db._conn() as c:
+            if kind == 'missing_user':
+                c.execute('DELETE FROM autotrade_users WHERE user_id=8')
+            elif kind == 'submission_marker':
+                c.execute('UPDATE autotrade_positions SET entry_submit_started_at=1 WHERE id=?', (old_id,))
+            else:
+                c.execute('UPDATE autotrade_positions SET shared_claim_id=? WHERE id=?', ('a' * 32, old_id))
+    runtime.maintenance(lambda _: None)
+    assert not runtime.ready and runtime.error
+
+
+def test_known_account_for_inactive_owner_still_seeds_and_holds_its_position(runtime):
+    old_id = inactive_legacy_position()
+    with db._conn() as c:
+        c.execute('UPDATE autotrade_positions SET account_key=? WHERE id=?', (account(), old_id))
+    runtime.maintenance(lambda _: None)
+    assert runtime.ready
+    assert runtime.transport.store.status()['active_claims'] == 1
+    with pytest.raises(CapacityError, match='refused'):
+        runtime.reserve(intent(), account(), 'LEGACY-X', 'entry-1', 3., positions(), 100., runtime.clock())
