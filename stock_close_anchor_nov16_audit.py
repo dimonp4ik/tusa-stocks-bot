@@ -170,6 +170,7 @@ def main():
         runtime_prefix_parity=parity,
         results={name:monthly(frame) for name,frame in outputs.items()},
         limitations=['Known signal close is an observable reference, not a certified executable market fill.',
+            'Prefix parity covers closed-bar setup generation, not publication quote checks or account admission.',
             '15m exit paths retain unknown intrabar ordering, stop first, delayed exit recognition.',
             'Causal version observes premarket triggers on all scans, not only qualifying candidates.',
             'No historical bid/ask, contract rounding, funding or actual client ledger.',
