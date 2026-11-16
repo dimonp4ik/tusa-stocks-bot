@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import patch, ANY
 
 import main
 
@@ -21,7 +21,7 @@ def test_paper_candidate_collects_labeled_decision_book():
             main, "record_setup_decision_book", return_value=True) as record:
         main._record_candidate_decision_books([(analysis, 7)])
     record.assert_called_once_with(
-        7, spread_bps=1.25, depth_usd=25_000.0, imbalance=.15)
+        7, spread_bps=1.25, depth_usd=25_000.0, imbalance=.15, observed_at=ANY)
 
 
 def test_live_published_candidate_collects_fallback_decision_book():
@@ -41,4 +41,4 @@ def test_live_published_candidate_collects_fallback_decision_book():
             main, "record_setup_decision_book", return_value=True) as record:
         main._record_candidate_decision_books([(analysis, 7)])
     record.assert_called_once_with(
-        7, spread_bps=1.5, depth_usd=12_000.0, imbalance=-.2)
+        7, spread_bps=1.5, depth_usd=12_000.0, imbalance=-.2, observed_at=ANY)

@@ -4063,12 +4063,14 @@ def _record_candidate_decision_books(
         try:
             spec = _okx_trade.get_xperp_spec(inst_id)
             book = _okx_trade.get_order_book(inst_id)
+            book_observed_at = time.time()
             if not spec or not book:
                 continue
             snap = order_book_snapshot(book, spec["ctVal"])
             record_setup_decision_book(
                 setup_id, spread_bps=snap.spread_bps,
-                depth_usd=snap.depth_usd, imbalance=snap.imbalance)
+                depth_usd=snap.depth_usd, imbalance=snap.imbalance,
+                observed_at=book_observed_at)
         except Exception as exc:
             log.warning("Decision-book snapshot failed for %s: %s", symbol, exc)
 
@@ -4200,6 +4202,8 @@ def _run_native_xperp_shadow_scan() -> None:
             if market is None:
                 portfolio_rejects["market_unavailable"] += 1
                 continue
+            setup.update(market_observed_at=time.time(),market_reference_price=float(market),
+                market_sample_kind='ticker_last')
             analysis = _native_xperp_analysis(setup, float(market))
             setup_id = log_setup_candidate_once(analysis)
             if not setup_id:

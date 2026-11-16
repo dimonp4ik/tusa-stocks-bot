@@ -32,3 +32,21 @@ def test_legacy_setup_stays_explicitly_without_evidence(tmp_path,monkeypatch):
     setup=db.log_setup_candidate(dict(symbol='TEST',direction='LONG',current_price=100))
     with db._conn() as c:
         assert c.execute('SELECT decision_context_json FROM setup_log WHERE id=?',(setup,)).fetchone()[0] is None
+
+
+def test_forming_observation_preserves_zero_volume_and_its_actual_time():
+    from src.decision_context import forming_entry_evidence
+    sample=forming_entry_evidence(dict(time=[900],confirmed=[0],high=[101],low=[100],
+        close=[100.5],volume=[0]),911.25)
+    saved=json.loads(context_json(sample))['decision_evidence']
+    assert saved['reference_observed_at']==911.25 and saved['reference_volume']==0
+    assert saved['reference_bar_ts']==900 and saved['reference_sample_kind']=='forming_15m_snapshot'
+
+
+def test_finalized_or_out_of_time_data_is_not_called_a_forming_observation():
+    from src.decision_context import forming_entry_evidence
+    sample=dict(time=[900],confirmed=[1],high=[101],low=[100],close=[100.5])
+    assert forming_entry_evidence(sample,911)=={}
+    sample['confirmed']=[0]
+    assert forming_entry_evidence(sample,899)=={}
+    assert forming_entry_evidence(sample,1800)=={}

@@ -5,6 +5,18 @@ from unittest.mock import patch
 from src import db
 
 
+def test_execution_book_keeps_observation_time_before_later_fill_write(tmp_path,monkeypatch):
+    monkeypatch.setattr(db,'DB_PATH',str(tmp_path/'audit.sqlite'));db.init_db()
+    signal=db.log_signal(dict(symbol='TEST',direction='LONG',current_price=100),101,102,99)
+    setup=db.log_setup_candidate(dict(symbol='TEST',direction='LONG',current_price=100))
+    db.link_setup_to_signal(setup,signal)
+    with patch.object(db.time_mod,'time',return_value=200.):
+        assert db.record_signal_execution_book(signal,spread_bps=2,depth_usd=1000,imbalance=.2,observed_at=150.)
+        assert not db.record_setup_decision_book(setup,spread_bps=2,depth_usd=1000,imbalance=.2,observed_at=300.)
+    with db._conn() as c:
+        assert c.execute('SELECT book_observed_ts FROM setup_log WHERE id=?',(setup,)).fetchone()[0]==150.
+
+
 def test_first_execution_book_snapshot_is_stable():
     conn = sqlite3.connect(":memory:")
     conn.execute("""

@@ -1693,16 +1693,32 @@ def link_setup_to_signal(setup_log_id: int, signal_id: int) -> None:
         c.execute("UPDATE setup_log SET signal_id=? WHERE id=?", (signal_id, setup_log_id))
 
 
+def _book_observation_time(observed_at):
+    """Keep the local receipt time, even when persistence happens after a fill."""
+    now = time_mod.time()
+    if observed_at is None:
+        return now
+    if isinstance(observed_at, bool):
+        return None
+    try:
+        stamp = float(observed_at)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return stamp if math.isfinite(stamp) and 0 < stamp <= now + 1 else None
+
+
 def record_signal_execution_book(signal_id: int, *, spread_bps: float,
-                                 depth_usd: float, imbalance: float) -> bool:
+                                 depth_usd: float, imbalance: float,
+                                 observed_at: float | None = None) -> bool:
     """Attach the first real pre-entry X-Perp book to its published setup.
 
     The setup is linked before autotrading starts. Replace a background
     decision snapshot, then keep the first real execution snapshot when several
     users mirror the same signal.
     """
+    captured = _book_observation_time(observed_at)
     values = (float(spread_bps), float(depth_usd), float(imbalance))
-    if (not signal_id or any(not math.isfinite(value) for value in values)
+    if (captured is None or not signal_id or any(not math.isfinite(value) for value in values)
             or values[0] < 0 or values[1] <= 0
             or not -1.0 <= values[2] <= 1.0):
         return False
@@ -1713,15 +1729,17 @@ def record_signal_execution_book(signal_id: int, *, spread_bps: float,
                    book_sample_kind='live_execution', book_observed_ts=?
              WHERE signal_id=?
                AND COALESCE(book_sample_kind, '') != 'live_execution'
-        """, (*values, time_mod.time(), int(signal_id)))
+        """, (*values, captured, int(signal_id)))
         return bool(cur.rowcount)
 
 
 def record_setup_decision_book(setup_id: int, *, spread_bps: float,
-                               depth_usd: float, imbalance: float) -> bool:
+                               depth_usd: float, imbalance: float,
+                               observed_at: float | None = None) -> bool:
     """Attach a public decision-time book unless a live fill already won."""
+    captured = _book_observation_time(observed_at)
     values = (float(spread_bps), float(depth_usd), float(imbalance))
-    if (not setup_id or any(not math.isfinite(value) for value in values)
+    if (captured is None or not setup_id or any(not math.isfinite(value) for value in values)
             or values[0] < 0 or values[1] <= 0
             or not -1.0 <= values[2] <= 1.0):
         return False
@@ -1735,7 +1753,7 @@ def record_setup_decision_book(setup_id: int, *, spread_bps: float,
                AND book_spread_bps IS NULL
                AND book_depth_usd IS NULL
                AND book_imbalance IS NULL
-        """, (*values, time_mod.time(), int(setup_id)))
+        """, (*values, captured, int(setup_id)))
         return bool(cur.rowcount)
 
 

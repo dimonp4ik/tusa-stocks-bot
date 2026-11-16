@@ -438,10 +438,12 @@ def _open_for_account_locked(
     # Refresh executable depth after leverage setup; last-trade prices may be stale.
     from src.execution_guard import execution_quote_with_retry, order_book_snapshot, SpreadLimitError
     book_snapshot = None
+    book_observed_at = None
     try:
         book, quote = execution_quote_with_retry(
             lambda: okx.get_order_book(inst_id), direction, sz,
             clock_ms=lambda: time.time()*1000)
+        book_observed_at = time.time()
         executable = quote.worst
         if not (original_sl < executable < float(sig['tp1']) if direction == 'LONG'
                 else float(sig['tp1']) < executable < original_sl):
@@ -767,7 +769,7 @@ def _open_for_account_locked(
             recorded = record_signal_execution_book(
                 sig["id"], spread_bps=book_snapshot.spread_bps,
                 depth_usd=book_snapshot.depth_usd,
-                imbalance=book_snapshot.imbalance)
+                imbalance=book_snapshot.imbalance, observed_at=book_observed_at)
             if not recorded:
                 log.info("autotrade book snapshot had no linked setup for signal %s",
                          sig.get("id"))
