@@ -441,11 +441,22 @@ def send_signal_update(sig: dict, new_status: str, exit_price: float) -> bool:
             f"✅ Сделка полностью закрыта"
         )
     elif new_status == "BREAKEVEN":
-        icon  = "🔄"
-        title = "БЕЗУБЫТОК"
+        from src.live_accounting import marked_r
+        from config import TP1_CLOSE_FRAC
+        fraction = TP1_CLOSE_FRAC if strategy_frac is None else float(strategy_frac)
+        result_r = marked_r(direction=direction, entry=entry, exit_price=exit_price,
+            sl=sl, tp1=tp1, tp1_fraction=fraction, reached_tp1=True)
+        gap = exit_price < entry if direction == "LONG" else exit_price > entry
+        icon = "🟠" if gap else "🔄"
+        title = "СТОП Б/У С ГЭПОМ" if gap else "БЕЗУБЫТОК"
+        detail = ("Цена прошла стоп в б/у разрывом; остаток рассчитан за уровнем входа"
+                  if gap else "Остаток закрыт по уровню входа")
         body  = (
-            f"TP1 был взят, остаток закрыт по входу\n"
-            f"Цена: `{_format_price(exit_price)}`"
+            "Цена достигла TP1\n"
+            f"{detail}\n"
+            f"Расчётная цена: `{_format_price(exit_price)}`\n"
+            f"Итог сигнала: `{result_r:+.4f}R`\n"
+            "Исполнение на вашем счёте — в уведомлении автотрейдинга."
         )
     elif new_status == "SL_HIT":
         icon  = "❌"
@@ -696,7 +707,7 @@ def send_weekly_digest(stats: dict, commentary: str) -> bool:
         if worst:
             lines.append(f"Худшая: *{_disp_sym(worst['symbol'])}* {worst['r']:+.2f}R")
         if top3:
-            top3_str = "  ".join(f"{_disp_sym(s)}({w}W/{sl}SL)" for s, w, sl in top3)
+            top3_str = "  ".join(f"{_disp_sym(s)}({w}W/{sl}L)" for s, w, sl in top3)
             lines.append(f"Топ тикеры: _{top3_str}_")
 
     if trend_wr:

@@ -429,7 +429,7 @@ def generate_weekly_commentary(stats: dict) -> str:
         return ""
 
     top3_str = ", ".join(
-        f"{s}({w}W/{sl}SL)" for s, w, sl in stats.get("top3", [])
+        f"{s}({w}W/{sl}L)" for s, w, sl in stats.get("top3", [])
     ) or "нет данных"
     trend_str = " | ".join(
         f"{t}: {int(wr)}% WR" for t, wr in stats.get("trend_wr", {}).items()

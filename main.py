@@ -3402,8 +3402,11 @@ def _check_open_signals():
                                     new_status, exit_px = "TP2_HIT", tp2; break
                                 continue
                             if low <= entry:
-                                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
-                                new_status, exit_px = "BREAKEVEN", entry; break
+                                be_fill = min(opening, entry) if _post_entry_bar else entry
+                                realized_r = marked_r(
+                                    direction=direction, entry=entry, exit_price=be_fill,
+                                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac, reached_tp1=True)
+                                new_status, exit_px = "BREAKEVEN", be_fill; break
                             if high >= tp2:
                                 realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break
@@ -3420,8 +3423,11 @@ def _check_open_signals():
                                     new_status, exit_px = "TP2_HIT", tp2; break
                                 continue
                             if high >= entry:
-                                realized_r = blended_r(tp1_close_frac, tp1_r, 0.0, 0.0)
-                                new_status, exit_px = "BREAKEVEN", entry; break
+                                be_fill = max(opening, entry) if _post_entry_bar else entry
+                                realized_r = marked_r(
+                                    direction=direction, entry=entry, exit_price=be_fill,
+                                    sl=sl, tp1=tp1, tp1_fraction=tp1_close_frac, reached_tp1=True)
+                                new_status, exit_px = "BREAKEVEN", be_fill; break
                             if low <= tp2:
                                 realized_r = blended_r(tp1_close_frac, tp1_r, runner_frac, tp2_r)
                                 new_status, exit_px = "TP2_HIT", tp2; break

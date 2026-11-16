@@ -6,7 +6,7 @@ Lifecycle:
   OPEN         -> signal is live, TP1 not reached yet
   TP1_PARTIAL  -> TP1 hit, 50% position closed, remaining 50% has SL moved to breakeven
   TP2_HIT      -> final target reached after TP1
-  BREAKEVEN    -> TP1 hit, remaining 50% closed at entry price
+  BREAKEVEN    -> TP1 hit; entry-level stop, realized_r includes known gaps
   SL_HIT       -> initial stop hit before TP1
   EXPIRED      -> no TP1/SL within 24h
   TP1_EXPIRED  -> TP1 hit, then rest expired before TP2/BE
@@ -1168,9 +1168,9 @@ def get_stats(days: int = 7, since_ts: float = None,
         ).fetchall()
         # Last 7 closed signals for streak (independent of days filter)
         streak_rows = c.execute(
-            f"SELECT status FROM signals "
+            f"SELECT status, realized_r FROM signals "
             f"WHERE status IN ({','.join('?'*len(FINAL_STATUSES))}) "
-            f"ORDER BY opened_at DESC LIMIT 7",
+            f"ORDER BY COALESCE(closed_at, opened_at) DESC, rowid DESC LIMIT 7",
             FINAL_STATUSES,
         ).fetchall()
 
@@ -1302,11 +1302,10 @@ def get_stats(days: int = 7, since_ts: float = None,
     streak = []
     for r in streak_rows:
         st = r["status"]
-        if st == "TP2_HIT":
-            streak.append("🏆")
-        elif st in PROFIT_STATUSES:
-            streak.append("✅")
-        elif st == "SL_HIT":
+        result = _row_unit_r(r)
+        if result > 0:
+            streak.append("🏆" if st == "TP2_HIT" else "✅")
+        elif result < 0:
             streak.append("❌")
         else:
             streak.append("➖")
@@ -2314,7 +2313,8 @@ def get_weekly_stats() -> dict:
     n_tp2   = sum(1 for t in trades if t["status"] == "TP2_HIT")
     n_sl    = sum(1 for t in trades if t["status"] == "SL_HIT")
     n_exp   = sum(1 for t in trades if t["status"] in ("EXPIRED", "TP1_EXPIRED"))
-    n_win   = sum(1 for t in trades if t["status"] in PROFIT_STATUSES)
+    n_win   = sum(1 for t in trades if _row_unit_r(t) > 0)
+    n_loss  = sum(1 for t in trades if _row_unit_r(t) < 0)
     wr      = round(n_win / n_total * 100, 1) if n_total else 0.0
     # Was a hand-rolled copy of "stored R, else fall back to the status" — the
     # same selection _row_r makes, written out again. It drifted the moment
@@ -2327,8 +2327,8 @@ def get_weekly_stats() -> dict:
     sym_sl: dict = defaultdict(int)
     for t in trades:
         s = t["symbol"]
-        if t["status"] in PROFIT_STATUSES: sym_w[s] += 1
-        elif t["status"] == "SL_HIT": sym_sl[s] += 1
+        if _row_unit_r(t) > 0: sym_w[s] += 1
+        elif _row_unit_r(t) < 0: sym_sl[s] += 1
     all_syms = set(sym_w) | set(sym_sl)
     top3 = sorted(all_syms, key=lambda s: sym_w.get(s, 0) - sym_sl.get(s, 0), reverse=True)[:3]
     top3_data = [(s, sym_w.get(s, 0), sym_sl.get(s, 0)) for s in top3]
@@ -2346,8 +2346,8 @@ def get_weekly_stats() -> dict:
         if not tr:
             continue
         trend_n[tr] += 1
-        if t["status"] in PROFIT_STATUSES: trend_w[tr] += 1
-        elif t["status"] == "SL_HIT": trend_sl[tr] += 1
+        if _row_unit_r(t) > 0: trend_w[tr] += 1
+        elif _row_unit_r(t) < 0: trend_sl[tr] += 1
     trend_wr = {
         tr: round(trend_w[tr] / trend_n[tr] * 100, 0)
         for tr in trend_n if trend_n[tr] >= 3
@@ -2362,6 +2362,8 @@ def get_weekly_stats() -> dict:
     return {
         "n_total":        n_total,
         "n_win":          n_win,
+        "n_loss":         n_loss,
+        "n_flat":         n_total - n_win - n_loss,
         "n_tp2":          n_tp2,
         "n_sl":           n_sl,
         "n_exp":          n_exp,
