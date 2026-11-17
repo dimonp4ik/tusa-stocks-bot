@@ -2198,30 +2198,65 @@ def get_route_live_readiness(source: str, window: int = 20,
                              min_total_r: float = 0.0) -> dict:
     """Return a causal live-order gate from the route's latest paper outcomes.
 
-    The signal engine continues recording every setup while this gate is
-    closed.  Only exchange order creation is withheld.  A fresh database is
+    Paper signal collection is independent of this account-entry gate.
+    Only exchange order creation is withheld here. A fresh database is
     deliberately not considered evidence: at least ``window`` resolved rows
-    from the exact production source are required.
+    from the exact production source are required. Missing outcomes are not
+    inferred from statuses. R and the modeled price-weighted result must both
+    be positive; neither is a private account-PnL reconstruction.
     """
     window = max(1, int(window))
     placeholders = ",".join("?" for _ in FINAL_STATUSES)
     query = (
-        "SELECT status, realized_r FROM signals "
+        "SELECT status, realized_r, direction, entry_price, sl FROM signals "
         f"WHERE source = ? AND status IN ({placeholders}) "
-        "AND closed_at IS NOT NULL ORDER BY closed_at DESC, id DESC LIMIT ?"
+        "AND closed_at IS NOT NULL AND closed_at <= ? "
+        "ORDER BY closed_at DESC, id DESC LIMIT ?"
     )
     with _conn() as c:
         rows = c.execute(
-            query, (str(source), *FINAL_STATUSES, window)).fetchall()
-    values = [_row_unit_r(row) for row in rows]
-    total_r = float(sum(values))
+            query, (str(source), *FINAL_STATUSES, time_mod.time(), window)).fetchall()
+    values = []
+    price_values = []
+    missing_geometry = 0
+    for row in rows:
+        # A winning status is not a measured outcome. Never bootstrap LIVE
+        # readiness with the generic display fallback for missing realized R.
+        try:
+            rr = float(row['realized_r'])
+            if not math.isfinite(rr):
+                continue
+        except (TypeError, ValueError):
+            continue
+        values.append(rr)
+        try:
+            entry, stop = float(row['entry_price']), float(row['sl'])
+            direction = row['direction']
+            if (not all(math.isfinite(v) and v > 0 for v in (entry, stop))
+                    or direction not in ('LONG', 'SHORT')
+                    or (stop >= entry if direction == 'LONG' else stop <= entry)):
+                raise ValueError('invalid original stop geometry')
+            weighted = rr * (abs(entry - stop) / entry)
+            if not math.isfinite(weighted):
+                raise ValueError('nonfinite modeled price return')
+            price_values.append(weighted)
+        except (TypeError, ValueError):
+            missing_geometry += 1
+    total_r = float(math.fsum(values))
+    total_price_return = float(math.fsum(price_values))
     resolved = len(values)
-    ready = resolved >= window and total_r > float(min_total_r)
+    missing_outcomes = len(rows) - resolved
+    ready = (len(rows) >= window and missing_outcomes == 0 and missing_geometry == 0
+             and total_r > float(min_total_r) + 1e-10 and total_price_return > 1e-12)
     return {
         "ready": ready,
         "resolved": resolved,
         "window": window,
         "total_r": total_r,
+        "total_price_return": total_price_return,
+        "observed": len(rows),
+        "missing_outcomes": missing_outcomes,
+        "missing_geometry": missing_geometry,
         "wins": sum(v > 0 for v in values),
         "losses": sum(v < 0 for v in values),
         "flat": sum(v == 0 for v in values),
