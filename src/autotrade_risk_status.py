@@ -11,7 +11,7 @@ def _positive(value):
     return number if math.isfinite(number) and number > 0 else None
 
 
-def risk_status_text(state, *, now):
+def risk_status_text(state, *, now, max_drawdown=None):
     """Never reevaluate/reset a guard or promise that an entry can be sent."""
     if not isinstance(state, dict):
         return "Проверка лимитов счёта: сохранённые данные недоступны."
@@ -29,6 +29,12 @@ def risk_status_text(state, *, now):
     equity = _positive(state.get('equity'))
     checked = _positive(state.get('checked_at'))
     limit = _positive(state.get('max_drawdown'))
+    if peak is not None:
+        current_limit = _positive(max_drawdown)
+        threshold = (f" Порог от этого максимума при текущем лимите "
+                     f"{current_limit*100:g}%: ${peak*(1-current_limit):.2f}."
+                     if current_limit is not None and current_limit < 1 else "")
+        lines.append(f"Сохранённый максимум счёта: ${peak:.2f}.{threshold}")
     # Legacy records contain peak/day but no timestamped equity. Do not pair
     # their peak with an unrelated last_balance and invent the trigger loss.
     if peak is not None and equity is not None and checked is not None and checked <= now + 1:

@@ -19,7 +19,8 @@ def test_old_latched_pause_does_not_invent_original_equity_or_expire():
     assert 'Новые входы остановлены: лимит общей просадки' in text
     assert 'смена дня и кнопка включения её не снимают' in text
     assert 'исходного убытка' in text
-    assert '$' not in text
+    assert 'Сохранённый максимум счёта: $130.00' in text
+    assert 'Последняя проверка' not in text
     assert state == original
 
 
@@ -45,7 +46,15 @@ def test_invalid_saved_data_is_not_presented_as_confirmed_equity():
     for bad in (float('nan'), float('inf'), -1, None):
         text = risk_status_text(dict(paused=True, peak=130, equity=bad,
             checked_at=NOW), now=NOW)
-        assert '$' not in text
+        assert 'Последняя проверка' not in text
+
+
+def test_old_peak_and_current_threshold_are_visible_without_inventing_trigger_balance():
+    text = risk_status_text(dict(paused=True, peak=130), now=NOW, max_drawdown=.03)
+    assert 'Сохранённый максимум счёта: $130.00' in text
+    assert 'при текущем лимите 3%: $126.10' in text
+    assert 'сумму исходного убытка' in text
+    assert 'Последняя проверка' not in text
 
 
 def test_menu_distinguishes_enabled_connection_from_latched_account_pause():

@@ -2323,7 +2323,8 @@ def _at_show_menu(chat_id: int, u: dict):
     from src.autotrade_risk_status import risk_status_text
     try:
         risk_state = json.loads(get_bot_state(f"risk_guard:{chat_id}") or "{}")
-        risk_line = risk_status_text(risk_state, now=time.time())
+        risk_line = risk_status_text(risk_state, now=time.time(),
+                                     max_drawdown=autotrader.AUTOTRADE_MAX_DRAWDOWN)
     except Exception:
         risk_line = "Проверка лимитов счёта: сохранённые данные недоступны."
     execution_line = _execution_state_text()
