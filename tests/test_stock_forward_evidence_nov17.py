@@ -30,7 +30,7 @@ def test_winning_status_without_measured_r_cannot_enable_live(database):
     assert not health['ready'] and health['resolved']==0
     assert health['missing_outcomes']==20 and health['total_r']==0
     with (patch.object(main,'DEPLOYMENT_MODE','live'),patch.object(main,'AUTOTRADE_ENABLED',True)):
-        assert 'неполные данные: исходов 20' in main._execution_state_text()
+        assert 'неподтверждённых исходов 20' in main._execution_state_text()
 
 
 def test_positive_r_with_negative_price_result_cannot_reach_client_accounts(database):
@@ -75,3 +75,9 @@ def test_complete_fixed_risk_positive_window_remains_ready(database):
     health=db.get_route_live_readiness(SOURCE)
     assert health['ready'] and health['resolved']==20
     assert health['total_price_return']==pytest.approx(.2)
+
+
+def test_floating_point_residue_is_not_a_profitable_window(database):
+    for i,rr in enumerate([.1,.2,-.3]+[0.]*17):insert(database,rr,closed=i+1)
+    health=db.get_route_live_readiness(SOURCE)
+    assert abs(health['total_r'])<1e-10 and not health['ready']

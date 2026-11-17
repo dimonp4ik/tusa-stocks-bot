@@ -817,9 +817,12 @@ def open_positions_for_signal(sig: dict) -> None:
         if not health["ready"]:
             log.warning(
                 "autotrade: stock forward gate refused signal %s "
-                "(%s/%s resolved, %+.2fR, %.1f%% wins)",
+                "(%s/%s resolved, %+.2fR, %.1f%% wins; price_return=%s; "
+                "missing_outcomes=%s; missing_geometry=%s)",
                 sig.get("id"), health["resolved"], health["window"],
                 health["total_r"], health["win_rate"],
+                health.get("total_price_return"), health.get("missing_outcomes"),
+                health.get("missing_geometry"),
             )
             return
     traders = at_get_active_traders()

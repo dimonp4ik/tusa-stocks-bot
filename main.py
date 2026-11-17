@@ -166,8 +166,8 @@ def _execution_state_text() -> str:
                 f"forward {health['total_r']:+.2f}R/{health['resolved']}{breakdown}")
     evidence = ""
     if health.get('missing_outcomes') or health.get('missing_geometry'):
-        evidence = (f" · неполные данные: исходов {health.get('missing_outcomes', 0)}, "
-                    f"уровней входа/стопа {health.get('missing_geometry', 0)}")
+        evidence = (f" · неподтверждённых исходов {health.get('missing_outcomes', 0)}, "
+                    f"некорректных уровней входа/стопа {health.get('missing_geometry', 0)}")
     elif health['total_r'] > STOCK_LIVE_FORWARD_MIN_TOTAL_R and health.get('total_price_return', 1.) <= 1e-12:
         evidence = " · положительные R не подтверждены ценовым результатом модели"
     return ("ЗАЩИТНАЯ ПАУЗА: сигналы считаются в PAPER, реальные входы "
