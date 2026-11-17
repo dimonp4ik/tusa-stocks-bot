@@ -132,6 +132,17 @@ def test_data_cleanup_preserves_the_indicator_prefix_of_retained_scans(tmp_path)
     assert store.reconstruct('A',ref)==f
 
 
+def test_expired_interrupted_scan_is_cleaned_before_a_new_capture_can_fail(tmp_path):
+    observer=StockStructureObserver(tmp_path/'observer.sqlite',source=Source(),clock=lambda:NOW,
+        symbols=['AAAUSDT','BBBUSDT'])
+    observer.store.initialize()
+    observer.store.claim(PROFILE,BUCKET-40*86400,NOW-40*86400,'interrupted')
+    with patch.object(observer.store,'claim',side_effect=sqlite3.OperationalError('disk full')):
+        result=observer.run()
+    assert result['status']=='archive_unavailable'
+    assert observer.store.summary(PROFILE)['scans']==0
+
+
 def test_application_collection_is_independent_of_trading_pause_and_client_database(tmp_path):
     import main
     source=Source();main_database=tmp_path/'main.db';main_database.write_bytes(b'untouched')

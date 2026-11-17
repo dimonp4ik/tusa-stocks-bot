@@ -115,8 +115,13 @@ class StockStructureObserver:
     def run(self):
         started=self.clock();bucket=int(started//900)*900
         if started<FROZEN_AT:return dict(status='before_freeze')
-        self.store.initialize()
-        if not self.store.claim(PROFILE,bucket,started,self.revision):return dict(status='already_recorded')
+        try:
+            self.store.initialize()
+            self.store.prune(started)
+            if not self.store.claim(PROFILE,bucket,started,self.revision):return dict(status='already_recorded')
+        except Exception as exc:
+            log.warning('Structure observer archive unavailable (%s)',type(exc).__name__)
+            return dict(status='archive_unavailable',error_type=type(exc).__name__)
         summary=dict(expected=len(self.symbols),loaded=0,quotes=0,candidates=0,quoted_candidates=0)
         try:
             mapping,specs=self.source.inventory()

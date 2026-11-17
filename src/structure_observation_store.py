@@ -105,14 +105,22 @@ class ObservationStore:
             return bool(c.execute('INSERT OR IGNORE INTO observations VALUES(?,?,?,?,?,?,?,?)',
                 (profile,bucket,symbol,instrument,received_at,int(quote_ok),int(candidate),encoded(payload))).rowcount)
 
+    def prune(self,now):
+        # Reclaim old pages before a new claim, even if the previous run failed.
+        with self.connect() as c:
+            self._prune(c,now)
+
+    @staticmethod
+    def _prune(c,now):
+        c.execute('DELETE FROM observations WHERE received_at<?',(now-RETENTION_SECONDS,))
+        c.execute('DELETE FROM scans WHERE started_at<?',(now-RETENTION_SECONDS,))
+        c.execute('DELETE FROM candles WHERE stamp<?',(now-RETENTION_SECONDS-2*86400-300*900,))
+
     def finish(self,profile,bucket,completed_at,status,summary):
         with self.connect() as c:
             c.execute('UPDATE scans SET completed_at=?,status=?,summary=? WHERE profile=? AND bucket=? '
                 'AND completed_at IS NULL',(completed_at,status,encoded(summary),profile,bucket))
-            c.execute('DELETE FROM observations WHERE received_at<?',(completed_at-RETENTION_SECONDS,))
-            c.execute('DELETE FROM scans WHERE started_at<?',(completed_at-RETENTION_SECONDS,))
-            # Keep the extra two-day indicator prefix for the oldest retained scan.
-            c.execute('DELETE FROM candles WHERE stamp<?',(completed_at-RETENTION_SECONDS-2*86400-300*900,))
+            self._prune(c,completed_at)
 
     def summary(self,profile):
         if not self.path.exists():return dict(status='not_started',scans=0,observations=0,quotes=0,candidates=0)
