@@ -768,6 +768,43 @@ def _native_scan_status_text() -> str:
         return "Последний скан: аудит недоступен"
 
 
+_structure_quote_observer = None
+
+
+def _run_structure_quote_observer():
+    """Independent archive job: no publishing, client keys or order creation."""
+    global _structure_quote_observer
+    if os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')!='1':
+        return
+    if _structure_quote_observer is None:
+        if not autotrader._shared_capacity.persistent_storage_ready():
+            log.warning('Structure observer requires existing persistent storage')
+            return
+        from src.stock_structure_observer import StockStructureObserver,observer_path
+        _structure_quote_observer=StockStructureObserver(observer_path(os.environ['DB_PATH']),
+            revision=os.getenv('RAILWAY_GIT_COMMIT_SHA') or os.getenv('GIT_COMMIT_SHA') or 'unknown')
+    return _structure_quote_observer.run()
+
+
+def _structure_observer_status_text():
+    if os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')!='1':
+        return 'Structure quote observer: disabled. '
+    if _structure_quote_observer is None:
+        return 'Structure quote observer: awaiting first collection. '
+    try:
+        from src.stock_structure_observer import PROFILE
+        state=_structure_quote_observer.store.summary(PROFILE)
+        last=state.get('last') or {}
+        age=max(0,int((time.time()-float(last.get('completed_at') or last.get('started_at') or time.time()))/60))
+        latest=json.loads(last.get('summary') or '{}')
+        return (f"Structure quote observer: {state['status']}; last {age} min ago; scans {state['scans']}; "
+                f"observations {state['observations']}; valid books {state['quotes']}; "
+                f"structural candidates {state['candidates']}; last history {latest.get('loaded',0)}/"
+                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; research only. ")
+    except Exception:
+        return 'Structure quote observer: archive status unavailable. '
+
+
 @app.route("/status")
 def status():
     day_start = int(time.time() // 86400) * 86400
@@ -804,6 +841,7 @@ def status():
             f"{autotrader._shared_capacity.status_text()} "
             f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. {risk_text}{regime_text}"
+            f"{_structure_observer_status_text()}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
@@ -4709,6 +4747,12 @@ def start_bot():
     if AUTOTRADE_ENABLED:
         scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
                           id='equity_guard_recovery',max_instances=1,coalesce=True)
+    if os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1':
+        from apscheduler.executors.pool import ThreadPoolExecutor as SchedulerPool
+        scheduler.add_executor(SchedulerPool(1),alias='structure_research')
+        scheduler.add_job(_run_structure_quote_observer,'cron',minute='0,15,30,45',second=20,
+                          timezone='UTC',id='structure_quote_observer',executor='structure_research',
+                          max_instances=1,coalesce=True,next_run_time=datetime.now(timezone.utc))
     scheduler.start()
     if AUTOTRADE_ENABLED:
         threading.Thread(target=autotrader.maintain_equity_guards,daemon=True).start()
