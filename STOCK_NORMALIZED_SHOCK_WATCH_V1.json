@@ -1,0 +1,28 @@
+{
+  "protocol": "normalized_stock_shock_watch_v1",
+  "frozen_at": 1794953646.5722816,
+  "first_eligible_bucket": 1794953700,
+  "hypotheses": [
+    "native_swing2_original_target",
+    "normalized_z_reversal_swing2_original_target"
+  ],
+  "normalization": "14-bar ATR ending before the two impulse bars",
+  "z_threshold": 2.0,
+  "minimum_move": 0.004,
+  "maximum_atr14_fraction": 0.01,
+  "history_bars": 64,
+  "stop_floor": 0.003,
+  "stop_ceiling": 0.02,
+  "stop_extreme_bars": 2,
+  "stop_atr_buffer": 0.25,
+  "target": "original native 2/2.5/3 percent",
+  "horizon_bars": 64,
+  "orders": false,
+  "objective_verified": false,
+  "code": {
+    "stock_volatility_phase_nov18.py": "ef8ade9a30f88b6bd6959c9e07e041f7faa265ee90ae76c519cbb3b7e3276fb5",
+    "stock_structure_geometry_nov17.py": "2635aea05dca3a0b1b23e7ed4093f4682d880c6aacb6096ea888073cbda724d8",
+    "stock_close_anchor_nov16_audit.py": "5ebf628171d00b932a0f30dad7ab006469f111823b9dd9ce6f1bb9482b7c9f4b"
+  },
+  "historical_report_sha256": "745653d0a4a37784780272c36cb3aa9ef63f433d583f1bc0c24d6017e2f11adf"
+}
