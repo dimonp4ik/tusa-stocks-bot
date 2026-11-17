@@ -96,6 +96,14 @@ def test_wrong_contract_book_cannot_be_labelled_as_the_requested_market():
             source.book('AAA-X')
 
 
+def test_single_instrument_books_accept_actual_okx_payload_without_echoed_id():
+    source=PublicSource()
+    row=dict(seqId=42,**book())
+    with patch('src.binance_client._okx_get',return_value=dict(code='0',data=[row])) as request:
+        assert source.book('AAA-X')==row
+    assert request.call_args.args[1]['instId']=='AAA-X'
+
+
 def test_freeze_and_closed_geometry_do_not_use_future_quotes_or_prices(tmp_path):
     source=Source()
     value=StockStructureObserver(tmp_path/'observer.sqlite',source=source,clock=lambda:FROZEN_AT-1,

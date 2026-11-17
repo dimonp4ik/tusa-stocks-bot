@@ -95,7 +95,9 @@ class PublicSource:
         self._pace()
         answer=_okx_get('/api/v5/market/books',dict(instId=instrument,sz=5),timeout=5)
         row=(answer.get('data') or [None])[0]
-        if row is not None and row.get('instId')!=instrument:
+        # This single-instrument endpoint normally omits instId. Its request
+        # identifies the contract; reject a conflicting echoed id if supplied.
+        if row is not None and row.get('instId') not in (None,instrument):
             raise ValueError('book_instrument_mismatch')
         return row
 

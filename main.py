@@ -800,7 +800,8 @@ def _structure_observer_status_text():
         return (f"Structure quote observer: {state['status']}; last {age} min ago; scans {state['scans']}; "
                 f"observations {state['observations']}; valid books {state['quotes']}; "
                 f"structural candidates {state['candidates']}; last history {latest.get('loaded',0)}/"
-                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; research only. ")
+                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; "
+                f"last quote errors {json.dumps(latest.get('quote_errors',{}),sort_keys=True)}; research only. ")
     except Exception:
         return 'Structure quote observer: archive status unavailable. '
 
