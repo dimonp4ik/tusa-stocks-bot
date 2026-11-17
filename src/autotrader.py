@@ -59,6 +59,7 @@ from src.db import (
     record_signal_execution_book,
 )
 from src.keystore import decrypt_secret, keystore_ready
+from src.autotrade_risk_status import risk_status_text
 from src import okx_trader as okx
 from src.shared_capacity_runtime import SharedCapacityRuntime
 from src.binance_client import get_xperp_instruments
@@ -286,14 +287,20 @@ def _open_for_account_locked(
             max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS, max_drawdown=AUTOTRADE_MAX_DRAWDOWN,
             peak_floor=peak_floor)
         state["last_block"] = blocked
+        state.update(equity=balance, checked_at=time.time(),
+                     max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS,
+                     max_drawdown=AUTOTRADE_MAX_DRAWDOWN)
         set_bot_state(state_key, json.dumps(state))
         if blocked:
             _entry_skip(
                 uid, sig, inst_id, f"лимит потерь: {blocked}",
                 f"⏸ Автотрейдинг: {disp} пропущен по лимиту потерь. "
-                "Открытые позиции продолжают сопровождаться. "
-                f"Причина: {blocked}")
-            log.warning("autotrade risk guard %s: %s", uid, blocked)
+                "Открытые позиции продолжают сопровождаться.\n"
+                + risk_status_text(state, now=time.time()))
+            log.warning("autotrade risk guard: %s; drawdown_pct=%.3f; "
+                        "drawdown_limit_pct=%.3f; latched=%s; snapshot_day=%s",
+                        blocked, 100 * max(0., 1 - balance / state["peak"]),
+                        100 * AUTOTRADE_MAX_DRAWDOWN, state["paused"], state["day"])
             return
     except Exception as exc:
         log.error("autotrade risk state unavailable; entry refused: %s", exc)

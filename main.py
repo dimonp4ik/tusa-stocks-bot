@@ -2319,7 +2319,14 @@ def _at_show_menu(chat_id: int, u: dict):
     mode_str = f"{pct:g}% от текущего депозита" if 1 <= pct <= 10 else "не задан"
     bal = u.get("last_balance")
     bal_str = f"${bal:.2f}" if bal is not None else "—"
-    state = "🟢 включён" if u.get("active") else "⏸ выключен"
+    state = "🟢 включено" if u.get("active") else "⏸ выключено"
+    from src.autotrade_risk_status import risk_status_text
+    try:
+        risk_state = json.loads(get_bot_state(f"risk_guard:{chat_id}") or "{}")
+        risk_line = risk_status_text(risk_state, now=time.time())
+    except Exception:
+        risk_line = "Проверка лимитов счёта: сохранённые данные недоступны."
+    execution_line = _execution_state_text()
     tp1_pct = float(u.get("tp1_close_pct") or 0)
     tp1_str = "не закрывать (весь объём под трейлинг)" if tp1_pct <= 0 else f"{tp1_pct:.0f}%"
     skip_line = ""
@@ -2340,8 +2347,9 @@ def _at_show_menu(chat_id: int, u: dict):
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     _at_reply_kb(chat_id,
-                  f"🤖 *Автотрейдинг*\n\nСтатус: {state}\nМаржа каждой сделки: *{mode_str}*\n"
+                  f"🤖 *Автотрейдинг*\n\nПодключение: {state}\nМаржа каждой сделки: *{mode_str}*\n"
                   f"Закрытие на TP1: *{tp1_str}*\n"
+                  f"Исполнение стратегии: {execution_line}\n\n{risk_line}\n\n"
                   f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа"
                   f"{skip_line}",
                   rows)

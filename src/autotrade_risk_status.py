@@ -1,0 +1,43 @@
+"""Read-only presentation of the last account-equity guard decision."""
+import math
+from datetime import datetime, timezone
+
+
+def _positive(value):
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) and number > 0 else None
+
+
+def risk_status_text(state, *, now):
+    """Never reevaluate/reset a guard or promise that an entry can be sent."""
+    if not isinstance(state, dict):
+        return "Проверка лимитов счёта: сохранённые данные недоступны."
+    day = datetime.fromtimestamp(now, timezone.utc).date().isoformat()
+    if state.get('paused'):
+        lines = ["⏸ Новые входы остановлены: лимит общей просадки.",
+                 "Пауза сохранена; смена дня и кнопка включения её не снимают."]
+    elif state.get('daily_paused') and state.get('day') == day:
+        lines = ["⏸ Новые входы остановлены: дневной лимит потерь.",
+                 "Дневная пауза действует до следующего дня UTC."]
+    else:
+        lines = ["Лимиты счёта: сохранённой действующей паузы нет.",
+                 "Перед входом бот заново проверяет счёт и ограничения."]
+    peak = _positive(state.get('peak'))
+    equity = _positive(state.get('equity'))
+    checked = _positive(state.get('checked_at'))
+    limit = _positive(state.get('max_drawdown'))
+    # Legacy records contain peak/day but no timestamped equity. Do not pair
+    # their peak with an unrelated last_balance and invent the trigger loss.
+    if peak is not None and equity is not None and checked is not None and checked <= now + 1:
+        age = max(0, int((now - checked) / 60))
+        drawdown = max(0., (peak - equity) / peak * 100.)
+        suffix = f"; порог {limit * 100:g}%" if limit is not None and limit < 1 else ""
+        lines.append(f"Последняя проверка ({age} мин назад): баланс ${equity:.2f}, "
+                     f"максимум ${peak:.2f}, просадка {drawdown:.2f}%{suffix}.")
+    elif state.get('paused') or (state.get('daily_paused') and state.get('day') == day):
+        lines.append("В старой записи нет снимка баланса и времени срабатывания; "
+                     "сумму исходного убытка по ней подтвердить нельзя.")
+    return '\n'.join(lines)
