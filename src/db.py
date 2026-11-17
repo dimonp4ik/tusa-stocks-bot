@@ -492,6 +492,13 @@ def set_bot_state(key: str, value: str) -> None:
         """, (key, value))
 
 
+def compare_and_set_bot_state(key: str, expected: str, value: str) -> bool:
+    """Preserve a concurrently changed risk snapshot."""
+    with _conn() as c:
+        return c.execute('UPDATE bot_state SET value=? WHERE key=? AND value=?',
+                         (value,key,expected)).rowcount == 1
+
+
 def delete_signal(signal_id: int) -> bool:
     """Hard-delete a signal row by ID. Returns True if a row was removed."""
     with _conn() as c:

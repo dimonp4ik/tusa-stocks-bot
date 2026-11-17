@@ -4706,7 +4706,12 @@ def start_bot():
         day_of_week="sun", hour=22, minute=0,
         timezone="Europe/Riga",
     )
+    if AUTOTRADE_ENABLED:
+        scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
+                          id='equity_guard_recovery',max_instances=1,coalesce=True)
     scheduler.start()
+    if AUTOTRADE_ENABLED:
+        threading.Thread(target=autotrader.maintain_equity_guards,daemon=True).start()
     if autotrader._shared_capacity.enabled:
         scheduler.add_job(autotrader.maintain_shared_capacity,'interval',seconds=60,
                           id='shared_capacity_maintenance',max_instances=1,coalesce=True)

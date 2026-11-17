@@ -18,7 +18,18 @@ def risk_status_text(state, *, now, max_drawdown=None):
     day = datetime.fromtimestamp(now, timezone.utc).date().isoformat()
     if state.get('paused'):
         lines = ["⏸ Новые входы остановлены: лимит общей просадки.",
-                 "Пауза сохранена; смена дня и кнопка включения её не снимают."]
+                 "Входы возобновятся после 3 свежих проверок за минимум 2 минуты "
+                 "в пределах прежнего лимита и без дневной паузы."]
+        status=state.get('recovery_status')
+        if status=='checking':
+            lines.append(f"Подтверждений восстановления: {int(state.get('recovery_checks') or 0)}/3.")
+        elif status=='daily_pause':
+            lines.append('Сначала должна закончиться дневная пауза: следующий день UTC.')
+        elif status=='balance_unavailable':
+            lines.append('Свежий баланс пока недоступен; восстановление не подтверждено.')
+        threshold=_positive(state.get('recovery_equity_threshold'))
+        if threshold is not None:
+            lines.append(f'Для восстановления нужен баланс выше ${threshold:.2f} с запасом к лимиту.')
     elif state.get('daily_paused') and state.get('day') == day:
         lines = ["⏸ Новые входы остановлены: дневной лимит потерь.",
                  "Дневная пауза действует до следующего дня UTC."]

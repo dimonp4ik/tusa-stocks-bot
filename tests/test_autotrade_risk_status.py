@@ -17,7 +17,7 @@ def test_old_latched_pause_does_not_invent_original_equity_or_expire():
     original = copy.deepcopy(state)
     text = risk_status_text(state, now=NOW)
     assert 'Новые входы остановлены: лимит общей просадки' in text
-    assert 'смена дня и кнопка включения её не снимают' in text
+    assert 'после 3 свежих проверок за минимум 2 минуты' in text
     assert 'исходного убытка' in text
     assert 'Сохранённый максимум счёта: $130.00' in text
     assert 'Последняя проверка' not in text
@@ -67,7 +67,7 @@ def test_menu_distinguishes_enabled_connection_from_latched_account_pause():
     assert 'Подключение: 🟢 включено' in text
     assert 'PAPER: биржевые ордера выключены' in text
     assert 'Новые входы остановлены: лимит общей просадки' in text
-    assert 'смена дня и кнопка включения её не снимают' in text
+    assert 'после 3 свежих проверок за минимум 2 минуты' in text
 
 
 def test_menu_reports_corrupt_guard_without_resetting_it():

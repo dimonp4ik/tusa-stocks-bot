@@ -46,7 +46,7 @@ from config import (
     STOP_CLOSE_CONFIRM, STOP_EXCHANGE_BACKSTOP_R,
 )
 from src.db import (
-    get_bot_state, set_bot_state,
+    get_bot_state, set_bot_state, compare_and_set_bot_state,
     at_get_active_traders, at_get, at_set_balance,
     at_create_entry_intent, at_mark_entry_submitting, at_release_unsent_entry,
     at_update_entry_intent_protection, at_activate_entry_intent,
@@ -60,6 +60,7 @@ from src.db import (
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src.autotrade_risk_status import risk_status_text
+from src.drawdown_recovery import checked_equity_guard, failed_equity_check
 from src import okx_trader as okx
 from src.shared_capacity_runtime import SharedCapacityRuntime
 from src.binance_client import get_xperp_instruments
@@ -150,6 +151,48 @@ def _margin_for(u: dict, balance: float) -> float:
 
 _entry_locks = defaultdict(threading.Lock)
 _account_entry_locks = defaultdict(threading.Lock)
+
+
+def maintain_equity_guards() -> None:
+    """Fresh checks for current connected clients; independent of TP/SL jobs."""
+    if not AUTOTRADE_ENABLED:
+        return
+    try:
+        users=at_get_active_traders()
+    except Exception:
+        log.warning('Equity recovery users unavailable')
+        return
+    for row in users:
+        uid=row['user_id']
+        lock=_entry_locks[uid]
+        if not lock.acquire(blocking=False):
+            continue
+        try:
+            user=at_get(uid)
+            if not user or not user.get('allowed') or not user.get('active'):
+                continue
+            key=f'risk_guard:{uid}'
+            raw=get_bot_state(key)
+            state=json.loads(raw or '{}')
+            if not isinstance(state,dict) or state.get('paused') is not True:
+                continue
+            creds=_creds_of(user)
+            ok,balance=okx.get_balance(creds) if creds else (False,None)
+            now=time.time()
+            if not ok:
+                result=failed_equity_check(state,now)
+            else:
+                result,blocked=checked_equity_guard(state,equity=balance,now=now,
+                    max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS,max_drawdown=AUTOTRADE_MAX_DRAWDOWN,
+                    peak_floor=max(float(user.get('last_balance') or 0),AUTOTRADE_EQUITY_PEAK_FLOOR))
+                result.update(last_block=blocked,equity=balance,checked_at=now,
+                    max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS,max_drawdown=AUTOTRADE_MAX_DRAWDOWN)
+            if compare_and_set_bot_state(key,raw,json.dumps(result)) and not result['paused']:
+                log.info('Equity drawdown pause recovered after sustained fresh checks inside existing limits')
+        except Exception as exc:
+            log.warning('Equity recovery check deferred (%s)',type(exc).__name__)
+        finally:
+            lock.release()
 
 
 def _entry_skip(user_id: int, sig: dict, inst_id: str, reason: str,
@@ -282,8 +325,8 @@ def _open_for_account_locked(
         state = json.loads(get_bot_state(state_key) or '{}')
         previous_balance = float(u.get('last_balance') or 0)
         peak_floor = max(previous_balance, AUTOTRADE_EQUITY_PEAK_FLOOR)
-        state, blocked = equity_guard(state, equity=balance,
-            day=datetime.now(timezone.utc).date().isoformat(),
+        state, blocked = checked_equity_guard(state, equity=balance,
+            now=time.time(),
             max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS, max_drawdown=AUTOTRADE_MAX_DRAWDOWN,
             peak_floor=peak_floor)
         state["last_block"] = blocked
