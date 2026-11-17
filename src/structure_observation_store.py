@@ -90,8 +90,12 @@ class ObservationStore:
 
     def reconstruct(self,instrument,reference):
         with self.connect() as c:
-            rows=c.execute('SELECT stamp,payload FROM candles WHERE instrument=? AND stamp BETWEEN ? AND ? '
-                'ORDER BY stamp',(instrument,reference['start'],reference['end'])).fetchall()
+            return self._reconstruct(c,instrument,reference)
+
+    @staticmethod
+    def _reconstruct(c,instrument,reference):
+        rows=c.execute('SELECT stamp,payload FROM candles WHERE instrument=? AND stamp BETWEEN ? AND ? '
+            'ORDER BY stamp',(instrument,reference['start'],reference['end'])).fetchall()
         values={r['stamp']:json.loads(r['payload']) for r in rows}
         values.update({r[0]:r[1:] for r in reference['overrides']})
         times=list(range(reference['start'],reference['end']+900,900))
@@ -99,6 +103,35 @@ class ObservationStore:
         frame=dict(time=times,**{k:[values[t][i] for t in times] for i,k in enumerate(FIELDS)})
         if frame_hash(frame)!=reference['sha256']:raise ValueError('archived_history_hash_mismatch')
         return frame
+
+    def export(self,profile,after_bucket=0,limit=1):
+        """Bounded read-only snapshot of this archive, never the client DB."""
+        if not self.path.exists():return dict(scans=[],next_bucket=after_bucket)
+        c=sqlite3.connect(self.path.as_uri()+'?mode=ro',uri=True,timeout=2)
+        c.row_factory=sqlite3.Row
+        try:
+            c.execute('BEGIN')
+            scans=c.execute('SELECT * FROM scans WHERE profile=? AND bucket>? '
+                'ORDER BY bucket LIMIT ?',(profile,after_bucket,limit)).fetchall()
+            output=[]
+            for scan in scans:
+                rows=c.execute('SELECT * FROM observations WHERE profile=? AND bucket=? '
+                    'ORDER BY symbol LIMIT 101',(profile,scan['bucket'])).fetchall()
+                if len(rows)>100:raise ValueError('archive_scan_too_large')
+                observations=[]
+                for row in rows:
+                    payload=json.loads(row['payload'])
+                    item={k:row[k] for k in ('symbol','instrument','received_at','quote_ok','candidate')}
+                    item['payload']=payload
+                    if payload.get('frame'):
+                        try:item['closed_frame']=self._reconstruct(c,row['instrument'],payload['frame'])
+                        except (KeyError,TypeError,ValueError):item['frame_error']='archived_history_unavailable'
+                    observations.append(item)
+                output.append(dict(profile=scan['profile'],bucket=scan['bucket'],started_at=scan['started_at'],
+                    completed_at=scan['completed_at'],status=scan['status'],revision=scan['revision'],
+                    summary=json.loads(scan['summary']) if scan['summary'] else None,observations=observations))
+            return dict(scans=output,next_bucket=output[-1]['bucket'] if output else after_bucket)
+        finally:c.close()
 
     def put_observation(self,profile,bucket,symbol,instrument,received_at,quote_ok,candidate,payload):
         with self.connect() as c:

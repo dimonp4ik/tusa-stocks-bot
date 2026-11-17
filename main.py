@@ -806,6 +806,11 @@ def _structure_observer_status_text():
         return 'Structure quote observer: archive status unavailable. '
 
 
+from src.structure_observation_api import register_structure_observation_api
+register_structure_observation_api(app,os.getenv('STRUCTURE_OBSERVER_AUDIT_TOKEN'),
+    lambda: _structure_quote_observer.store if _structure_quote_observer is not None else None)
+
+
 @app.route("/status")
 def status():
     day_start = int(time.time() // 86400) * 86400
