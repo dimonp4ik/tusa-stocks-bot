@@ -10,6 +10,17 @@ FIELDS=('open','high','low','close','volume')
 RETENTION_SECONDS=30*86400
 
 
+def series_fields(kind):
+    if kind=='trade':return FIELDS
+    if kind=='mark':return FIELDS[:-1]
+    raise ValueError('unknown_price_series_kind')
+
+
+def series_key(instrument,kind):
+    series_fields(kind)
+    return instrument if kind=='trade' else 'mark:'+instrument
+
+
 def encoded(value):
     return json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)
 
@@ -18,7 +29,7 @@ def frame_hash(frame):
     return hashlib.sha256(encoded(frame).encode()).hexdigest()
 
 
-def closed_frame(frame,bucket,minimum):
+def closed_frame(frame,bucket,minimum,*,kind='trade'):
     if not isinstance(frame,dict):raise ValueError('missing_history')
     times=frame.get('time') or []
     if len(times)<minimum or len(times)>300:raise ValueError('history_length')
@@ -27,7 +38,7 @@ def closed_frame(frame,bucket,minimum):
         raise ValueError('history_alignment')
     if frame.get('confirmed')!=[1]*len(times):raise ValueError('unconfirmed_history')
     out=dict(time=[int(t) for t in times])
-    for key in FIELDS:
+    for key in series_fields(kind):
         values=[float(x) for x in frame[key]]
         if len(values)!=len(times) or not all(math.isfinite(x) and (x>=0 if key=='volume' else x>0) for x in values):
             raise ValueError('invalid_history_values')
@@ -76,17 +87,20 @@ class ObservationStore:
             return bool(c.execute('INSERT OR IGNORE INTO scans(profile,bucket,started_at,status,revision) '
                 'VALUES(?,?,?,\'collecting\',?)',(profile,bucket,started_at,revision)).rowcount)
 
-    def put_frame(self,instrument,frame):
+    def put_frame(self,instrument,frame,*,kind='trade'):
         overrides=[]
+        fields=series_fields(kind);storage_key=series_key(instrument,kind)
         with self.connect() as c:
             for i,stamp in enumerate(frame['time']):
-                values=[frame[k][i] for k in FIELDS];payload=encoded(values)
-                inserted=c.execute('INSERT OR IGNORE INTO candles VALUES(?,?,?)',(instrument,stamp,payload)).rowcount
+                values=[frame[k][i] for k in fields];payload=encoded(values)
+                inserted=c.execute('INSERT OR IGNORE INTO candles VALUES(?,?,?)',(storage_key,stamp,payload)).rowcount
                 if not inserted:
-                    old=c.execute('SELECT payload FROM candles WHERE instrument=? AND stamp=?',(instrument,stamp)).fetchone()[0]
+                    old=c.execute('SELECT payload FROM candles WHERE instrument=? AND stamp=?',(storage_key,stamp)).fetchone()[0]
                     if old!=payload:overrides.append([stamp,*values])
-        return dict(start=frame['time'][0],end=frame['time'][-1],bars=len(frame['time']),
-                    sha256=frame_hash(frame),overrides=overrides)
+        reference=dict(start=frame['time'][0],end=frame['time'][-1],bars=len(frame['time']),
+                       sha256=frame_hash(frame),overrides=overrides)
+        if kind!='trade':reference['kind']=kind
+        return reference
 
     def reconstruct(self,instrument,reference):
         with self.connect() as c:
@@ -94,13 +108,14 @@ class ObservationStore:
 
     @staticmethod
     def _reconstruct(c,instrument,reference):
+        kind=reference.get('kind','trade');fields=series_fields(kind)
         rows=c.execute('SELECT stamp,payload FROM candles WHERE instrument=? AND stamp BETWEEN ? AND ? '
-            'ORDER BY stamp',(instrument,reference['start'],reference['end'])).fetchall()
+            'ORDER BY stamp',(series_key(instrument,kind),reference['start'],reference['end'])).fetchall()
         values={r['stamp']:json.loads(r['payload']) for r in rows}
         values.update({r[0]:r[1:] for r in reference['overrides']})
         times=list(range(reference['start'],reference['end']+900,900))
         if len(times)!=reference['bars'] or any(t not in values for t in times):raise ValueError('missing_archived_history')
-        frame=dict(time=times,**{k:[values[t][i] for t in times] for i,k in enumerate(FIELDS)})
+        frame=dict(time=times,**{k:[values[t][i] for t in times] for i,k in enumerate(fields)})
         if frame_hash(frame)!=reference['sha256']:raise ValueError('archived_history_hash_mismatch')
         return frame
 
@@ -126,6 +141,9 @@ class ObservationStore:
                     if payload.get('frame'):
                         try:item['closed_frame']=self._reconstruct(c,row['instrument'],payload['frame'])
                         except (KeyError,TypeError,ValueError):item['frame_error']='archived_history_unavailable'
+                    if payload.get('trade_frame'):
+                        try:item['trade_closed_frame']=self._reconstruct(c,row['instrument'],payload['trade_frame'])
+                        except (KeyError,TypeError,ValueError):item['trade_frame_error']='archived_trade_history_unavailable'
                     observations.append(item)
                 output.append(dict(profile=scan['profile'],bucket=scan['bucket'],started_at=scan['started_at'],
                     completed_at=scan['completed_at'],status=scan['status'],revision=scan['revision'],

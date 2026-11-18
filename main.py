@@ -769,6 +769,7 @@ def _native_scan_status_text() -> str:
 
 
 _structure_quote_observer = None
+_liquid_mark_observer = None
 
 
 def _run_structure_quote_observer():
@@ -806,9 +807,35 @@ def _structure_observer_status_text():
         return 'Structure quote observer: archive status unavailable. '
 
 
+def _run_liquid_mark_context():
+    global _liquid_mark_observer
+    if os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')!='1':return
+    if _liquid_mark_observer is None:
+        if not autotrader._shared_capacity.persistent_storage_ready():return
+        from src.stock_structure_observer import observer_path
+        from src.stock_mark_context import StockMarkContextObserver
+        _liquid_mark_observer=StockMarkContextObserver(observer_path(os.environ['DB_PATH']),
+            revision=os.getenv('RAILWAY_GIT_COMMIT_SHA') or os.getenv('GIT_COMMIT_SHA') or 'unknown')
+    return _liquid_mark_observer.run()
+
+
+def _liquid_mark_status_text():
+    if os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')!='1':return 'Liquid mark context: disabled. '
+    if _liquid_mark_observer is None:return 'Liquid mark context: awaiting collection. '
+    try:
+        from src.stock_mark_context import PROFILE
+        state=_liquid_mark_observer.store.summary(PROFILE)
+        last=state.get('last') or {};latest=json.loads(last.get('summary') or '{}')
+        return (f"Liquid mark context: {state['status']}; windows {state['scans']}; "
+                f"mark {latest.get('mark_loaded',0)}/{latest.get('expected',0)}; "
+                f"trade {latest.get('trade_loaded',0)}; books {latest.get('quotes',0)}; research only. ")
+    except Exception:return 'Liquid mark context: archive status unavailable. '
+
+
 from src.structure_observation_api import register_structure_observation_api
 register_structure_observation_api(app,os.getenv('STRUCTURE_OBSERVER_AUDIT_TOKEN'),
-    lambda: _structure_quote_observer.store if _structure_quote_observer is not None else None)
+    lambda: _structure_quote_observer.store if _structure_quote_observer is not None else None,
+    lambda: _liquid_mark_observer.store if _liquid_mark_observer is not None else None)
 
 
 @app.route("/status")
@@ -848,6 +875,7 @@ def status():
             f"Persistent intent storage: {autotrader._shared_capacity.persistent_storage_ready()}. "
             f"Signal cache: {len(_signal_cache)} entries. {risk_text}{regime_text}"
             f"{_structure_observer_status_text()}"
+            f"{_liquid_mark_status_text()}"
             f"{_native_scan_status_text().replace(chr(10), ' | ')}"), 200
 
 
@@ -4753,12 +4781,19 @@ def start_bot():
     if AUTOTRADE_ENABLED:
         scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
                           id='equity_guard_recovery',max_instances=1,coalesce=True)
-    if os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1':
+    if (os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1'
+            or os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')=='1'):
         from apscheduler.executors.pool import ThreadPoolExecutor as SchedulerPool
         scheduler.add_executor(SchedulerPool(1),alias='structure_research')
+    if os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1':
         scheduler.add_job(_run_structure_quote_observer,'cron',minute='0,15,30,45',second=20,
                           timezone='UTC',id='structure_quote_observer',executor='structure_research',
                           max_instances=1,coalesce=True,next_run_time=datetime.now(timezone.utc))
+    if os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')=='1':
+        scheduler.add_job(_run_liquid_mark_context,'cron',minute='0,15,30,45',second=40,
+                          timezone='UTC',id='liquid_mark_context',executor='structure_research',
+                          max_instances=1,coalesce=True,misfire_grace_time=120,
+                          next_run_time=datetime.now(timezone.utc))
     scheduler.start()
     if AUTOTRADE_ENABLED:
         threading.Thread(target=autotrader.maintain_equity_guards,daemon=True).start()
