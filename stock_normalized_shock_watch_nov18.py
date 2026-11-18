@@ -3,6 +3,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import pandas as pd
 
 import stock_close_anchor_nov16_audit as anchor
 from stock_structure_geometry_nov17 import bracket
@@ -31,8 +32,19 @@ def inspect_snapshot(scan,protocol):
             return dict(bucket=bucket,status='unaligned_archived_history')
         frames[row['symbol']]=f;observed[row['symbol']]=row
     if len(frames)!=summary['expected']:return dict(bucket=bucket,status='incomplete_universe')
-    native=anchor.causal_candidates(frames)
-    native=native[native.entry_time.eq(bucket)]
+    # A historical batch labels entries with the following candle row. Real
+    # closed-only prefixes have no such row. Keep the immutable decisions of
+    # the pinned native scanner instead of dropping the latest boundary.
+    native_rows=[]
+    for symbol,row in observed.items():
+        setup=row['payload'].get('native_candidate')
+        if setup is None:continue
+        if setup['entry_time']!=bucket or setup['signal_bar_ts']!=bucket-900:
+            return dict(bucket=bucket,status='native_candidate_time_mismatch')
+        native_rows.append(dict(symbol=symbol,entry_time=bucket,entry_index=len(frames[symbol]['time']),
+            direction_n=1 if setup['direction']=='LONG' else -1,
+            atr14_fraction=setup['atr14_fraction'],audited_target_pct=setup['target_r']))
+    native=pd.DataFrame(native_rows)
     pool=feature_pool(frames);context=anchor.context_table(frames)
     normalized=prepare_entries(pool,context,'normalized_z','reversal')
     normalized=normalized[normalized.entry_time.eq(bucket)]
