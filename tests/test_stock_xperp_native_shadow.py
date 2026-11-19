@@ -234,6 +234,14 @@ def test_active_volume_bars_and_native_route_latch_illiquid_crash_regime():
     assert audit["basket_trend_64_pct"] <= -6
     assert audit["liquid_universe_ratio"] == 0
 
+    for series in data.values():
+        series["volume_contracts"] = [1.0] * 112 + [.05] * 8
+    assert active_volume_bars(next(iter(data.values())), 119) == 8
+    audit.clear()
+    native_shadow_setups(data, now=signal_time + 901, diagnostics=audit)
+    assert not audit.get("premarket_regime_trigger")
+    assert audit["liquid_universe_ratio"] == 1.0
+
 
 def test_premarket_regime_is_recovered_after_same_day_restart():
     latest = int(datetime(

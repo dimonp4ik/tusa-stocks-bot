@@ -233,7 +233,9 @@ def active_volume_bars(candles: dict, index: int,
     index = int(index)
     if lookback < 1 or index < lookback - 1:
         return None
-    volumes = candles.get("volume") or []
+    # The audited liquidity gate was calibrated on contract counts. The live
+    # base-volume field can round small matched positions down to zero.
+    volumes = candles.get("volume_contracts", candles.get("volume")) or []
     if index >= len(volumes):
         return None
     try:
