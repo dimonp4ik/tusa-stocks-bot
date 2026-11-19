@@ -4060,7 +4060,8 @@ def _native_xperp_analysis(setup: dict, market_price: float) -> dict:
 def _publish_stock_venue_candidates(
         candidates: list[tuple[dict, int]],
         open_direction_counts: dict[str, int] | None = None,
-        diagnostics: dict[str, int] | None = None) -> int:
+        diagnostics: dict[str, int] | None = None, *,
+        instruments: dict[str, str] | None = None) -> int:
     """Publish at most the historically replayed number of entries per scan."""
     reject_counts = diagnostics if diagnostics is not None else {}
 
@@ -4139,6 +4140,24 @@ def _publish_stock_venue_candidates(
                 and time.time() - float(entry_bar) > NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS):
             reject(setup_id, "stale_at_publish")
             continue
+        if instruments is not None and entry_bar and not analysis.get('_shadow_only', True):
+            from src.publication_book import publication_book
+            symbol = analysis['symbol'].removesuffix('USDT')
+            inst_id = instruments.get(symbol)
+            if inst_id:
+                wide, snapshot, observed_at = publication_book(
+                    lambda: _okx_trade.get_order_book(inst_id, timeout=1.0),
+                    clock=time.time,
+                )
+                if snapshot is not None:
+                    analysis['_publication_book'] = (snapshot, observed_at)
+            else:
+                wide = False
+            late = time.time() - float(entry_bar) >= NATIVE_XPERP_MAX_SIGNAL_AGE_SECONDS
+            if wide or late:
+                reason = 'stale_at_publish' if late else 'spread_at_publish'
+                reject(setup_id, reason)
+                continue
         if not send_signal(analysis):
             reject(setup_id, "send_failed")
             continue
@@ -4186,14 +4205,22 @@ def _record_candidate_decision_books(
             continue
         try:
             spec = _okx_trade.get_xperp_spec(inst_id)
-            book = _okx_trade.get_order_book(inst_id)
-            book_observed_at = time.time()
-            if not spec or not book:
+            if not spec:
                 continue
-            snap = order_book_snapshot(book, spec["ctVal"])
+            preflight = analysis.get('_publication_book')
+            if preflight:
+                snap, book_observed_at = preflight
+                depth_usd = snap.depth_usd * float(spec['ctVal'])
+            else:
+                book = _okx_trade.get_order_book(inst_id)
+                book_observed_at = time.time()
+                if not book:
+                    continue
+                snap = order_book_snapshot(book, spec['ctVal'])
+                depth_usd = snap.depth_usd
             record_setup_decision_book(
                 setup_id, spread_bps=snap.spread_bps,
-                depth_usd=snap.depth_usd, imbalance=snap.imbalance,
+                depth_usd=depth_usd, imbalance=snap.imbalance,
                 observed_at=book_observed_at)
         except Exception as exc:
             log.warning("Decision-book snapshot failed for %s: %s", symbol, exc)
@@ -4233,7 +4260,8 @@ def _run_native_xperp_shadow_scan() -> None:
                     "an illiquid premarket crash regime")
         return
     scan_started = time.monotonic()
-    available = set(get_xperp_instruments())
+    instruments = get_xperp_instruments()
+    available = set(instruments)
     targets = sorted(
         symbol for symbol in NATIVE_XPERP_SYMBOLS
         if symbol[:-4] in available)
@@ -4347,7 +4375,7 @@ def _run_native_xperp_shadow_scan() -> None:
             log.warning("Native X-Perp setup failed for %s: %s", symbol, exc)
     publish_rejects = {}
     published = _publish_stock_venue_candidates(
-        candidates, open_direction_counts, publish_rejects)
+        candidates, open_direction_counts, publish_rejects, instruments=instruments)
     _record_candidate_decision_books(candidates)
     bar_lengths = [len(row.get("close") or []) for row in fetched.values()]
     audit = {

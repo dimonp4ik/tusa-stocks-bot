@@ -3,6 +3,9 @@ from dataclasses import dataclass
 import math
 import time
 
+MAX_ENTRY_SPREAD = .0005
+MAX_BOOK_AGE_MS = 3000
+
 
 class SpreadLimitError(ValueError):
     def __init__(self, measured, limit):
@@ -12,20 +15,27 @@ class SpreadLimitError(ValueError):
 
 
 def execution_quote_with_retry(fetch_book, direction, contracts, *, clock_ms,
-                               sleep=time.sleep, attempts=3, retry_delay=.2):
+                               sleep=time.sleep, attempts=3, retry_delay=.2,
+                               deadline_ms=None):
     """Retry only a wide spread; each fresh book must pass every original gate."""
     if attempts not in (1, 2, 3):
         raise ValueError('invalid execution attempts')
     for attempt in range(attempts):
+        if deadline_ms is not None and clock_ms() >= deadline_ms:
+            raise ValueError('entry deadline elapsed')
         book = fetch_book()
         if not book:
             raise ValueError('order book unavailable')
         try:
-            return book, execution_quote(book, direction, contracts, clock_ms())
+            now = clock_ms()
+            if deadline_ms is not None and now >= deadline_ms:
+                raise ValueError('entry deadline elapsed')
+            return book, execution_quote(book, direction, contracts, now)
         except SpreadLimitError:
             if attempt + 1 == attempts:
                 raise
-            sleep(retry_delay)
+            # Separate checks enough to catch a temporarily wide market.
+            sleep(retry_delay * (1 if attempt == 0 else 3))
 
 @dataclass(frozen=True)
 class ExecutionQuote:
@@ -82,12 +92,17 @@ def order_book_snapshot(book, contract_value):
     )
 
 
-def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=3000,
-                    max_spread=.0005, max_slippage=.0005):
+def validate_book_freshness(book, now_ms, max_age_ms=MAX_BOOK_AGE_MS):
+    age = now_ms - float(book['ts'])
+    if not math.isfinite(age) or age < -1000 or age > max_age_ms:
+        raise ValueError('stale order book')
+
+
+def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=MAX_BOOK_AGE_MS,
+                    max_spread=MAX_ENTRY_SPREAD, max_slippage=.0005):
     if direction not in ('LONG','SHORT'):raise ValueError('invalid direction')
     if not math.isfinite(contracts) or contracts<=0:raise ValueError('invalid size')
-    age=now_ms-float(book['ts'])
-    if not math.isfinite(age) or age < -1000 or age>max_age_ms:raise ValueError('stale order book')
+    validate_book_freshness(book, now_ms, max_age_ms)
     sides={}
     for key,descending in [('bids',True),('asks',False)]:
         levels=[(float(r[0]),float(r[1])) for r in book[key]]

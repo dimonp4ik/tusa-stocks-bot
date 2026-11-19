@@ -492,7 +492,7 @@ def _open_for_account_locked(
     try:
         book, quote = execution_quote_with_retry(
             lambda: okx.get_order_book(inst_id), direction, sz,
-            clock_ms=lambda: time.time()*1000)
+            clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms)
         book_observed_at = time.time()
         executable = quote.worst
         if not (original_sl < executable < float(sig['tp1']) if direction == 'LONG'
@@ -505,6 +505,7 @@ def _open_for_account_locked(
         friendly = {
             "order book unavailable": "стакан OKX недоступен",
             "stale order book": "стакан OKX устарел",
+            "entry deadline elapsed": "истёк срок входа",
             "spread exceeds limit": "спред в стакане слишком широкий",
             "insufficient displayed depth": "в стакане недостаточно объёма",
             "depth slippage exceeds limit": "ожидаемое проскальзывание слишком большое",
@@ -1264,43 +1265,19 @@ def poll_exchange_closes() -> None:
                     continue
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
-            # Report the REAL fill. The signal engine sends its own message
-            # later -- it waits for a 15m candle to close beyond the stop --
-            # and quotes that candle close, a price this position never
-            # traded at. Ported from the crypto bot, which hit this live.
+            # Bound all exit fills to this position's protective orders and
+            # full original entry quantity. A final BE order alone omits TP1.
+            from src.exit_summary import protective_exit_summary, format_exit_summary
+            summary = None
+            try:
+                summary = protective_exit_summary(pos, creds, okx)
+            except Exception as lookup_error:
+                log.warning("protective exit summary unavailable pos#%s: %s",
+                            pos['id'], type(lookup_error).__name__)
             _tick = (okx.get_xperp_spec(pos["inst_id"]) or {}).get("tickSz", 0)
-            _fill = okx.get_last_fill_px(creds, pos["inst_id"],
-                since_ts=pos.get("opened_at"),
-                side="sell" if str(pos.get("direction", "")).upper()=="LONG" else "buy")
-            _entry = float(pos.get("entry_px") or 0)
-            if _fill and _entry > 0:
-                _mv = ((_fill - _entry) / _entry * 100.0
-                       if str(pos.get("direction", "")).upper() == "LONG"
-                       else (_entry - _fill) / _entry * 100.0)
-                _px_line = (f"Средняя цена последнего ордера закрытия: `{okx.fmt_px_display(_fill, _tick)}` "
-                            f"(вход `{okx.fmt_px_display(_entry, _tick)}`, "
-                            f"движение цены {_mv:+.2f}%). Без комиссий и funding; не чистый PnL счёта.")
-            else:
-                _px_line = "Цену заливки биржа не отдала."
+            _px_line = format_exit_summary(summary, lambda price: okx.fmt_px_display(price, _tick))
             _dm(pos["user_id"],
-                f"🤖 *{base}/USDC*: позиция закрыта на бирже (стоп/тейк сработал).\n"
-                f"{_px_line}\n"
-                f"_Это реальная цена сделки. Сообщение по сигналу придёт позже "
-                f"и покажет цену закрытия свечи — она может отличаться._")
-            if pos.get("entry_filled_sz") and pos.get("sl_algo_id"):
-                algo_ids = [pos["sl_algo_id"]]
-                if pos.get("tp1_algo_id"):
-                    algo_ids.append(pos["tp1_algo_id"])
-                orders = [okx.get_protection_order_ids(creds, pos["inst_id"], algo_id)
-                          for algo_id in algo_ids]
-                if all(group is not None for group in orders):
-                    order_ids = tuple(order_id for group in orders for order_id in group)
-                    matched = okx.get_last_fill_px(
-                        creds, pos["inst_id"], since_ts=pos.get("opened_at"),
-                        side="sell" if pos["direction"] == "LONG" else "buy",
-                        order_ids=order_ids, expected_size=pos["entry_filled_sz"])
-                    if matched is not None:
-                        log.info("matched protective exit signal=%s inst=%s size=%s vwap=%s",
-                                 pos["signal_id"], pos["inst_id"], pos["entry_filled_sz"], matched)
+                f"🤖 *{base}/USDC*: позиция закрыта на бирже.\n"
+                f"{_px_line}")
         except Exception as e:
             log.warning(f"autotrade exchange-close poll failed pos#{pos['id']}: {e}")
