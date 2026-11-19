@@ -4,7 +4,7 @@ import pytest
 from flask import Flask
 from src.structure_observation_api import register_structure_observation_api
 from src.structure_observation_store import ObservationStore
-from src.stock_structure_observer import PROFILE
+from src.stock_structure_observer import LEGACY_PROFILE, PROFILE
 
 TOKEN='q'*48
 
@@ -14,9 +14,9 @@ def api(tmp_path):
     store=ObservationStore(tmp_path/'observer.db');store.initialize()
     f=dict(time=[900,1800],open=[100.,100.],high=[101.,101.],low=[99.,99.],close=[100.,100.],volume=[1.,1.])
     ref=store.put_frame('TEST-X',f)
-    store.claim(PROFILE,2700,2720.,'test')
-    store.put_observation(PROFILE,2700,'TEST','TEST-X',2721.,True,False,dict(frame=ref,book=dict(bid=99.,ask=101.)))
-    store.finish(PROFILE,2700,2722.,'complete',dict(expected=1,quotes=1))
+    store.claim(LEGACY_PROFILE,2700,2720.,'test')
+    store.put_observation(LEGACY_PROFILE,2700,'TEST','TEST-X',2721.,True,False,dict(frame=ref,book=dict(bid=99.,ask=101.)))
+    store.finish(LEGACY_PROFILE,2700,2722.,'complete',dict(expected=1,quotes=1))
     # A different profile and its data must not appear in the fixed export.
     store.claim('other_profile',3600,3620.,'OTHER_DATA')
     app=Flask(__name__);register_structure_observation_api(app,TOKEN,lambda:store)
@@ -68,7 +68,7 @@ def test_disabled_endpoint_and_missing_archive_are_not_created_by_a_read(tmp_pat
 def test_context_export_is_authenticated_keeps_series_distinct_and_cannot_select_other_profiles(api):
     from src.stock_mark_context import PROFILE as CONTEXT_PROFILE
     _,store=api
-    original=store.export(PROFILE)['scans'][0]['observations'][0]
+    original=store.export(LEGACY_PROFILE)['scans'][0]['observations'][0]
     mark=dict(time=[900,1800],open=[200.,200.],high=[201.,201.],low=[199.,199.],close=[200.,200.])
     reference=store.put_frame('TEST-X',mark,kind='mark')
     store.claim(CONTEXT_PROFILE,2700,2720.,'mark')
@@ -83,5 +83,25 @@ def test_context_export_is_authenticated_keeps_series_distinct_and_cannot_select
     assert scan['profile']==CONTEXT_PROFILE
     assert scan['observations'][0]['closed_frame']['close']==[200.,200.]
     assert scan['observations'][0]['trade_closed_frame']['close']==[100.,100.]
-    assert store.export(PROFILE)['scans'][0]['observations'][0]['closed_frame']['close']==[100.,100.]
+    assert store.export(LEGACY_PROFILE)['scans'][0]['observations'][0]['closed_frame']['close']==[100.,100.]
     assert client.post(url,json={'profile':PROFILE},headers={'Authorization':'Bearer '+TOKEN}).status_code==400
+
+
+def test_contract_profile_keeps_old_volume_and_same_bucket_separate(api):
+    app, store = api
+    old = store.export(LEGACY_PROFILE)['scans'][0]['observations'][0]['closed_frame']
+    contract = store.put_frame('TEST-X', dict(old, volume=[.05, .10]), kind='trade_contracts')
+    assert not contract['overrides']
+    store.claim(PROFILE,2700,2720.,'contracts')
+    store.put_observation(PROFILE,2700,'TEST','TEST-X',2721.,True,True,dict(frame=contract))
+    store.finish(PROFILE,2700,2722.,'complete',{})
+    url = '/internal/structure-observer/v1/contract-export'
+    client = app.test_client()
+    assert client.post(url,json={}).status_code == 401
+    response = client.post(url,json={},headers={'Authorization':'Bearer '+TOKEN}).get_json()
+    scan = response['export']['scans'][0]
+    assert scan['profile'] == PROFILE
+    assert scan['observations'][0]['closed_frame']['volume'] == [.05, .10]
+    legacy = post(app,{}).get_json()['export']['scans'][0]
+    assert legacy['profile'] == LEGACY_PROFILE
+    assert legacy['observations'][0]['closed_frame']['volume'] == [1., 1.]

@@ -11,9 +11,12 @@ import time
 from src import stock_xperp_native_shadow as native
 from src.structure_observation_store import ObservationStore,closed_frame,encoded
 
-PROFILE='stock_swing2_original_target_quote_observer_v1'
-FROZEN_AT=1794948873.  # 2026-11-17 20:54:33 UTC, before prospective collection.
+LEGACY_PROFILE='stock_swing2_original_target_quote_observer_v1'
+PROFILE='stock_swing2_original_target_quote_observer_v2'
+FROZEN_AT=1795123704.  # 2026-11-19 21:28:24 UTC, before the new cohort.
 NATIVE_SOURCE_SHA='bef374601c9599b9df506e3ac9abf4e05a9d4d80e66daf07625edc04eb524b0d'
+CONTRACT_NATIVE_SOURCE_SHA='663c490bb993dcd09f28611385e20be121a37dd07bbddba44676f15e37a1aa24'
+TRADE_SERIES='trade_contracts'
 log=logging.getLogger(__name__)
 
 
@@ -129,18 +132,20 @@ class StockStructureObserver:
             frames={};history_errors={}
             def fetch(symbol):
                 if self.clock()-started>80:raise ValueError('history_deadline')
-                return closed_frame(self.source.candles(symbol),bucket,native.REQUIRED_HISTORY_BARS)
+                return closed_frame(self.source.candles(symbol),bucket,native.REQUIRED_HISTORY_BARS,
+                                    kind=TRADE_SERIES)
             with ThreadPoolExecutor(max_workers=4) as pool:
                 futures={pool.submit(fetch,s):s for s in instruments}
                 for future in as_completed(futures):
                     symbol=futures[future]
                     try:frames[symbol]=future.result()
                     except Exception as exc:history_errors[symbol]=type(exc).__name__
-            references={s:self.store.put_frame(instruments[s],f) for s,f in frames.items()}
+            references={s:self.store.put_frame(instruments[s],f,kind=TRADE_SERIES)
+                        for s,f in frames.items()}
             decision_at=self.clock();diagnostics={}
             native_sha=hashlib.sha256(Path(native.__file__).read_text(encoding='utf-8').encode()).hexdigest()
             complete=len(instruments)==len(frames)==len(self.symbols)
-            protocol_ok=native_sha==NATIVE_SOURCE_SHA
+            protocol_ok=native_sha==CONTRACT_NATIVE_SOURCE_SHA
             forward_boundary=bucket>=math.ceil(FROZEN_AT/900)*900
             setups=(self.source.candidates(frames,decision_at,diagnostics)
                     if complete and protocol_ok and forward_boundary else [])
@@ -148,6 +153,7 @@ class StockStructureObserver:
             summary.update(available=len(instruments),loaded=len(frames),decision_at=decision_at,
                 native_source_sha256=native_sha,protocol_ok=protocol_ok,history_errors=history_errors,
                 history_complete=complete,native_result=diagnostics.get('result'),raw_setups=len(setups),
+                trade_volume_field='contracts',
                 universe_sha256=hashlib.sha256(encoded(self.symbols).encode()).hexdigest(),
                 basis='public quote evidence, no orders, no portfolio admission, no account PnL')
             def spec_usable(instrument):

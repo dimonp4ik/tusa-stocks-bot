@@ -11,14 +11,14 @@ RETENTION_SECONDS=30*86400
 
 
 def series_fields(kind):
-    if kind=='trade':return FIELDS
+    if kind in ('trade','trade_contracts'):return FIELDS
     if kind=='mark':return FIELDS[:-1]
     raise ValueError('unknown_price_series_kind')
 
 
 def series_key(instrument,kind):
     series_fields(kind)
-    return instrument if kind=='trade' else 'mark:'+instrument
+    return instrument if kind=='trade' else kind+':'+instrument
 
 
 def encoded(value):
@@ -39,7 +39,8 @@ def closed_frame(frame,bucket,minimum,*,kind='trade'):
     if frame.get('confirmed')!=[1]*len(times):raise ValueError('unconfirmed_history')
     out=dict(time=[int(t) for t in times])
     for key in series_fields(kind):
-        values=[float(x) for x in frame[key]]
+        source_key='volume_contracts' if kind=='trade_contracts' and key=='volume' else key
+        values=[float(x) for x in frame[source_key]]
         if len(values)!=len(times) or not all(math.isfinite(x) and (x>=0 if key=='volume' else x>0) for x in values):
             raise ValueError('invalid_history_values')
         out[key]=values

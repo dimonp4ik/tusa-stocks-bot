@@ -17,7 +17,7 @@ NOW=BUCKET+20
 def frame():
     n=native.REQUIRED_HISTORY_BARS
     return dict(time=list(range(BUCKET-n*900,BUCKET,900)),open=[100.]*n,high=[100.2]*n,
-        low=[99.8]*n,close=[100.]*n,volume=[1.]*n,confirmed=[1]*n)
+        low=[99.8]*n,close=[100.]*n,volume=[0.]*n,volume_contracts=[.05]*n,confirmed=[1]*n)
 
 
 def book():return dict(ts=NOW*1000,bids=[['99.99','10']],asks=[['100.01','10']])
@@ -32,6 +32,7 @@ class Source:
     def book(self,instrument):self.calls+=1;return book()
     def candidates(self,frames,now,diagnostics):
         self.candidate_calls+=1;diagnostics['result']='candidates'
+        assert all(series['volume'] == frame()['volume_contracts'] for series in frames.values())
         return [dict(symbol='AAAUSDT',direction='LONG',entry=100.,atr14_fraction=.004,
             target_r=2.5,signal_bar_ts=BUCKET-900,entry_time=BUCKET)]
     def place_order(self,*args):raise AssertionError('collector must never trade')
@@ -53,6 +54,8 @@ def test_collection_is_idempotent_durable_and_does_not_create_signal_tables(tmp_
     assert payload['geometry']['signal_entry']==100.
     rebuilt=restarted.reconstruct('AAA-X',payload['frame'])
     assert rebuilt['close']==frame()['close']
+    assert rebuilt['volume']==frame()['volume_contracts']
+    assert payload['frame']['kind']=='trade_contracts'
 
 
 def test_revised_closed_candle_is_preserved_without_overwriting_old_evidence(tmp_path):

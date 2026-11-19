@@ -8,7 +8,7 @@ def register_structure_observation_api(app,token,store_provider,context_provider
     try:valid_token(token)
     except ValueError:return
     from flask import Blueprint,request,jsonify
-    from src.stock_structure_observer import PROFILE
+    from src.stock_structure_observer import LEGACY_PROFILE,PROFILE
     from src.stock_mark_context import PROFILE as CONTEXT_PROFILE
     api=Blueprint('structure_observer_audit',__name__)
 
@@ -33,7 +33,10 @@ def register_structure_observation_api(app,token,store_provider,context_provider
             return jsonify(ok=False,error='archive_unavailable'),503
 
     @api.route('/export',methods=['POST'])
-    def export():return bounded_export(PROFILE,store_provider)
+    def export():return bounded_export(LEGACY_PROFILE,store_provider)
+
+    @api.route('/contract-export',methods=['POST'])
+    def contract_export():return bounded_export(PROFILE,store_provider)
 
     @api.route('/context-export',methods=['POST'])
     def context_export():return bounded_export(CONTEXT_PROFILE,context_provider)
