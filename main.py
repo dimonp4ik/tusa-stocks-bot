@@ -3350,11 +3350,16 @@ def _check_open_signals():
                     reason=str(exc) if type(exc) is EntryWindowUnavailable else type(exc).__name__
                     log.warning('Native entry-window verification deferred #%s (%s)',sig['id'],reason)
                     continue
-            if status == 'TP1_PARTIAL' and use_trail:
-                live_trail_stop, crossed = trailing_observation(df, direction=direction,
+            from src.candle_evidence import bar_has_trade, traded_bars
+            trade_df = traded_bars(df)
+            fresh_quote = bar_has_trade(df_all, len(df_all['close']) - 1)
+            if status == 'TP1_PARTIAL' and use_trail and trade_df.get('close'):
+                live_trail_stop, crossed = trailing_observation(trade_df, direction=direction,
                     entry=entry, atr=atr, multiple=trail_atr_mult, quote=latest_quote)
-                resting_tp2_hit = (max(df.get('high') or [latest_quote]) >= tp2
-                    if direction == 'LONG' else min(df.get('low') or [latest_quote]) <= tp2)
+                if not fresh_quote:
+                    live_trail_stop, crossed = None, False
+                resting_tp2_hit = (max(trade_df['high']) >= tp2
+                    if direction == 'LONG' else min(trade_df['low']) <= tp2)
                 if resting_tp2_hit or crossed:
                     new_status = 'TP2_HIT' if resting_tp2_hit else 'TP1_TRAIL'
                     exit_px = tp2 if resting_tp2_hit else latest_quote
@@ -3363,6 +3368,8 @@ def _check_open_signals():
                         tp1_fraction=tp1_close_frac, reached_tp1=True)
             _conf_flags = df.get("confirmed") or []
             for i in range(0 if status == "TP1_PARTIAL" and use_trail else len(df.get("close", []))):
+                if not bar_has_trade(df, i):
+                    continue
                 opening = float(df["open"][i])
                 high  = float(df["high"][i])
                 low   = float(df["low"][i])
@@ -3658,9 +3665,13 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         # turn an expired counterfactual into a fictional TP or stop.
         sliced = {key: value[:NATIVE_XPERP_HOLD_BARS]
                   for key, value in sliced.items()}
-    intrabar = float(sliced["time"][0]) < opened
+    from src.candle_evidence import bar_has_trade
+    trade_indices = [i for i in range(len(sliced['time'])) if bar_has_trade(sliced, i)]
+    if not trade_indices:
+        return None
+    intrabar = float(sliced["time"][trade_indices[0]]) < opened
     result = simulate_exit(
-        sliced, range(len(sliced["time"])), direction=setup["direction"],
+        sliced, trade_indices, direction=setup["direction"],
         entry=entry, sl=stop, tp1=tp1, tp2=tp2,
         atr=float(setup.get("atr") or abs(entry - stop)),
         tp1_fraction=1.0, trail=False, trail_mult=0.0,
@@ -3677,6 +3688,8 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         reached_tp1 = int(result.outcome in {"TP1", "TP2", "TRAIL"})
         reached_tp2 = int(result.outcome == "TP2")
         return result.outcome, reached_tp1, reached_tp2, result.gross_r
+    if not bar_has_trade(sliced, len(sliced['time']) - 1):
+        return None
 
     if native_xperp_shadow:
         horizon_end = entry_bar_open + NATIVE_XPERP_HOLD_BARS * bar_seconds
