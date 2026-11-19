@@ -16,7 +16,7 @@ class SpreadLimitError(ValueError):
 
 def execution_quote_with_retry(fetch_book, direction, contracts, *, clock_ms,
                                sleep=time.sleep, attempts=3, retry_delay=.2,
-                               deadline_ms=None):
+                               deadline_ms=None, size_for_price=None):
     """Retry only a wide spread; each fresh book must pass every original gate."""
     if attempts not in (1, 2, 3):
         raise ValueError('invalid execution attempts')
@@ -30,7 +30,8 @@ def execution_quote_with_retry(fetch_book, direction, contracts, *, clock_ms,
             now = clock_ms()
             if deadline_ms is not None and now >= deadline_ms:
                 raise ValueError('entry deadline elapsed')
-            return book, execution_quote(book, direction, contracts, now)
+            return book, execution_quote(book, direction, contracts, now,
+                                         size_for_price=size_for_price)
         except SpreadLimitError:
             if attempt + 1 == attempts:
                 raise
@@ -44,6 +45,12 @@ class ExecutionQuote:
     worst: float
     spread_fraction: float
     slippage_fraction: float
+    contracts: float
+
+    def validate_bracket(self, stop, target):
+        low, high = sorted((stop, target))
+        if not (low < min(self.best, self.worst) <= max(self.best, self.worst) < high):
+            raise ValueError('executable price outside signal bracket')
 
 
 @dataclass(frozen=True)
@@ -99,9 +106,8 @@ def validate_book_freshness(book, now_ms, max_age_ms=MAX_BOOK_AGE_MS):
 
 
 def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=MAX_BOOK_AGE_MS,
-                    max_spread=MAX_ENTRY_SPREAD, max_slippage=.0005):
+                    max_spread=MAX_ENTRY_SPREAD, max_slippage=.0005, size_for_price=None):
     if direction not in ('LONG','SHORT'):raise ValueError('invalid direction')
-    if not math.isfinite(contracts) or contracts<=0:raise ValueError('invalid size')
     validate_book_freshness(book, now_ms, max_age_ms)
     sides={}
     for key,descending in [('bids',True),('asks',False)]:
@@ -116,12 +122,33 @@ def execution_quote(book, direction, contracts, now_ms, *, max_age_ms=MAX_BOOK_A
     spread=(ask-bid)/((ask+bid)/2)
     if spread>max_spread:raise SpreadLimitError(spread, max_spread)
     levels=sides['asks' if direction=='LONG' else 'bids'];best=levels[0][0]
-    remaining=contracts;value=0.;worst=best
-    for price,quantity in levels:
-        take=min(remaining,quantity);value+=take*price;remaining-=take;worst=price
-        if remaining<=contracts*1e-12:break
-    if remaining>contracts*1e-12:raise ValueError('insufficient displayed depth')
+    if contracts is None and size_for_price is not None:
+        contracts = size_for_price(best)
+    if contracts is None or not math.isfinite(contracts) or contracts <= 0:
+        raise ValueError('order size below contract minimum' if size_for_price else 'invalid size')
+    average, worst = walk_depth(levels, contracts)
+    if size_for_price is not None:
+        # Use the highest price paid by any lot as the notional bound on
+        # either side. Size from the fresh book, never from the last trade.
+        budget_size = size_for_price(max(best, worst))
+        if contracts > budget_size:
+            if not budget_size > 0:
+                raise ValueError('order size below contract minimum')
+            contracts = budget_size
+            average, worst = walk_depth(levels, contracts)
     sign=1 if direction=='LONG' else -1
     slip=sign*(worst/best-1)
     if slip>max_slippage:raise ValueError('depth slippage exceeds limit')
-    return ExecutionQuote(best,value/contracts,worst,spread,slip)
+    return ExecutionQuote(best,average,worst,spread,slip,contracts)
+
+
+def walk_depth(levels, contracts):
+    remaining = contracts
+    value = 0.0
+    for price, quantity in levels:
+        take = min(remaining, quantity)
+        value += take * price
+        remaining -= take
+        if remaining <= contracts * 1e-12:
+            return value / contracts, price
+    raise ValueError('insufficient displayed depth')

@@ -434,46 +434,31 @@ def _open_for_account_locked(
         return
 
     spec = okx.get_xperp_spec(inst_id)
-    px = okx.get_last_price(inst_id)
     try:
-        if not px or not spec:
-            raise ValueError("current exchange price or contract specification unavailable")
+        if not spec:
+            raise ValueError("contract specification unavailable")
         pos_ok, exchange_size = okx.get_position_size(creds, inst_id)
         if not pos_ok or exchange_size != 0:
             raise ValueError("exchange instrument is not confirmed flat")
         planned, original_sl = float(sig['entry_price']), float(sig['sl'])
         direction = sig['direction']
-        if (direction == 'LONG' and not original_sl < px < float(sig['tp1'])) or (
-                direction == 'SHORT' and not float(sig['tp1']) < px < original_sl):
-            raise ValueError("entry has crossed the original stop or first target")
-        distance = abs(planned-original_sl)*max(1.,STOP_EXCHANGE_BACKSTOP_R)
+        target1 = float(sig['tp1'])
+        if not (original_sl < planned < target1 if direction == 'LONG'
+                else target1 < planned < original_sl if direction == 'SHORT' else False):
+            raise ValueError("invalid entry bracket")
     except (TypeError, ValueError, KeyError) as exc:
         log.warning("autotrade risk validation refused %s: %s", inst_id, exc)
         detail = str(exc)
         friendly = {
-            "current exchange price or contract specification unavailable":
-                "биржа не отдала актуальную цену или параметры контракта",
+            "contract specification unavailable": "биржа не отдала параметры контракта",
             "exchange instrument is not confirmed flat":
                 "по инструменту уже есть позиция либо биржа не подтвердила нулевой остаток",
-            "entry has crossed the original stop or first target":
-                "цена уже вышла за диапазон между стопом и TP1",
         }.get(detail, "вход не прошёл проверку цены и риска")
         _entry_skip(
             uid, sig, inst_id, friendly,
             f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")
         return
-    sz = okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, px, spec or {})
-    if sz <= 0:
-        _entry_skip(uid, sig, inst_id, "order size below contract minimum",
-                    f"⚠️ Автотрейдинг: размер сделки ${margin:.2f} слишком мал для минимального контракта {disp} — пропущено.")
-        return
-
-    # The order size above was computed FOR this leverage. The result used to
-    # be discarded, so a failed call meant the exchange kept whatever leverage
-    # the instrument already had and filled a size priced for a different one —
-    # silently more or less risk than the strategy asked for. Refusing the trade
-    # is the safe failure here: a skipped setup costs nothing, a mis-levered
-    # position costs whatever the market does next.
+    # Confirm the leverage used to convert the client's margin to contracts.
     _lev_ok, _lev_err = okx.ensure_leverage(creds, inst_id, AUTOTRADE_LEVERAGE)
     if not _lev_ok:
         log.warning(f"autotrade leverage set failed {uid} {inst_id}: {_lev_err}")
@@ -486,23 +471,26 @@ def _open_for_account_locked(
         return
 
     # Refresh executable depth after leverage setup; last-trade prices may be stale.
-    from src.execution_guard import execution_quote_with_retry, order_book_snapshot, SpreadLimitError
-    book_snapshot = None
-    book_observed_at = None
+    from src.execution_guard import (execution_quote_with_retry, order_book_snapshot,
+                                     SpreadLimitError, validate_book_freshness)
+
+    def size_for_price(price):
+        return okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, price, spec)
+
     try:
         book, quote = execution_quote_with_retry(
-            lambda: okx.get_order_book(inst_id), direction, sz,
-            clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms)
+            lambda: okx.get_order_book(inst_id), direction, None,
+            clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms,
+            size_for_price=size_for_price)
         book_observed_at = time.time()
-        executable = quote.worst
-        if not (original_sl < executable < float(sig['tp1']) if direction == 'LONG'
-                else float(sig['tp1']) < executable < original_sl):
-            raise ValueError("executable price outside signal bracket")
-        px = quote.average
+        quote.validate_bracket(original_sl, target1)
+        sz, px = quote.contracts, quote.average
     except (TypeError, ValueError, KeyError, IndexError) as exc:
         log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
         detail = str(exc)
         friendly = {
+            "order size below contract minimum":
+                f"маржа ${margin:.2f} меньше минимального объёма по цене стакана",
             "order book unavailable": "стакан OKX недоступен",
             "stale order book": "стакан OKX устарел",
             "entry deadline elapsed": "истёк срок входа",
@@ -519,13 +507,6 @@ def _open_for_account_locked(
             uid, sig, inst_id, friendly,
             f"ℹ️ Автотрейдинг: {disp} пропущен — {friendly}.")
         return
-
-    try:
-        book_snapshot = order_book_snapshot(book, spec["ctVal"])
-    except (TypeError, ValueError, KeyError, IndexError) as exc:
-        # The book already passed the execution gate. Losing a diagnostic must
-        # never turn a valid entry into a skipped trade.
-        log.warning("autotrade book snapshot unavailable %s: %s", inst_id, exc)
 
     if deadline_ms is not None and time.time() * 1000 >= deadline_ms:
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
@@ -593,6 +574,28 @@ def _open_for_account_locked(
         at_close_position(intent_id, "ENTRY_SHARED_EXPIRED")
         _entry_skip(uid, sig, inst_id, "entry expired during shared reservation")
         return
+    try:
+        validate_book_freshness(book, time.time()*1000)
+    except ValueError:
+        try:
+            # The claim already covers a fixed quantity. A fresh book must
+            # support that quantity inside the signal and reserved budget.
+            book, quote = execution_quote_with_retry(
+                lambda: okx.get_order_book(inst_id, timeout=1.0), direction, sz,
+                attempts=1, clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms)
+            book_observed_at = time.time()
+            quote.validate_bracket(original_sl, target1)
+            if sz > size_for_price(max(quote.best, quote.worst)):
+                raise ValueError("reserved order size exceeds the refreshed margin budget")
+            if time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC:
+                raise ValueError("account snapshot expired during book refresh")
+            px = quote.average
+        except (TypeError, ValueError, KeyError, IndexError, ArithmeticError) as exc:
+            at_close_position(intent_id, "ENTRY_BOOK_CHANGED")
+            log.warning("autotrade refreshed book refused %s: %s", inst_id, exc)
+            _entry_skip(uid, sig, inst_id, "стакан изменился во время бронирования входа",
+                        f"ℹ️ Автотрейдинг: {disp} пропущен — стакан изменился во время общей брони.")
+            return
     if not at_mark_entry_submitting(
             intent_id, account_short_count=latest_positions.get("short_count"),
             account_unknown_side_count=latest_positions.get("unknown_side_count")):
@@ -825,18 +828,16 @@ def _open_for_account_locked(
         )
     # Diagnostics come strictly after the live fill has both exchange protection
     # and durable OPEN tracking. SQLite must never delay the protective OCO.
-    if book_snapshot is not None:
-        try:
-            recorded = record_signal_execution_book(
-                sig["id"], spread_bps=book_snapshot.spread_bps,
-                depth_usd=book_snapshot.depth_usd,
-                imbalance=book_snapshot.imbalance, observed_at=book_observed_at)
-            if not recorded:
-                log.info("autotrade book snapshot had no linked setup for signal %s",
-                         sig.get("id"))
-        except Exception as exc:
-            log.warning("autotrade book snapshot write failed signal %s: %s",
-                        sig.get("id"), exc)
+    try:
+        book_snapshot = order_book_snapshot(book, spec["ctVal"])
+        recorded = record_signal_execution_book(
+            sig["id"], spread_bps=book_snapshot.spread_bps,
+            depth_usd=book_snapshot.depth_usd,
+            imbalance=book_snapshot.imbalance, observed_at=book_observed_at)
+        if not recorded:
+            log.info("autotrade book snapshot had no linked setup for signal %s", sig.get("id"))
+    except Exception as exc:
+        log.warning("autotrade book snapshot write failed signal %s: %s", sig.get("id"), exc)
     lev = AUTOTRADE_LEVERAGE
     # Report what was actually BOUGHT, not what was requested. Size is in
     # contracts and OKX floors to lotSz, so the real notional is
