@@ -175,6 +175,11 @@ def test_native_fractional_publication_second_stop_precedes_later_target():
     from test_entry_window import seconds, frame
 
     raw = seconds({10: (104, 104, 98, 98, 2), 30: (103, 103, 103, 103, 1)})
+    raw[10][6] = "0"
+    raw[30][6] = "0"
+    minute = frame(raw)
+    minute["volume_contracts"] = [3., 0.]
+    minute["volume"] = [2., 0.]  # rounded sum can differ by timeframe
     trades = [dict(ts="10100", tradeId="1", px="104", sz="1"),
               dict(ts="10600", tradeId="2", px="98", sz="1")]
     row = signal(source="stock_xperp_native_shadow", opened_at=10.5,
@@ -183,7 +188,7 @@ def test_native_fractional_publication_second_stop_precedes_later_target():
                  tp1=102, tp2=102)
     with patch("src.binance_client.get_xperp_entry_seconds", return_value=raw), \
          patch("src.binance_client.get_xperp_entry_second_trades", return_value=trades):
-        update, notify, mirror = run_monitor(row, frame(raw))
+        update, notify, mirror = run_monitor(row, minute)
     assert update.call_args.kwargs["realized_r"] == -2
     for transition in (update, notify, mirror):
         assert transition.call_args.args[1:3] == ("SL_HIT", 98)

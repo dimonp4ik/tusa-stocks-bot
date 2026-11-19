@@ -80,7 +80,10 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
     original=tuple(float(frame[k][index]) for k in ('open','high','low','close'))
     if not all(_near(a,b) for a,b in zip(aggregate,original)):
         raise EntryWindowUnavailable('entry minute and seconds disagree')
-    if 'volume' in frame and not _near(sum(r[6] for r in seconds),frame['volume'][index]):
+    if 'volume_contracts' in frame:
+        if not _near(math.fsum(r[5] for r in seconds), frame['volume_contracts'][index]):
+            raise EntryWindowUnavailable('entry minute contracts disagree')
+    elif 'volume' in frame and not _near(math.fsum(r[6] for r in seconds), frame['volume'][index]):
         raise EntryWindowUnavailable('entry minute volume disagrees')
     replacements=[]
     boundary=int(math.floor(opened));part=seconds[boundary-start]
@@ -89,16 +92,14 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
         # OKX trades use contracts, while the minute frame uses base units.
         # Preserve the matched trade's volume so the monitor sees its price.
         base_per_contract = part[6] / part[5]
-        if base_per_contract <= 0:
-            raise EntryWindowUnavailable('boundary trade has no base volume')
         replacements.extend(dict(time=t/1000,open=p,high=p,low=p,close=p,
-            volume=size*base_per_contract,confirmed=1)
+            volume=size*base_per_contract,volume_contracts=size,confirmed=1)
             for t,_,p,size in ticks if t>=math.ceil(opened*1000))
     for r in seconds:
         if r[0]>=math.ceil(opened):
             replacements.append(dict(time=r[0],open=r[1],high=r[2],low=r[3],close=r[4],
-                volume=r[6],confirmed=1))
-    allowed={'time','open','high','low','close','volume','confirmed'}
+                volume=r[6],volume_contracts=r[5],confirmed=1))
+    allowed={'time','open','high','low','close','volume','volume_contracts','confirmed'}
     if set(frame)-allowed or any(len(v)!=len(frame['time']) for v in frame.values()):
         raise EntryWindowUnavailable('unsupported candle schema')
     return {k:list(v[:index])+[r[k] for r in replacements]+list(v[index+1:])

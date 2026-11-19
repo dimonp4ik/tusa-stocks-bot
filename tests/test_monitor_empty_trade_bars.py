@@ -48,3 +48,24 @@ def test_volume_filter_handles_invalid_values_and_preserves_legacy_missing_volum
     assert [i for i in range(6) if bar_has_trade(frame,i)]==[5]
     assert traded_bars(frame)==dict(close=[1.],volume=[.001])
     assert bar_has_trade(dict(close=[1.]),0)
+
+
+def test_fractional_contracts_with_rounded_base_volume_are_trade_evidence(monkeypatch):
+    from src import binance_client as market
+
+    raw = [["1000000", "100", "100", "98", "98.5", "0.5", "0", "49.5", "1"]]
+    monkeypatch.setattr(market, "get_xperp_instruments", lambda: {"TEST": "TEST-X"})
+    monkeypatch.setattr(market, "_okx_get", lambda *args, **kwargs: {"data": raw})
+    parsed = market.get_klines_xperp("TESTUSDT", limit=1, include_forming=True)
+    assert parsed["volume"] == [0.]
+    assert parsed["volume_contracts"] == [.5]
+
+    update, notify, mirror = run_monitor(signal(), parsed)
+    for transition in (update, notify, mirror):
+        assert transition.call_args.args[1] == "SL_HIT"
+
+
+def test_empty_contract_bar_cannot_trigger_with_nonzero_base_field():
+    from src.candle_evidence import bar_has_trade
+
+    assert not bar_has_trade({"volume_contracts": [0.], "volume": [1.]}, 0)

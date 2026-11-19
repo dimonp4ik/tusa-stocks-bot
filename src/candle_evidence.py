@@ -3,12 +3,13 @@ import math
 
 
 def bar_has_trade(candles,index):
-    # Legacy feeds without volume retain their prior contract. Native OKX
-    # candles carry volume: a zero bar repeats an older price, not a new trade.
-    if 'volume' not in candles:return True
+    # OKX base volume can round to zero even when fractional contracts traded.
+    key = 'volume_contracts' if 'volume_contracts' in candles else 'volume'
+    if key not in candles:
+        return True
     try:
-        volume=float(candles['volume'][index])
-        return math.isfinite(volume) and volume>0
+        volume = float(candles[key][index])
+        return math.isfinite(volume) and volume > 0
     except (IndexError,KeyError,TypeError,ValueError):
         return False
 
