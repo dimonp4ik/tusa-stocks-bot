@@ -86,8 +86,14 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
     boundary=int(math.floor(opened));part=seconds[boundary-start]
     if opened!=boundary and part[5]>0 and touch(part[2],part[3]):
         ticks=_trades(load_second_trades(boundary),boundary,part)
+        # OKX trades use contracts, while the minute frame uses base units.
+        # Preserve the matched trade's volume so the monitor sees its price.
+        base_per_contract = part[6] / part[5]
+        if base_per_contract <= 0:
+            raise EntryWindowUnavailable('boundary trade has no base volume')
         replacements.extend(dict(time=t/1000,open=p,high=p,low=p,close=p,
-            volume=0.,confirmed=1) for t,_,p,_ in ticks if t>=math.ceil(opened*1000))
+            volume=size*base_per_contract,confirmed=1)
+            for t,_,p,size in ticks if t>=math.ceil(opened*1000))
     for r in seconds:
         if r[0]>=math.ceil(opened):
             replacements.append(dict(time=r[0],open=r[1],high=r[2],low=r[3],close=r[4],

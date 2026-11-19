@@ -51,9 +51,12 @@ def test_boundary_second_uses_exact_publication_milliseconds():
 
 def test_post_publication_boundary_trade_is_retained():
     raw=seconds({0:(100,100,100,100,1),10:(100,103,100,103,2)})
+    raw[10][6]='0.5'
     ticks=[dict(ts='10100',tradeId='1',px='100',sz='1'),
         dict(ts='10600',tradeId='2',px='103',sz='1')]
-    assert clip(raw,ticks=ticks)['high'][0]==103
+    result=clip(raw,ticks=ticks)
+    assert result['high'][0]==103
+    assert result['volume'][0]==.25
 
 
 def test_missing_or_revised_seconds_never_invent_a_result():
