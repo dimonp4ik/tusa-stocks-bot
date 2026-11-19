@@ -68,7 +68,7 @@ from src.binance_client import get_xperp_instruments
 log = logging.getLogger(__name__)
 
 _STATUS_RU = {
-    "TP1_PARTIAL": "TP1 достигнут — включён трейлинг-стоп",
+    "TP1_PARTIAL": "TP1 достигнут — остаток под защитой стопа",
     "TP2_HIT":     "TP2 достигнут — позиция закрыта",
     "TP1_TRAIL":   "трейлинг-стоп сработал — позиция закрыта",
     "SL_HIT":      "стоп-лосс — позиция закрыта",
@@ -739,7 +739,9 @@ def _open_for_account_locked(
         close_pct = 0.0
     tp1_line = "TP1 и трейлинг ведёт бот автоматически."
     if close_pct > 0:
-        partial = okx.calc_partial_close(_pos_sz, close_pct, spec or {})
+        from src.tp1_plan import plan_tp1_close
+        partial = plan_tp1_close(_pos_sz, close_pct, spec or {},
+            ensure_minimum=bool(u.get('tp1_minimum_close')))
         raw_tp1_sz = partial["size"]
         if raw_tp1_sz > 0:
             tp1_px = okx.round_to_tick(float(sig["tp1"]), tick)
@@ -762,6 +764,14 @@ def _open_for_account_locked(
                 tp1_line = (f"На TP1 ({tp1_px}) закроется {_pct_s} "
                             f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(_pos_sz)} контр.), "
                             f"остаток — под трейлинг.")
+                if partial['full_close']:
+                    tp1_line = (f"На TP1 ({tp1_px}) закроется вся позиция "
+                        f"({okx._fmt_sz(raw_tp1_sz)} контр.): выбран режим минимального объёма, "
+                        "на допустимые части она не делится. Остатка к TP2 не будет.")
+                elif u.get('tp1_minimum_close'):
+                    tp1_line = (f"На TP1 ({tp1_px}) закроется {_act_pct:.1f}% "
+                        f"({okx._fmt_sz(raw_tp1_sz)} из {okx._fmt_sz(_pos_sz)} контр.). "
+                        "Выбран минимум допустимого объёма; остаток — к TP2 под защитой стопа.")
             else:
                 log.warning(f"autotrade TP1 order failed for {uid} {inst_id}: {tp1_result}")
                 tp1_line = "⚠️ Не смог поставить ордер на частичное закрытие TP1 — весь объём пойдёт под трейлинг."
@@ -1059,9 +1069,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                         ok, real_sz = okx.get_position_size(creds, pos["inst_id"])
                         if ok and real_sz < float(pos["sz"]):
                             if real_sz <= 0:
-                                at_close_position(pos["id"], "TP1_FULL_CLOSE")
-                                _dm(pos["user_id"],
-                                    f"🤖 *{disp}*: {label}.\nЗакрыто по твоей настройке — вся позиция.")
+                                log.info('TP1 flat read awaiting independent confirmation pos#%s',pos['id'])
                                 continue
                             at_reduce_position_sz(pos["id"], real_sz)
                             # Say how much actually closed: the exchange fills in

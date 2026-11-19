@@ -407,6 +407,7 @@ def init_db():
             )
         """)
         _ensure_column(c, "autotrade_users", "tp1_close_pct", "REAL NOT NULL DEFAULT 0")
+        _ensure_column(c, "autotrade_users", "tp1_minimum_close", "INTEGER NOT NULL DEFAULT 0")
         # Legacy releases offered a fixed-dollar mode below $100. Values in the
         # supported 1-10 range represent the same number the clients intended
         # as their per-trade percentage. Unsafe legacy values require a fresh
@@ -2557,12 +2558,12 @@ def at_set_balance(user_id: int, balance: float) -> None:
                   (balance, user_id))
 
 
-def at_set_tp1_close_pct(user_id: int, pct: float) -> None:
+def at_set_tp1_close_pct(user_id: int, pct: float, *, minimum_close: bool = False) -> None:
     """% of the position to market-close when TP1 first hits (0-100).
     0 = keep the full position on trailing (current default strategy)."""
     with _conn() as c:
-        c.execute("UPDATE autotrade_users SET tp1_close_pct = ? WHERE user_id = ?",
-                  (pct, user_id))
+        c.execute("UPDATE autotrade_users SET tp1_close_pct = ?, tp1_minimum_close = ? WHERE user_id = ?",
+                  (pct, int(minimum_close and pct > 0), user_id))
 
 
 def at_log_position(signal_id: int, user_id: int, inst_id: str, direction: str,
