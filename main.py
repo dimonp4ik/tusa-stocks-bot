@@ -7,6 +7,8 @@ mirror an eligible signal for an opted-in user after the forward-health gate.
 """
 
 import json
+import hashlib
+import hmac
 import logging
 import math
 import os
@@ -2701,6 +2703,10 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
+    supplied = flask_request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+    secret = _telegram_webhook_secret()
+    if not secret or not supplied.isascii() or not hmac.compare_digest(supplied, secret):
+        return "unauthorized", 401
     data = flask_request.get_json(silent=True)
     if not data:
         return "ok", 200
@@ -4670,20 +4676,36 @@ def _self_ping():
 
 
 # ── Webhook setup ────────────────────────────────────────────────────────────
+_webhook_registered = False
+
+
+def _telegram_webhook_secret():
+    if not TELEGRAM_TOKEN:
+        return ""
+    return hmac.new(TELEGRAM_TOKEN.encode(), b"tusa-stocks:webhook:v1", hashlib.sha256).hexdigest()
+
+
 def _setup_webhook():
     """Register Telegram webhook so bot can receive messages."""
+    global _webhook_registered
+    if _webhook_registered:
+        return
     url = _app_url()
-    if not url:
-        log.info("No APP_URL set — webhook skipped (local run)")
+    secret = _telegram_webhook_secret()
+    if not url or not secret:
         return
     webhook_url = f"{url}/webhook"
     try:
         resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/setWebhook",
-            json={"url": webhook_url},
+            json={"url": webhook_url, "secret_token": secret},
             timeout=10,
         )
-        log.info(f"Webhook set: {webhook_url} → {resp.json().get('description', '?')}")
+        _webhook_registered = resp.status_code == 200 and resp.json().get("ok") is True
+        if _webhook_registered:
+            log.info("Authenticated Telegram webhook registration confirmed")
+        else:
+            log.warning("Telegram webhook registration refused (HTTP %s)", resp.status_code)
     except Exception as exc:
         log.warning("Webhook setup failed (%s)", type(exc).__name__)
 
@@ -4870,6 +4892,8 @@ def start_bot():
         day_of_week="sun", hour=22, minute=0,
         timezone="Europe/Riga",
     )
+    scheduler.add_job(_setup_webhook, 'interval', seconds=60,
+                      id='telegram_webhook_setup', max_instances=1, coalesce=True)
     if AUTOTRADE_ENABLED:
         scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
                           id='equity_guard_recovery',max_instances=1,coalesce=True)
