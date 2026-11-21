@@ -15,6 +15,7 @@ import threading
 from datetime import datetime, timezone
 
 from flask import Flask, request as flask_request
+from src import telegram_webhook_reply
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import (EVENT_JOB_MISSED, EVENT_JOB_MAX_INSTANCES,
                                 EVENT_JOB_ERROR)
@@ -1047,15 +1048,17 @@ def _send_persistent_menu(chat_id: int, is_admin: bool = False, is_dm: bool = Tr
     text = ("✅ *Меню готово*\nВыберите нужный раздел. Админ-панель доступна."
             if is_admin else
             "✅ *Меню готово*\nВыберите нужный раздел кнопками внизу.")
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": kb}
+    if telegram_webhook_reply.queue("sendMessage", payload, priority=2):
+        return
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
-                  "reply_markup": kb},
+            json=payload,
             timeout=10,
         )
-    except Exception as e:
-        log.warning(f"_send_persistent_menu failed: {e}")
+    except Exception as exc:
+        log.warning("_send_persistent_menu failed (%s)", type(exc).__name__)
 
 
 def _panel_message_key(chat_id: int, message_id: int):
@@ -1130,6 +1133,13 @@ def _should_send_replacement(desc: str) -> bool:
 
 def _edit_admin_text(chat_id: int, message_id: int, text: str, reply_markup: dict):
     key = _panel_message_key(chat_id, message_id)
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown", "reply_markup": reply_markup}
+    if key in _photo_panel_messages:
+        if telegram_webhook_reply.queue("sendMessage", payload, priority=2):
+            return
+    elif message_id and telegram_webhook_reply.queue(
+            "editMessageText", dict(payload, message_id=message_id), priority=2):
+        return
     if key in _photo_panel_messages:
         _clear_inline_keyboard(chat_id, message_id)
         return _send_admin_text(chat_id, text, reply_markup)
@@ -1180,6 +1190,9 @@ def _edit_admin_text(chat_id: int, message_id: int, text: str, reply_markup: dic
 
 def _send_keyboard(chat_id: int, text: str):
     """Send message with admin inline keyboard."""
+    if telegram_webhook_reply.queue("sendMessage", dict(
+            chat_id=chat_id, text=text, parse_mode="Markdown", reply_markup=_ADMIN_KEYBOARD), priority=2):
+        return
     try:
         if os.path.exists(ADMIN_PANEL_IMAGE_PATH):
             with open(ADMIN_PANEL_IMAGE_PATH, "rb") as photo:
@@ -1193,16 +1206,19 @@ def _send_keyboard(chat_id: int, text: str):
                 log.warning(f"admin banner send failed: {resp.status_code} {_telegram_error(resp)}")
 
         _send_admin_text(chat_id, text, _ADMIN_KEYBOARD)
-    except Exception as e:
-        log.warning(f"_send_keyboard failed: {e}")
+    except Exception as exc:
+        log.warning("_send_keyboard failed (%s)", type(exc).__name__)
 
 
 def _answer_callback(callback_id: str, text: str = ""):
     """Acknowledge a button press (stops Telegram spinner)."""
+    payload = {"callback_query_id": callback_id, "text": text}
+    if telegram_webhook_reply.queue("answerCallbackQuery", payload, priority=0):
+        return
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
-            json={"callback_query_id": callback_id, "text": text},
+            json=payload,
             timeout=5,
         )
     except Exception:
@@ -2367,15 +2383,18 @@ def _at_delete_msg(chat_id: int, message_id: int):
 
 
 def _at_reply_kb(chat_id: int, text: str, kb_rows: list):
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
+               "reply_markup": {"inline_keyboard": kb_rows}}
+    if telegram_webhook_reply.queue("sendMessage", payload, priority=2):
+        return
     try:
         _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown",
-                  "reply_markup": {"inline_keyboard": kb_rows}},
+            json=payload,
             timeout=10,
         )
-    except Exception as e:
-        log.warning(f"_at_reply_kb failed: {e}")
+    except Exception as exc:
+        log.warning("_at_reply_kb failed (%s)", type(exc).__name__)
 
 
 def _at_ask_size(chat_id: int, balance: float, resize: bool = False):
@@ -2696,6 +2715,8 @@ def webhook():
         cb_id      = cb.get("id")
         if cb.get("message", {}).get("photo"):
             _mark_photo_panel_message(chat_id, message_id)
+        if cb_data not in ("prayer_commandments", "evening_ritual"):
+            telegram_webhook_reply.begin(chat_id, cb_id)
         if DEPLOYMENT_MODE == "shadow" and cb_data.startswith(("at_", "sw_")):
             _answer_callback(cb_id, "Теневой режим: реальные операции отключены")
             _reply(chat_id, "🛡 Сейчас бот только фиксирует paper-сделки. Реальные ордера запрещены.")
@@ -2711,7 +2732,7 @@ def webhook():
             _handle_admin_callback(cb_id, chat_id, message_id, cb_data, user_id)
         else:
             _answer_callback(cb_id, "Нет доступа.")
-        return "ok", 200
+        return telegram_webhook_reply.response()
 
     message = data.get("message") or data.get("channel_post")
     if not message:
@@ -2743,9 +2764,14 @@ def webhook():
 
     # DM = positive chat_id (private chat with bot)
     is_dm = isinstance(chat_id, int) and chat_id > 0
+    menu_text = text in {
+        "/start", "🛡 режим", "📋 открытые сделки", "📋 paper-сделки",
+        "📈 результаты", "📈 paper-результаты", "❓ помощь", "📰 новости на сегодня",
+        "/status", "/старт", "/stats", "/статистика", "🛠 админ панель", "🤖 автотрейдинг",
+    }
 
     # ── Autotrade onboarding dialog (DM only, consumes key/size inputs) ──────
-    if is_dm and chat_id in _at_onboarding:
+    if is_dm and chat_id in _at_onboarding and not menu_text:
         try:
             msg_id = message.get("message_id")
             if _at_handle_text(chat_id, user_id, text_raw, msg_id):
@@ -2860,6 +2886,10 @@ def webhook():
         except Exception as e:
             _reply(chat_id, f"Ошибка: {e}")
         return "ok", 200
+
+    # User-facing buttons can reply on the incoming webhook connection even
+    # when Railway cannot establish a separate connection to Telegram.
+    telegram_webhook_reply.begin(chat_id)
 
     # /start → постоянное меню (у админов расширенное — ЛС и группа, группа
     # для этого бота admin-only, так что гейт по is_dm тут не нужен для админки;
@@ -2978,16 +3008,19 @@ def webhook():
             log.exception("Paper stats command failed")
             _reply(chat_id, f"Не удалось посчитать результаты: {e}")
 
-    return "ok", 200
+    return telegram_webhook_reply.response()
 
 
 def _reply(chat_id: int, text: str):
     """Send a reply to a specific chat. Falls back to plain text when Telegram
     rejects the Markdown (e.g. an unbalanced `_` from a @username)."""
+    payload = {"chat_id": chat_id, "text": text, "parse_mode": "Markdown"}
+    if telegram_webhook_reply.queue("sendMessage", payload):
+        return
     try:
         resp = _requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            json=payload,
             timeout=10,
         )
         if resp.status_code != 200 and "parse" in _telegram_error(resp).lower():
@@ -2996,8 +3029,8 @@ def _reply(chat_id: int, text: str):
                 json={"chat_id": chat_id, "text": text},
                 timeout=10,
             )
-    except Exception as e:
-        log.warning(f"Reply failed: {e}")
+    except Exception as exc:
+        log.warning("Reply failed (%s)", type(exc).__name__)
 
 
 # ── Signal deduplication cache ────────────────────────────────────────────────
@@ -4651,8 +4684,8 @@ def _setup_webhook():
             timeout=10,
         )
         log.info(f"Webhook set: {webhook_url} → {resp.json().get('description', '?')}")
-    except Exception as e:
-        log.warning(f"Webhook setup failed: {e}")
+    except Exception as exc:
+        log.warning("Webhook setup failed (%s)", type(exc).__name__)
 
 
 # ── Startup ───────────────────────────────────────────────────────────────────
