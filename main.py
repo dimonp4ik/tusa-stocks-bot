@@ -2412,7 +2412,7 @@ def _at_ask_size(chat_id: int, balance: float, resize: bool = False):
            f"_Перед каждым новым входом бот заново считает этот процент от свежего баланса._")
 
 
-def _at_show_menu(chat_id: int, u: dict):
+def _at_show_menu(chat_id: int, u: dict, *, notice: str = ""):
     """Status panel for an onboarded (active or paused) autotrader."""
     pct = float(u.get("size_value") or 0)
     mode_str = f"{pct:g}% от текущего депозита" if 1 <= pct <= 10 else "не задан"
@@ -2420,10 +2420,12 @@ def _at_show_menu(chat_id: int, u: dict):
     bal_str = f"${bal:.2f}" if bal is not None else "—"
     state = "🟢 включено" if u.get("active") else "⏸ выключено"
     from src.autotrade_risk_status import risk_status_text
+    reset_version = None
     try:
         risk_state = json.loads(get_bot_state(f"risk_guard:{chat_id}") or "{}")
         risk_line = risk_status_text(risk_state, now=time.time(),
                                      max_drawdown=autotrader.AUTOTRADE_MAX_DRAWDOWN)
+        reset_version = autotrader.drawdown_reset_version(risk_state)
     except Exception:
         risk_line = "Проверка лимитов счёта: сохранённые данные недоступны."
     execution_line = _execution_state_text()
@@ -2448,8 +2450,14 @@ def _at_show_menu(chat_id: int, u: dict):
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
             [{"text": "🎯 TP1: 50% / минимум лот", "callback_data": "at_tp1auto50"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
+    if reset_version:
+        rows.insert(0, [{"text": "🔓 Сбросить паузу по просадке", "callback_data": f"at_reset_dd:{reset_version}"}])
+        risk_line += "\nПосле сброса просадка отсчитывается от свежего баланса OKX."
+    header = "🤖 *Автотрейдинг*\n\n"
+    if notice:
+        header += f"{notice}\n\n"
     _at_reply_kb(chat_id,
-                  f"🤖 *Автотрейдинг*\n\nПодключение: {state}\nМаржа каждой сделки: *{mode_str}*\n"
+                  header + f"Подключение: {state}\nМаржа каждой сделки: *{mode_str}*\n"
                   f"Закрытие на TP1: *{tp1_str}*\n"
                   f"Исполнение стратегии: {execution_line}\n\n{risk_line}\n\n"
                   f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа"
@@ -2650,6 +2658,27 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
     elif data == "at_cancel":
         _answer_callback(cb_id)
         _reply(chat_id, "Ок, автотрейдинг не включён. Нажми «🤖 Автотрейдинг» когда будешь готов.")
+    elif data.startswith("at_reset_dd:"):
+        if chat_id != user_id:
+            _answer_callback(cb_id, "Сброс доступен в личном чате с ботом.")
+            return True
+        result, new_state = autotrader.reset_user_drawdown(user_id, data.removeprefix("at_reset_dd:"))
+        notices = {
+            "busy": "⏳ Бот сейчас проверяет счёт. Попробуй ещё раз.",
+            "stale": "Пауза уже изменилась. Показано текущее состояние.",
+            "not_connected": "Для сброса нужно подключение к OKX.",
+            "balance_unavailable": "⚠️ OKX не вернул свежий баланс. Пауза сохранена.",
+            "unavailable": "⚠️ Сброс сейчас недоступен. Пауза сохранена.",
+        }
+        if result == "reset":
+            u = dict(u, last_balance=new_state["equity"])
+            notice = "✅ Пауза по общей просадке сброшена."
+            if new_state["daily_paused"]:
+                notice += " Дневная пауза действует до следующего дня UTC."
+        else:
+            notice = notices[result]
+        _answer_callback(cb_id)
+        _at_show_menu(chat_id, u, notice=notice)
     elif data == "at_toggle":
         newly_active = not u.get("active")
         if newly_active and not AUTOTRADE_ENABLED:

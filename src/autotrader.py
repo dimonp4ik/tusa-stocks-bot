@@ -60,7 +60,9 @@ from src.db import (
 )
 from src.keystore import decrypt_secret, keystore_ready
 from src.autotrade_risk_status import risk_status_text
-from src.drawdown_recovery import checked_equity_guard, failed_equity_check
+from src.drawdown_recovery import (
+    checked_equity_guard, drawdown_reset_version, failed_equity_check, manual_reset_equity_guard,
+)
 from src import okx_trader as okx
 from src.shared_capacity_runtime import SharedCapacityRuntime
 from src.binance_client import get_xperp_instruments
@@ -151,6 +153,42 @@ def _margin_for(u: dict, balance: float) -> float:
 
 _entry_locks = defaultdict(threading.Lock)
 _account_entry_locks = defaultdict(threading.Lock)
+
+
+def reset_user_drawdown(user_id: int, version: str) -> tuple[str, dict | None]:
+    """Rebase the saved drawdown using a fresh balance from this user's account."""
+    lock = _entry_locks[user_id]
+    if not lock.acquire(blocking=False):
+        return "busy", None
+    try:
+        user = at_get(user_id)
+        if not user or not user.get("allowed"):
+            return "not_connected", None
+        key = f"risk_guard:{user_id}"
+        raw = get_bot_state(key)
+        state = json.loads(raw or "{}")
+        if not version or drawdown_reset_version(state) != version:
+            return "stale", None
+        creds = _creds_of(user)
+        if not creds:
+            return "not_connected", None
+        ok, balance = okx.get_balance(creds)
+        if not ok:
+            return "balance_unavailable", None
+        latest = at_get(user_id)
+        if not latest or not latest.get("allowed") or _creds_of(latest) != creds:
+            return "stale", None
+        state = manual_reset_equity_guard(state, equity=balance, now=time.time(),
+            max_daily_loss=AUTOTRADE_MAX_DAILY_LOSS, max_drawdown=AUTOTRADE_MAX_DRAWDOWN)
+        if not compare_and_set_bot_state(key, raw, json.dumps(state)):
+            return "stale", None
+        log.info("User reset a drawdown pause using fresh account equity")
+        return "reset", state
+    except Exception as exc:
+        log.warning("Drawdown reset unavailable (%s)", type(exc).__name__)
+        return "unavailable", None
+    finally:
+        lock.release()
 
 
 def maintain_equity_guards() -> None:

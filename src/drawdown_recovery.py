@@ -1,4 +1,5 @@
 """Recover only after sustained fresh equity inside the original loss budget."""
+import hashlib
 import math
 from datetime import datetime,timezone
 from src.risk_limits import equity_guard
@@ -9,10 +10,18 @@ MIN_CHECK_SPACING=45
 MAX_CHECK_GAP=150
 
 
+def drawdown_reset_version(state):
+    if not isinstance(state, dict) or state.get("paused") is not True:
+        return None
+    previous = (state.get("manual_reset_at"), state.get("last_auto_recovery_at"))
+    return hashlib.sha256(repr(previous).encode()).hexdigest()[:12]
+
+
 def checked_equity_guard(state,*,equity,now,max_daily_loss,max_drawdown,peak_floor):
     if not math.isfinite(now) or now<=0:raise ValueError('invalid observation time')
     args=dict(equity=equity,day=datetime.fromtimestamp(now,timezone.utc).date().isoformat(),
-              max_daily_loss=max_daily_loss,max_drawdown=max_drawdown,peak_floor=peak_floor)
+              max_daily_loss=max_daily_loss,max_drawdown=max_drawdown,
+              peak_floor=None if (state or {}).get("manual_reset_at") else peak_floor)
     result,blocked=equity_guard(state,**args)
     if not result['paused']:return result,blocked
     threshold=result['peak']*(1-max_drawdown+min(.001,max_drawdown/4))
@@ -36,6 +45,21 @@ def checked_equity_guard(state,*,equity,now,max_daily_loss,max_drawdown,peak_flo
             recovery_equity_threshold=threshold,recovery_status='recovered',last_auto_recovery_at=now)
         return possible,None
     return result,blocked
+
+
+def manual_reset_equity_guard(state, *, equity, now, max_daily_loss, max_drawdown):
+    if drawdown_reset_version(state) is None:
+        raise ValueError("drawdown is not paused")
+    rebased = dict(state, peak=equity, paused=False, manual_reset_at=now,
+                   pre_reset_peak=state.get("peak"))
+    for key in ("recovery_checks", "recovery_since", "recovery_last_good_at",
+                "recovery_equity_threshold", "recovery_status", "recovery_last_attempt_at"):
+        rebased.pop(key, None)
+    result, blocked = checked_equity_guard(rebased, equity=equity, now=now,
+        max_daily_loss=max_daily_loss, max_drawdown=max_drawdown, peak_floor=None)
+    result.update(last_block=blocked, equity=equity, checked_at=now,
+                  max_daily_loss=max_daily_loss, max_drawdown=max_drawdown)
+    return result
 
 
 def failed_equity_check(state,now):
