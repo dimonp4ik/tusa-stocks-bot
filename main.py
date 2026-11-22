@@ -4274,6 +4274,9 @@ def _publish_stock_venue_candidates(
                 if signal is None:
                     log.error("Live signal %s disappeared before autotrade", signal_id)
                 else:
+                    if native:
+                        context = analysis.get("_decision_context") or {}
+                        signal = dict(signal, _native_backing_level=context.get("backing_level"))
                     autotrader.open_positions_for_signal(signal)
         published += 1
         scan_count += 1

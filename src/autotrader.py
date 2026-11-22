@@ -26,6 +26,7 @@ Fail-safe rules:
 import logging
 import json
 import hashlib
+import math
 from datetime import datetime, timezone
 import threading
 from collections import defaultdict
@@ -341,8 +342,9 @@ def _open_for_account_locked(
         return
     _writers = 1 if _shared_capacity.enabled else AUTOTRADE_ACCOUNT_WRITER_COUNT
     deadline_ms = None
-    if sig.get("source") == "stock_xperp_native_shadow":
-        from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS
+    native_signal = sig.get("source") == "stock_xperp_native_shadow"
+    if native_signal:
+        from src.stock_xperp_native_shadow import MAX_SIGNAL_AGE_SECONDS, backing_level_allows_entry
 
         entry_bar = sig.get("strategy_entry_bar_ts")
         if entry_bar:
@@ -351,6 +353,16 @@ def _open_for_account_locked(
         _entry_skip(uid, sig, inst_id, "истёк срок входа",
                     f"ℹ️ Автотрейдинг: {disp} пропущен — истёк срок входа.")
         return
+    if native_signal:
+        try:
+            backing_level = float(sig.get("_native_backing_level"))
+            if not math.isfinite(backing_level) or backing_level <= 0:
+                raise ValueError("Invalid native backing level")
+        except (TypeError, ValueError, OverflowError):
+            _entry_skip(uid, sig, inst_id, "опорный уровень сигнала недоступен",
+                        f"ℹ️ Автотрейдинг: {disp} пропущен — опорный уровень сигнала недоступен.")
+            return
+        backing = {"direction": sig["direction"], "backing_level": backing_level}
 
     ok, balance = okx.get_balance(creds)
     if not ok:
@@ -515,13 +527,22 @@ def _open_for_account_locked(
     def size_for_price(price):
         return okx.calc_contracts(margin, AUTOTRADE_LEVERAGE, price, spec)
 
+    backing_crossed = "executable price crossed original backing level"
+    backing_rejection = "цена в стакане пробила опорный уровень сигнала"
+
+    def validate_entry_quote(quote):
+        quote.validate_bracket(original_sl, target1)
+        if native_signal and not all(backing_level_allows_entry(backing, price)
+                                     for price in (quote.best, quote.worst)):
+            raise ValueError(backing_crossed)
+
     try:
         book, quote = execution_quote_with_retry(
             lambda: okx.get_order_book(inst_id), direction, None,
             clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms,
             size_for_price=size_for_price)
         book_observed_at = time.time()
-        quote.validate_bracket(original_sl, target1)
+        validate_entry_quote(quote)
         sz, px = quote.contracts, quote.average
     except (TypeError, ValueError, KeyError, IndexError) as exc:
         log.warning("autotrade execution filter refused %s: %s", inst_id, exc)
@@ -537,6 +558,7 @@ def _open_for_account_locked(
             "depth slippage exceeds limit": "ожидаемое проскальзывание слишком большое",
             "executable price outside signal bracket":
                 "исполняемая цена уже вышла за диапазон сигнала",
+            backing_crossed: backing_rejection,
         }.get(detail, "стакан или исполняемая цена не прошли проверку")
         if isinstance(exc, SpreadLimitError):
             friendly += (f" ({exc.measured * 100:.4f}%, лимит "
@@ -622,7 +644,7 @@ def _open_for_account_locked(
                 lambda: okx.get_order_book(inst_id, timeout=1.0), direction, sz,
                 attempts=1, clock_ms=lambda: time.time()*1000, deadline_ms=deadline_ms)
             book_observed_at = time.time()
-            quote.validate_bracket(original_sl, target1)
+            validate_entry_quote(quote)
             if sz > size_for_price(max(quote.best, quote.worst)):
                 raise ValueError("reserved order size exceeds the refreshed margin budget")
             if time.monotonic() - account_snapshot_started > _ACCOUNT_SNAPSHOT_MAX_AGE_SEC:
@@ -631,8 +653,9 @@ def _open_for_account_locked(
         except (TypeError, ValueError, KeyError, IndexError, ArithmeticError) as exc:
             at_close_position(intent_id, "ENTRY_BOOK_CHANGED")
             log.warning("autotrade refreshed book refused %s: %s", inst_id, exc)
-            _entry_skip(uid, sig, inst_id, "стакан изменился во время бронирования входа",
-                        f"ℹ️ Автотрейдинг: {disp} пропущен — стакан изменился во время общей брони.")
+            reason = (backing_rejection if str(exc) == backing_crossed
+                      else "стакан изменился во время общей брони")
+            _entry_skip(uid, sig, inst_id, reason, f"ℹ️ Автотрейдинг: {disp} пропущен — {reason}.")
             return
     if not at_mark_entry_submitting(
             intent_id, account_short_count=latest_positions.get("short_count"),

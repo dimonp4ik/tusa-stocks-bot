@@ -206,6 +206,7 @@ class ShadowDeploymentTests(unittest.TestCase):
         analysis = {
             "symbol": "AAPLUSDT", "direction": "SHORT",
             "source": "stock_xperp_native_shadow", "_shadow_only": False,
+            "_decision_context": {"backing_level": 105.25},
         }
         persisted = {"id": 71, "symbol": "AAPLUSDT",
                      "direction": "SHORT", "autotrade_eligible": 1}
@@ -224,7 +225,7 @@ class ShadowDeploymentTests(unittest.TestCase):
             self.assertEqual(
                 main._publish_stock_venue_candidates([(analysis, 7)]), 1)
 
-        open_live.assert_called_once_with(persisted)
+        open_live.assert_called_once_with(dict(persisted, _native_backing_level=105.25))
 
     def test_shadow_candidate_never_reaches_autotrader(self):
         analysis = {

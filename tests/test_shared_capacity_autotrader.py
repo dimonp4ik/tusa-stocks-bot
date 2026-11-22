@@ -8,9 +8,14 @@ from src.shared_capacity_transport import CapacityUnavailable
 
 
 def entry_harness(prepare=True,reserve_error=False,begin_error=False,expire=False,
-                  refresh_ask=None):
+                  refresh_ask=None, *, native_direction=None, backing_level=None):
     spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
     sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
+    if native_direction is not None:
+        sig.update(source='stock_xperp_native_shadow', direction=native_direction,
+                   strategy_entry_bar_ts=time.time(), _native_backing_level=backing_level)
+        if native_direction == 'SHORT':
+            sig.update(sl=102, tp1=98, tp2=90)
     shared=SimpleNamespace(enabled=True,prepare=Mock(return_value=prepare),
         reserve=Mock(return_value='a'*32),begin=Mock(),maintenance=Mock())
     if reserve_error:shared.reserve.side_effect=CapacityUnavailable('lost reserve response')
@@ -23,8 +28,9 @@ def entry_harness(prepare=True,reserve_error=False,begin_error=False,expire=Fals
     with ExitStack() as stack:
         for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
             ('at_set_balance',None),('get_bot_state',None),('set_bot_state',None),
-            ('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None),('_entry_skip',None)]:
+            ('set_signal_size_mult',None),('at_all_open_positions',[]),('_dm',None)]:
             stack.enter_context(patch.object(at,name,return_value=value))
+        shared.skip = stack.enter_context(patch.object(at,'_entry_skip'))
         for name,value in [('validate_autotrade_account',(True,dict(account_uid='123',position_mode='net_mode'))),
             ('get_balance',(True,128.)),('get_open_position_margin',(True,dict(count=0,inst_ids=(),margin_usd=0.,margin_by_inst={}))),
             ('get_xperp_spec',spec),('get_last_price',100.),('get_position_size',(True,0)),
@@ -77,6 +83,34 @@ def test_stale_book_refresh_can_pass_with_the_same_reserved_quantity():
     _,create,mark,_,order=entry_harness(refresh_ask=100.0)
     mark.assert_called_once()
     assert order.call_args.args[3] == create.call_args.args[4] == .383
+
+
+@pytest.mark.parametrize('direction,level', [('LONG', 100.05), ('SHORT', 99.95)])
+def test_native_entry_refuses_a_book_beyond_the_original_backing_level(direction,level):
+    shared,create,mark,close,order=entry_harness(native_direction=direction,backing_level=level)
+    create.assert_not_called();mark.assert_not_called();close.assert_not_called();order.assert_not_called()
+    assert 'пробила опорный уровень' in shared.skip.call_args.args[3]
+
+
+@pytest.mark.parametrize('direction,ask', [('LONG', 99.99), ('SHORT', 100.04)])
+def test_native_backing_is_checked_again_after_shared_reservation(direction,ask):
+    shared,create,mark,close,order=entry_harness(refresh_ask=ask,native_direction=direction,backing_level=100.)
+    create.assert_called_once();mark.assert_not_called();order.assert_not_called()
+    close.assert_called_once_with(91,'ENTRY_BOOK_CHANGED')
+    assert 'пробила опорный уровень' in shared.skip.call_args.args[3]
+
+
+@pytest.mark.parametrize('level', [None, float('nan'), 0.])
+def test_native_entry_needs_valid_backing(level):
+    shared,create,mark,close,order=entry_harness(native_direction='LONG',backing_level=level)
+    create.assert_not_called();mark.assert_not_called();close.assert_not_called();order.assert_not_called()
+    assert 'уровень сигнала недоступен' in shared.skip.call_args.args[3]
+
+
+@pytest.mark.parametrize('direction', ['LONG','SHORT'])
+def test_native_entry_can_submit_inside_the_backing_level(direction):
+    _,create,mark,_,order=entry_harness(native_direction=direction,backing_level=100.)
+    create.assert_called_once();mark.assert_called_once();order.assert_called_once()
 
 
 def test_shared_entry_pause_does_not_stop_management_of_existing_position():
