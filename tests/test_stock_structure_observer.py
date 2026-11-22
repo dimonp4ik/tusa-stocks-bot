@@ -7,7 +7,7 @@ import pytest
 
 from src import stock_xperp_native_shadow as native
 from src.stock_structure_observer import (StockStructureObserver,PROFILE,FROZEN_AT,
-    PublicSource,book_evidence,signal_geometry,observer_path)
+    PublicSource,book_evidence,closed_minute_activity,signal_geometry,observer_path)
 from src.structure_observation_store import ObservationStore,closed_frame
 
 BUCKET=math.ceil(FROZEN_AT/900)*900
@@ -23,6 +23,12 @@ def frame():
 def book():return dict(ts=NOW*1000,bids=[['99.99','10']],asks=[['100.01','10']])
 
 
+def minutes():
+    return [[str(stamp * 1000), '100', '100', '100', '100',
+             '.01' if i in (1, 4, 8, 10, 13) else '0', '0', '0', '1']
+            for i, stamp in enumerate(range(BUCKET - 900, BUCKET, 60))]
+
+
 class Source:
     def __init__(self):self.calls=0;self.candidate_calls=0
     def inventory(self):
@@ -30,6 +36,9 @@ class Source:
             for s in ('AAA-X','BBB-X')}
     def candles(self,symbol):return frame()
     def book(self,instrument):self.calls+=1;return book()
+    def minute_rows(self, instrument, bucket):
+        assert (instrument, bucket, self.calls) == ('AAA-X', BUCKET, 2)
+        return list(reversed(minutes()))
     def candidates(self,frames,now,diagnostics):
         self.candidate_calls+=1;diagnostics['result']='candidates'
         assert all(series['volume'] == frame()['volume_contracts'] for series in frames.values())
@@ -44,9 +53,12 @@ def test_collection_is_idempotent_durable_and_does_not_create_signal_tables(tmp_
     result=observer.run()
     assert result['status']=='complete' and result['quotes']==2 and result['candidates']==1
     assert result['books_within_spread']==2 and result['native_candidates_within_spread']==1
+    assert result['minute_activity']['AAAUSDT']['active_minutes'] == 5
+    assert result['minute_activity']['AAAUSDT']['newest_traded_minute'] == 2
     assert observer.run()['status']=='already_recorded' and source.calls==2
     restarted=ObservationStore(path);summary=restarted.summary(PROFILE)
     assert summary['quotes']==2 and summary['candidates']==1
+    assert json.loads(summary['last']['summary'])['minute_activity'] == result['minute_activity']
     with sqlite3.connect(path) as c:
         tables={r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
         assert not tables & {'signals','autotrade_users','autotrade_positions'}
@@ -100,6 +112,21 @@ def test_stale_or_failed_book_is_not_invented_as_a_valid_quote(tmp_path):
     assert book_evidence(old,NOW)['rejection']=='book_age'
     crossed=book();crossed['asks']=[['99','1']]
     assert not book_evidence(crossed,NOW)['ok']
+
+
+def test_minute_activity_rejects_disagreement_and_incomplete_windows(tmp_path):
+    source = Source()
+    source.minute_rows = lambda instrument, bucket: minutes()[:-1]
+    result = StockStructureObserver(tmp_path / 'observer.sqlite', source=source, clock=lambda: NOW,
+                                    symbols=['AAAUSDT', 'BBBUSDT']).run()
+    assert result['status'] == 'complete' and result['native_candidates_within_spread'] == 1
+    assert result['minute_activity'] == {'AAAUSDT': {'status': 'unverified'}}
+    with pytest.raises(ValueError, match='minute_volume_disagreement'):
+        closed_minute_activity(minutes(), BUCKET, .06)
+    rows = minutes()
+    rows[-1][0] = str(BUCKET * 1000)
+    with pytest.raises(ValueError, match='minute_coverage'):
+        closed_minute_activity(rows, BUCKET, .05)
 
 
 def test_wrong_contract_book_cannot_be_labelled_as_the_requested_market():
@@ -172,5 +199,6 @@ def test_application_collection_is_independent_of_trading_pause_and_client_datab
         assert main._run_structure_quote_observer()['quotes']==2
         assert 'valid books 2' in main._structure_observer_status_text()
         assert 'spread within 5 bp: 2/2 books, 1/1 native setups' in main._structure_observer_status_text()
+        assert 'minute activity verified 1/1 native setups, 1 with at least 3 traded minutes' in main._structure_observer_status_text()
     assert main_database.read_bytes()==b'untouched'
     paused.assert_not_called();clients.assert_not_called()

@@ -66,6 +66,27 @@ def signal_geometry(setup,frame):
         side=setup['direction'])
 
 
+def closed_minute_activity(rows, bucket, reference_volume):
+    """Check 15 confirmed minute volumes against the frozen trade candle."""
+    stamps = range((bucket - 900) * 1000, bucket * 1000, 60_000)
+    if not isinstance(rows, list) or len(rows) != len(stamps):
+        raise ValueError('minute_coverage')
+    volumes = {}
+    for row in rows:
+        if not isinstance(row, list) or len(row) < 9 or row[8] != '1':
+            raise ValueError('minute_unconfirmed')
+        stamp, volume = int(row[0]), float(row[5])
+        if stamp not in stamps or stamp in volumes or not math.isfinite(volume) or volume < 0:
+            raise ValueError('minute_coverage')
+        volumes[stamp] = volume
+    ordered = [volumes[stamp] for stamp in stamps]
+    if not math.isclose(math.fsum(ordered), reference_volume, rel_tol=1e-8, abs_tol=1e-8):
+        raise ValueError('minute_volume_disagreement')
+    traded = [i for i, volume in enumerate(ordered) if volume > 0]
+    return dict(active_minutes=len(traded), newest_traded_minute=15 - traded[-1] if traded else None,
+                volume_contracts=ordered)
+
+
 class PublicSource:
     def __init__(self):
         self._pace_lock=threading.Lock();self._next_request=0.
@@ -104,6 +125,15 @@ class PublicSource:
         if row is not None and row.get('instId') not in (None,instrument):
             raise ValueError('book_instrument_mismatch')
         return row
+
+    def minute_rows(self, instrument, bucket):
+        from src.binance_client import _okx_get
+        self._pace()
+        answer = _okx_get('/api/v5/market/history-candles',
+                          dict(instId=instrument, bar='1m', after=str(bucket * 1000), limit=15), timeout=3)
+        if answer.get('code') != '0':
+            raise ValueError('minute_fetch')
+        return answer.get('data')
 
     def candidates(self,frames,now,diagnostics):
         return native.native_shadow_setups(frames,now=now,diagnostics=diagnostics)
@@ -207,6 +237,23 @@ class StockStructureObserver:
                     summary['quoted_candidates']+=int(geometry is not None and book['ok'])
                     if not book['ok']:errors[book['rejection']]+=1
             summary['quote_errors']=dict(errors)
+            # Collect only candidate instruments after taking every entry quote.
+            # Late or incomplete activity data stays missing in the study.
+            def activity(symbol):
+                if self.clock() - started > 150:
+                    return dict(status='deadline')
+                try:
+                    rows = self.source.minute_rows(instruments[symbol], bucket)
+                    evidence = closed_minute_activity(rows, bucket, frames[symbol]['volume'][-1])
+                    return dict(status='observed', **evidence)
+                except (TypeError, ValueError, KeyError, IndexError, OverflowError):
+                    return dict(status='unverified')
+                except Exception as exc:
+                    log.debug('Minute activity unavailable (%s)', type(exc).__name__)
+                    return dict(status='unavailable')
+
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                summary['minute_activity'] = dict(zip(candidates, pool.map(activity, candidates), strict=True))
             status='complete' if (complete and summary['quotes']==len(self.symbols)
                 and summary['specs_available']==len(self.symbols) and protocol_ok) else 'partial'
             self.store.finish(PROFILE,bucket,self.clock(),status,summary)

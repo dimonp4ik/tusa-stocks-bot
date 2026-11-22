@@ -822,10 +822,17 @@ def _structure_observer_status_text():
                 f"spread within {latest['spread_limit_bps']:g} bp: "
                 f"{latest['books_within_spread']}/{latest.get('quotes',0)} books, "
                 f"{latest['native_candidates_within_spread']}/{latest.get('raw_setups',0)} native setups; ")
+        activity_status = ''
+        if 'minute_activity' in latest:
+            activity = latest['minute_activity']
+            observed = [row for row in activity.values() if row['status'] == 'observed']
+            active = sum(row['active_minutes'] >= 3 for row in observed)
+            activity_status = (f"minute activity verified {len(observed)}/{len(activity)} native setups, "
+                               f"{active} with at least 3 traded minutes; ")
         return (f"Structure quote observer: {state['status']}; last {age} min ago; scans {state['scans']}; "
                 f"observations {state['observations']}; valid books {state['quotes']}; "
                 f"structural candidates {state['candidates']}; last history {latest.get('loaded',0)}/"
-                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; {spread_status}"
+                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; {spread_status}{activity_status}"
                 f"last quote errors {json.dumps(latest.get('quote_errors',{}),sort_keys=True)}; research only. ")
     except Exception:
         return 'Structure quote observer: archive status unavailable. '
