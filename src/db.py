@@ -2493,6 +2493,17 @@ def at_get(user_id: int) -> dict | None:
         return dict(row) if row else None
 
 
+def at_entry_order_identities(user_id: int) -> dict:
+    """Return this user's submitted client IDs for exchange PnL reconciliation."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT client_order_id, inst_id, direction FROM autotrade_positions
+            WHERE user_id = ? AND client_order_id IS NOT NULL AND client_order_id != ''
+              AND entry_submit_started_at IS NOT NULL
+        """, (user_id,)).fetchall()
+    return {row["client_order_id"]: (row["inst_id"], row["direction"]) for row in rows}
+
+
 def at_all_allowed() -> list:
     with _conn() as c:
         rows = c.execute(

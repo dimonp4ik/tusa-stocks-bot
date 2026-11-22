@@ -2307,7 +2307,14 @@ def _paper_results_text(user_id: int) -> str:
 
 
 def _send_paper_results(chat_id: int, user_id: int) -> None:
-    _reply(chat_id, _paper_results_text(user_id))
+    text = _paper_results_text(user_id)
+    connection = at_get(user_id) if chat_id == user_id else None
+    if connection and connection.get("allowed") and connection.get("api_key_enc"):
+        _at_reply_kb(chat_id, text, [[{
+            "text": "💵 Реальные результаты OKX", "callback_data": "at_closed_results",
+        }]])
+    else:
+        _reply(chat_id, text)
 
 
 def _format_day_news() -> str:
@@ -2662,6 +2669,18 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _answer_callback(cb_id, "Нет доступа.")
         return True
 
+    if data == "at_closed_results":
+        if chat_id != user_id:
+            _answer_callback(cb_id, "Результаты OKX доступны в личном чате.")
+            return True
+        if not u.get("api_key_enc"):
+            _answer_callback(cb_id, "Подключи OKX в «Автотрейдинге».")
+            return True
+        from src.okx_closed_pnl import start_user_report
+        started = start_user_report(user_id, u, lambda message: _reply(chat_id, message))
+        _answer_callback(cb_id, "Проверяю историю OKX." if started else "Проверка уже запущена.")
+        return True
+
     if data == "at_confirm":
         if not AUTOTRADE_ENABLED:
             _answer_callback(cb_id, "Живая торговля пока не включена.")
@@ -2767,7 +2786,8 @@ def webhook():
             _mark_photo_panel_message(chat_id, message_id)
         if cb_data not in ("prayer_commandments", "evening_ritual"):
             telegram_webhook_reply.begin(chat_id, cb_id)
-        if DEPLOYMENT_MODE == "shadow" and cb_data.startswith(("at_", "sw_")):
+        if (DEPLOYMENT_MODE == "shadow" and cb_data.startswith(("at_", "sw_"))
+                and cb_data != "at_closed_results"):
             _answer_callback(cb_id, "Теневой режим: реальные операции отключены")
             _reply(chat_id, "🛡 Сейчас бот только фиксирует paper-сделки. Реальные ордера запрещены.")
         elif cb_data == "prayer_commandments":
@@ -3021,7 +3041,7 @@ def webhook():
             chat_id,
             "❓ *Как пользоваться ботом*\n\n"
             "📋 *Открытые сделки* — текущая цена, результат от входа, ближайшая цель и стоп.\n"
-            "📈 *Результаты* — только закрытые PAPER-сделки за сегодня, 7 и 30 дней.\n"
+            "📈 *Результаты* — статистика PAPER. В личке подключённым пользователям доступна история OKX.\n"
             "🛡 *Режим* — активная стратегия и состояние реальных ордеров.\n\n"
             "*Как читать сигнал*\n"
             "LONG — ожидается рост, SHORT — снижение. Вход фиксируется по рыночной цене "
