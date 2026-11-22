@@ -404,7 +404,7 @@ class ExchangeTests(unittest.TestCase):
         order.assert_called_once()
         quantity=order.call_args.args[3]
         self.assertEqual(quantity, okx.calc_contracts(
-            3.84, at.AUTOTRADE_LEVERAGE, 100, spec))
+            3.84, at.AUTOTRADE_LEVERAGE, 100.01, spec))
         self.assertEqual(len(order.call_args.args[4]), 32)
         self.assertTrue(order.call_args.args[4].startswith('s1'))
 
@@ -514,12 +514,22 @@ class ExchangeTests(unittest.TestCase):
                     request.assert_called_once()
 
     def test_position_response_counts_all_rows(self):
-        with patch.object(okx,'_request',return_value=(True,[{'pos':'0'},{'pos':'-2'}])):
+        rows=[{'instId':'TEST','pos':'0'},{'instId':'TEST','pos':'-2'}]
+        with patch.object(okx,'_request',return_value=(True,rows)):
             self.assertEqual(okx.get_position_size({},'TEST'),(True,2))
 
     def test_malformed_position_is_not_flat(self):
-        with patch.object(okx,'_request',return_value=(True,[{}])):
-            self.assertFalse(okx.get_position_size({},'TEST')[0])
+        for rows in ([{}],[{'pos':'0'}],[{'instId':'OTHER','pos':'0'}]):
+            with patch.object(okx,'_request',return_value=(True,rows)):
+                self.assertFalse(okx.get_position_size({},'TEST')[0])
+
+    def test_missing_signed_data_does_not_confirm_flat_or_clear_pending(self):
+        response=Mock()
+        response.json.return_value={'code':'0'}
+        creds=dict(api_key='test',api_secret='test',passphrase='test')
+        with patch.object(okx.requests,'get',return_value=response):
+            self.assertFalse(okx.get_position_size(creds,'TEST')[0])
+            self.assertFalse(okx.pending_entries_clear(creds,inst_id='TEST')[0])
 
     def test_failed_close_keeps_protection_and_tracking(self):
         from src import autotrader as at

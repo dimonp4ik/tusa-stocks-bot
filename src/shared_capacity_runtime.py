@@ -196,7 +196,8 @@ class SharedCapacityRuntime:
                 log.warning('shared close proof deferred for %s (%s)',self.owner,type(exc).__name__)
 
     def _release_closed(self,row,credentials):
-        if row.get('shared_epoch')!=self.epoch or not row.get('shared_claim_id'):
+        epoch,claim_id=row.get('shared_epoch'),row.get('shared_claim_id')
+        if epoch!=self.epoch or not claim_id:
             return
         if row.get('entry_submit_started_at')==0:
             evidence=dict(kind='never_submitted',local_status='CLOSED',submit_started_at=0)
@@ -219,11 +220,12 @@ class SharedCapacityRuntime:
             rejected=(re.search(r'\((?:sCode|code) (51007|51008)\)$',str(row.get('error') or ''))
                 if row.get('close_reason')=='ENTRY_REJECTED' else None)
             if not rejected:
-                good,order=okx.get_order_by_client_id(creds,row['inst_id'],row['client_order_id'])
+                good,order=okx.get_entry_order_for_release(creds,row['inst_id'],row['client_order_id'],
+                    row.get('entry_submit_started_at'),now=self.clock())
                 if not good or order.get('state') not in {'filled','canceled'}:
                     return
-            good,positions=okx.get_open_position_margin(creds)
-            if not good or row['inst_id'] in positions['inst_ids']:
+            clear,_=okx.pending_entries_clear(creds,inst_id=row['inst_id'])
+            if not clear:
                 return
             good,size=okx.get_position_size(creds,row['inst_id'])
             if not good or size!=0:
@@ -233,11 +235,13 @@ class SharedCapacityRuntime:
                 evidence.update(kind='rejected_flat',rejection_code=rejected.group(1))
             else:
                 evidence.update(kind='terminal_flat',terminal_order_state=order['state'])
-        answer=self.transport.call('release',dict(owner=self.owner,epoch=self.epoch,
-            claim_id=row['shared_claim_id'],evidence=evidence,identity=dict(owner=self.owner,
+        if epoch!=self.epoch:
+            return
+        answer=self.transport.call('release',dict(owner=self.owner,epoch=epoch,
+            claim_id=claim_id,evidence=evidence,identity=dict(owner=self.owner,
                 account=row['account_key'],instrument=row['inst_id'],intent=self._intent(row))))
         if answer.get('released') is True:
-            db.at_mark_shared_released(row['id'],row['shared_claim_id'],self.epoch)
+            db.at_mark_shared_released(row['id'],claim_id,epoch)
 
     def prepare(self,credentials):
         if not self.enabled:

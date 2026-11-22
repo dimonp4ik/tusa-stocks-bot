@@ -66,19 +66,83 @@ def test_submitted_closed_claim_is_retained_until_terminal_order_and_two_flat_re
     db.at_close_position(pos_id,'EXCHANGE_CLOSED')
     runtime.test_clock[0]+=91
     with (patch.object(okx,'get_account_configuration',return_value=(True,{'account_uid':'123'})),
-          patch.object(okx,'get_order_by_client_id',return_value=(True,{'state':'filled'})),
-          patch.object(okx,'get_open_position_margin',return_value=(True,positions())),
+          patch.object(okx,'get_order_by_client_id',return_value=(True,{'state':'filled','instId':'TEST-X'})),
+          patch.object(okx,'pending_entries_clear',return_value=(True,None)),
           patch.object(okx,'get_position_size',side_effect=[(True,0),(True,1)])):
         runtime.maintenance(lambda _:{'test':True})
     assert runtime.transport.store.status()['active_claims']==1
     with (patch.object(okx,'get_account_configuration',return_value=(True,{'account_uid':'123'})),
-          patch.object(okx,'get_order_by_client_id',return_value=(True,{'state':'filled'})),
-          patch.object(okx,'get_open_position_margin',return_value=(True,positions())),
+          patch.object(okx,'get_order_by_client_id',return_value=(True,{'state':'filled','instId':'TEST-X'})),
+          patch.object(okx,'pending_entries_clear',return_value=(True,None)) as pending,
           patch.object(okx,'get_position_size',return_value=(True,0)) as sizes):
         runtime.maintenance(lambda _:{'test':True})
     assert sizes.call_count==2
+    pending.assert_called_once_with({'test':True},inst_id='TEST-X')
     assert runtime.transport.store.status()['active_claims']==0
     assert db.at_shared_positions()==[]
+
+
+@pytest.mark.parametrize('pending,released',[
+    ([],True),
+    ([dict(instType='FUTURES',instId='TEST-X',reduceOnly='true')],True),
+    ([dict(instType='FUTURES',instId='TEST-X',reduceOnly='false')],False),
+    ([dict(instType='FUTURES',instId='OTHER-X',reduceOnly='true')],False),
+])
+def test_closed_claim_uses_its_instrument_pending_orders(runtime,pending,released):
+    pos_id=intent();begin(runtime,pos_id);db.at_mark_entry_submitting(pos_id)
+    db.at_close_position(pos_id,'EXCHANGE_CLOSED')
+    runtime.test_clock[0]+=91
+    other_entry=dict(instType='FUTURES',instId='OTHER-X',reduceOnly='false')
+
+    def exchange(creds,method,path,params=None):
+        assert method=='GET'
+        if path.endswith('/orders-pending'):
+            if params.get('instId') is None:
+                return True,[other_entry]
+            assert params=={'limit':'100','instType':'FUTURES','instId':'TEST-X'}
+            return True,pending
+        if path.endswith('/positions'):
+            assert params=={'instId':'TEST-X'}
+            return True,[]
+        if path.endswith('/order'):
+            return True,[dict(ordId='42',clOrdId='entry-1',instId='TEST-X',state='filled')]
+        raise AssertionError(path)
+
+    with (patch.object(okx,'get_account_configuration',return_value=(True,{'account_uid':'123'})),
+          patch.object(okx,'_request',side_effect=exchange)):
+        runtime.maintenance(lambda _:{'test':True})
+        assert okx.get_open_position_margin({})[0] is False
+    assert runtime.transport.store.status()['active_claims']==int(not released)
+
+
+@pytest.mark.parametrize('days,match,released',[
+    (0,'exact',True),(12,'exact',True),(0,'absent',False),
+    (0,'duplicated',False),(0,'foreign',False),(0,'old',False),(0,'live',False),
+])
+def test_closed_claim_recovers_only_a_verified_history_entry(runtime,days,match,released):
+    pos_id=intent();begin(runtime,pos_id);db.at_mark_entry_submitting(pos_id)
+    db.at_close_position(pos_id,'EXCHANGE_CLOSED')
+    runtime.test_clock[0]+=days*86400+91
+    row=db.at_shared_positions()[0]
+    submitted=row['entry_submit_started_at']
+    historical=dict(ordId='42',clOrdId='entry-1',instId='TEST-X',instType='FUTURES',
+                    tdMode='isolated',ordType='market',state='filled',cTime=str(int(submitted*1000)))
+    history={
+        'absent':[], 'duplicated':[historical,historical],
+        'foreign':[dict(historical,instId='OTHER-X')],
+        'old':[dict(historical,cTime=str(int((submitted-61)*1000)))],
+        'live':[dict(historical,state='live')], 'exact':[historical],
+    }[match]
+    path='/api/v5/trade/orders-history'+('-archive' if days else '')
+    with (patch.object(okx,'get_account_configuration',return_value=(True,{'account_uid':'123'})),
+          patch.object(okx,'get_order_by_client_id',return_value=(False,'Order does not exist (code 51603)')),
+          patch.object(okx,'_request',return_value=(True,history)) as request,
+          patch.object(okx,'pending_entries_clear',return_value=(True,None)),
+          patch.object(okx,'get_position_size',return_value=(True,0))):
+        runtime._release_closed(row,lambda _:{'test':True})
+    request.assert_called_once()
+    assert request.call_args.args[2]==path
+    assert runtime.transport.store.status()['active_claims']==int(not released)
 
 
 def test_closed_submitted_claim_is_seeded_after_coordinator_database_replacement(runtime,tmp_path):
@@ -171,7 +235,7 @@ def test_definitive_balance_rejection_does_not_leave_a_permanent_claim(runtime):
     runtime.test_clock[0]+=91
     with (patch.object(okx,'get_account_configuration',return_value=(True,{'account_uid':'123'})),
           patch.object(okx,'get_order_by_client_id') as order,
-          patch.object(okx,'get_open_position_margin',return_value=(True,positions())),
+          patch.object(okx,'pending_entries_clear',return_value=(True,None)),
           patch.object(okx,'get_position_size',return_value=(True,0))):
         runtime.maintenance(lambda _:{'test':True})
     order.assert_not_called()

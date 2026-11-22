@@ -22,6 +22,7 @@ import json
 import logging
 import math
 import os
+import re
 import time
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -81,7 +82,7 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
             resp = requests.post(url, headers=headers, data=body_str, timeout=timeout)
         j = resp.json()
         if str(j.get("code")) == "0":
-            data = j.get("data", [])
+            data = j.get("data")
             for item in data if isinstance(data, list) else []:
                 if isinstance(item, dict) and str(item.get("sCode", "0")) != "0":
                     return False, f"{item.get('sMsg') or 'order rejected'} (sCode {item['sCode']})"
@@ -269,8 +270,8 @@ def get_position_size(creds: dict, inst_id: str) -> tuple:
             raise ValueError('positions response must be a list')
         size = 0.0
         for row in data:
-            if row.get('instId', inst_id) != inst_id:
-                continue
+            if not isinstance(row, dict) or row.get('instId') != inst_id:
+                raise ValueError('position instrument mismatch')
             if 'pos' not in row or row['pos'] in ('', None):
                 raise ValueError('position size missing')
             value = abs(float(row['pos']))
@@ -282,20 +283,14 @@ def get_position_size(creds: dict, inst_id: str) -> tuple:
         return False, f'position parse failed: {exc}'
 
 
-def get_open_position_margin(creds: dict) -> tuple:
-    """Return exchange-wide occupied derivative margin for this account.
-
-    The two bots run against separate Railway databases, so their local rows
-    cannot enforce a shared account limit.  OKX positions are authoritative.
-    For every non-flat position use the largest available conservative margin
-    estimate: isolated margin, initial-margin requirement, or notional/leverage.
-    A non-flat row without a usable estimate fails closed.
-    """
-    # Read pending entries first so an order that fills between the reads
-    # is still visible in either the order list or the position snapshot.
+def pending_entries_clear(creds: dict, *, inst_id: str | None = None) -> tuple:
+    """Require a complete pending-order view for the requested scope."""
+    params = {"limit": "100"}
+    if inst_id is not None:
+        params.update(instType="FUTURES", instId=inst_id)
     ok, orders = _request(
         creds, "GET", "/api/v5/trade/orders-pending",
-        params={"limit": "100"},
+        params=params,
     )
     if not ok:
         return False, orders
@@ -304,10 +299,25 @@ def get_open_position_margin(creds: dict) -> tuple:
     for order in orders:
         if not isinstance(order, dict):
             return False, "pending account order response invalid"
-        if order.get("instType") == "SPOT":
+        if inst_id is not None and (order.get("instId") != inst_id or order.get("instType") != "FUTURES"):
+            return False, "pending instrument order response does not match the request"
+        if inst_id is None and order.get("instType") == "SPOT":
             continue
         if str(order.get("reduceOnly")).lower() != "true":
             return False, "pending leveraged entry occupies unconfirmed account capacity"
+    return True, None
+
+
+def get_open_position_margin(creds: dict) -> tuple:
+    """Return exchange-wide occupied derivative margin for this account.
+
+    For every non-flat position use the largest available conservative margin
+    estimate. A non-flat row without a usable estimate fails closed.
+    """
+    # An entry filling between these reads appears in at least one of them.
+    clear, issue = pending_entries_clear(creds)
+    if not clear:
+        return False, issue
     ok, data = _request(creds, "GET", "/api/v5/account/positions")
     if not ok:
         return False, data
@@ -431,6 +441,8 @@ def get_order_by_client_id(creds: dict, inst_id: str,
     if not ok:
         return False, data
     try:
+        if not isinstance(data, list) or len(data) != 1 or not isinstance(data[0], dict):
+            raise ValueError("expected one order")
         row = data[0]
         if not row.get("ordId"):
             raise ValueError("missing ordId")
@@ -439,6 +451,47 @@ def get_order_by_client_id(creds: dict, inst_id: str,
         return True, row
     except (TypeError, ValueError, KeyError, IndexError) as exc:
         return False, f"order lookup parse failed: {exc}"
+
+
+def get_entry_order_for_release(creds: dict, inst_id: str, client_order_id: str,
+                                submitted_at: float | None, *, now: float) -> tuple:
+    """Look up a submitted entry, including recent OKX history after a 51603."""
+    ok, order = get_order_by_client_id(creds, inst_id, client_order_id)
+    if ok:
+        if order.get("instId") != inst_id:
+            return False, "entry order instrument does not match the request"
+        return True, order
+    if not re.search(r"\((?:sCode|code) 51603(?:,|\))", str(order)):
+        return False, order
+    age = now - submitted_at if submitted_at else math.inf
+    if not 0 <= age < 89 * 86400:
+        return False, order
+    # Bound cTime to the submission and allow for clock skew and lookup delay.
+    begin = int((submitted_at - 60) * 1000)
+    end = int(min(now, submitted_at + 180) * 1000)
+    path = "/api/v5/trade/orders-history"
+    if age + 60 >= 7 * 86400:
+        path += "-archive"
+    ok, orders = _request(creds, "GET", path, params={
+        "instType": "FUTURES", "instId": inst_id, "ordType": "market",
+        "begin": str(begin), "end": str(end), "limit": "100",
+    })
+    if not ok:
+        return False, orders
+    if (not isinstance(orders, list) or len(orders) >= 100
+            or any(not isinstance(row, dict) for row in orders)):
+        return False, "entry order history response invalid or incomplete"
+    matches = [row for row in orders if row.get("clOrdId") == client_order_id]
+    if len(matches) != 1:
+        return False, "entry order history has no unique match"
+    row = matches[0]
+    timestamp = str(row.get("cTime") or "")
+    if (row.get("instId") != inst_id or row.get("instType") != "FUTURES"
+            or row.get("ordType") != "market" or row.get("tdMode") != "isolated"
+            or not row.get("ordId") or not timestamp.isascii() or not timestamp.isdecimal()
+            or len(timestamp) > 16 or not begin <= int(timestamp) <= end):
+        return False, "entry order history does not match the submitted entry"
+    return True, row
 
 
 def is_ambiguous_request_error(error) -> bool:
