@@ -63,7 +63,7 @@ def _base_of(symbol: str) -> str:
 
 
 def _reporters_on(date_str: str) -> set:
-    """Set of US tickers reporting on date_str (YYYY-MM-DD). Cached; empty on failure."""
+    """Set of US tickers reporting on date_str, with stale fallback on errors."""
     now = time.time()
     hit = _cache.get(date_str)
     # Accept the old two-field cache during a hot module reload. A normal
@@ -80,8 +80,28 @@ def _reporters_on(date_str: str) -> set:
             headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
             timeout=12,
         )
-        rows = ((resp.json().get("data") or {}).get("rows")) or []
-        symbols = {str(r.get("symbol", "")).upper() for r in rows if r.get("symbol")}
+        resp.raise_for_status()
+        body = resp.json()
+        status = body.get("status")
+        if not isinstance(status, dict) or str(status.get("rCode")) != "200":
+            raise ValueError("calendar provider did not report success")
+        data = body.get("data")
+        if not isinstance(data, dict) or "rows" not in data:
+            raise ValueError("calendar rows are missing")
+        served_day = datetime.strptime(data["asOf"], "%a, %b %d, %Y").date().isoformat()
+        if served_day != date_str:
+            raise ValueError("calendar response is for a different day")
+        rows = data["rows"]
+        if rows is None:
+            rows = []  # Nasdaq uses a null rows value for a valid empty day.
+        if not isinstance(rows, list):
+            raise ValueError("calendar rows are malformed")
+        symbols = set()
+        for row in rows:
+            symbol = row.get("symbol") if isinstance(row, dict) else None
+            if not isinstance(symbol, str) or not symbol.strip():
+                raise ValueError("calendar ticker is missing or malformed")
+            symbols.add(symbol.strip().upper())
         _cache[date_str] = (now, symbols, True)
         return symbols
     except Exception as e:
