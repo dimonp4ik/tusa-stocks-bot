@@ -165,8 +165,23 @@ def _execution_state_text() -> str:
         if "wins" in health else ""
     )
     if health["ready"]:
-        return ("LIVE: реальные ордера доступны подключённым пользователям · "
-                f"forward {health['total_r']:+.2f}R/{health['resolved']}{breakdown}")
+        forward = f"forward {health['total_r']:+.2f}R/{health['resolved']}{breakdown}"
+        if NATIVE_XPERP_SHADOW_ENABLED:
+            now = time.time()
+            try:
+                pauses = []
+                if _native_xperp_daily_loss_pause():
+                    next_day = (int(now // 86400) + 1) * 86400
+                    reset = datetime.fromtimestamp(next_day, timezone.utc).strftime("%d.%m %H:%M UTC")
+                    pauses.append(f"дневной лимит убытков до пересчёта {reset}")
+                if _native_xperp_premarket_regime_pause(now):
+                    pauses.append("тонкий рынок до 00:00 по Нью-Йорку")
+            except Exception as exc:
+                log.warning("Stock entry-pause status unavailable: %s", type(exc).__name__)
+                return f"Статус новых входов временно неизвестен · {forward}"
+            if pauses:
+                return f"ПАУЗА НОВЫХ ВХОДОВ: {' · '.join(pauses)} · {forward}"
+        return f"LIVE: реальные ордера доступны подключённым пользователям · {forward}"
     evidence = ""
     if health.get('missing_outcomes') or health.get('missing_geometry'):
         evidence = (f" · неподтверждённых исходов {health.get('missing_outcomes', 0)}, "

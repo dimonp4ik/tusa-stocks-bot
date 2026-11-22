@@ -50,6 +50,34 @@ class ShadowDeploymentTests(unittest.TestCase):
         self.assertIn("-5.00R", text)
         self.assertIn("реальные входы не открываются", text)
 
+    def test_positive_forward_results_do_not_hide_active_entry_pauses(self):
+        positive = dict(ready=True, total_r=5.81, resolved=20, wins=10, losses=10, flat=0)
+        now = main.datetime(2026, 11, 22, 9, 30, tzinfo=main.timezone.utc).timestamp()
+        variants = (
+            (True, False, "23.11 00:00 UTC"),
+            (False, True, "00:00 по Нью-Йорку"),
+            (True, True, "23.11 00:00 UTC"),
+        )
+        with patch.object(main, "DEPLOYMENT_MODE", "live"), \
+             patch.object(main, "AUTOTRADE_ENABLED", True), \
+             patch.object(main, "NATIVE_XPERP_SHADOW_ENABLED", True), \
+             patch.object(main, "_stock_forward_health", return_value=positive), \
+             patch.object(main.time, "time", return_value=now):
+            for day, premarket, expected in variants:
+                with self.subTest(day=day, premarket=premarket), \
+                     patch.object(main, "_native_xperp_daily_loss_pause", return_value=day), \
+                     patch.object(main, "_native_xperp_premarket_regime_pause", return_value=premarket):
+                    text = main._execution_state_text()
+                    self.assertIn("ПАУЗА НОВЫХ ВХОДОВ", text)
+                    self.assertIn(expected, text)
+                    self.assertIn("+5.81R/20", text)
+                    self.assertNotIn("LIVE:", text)
+                    if premarket:
+                        self.assertIn("00:00 по Нью-Йорку", text)
+            with patch.object(main, "_native_xperp_daily_loss_pause", return_value=False), \
+                 patch.object(main, "_native_xperp_premarket_regime_pause", return_value=False):
+                self.assertIn("LIVE:", main._execution_state_text())
+
     def test_scan_dispatches_only_native_shadow_router(self):
         calls = []
         with patch.object(main, "_check_open_signals",
