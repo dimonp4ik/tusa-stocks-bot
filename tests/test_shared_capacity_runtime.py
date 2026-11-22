@@ -1,4 +1,6 @@
 import time
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event, RLock, current_thread
 from unittest.mock import patch
 import pytest
 from src import db,okx_trader as okx
@@ -173,6 +175,60 @@ def test_lost_release_response_is_recovered_by_closed_sync_without_resurrection(
     runtime.transport.call=real
     runtime.maintenance(lambda _:None)
     assert db.at_shared_positions()==[]
+
+
+def test_completed_release_does_not_invalidate_concurrent_sync(runtime, monkeypatch):
+    pos_id = intent()
+    begin(runtime, pos_id)
+    db.at_close_position(pos_id, 'ENTRY_UNSENT')
+    row = db.at_shared_positions()[0]
+    sync_read = Event()
+    release_ready_to_bind = Event()
+    release_thread = None
+    real_call = runtime.transport.call
+    real_mark = db.at_mark_shared_released
+
+    class ObservedLock:
+        lock = RLock()
+
+        def __enter__(self):
+            if current_thread() is release_thread:
+                release_ready_to_bind.set()
+            return self.lock.__enter__()
+
+        def __exit__(self, *exc):
+            return self.lock.__exit__(*exc)
+
+    def call(action, payload):
+        result = real_call(action, payload)
+        if action == 'sync':
+            assert not result['released']
+            sync_read.set()
+            assert release_ready_to_bind.wait(5)
+        return result
+
+    def mark(*args):
+        result = real_mark(*args)
+        release_ready_to_bind.set()
+        return result
+
+    def release():
+        nonlocal release_thread
+        release_thread = current_thread()
+        runtime._release_closed(row, lambda _: None)
+
+    monkeypatch.setattr(runtime, 'lock', ObservedLock())
+    monkeypatch.setattr(runtime.transport, 'call', call)
+    monkeypatch.setattr(db, 'at_mark_shared_released', mark)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        sync = pool.submit(runtime.maintenance, lambda _: None, reconcile=False)
+        assert sync_read.wait(5)
+        pool.submit(release).result(timeout=5)
+        sync.result(timeout=5)
+
+    assert runtime.transport.store.status()['active_claims'] == 0
+    assert db.at_shared_positions() == []
+    assert runtime.ready and runtime.error is None
 
 
 def test_malformed_successful_reservation_cannot_authorize_order_submission(runtime):

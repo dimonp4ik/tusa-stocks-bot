@@ -241,7 +241,12 @@ class SharedCapacityRuntime:
             claim_id=claim_id,evidence=evidence,identity=dict(owner=self.owner,
                 account=row['account_key'],instrument=row['inst_id'],intent=self._intent(row))))
         if answer.get('released') is True:
-            db.at_mark_shared_released(row['id'],claim_id,epoch)
+            # Apply the local release after any sync that already read this row.
+            # If that sync rebound it to a new coordinator epoch, its new claim
+            # still needs reconciliation. Do not hold the lock during network IO.
+            with self.lock:
+                if epoch == self.epoch:
+                    db.at_mark_shared_released(row['id'],claim_id,epoch)
 
     def prepare(self,credentials):
         if not self.enabled:
