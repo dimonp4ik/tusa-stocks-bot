@@ -43,6 +43,7 @@ def test_collection_is_idempotent_durable_and_does_not_create_signal_tables(tmp_
     observer=StockStructureObserver(path,source=source,clock=lambda:NOW,symbols=['AAAUSDT','BBBUSDT'])
     result=observer.run()
     assert result['status']=='complete' and result['quotes']==2 and result['candidates']==1
+    assert result['books_within_spread']==2 and result['native_candidates_within_spread']==1
     assert observer.run()['status']=='already_recorded' and source.calls==2
     restarted=ObservationStore(path);summary=restarted.summary(PROFILE)
     assert summary['quotes']==2 and summary['candidates']==1
@@ -56,6 +57,16 @@ def test_collection_is_idempotent_durable_and_does_not_create_signal_tables(tmp_
     assert rebuilt['close']==frame()['close']
     assert rebuilt['volume']==frame()['volume_contracts']
     assert payload['frame']['kind']=='trade_contracts'
+
+
+def test_observer_counts_wide_books_as_valid_but_not_within_entry_spread(tmp_path):
+    source=Source()
+    wide=dict(ts=NOW*1000,bids=[['99','10']],asks=[['101','10']])
+    source.book=lambda instrument:wide if instrument=='AAA-X' else book()
+    result=StockStructureObserver(tmp_path/'observer.sqlite',source=source,clock=lambda:NOW,
+                                  symbols=['AAAUSDT','BBBUSDT']).run()
+    assert result['quotes']==2 and result['raw_setups']==1
+    assert result['books_within_spread']==1 and result['native_candidates_within_spread']==0
 
 
 def test_revised_closed_candle_is_preserved_without_overwriting_old_evidence(tmp_path):
@@ -160,5 +171,6 @@ def test_application_collection_is_independent_of_trading_pause_and_client_datab
           patch.object(main.autotrader,'at_get_active_traders') as clients):
         assert main._run_structure_quote_observer()['quotes']==2
         assert 'valid books 2' in main._structure_observer_status_text()
+        assert 'spread within 5 bp: 2/2 books, 1/1 native setups' in main._structure_observer_status_text()
     assert main_database.read_bytes()==b'untouched'
     paused.assert_not_called();clients.assert_not_called()

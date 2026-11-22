@@ -816,10 +816,16 @@ def _structure_observer_status_text():
         last=state.get('last') or {}
         age=max(0,int((time.time()-float(last.get('completed_at') or last.get('started_at') or time.time()))/60))
         latest=json.loads(last.get('summary') or '{}')
+        spread_status = ''
+        if 'books_within_spread' in latest:
+            spread_status = (
+                f"spread within {latest['spread_limit_bps']:g} bp: "
+                f"{latest['books_within_spread']}/{latest.get('quotes',0)} books, "
+                f"{latest['native_candidates_within_spread']}/{latest.get('raw_setups',0)} native setups; ")
         return (f"Structure quote observer: {state['status']}; last {age} min ago; scans {state['scans']}; "
                 f"observations {state['observations']}; valid books {state['quotes']}; "
                 f"structural candidates {state['candidates']}; last history {latest.get('loaded',0)}/"
-                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; "
+                f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; {spread_status}"
                 f"last quote errors {json.dumps(latest.get('quote_errors',{}),sort_keys=True)}; research only. ")
     except Exception:
         return 'Structure quote observer: archive status unavailable. '

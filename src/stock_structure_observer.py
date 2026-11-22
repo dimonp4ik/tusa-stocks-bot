@@ -9,6 +9,7 @@ import threading
 import time
 
 from src import stock_xperp_native_shadow as native
+from src.execution_guard import MAX_ENTRY_SPREAD
 from src.structure_observation_store import ObservationStore,closed_frame,encoded
 
 LEGACY_PROFILE='stock_swing2_original_target_quote_observer_v1'
@@ -125,7 +126,9 @@ class StockStructureObserver:
         except Exception as exc:
             log.warning('Structure observer archive unavailable (%s)',type(exc).__name__)
             return dict(status='archive_unavailable',error_type=type(exc).__name__)
-        summary=dict(expected=len(self.symbols),loaded=0,quotes=0,candidates=0,quoted_candidates=0)
+        summary=dict(expected=len(self.symbols),loaded=0,quotes=0,candidates=0,quoted_candidates=0,
+                     spread_limit_bps=MAX_ENTRY_SPREAD*10_000,books_within_spread=0,
+                     native_candidates_within_spread=0)
         try:
             mapping,specs=self.source.inventory()
             instruments={s:mapping[s[:-4]] for s in self.symbols if s[:-4] in mapping}
@@ -197,6 +200,9 @@ class StockStructureObserver:
                     self.store.put_observation(PROFILE,bucket,symbol,instruments[symbol],received,
                         book['ok'],geometry is not None,payload)
                     summary['quotes']+=int(book['ok'])
+                    within_spread = book['ok'] and book['spread_bps']<=summary['spread_limit_bps']
+                    summary['books_within_spread']+=int(within_spread)
+                    summary['native_candidates_within_spread']+=int(within_spread and symbol in candidates)
                     summary['candidates']+=int(geometry is not None)
                     summary['quoted_candidates']+=int(geometry is not None and book['ok'])
                     if not book['ok']:errors[book['rejection']]+=1
