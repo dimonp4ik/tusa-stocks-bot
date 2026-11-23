@@ -77,7 +77,10 @@ def _request(creds: dict, method: str, path: str, params: dict = None,
             return False,'unsupported regional diagnostic'
         url = (base_url or _base_url()) + sign_path
         if method == "GET":
-            resp = requests.get(url, headers=headers, timeout=timeout)
+            if base_url is not None:
+                resp = requests.get(url, headers=headers, timeout=timeout, allow_redirects=False)
+            else:
+                resp = requests.get(url, headers=headers, timeout=timeout)
         else:
             resp = requests.post(url, headers=headers, data=body_str, timeout=timeout)
         j = resp.json()

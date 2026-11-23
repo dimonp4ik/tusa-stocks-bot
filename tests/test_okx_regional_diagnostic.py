@@ -19,3 +19,4 @@ def test_region_probe_uses_only_official_eu_configuration_endpoint():
         good,config=okx.get_account_configuration(creds,base_url='https://eea.okx.com')
     assert good and config['account_uid']=='123'
     assert get.call_args.args[0]=='https://eea.okx.com/api/v5/account/config'
+    assert get.call_args.kwargs['allow_redirects'] is False

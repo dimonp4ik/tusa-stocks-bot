@@ -315,6 +315,12 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
             "конфигурацию API-ключа OKX не удалось проверить",
             f"⚠️ Автотрейдинг: {disp} пропущен — не удалось проверить "
             "конфигурацию API-ключа OKX."))
+        from src.okx_connection_check import account_failure_label
+        key_failure = account_failure_label(account_check or {})
+        if key_failure:
+            audit_reason = key_failure
+            message = (f"⚠️ Автотрейдинг: {disp} пропущен. {key_failure}. "
+                       "В «Автотрейдинге» нажми «Проверить подключение OKX».")
         _entry_skip(
             uid, sig, inst_id, audit_reason,
             message + " Бот отказался от входа для безопасности.")

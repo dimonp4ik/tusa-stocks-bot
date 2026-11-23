@@ -2492,6 +2492,7 @@ def _at_show_menu(chat_id: int, u: dict, *, notice: str = ""):
             [{"text": "⚙️ Изменить размер сделки", "callback_data": "at_resize"}],
             [{"text": f"🎯 % закрытия на TP1: {tp1_pct:.0f}%", "callback_data": "at_tp1pct"}],
             [{"text": "🎯 TP1: 50% / минимум лот", "callback_data": "at_tp1auto50"}],
+            [{"text": "🔎 Проверить подключение OKX", "callback_data": "at_check_connection"}],
             [{"text": "🔑 Заменить API-ключи", "callback_data": "at_rekey"}]]
     if reset_version:
         rows.insert(0, [{"text": "🔓 Сбросить паузу по просадке", "callback_data": f"at_reset_dd:{reset_version}"}])
@@ -2690,6 +2691,18 @@ def _at_handle_callback(cb_id: str, chat_id: int, user_id: int, data: str) -> bo
         _answer_callback(cb_id, "Нет доступа.")
         return True
 
+    if data == "at_check_connection":
+        if chat_id != user_id:
+            _answer_callback(cb_id, "Проверка OKX доступна в личном чате.")
+            return True
+        if not u.get("api_key_enc"):
+            _answer_callback(cb_id, "Подключи OKX в «Автотрейдинге».")
+            return True
+        from src.okx_connection_check import start_user_check
+        started = start_user_check(user_id, u, lambda message: _reply(chat_id, message))
+        _answer_callback(cb_id, "Проверяю подключение OKX." if started else "Проверка уже запущена.")
+        return True
+
     if data == "at_closed_results":
         if chat_id != user_id:
             _answer_callback(cb_id, "Результаты OKX доступны в личном чате.")
@@ -2808,7 +2821,7 @@ def webhook():
         if cb_data not in ("prayer_commandments", "evening_ritual"):
             telegram_webhook_reply.begin(chat_id, cb_id)
         if (DEPLOYMENT_MODE == "shadow" and cb_data.startswith(("at_", "sw_"))
-                and cb_data != "at_closed_results"):
+                and cb_data not in {"at_closed_results", "at_check_connection"}):
             _answer_callback(cb_id, "Теневой режим: реальные операции отключены")
             _reply(chat_id, "🛡 Сейчас бот только фиксирует paper-сделки. Реальные ордера запрещены.")
         elif cb_data == "prayer_commandments":
