@@ -76,9 +76,36 @@ def test_observer_counts_wide_books_as_valid_but_not_within_entry_spread(tmp_pat
     wide=dict(ts=NOW*1000,bids=[['99','10']],asks=[['101','10']])
     source.book=lambda instrument:wide if instrument=='AAA-X' else book()
     result=StockStructureObserver(tmp_path/'observer.sqlite',source=source,clock=lambda:NOW,
-                                  symbols=['AAAUSDT','BBBUSDT']).run()
+                                  sleep=lambda _: None, symbols=['AAAUSDT','BBBUSDT']).run()
     assert result['quotes']==2 and result['raw_setups']==1
     assert result['books_within_spread']==1 and result['native_candidates_within_spread']==0
+
+
+def test_wide_native_observation_records_two_independent_books_without_a_signal(tmp_path):
+    source = Source()
+    now = [NOW]
+
+    def sleep(seconds):
+        now[0] += seconds
+
+    def quote(instrument):
+        source.calls += 1
+        spread = .1 if now[0] == NOW and instrument == 'AAA-X' else .07
+        if instrument == 'BBB-X':
+            spread = .02
+        return {'ts': now[0] * 1000, 'bids': [[100 - spread / 2, 5]], 'asks': [[100 + spread / 2, 5]]}
+
+    source.book = quote
+    observer = StockStructureObserver(tmp_path / 'observer.sqlite', source=source, clock=lambda: now[0], sleep=sleep,
+                                      symbols=['AAAUSDT', 'BBBUSDT'])
+    result = observer.run()
+    probe = result['spread_rechecks']['AAAUSDT']
+    assert probe['distinct_pair'] and probe['max_spread_bps'] == pytest.approx(7)
+    assert probe['initial_received_at'] == NOW
+    assert [row['received_at'] for row in probe['samples']] == [NOW + 5, NOW + 10]
+    assert source.calls == 4
+    assert result['native_candidates_within_spread'] == 0
+    assert result['status'] == 'complete'
 
 
 def test_revised_closed_candle_is_preserved_without_overwriting_old_evidence(tmp_path):
@@ -105,7 +132,7 @@ def test_forming_or_future_bar_cannot_create_a_candidate(tmp_path):
 def test_stale_or_failed_book_is_not_invented_as_a_valid_quote(tmp_path):
     source=Source();source.book=lambda instrument:None
     result=StockStructureObserver(tmp_path/'observer.sqlite',source=source,clock=lambda:NOW,
-                                  symbols=['AAAUSDT','BBBUSDT']).run()
+                                  sleep=lambda _: None, symbols=['AAAUSDT','BBBUSDT']).run()
     assert result['quotes']==0 and result['status']=='partial'
     old=book();old['ts']-=4000
     assert not book_evidence(old,NOW)['ok']

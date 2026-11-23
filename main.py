@@ -829,10 +829,18 @@ def _structure_observer_status_text():
             active = sum(row['active_minutes'] >= 3 for row in observed)
             activity_status = (f"minute activity verified {len(observed)}/{len(activity)} native setups, "
                                f"{active} with at least 3 traded minutes; ")
+        recheck_status = ''
+        if 'spread_rechecks' in latest:
+            rechecks = latest['spread_rechecks']
+            spreads = [row['max_spread_bps'] for row in rechecks.values() if row['distinct_pair']]
+            recheck_status = (f"spread rechecks {len(spreads)}/{len(rechecks)} native setups, "
+                              f"{sum(bp <= 10 for bp in spreads)} within 10 bp, "
+                              f"{sum(bp <= 15 for bp in spreads)} within 15 bp; ")
         return (f"Structure quote observer: {state['status']}; last {age} min ago; scans {state['scans']}; "
                 f"observations {state['observations']}; valid books {state['quotes']}; "
                 f"structural candidates {state['candidates']}; last history {latest.get('loaded',0)}/"
                 f"{latest.get('expected',0)}; last books {latest.get('quotes',0)}; {spread_status}{activity_status}"
+                f"{recheck_status}"
                 f"last quote errors {json.dumps(latest.get('quote_errors',{}),sort_keys=True)}; research only. ")
     except Exception:
         return 'Structure quote observer: archive status unavailable. '

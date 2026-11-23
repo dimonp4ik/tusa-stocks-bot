@@ -18,6 +18,7 @@ FROZEN_AT=1795123704.  # 2026-11-19 21:28:24 UTC, before the new cohort.
 NATIVE_SOURCE_SHA='bef374601c9599b9df506e3ac9abf4e05a9d4d80e66daf07625edc04eb524b0d'
 CONTRACT_NATIVE_SOURCE_SHA='663c490bb993dcd09f28611385e20be121a37dd07bbddba44676f15e37a1aa24'
 TRADE_SERIES='trade_contracts'
+SPREAD_RECHECK_SECONDS = 5
 log=logging.getLogger(__name__)
 
 
@@ -140,11 +141,38 @@ class PublicSource:
 
 
 class StockStructureObserver:
-    def __init__(self,path,*,source=None,clock=time.time,symbols=None,revision='unknown'):
+    def __init__(self,path,*,source=None,clock=time.time,sleep=time.sleep,symbols=None,revision='unknown'):
         self.store=ObservationStore(path)
-        self.source=source or PublicSource();self.clock=clock
+        self.source=source or PublicSource();self.clock=clock;self.sleep=sleep
         self.symbols=tuple(sorted(symbols if symbols is not None else native.AUDITED_SYMBOLS))
         self.revision=str(revision)[:64]
+
+    def _observe_spread_rechecks(self, instrument, first_received, bucket):
+        samples = []
+        due = first_received + SPREAD_RECHECK_SECONDS
+        deadline = bucket + native.MAX_SIGNAL_AGE_SECONDS
+        for _ in range(2):
+            if due >= deadline:
+                break
+            self.sleep(max(0, due - self.clock()))
+            requested = self.clock()
+            if requested >= deadline:
+                break
+            try:
+                raw = self.source.book(instrument)
+                received = self.clock()
+                book = book_evidence(raw, received)
+            except Exception as exc:
+                received = self.clock()
+                book = dict(ok=False, rejection=type(exc).__name__)
+            if received >= deadline:
+                book = dict(ok=False, rejection='entry_deadline')
+            samples.append(dict(requested_at=requested, received_at=received, book=book))
+            due = received + SPREAD_RECHECK_SECONDS
+        pair = [row['book'] for row in samples if row['book']['ok']]
+        distinct = len(pair) == 2 and pair[0]['exchange_at'] < pair[1]['exchange_at']
+        return dict(initial_received_at=first_received, samples=samples, distinct_pair=distinct,
+                    max_spread_bps=max(row['spread_bps'] for row in pair) if distinct else None)
 
     def run(self):
         started=self.clock();bucket=int(started//900)*900
@@ -197,6 +225,7 @@ class StockStructureObserver:
                 except (KeyError,TypeError,ValueError):return False
             summary['specs_available']=sum(spec_usable(i) for i in instruments.values())
             errors=collections.Counter()
+            retry_candidates = {}
             def quote(symbol):
                 requested=self.clock()
                 if requested-started>150:return requested,requested,None,'quote_deadline'
@@ -233,6 +262,8 @@ class StockStructureObserver:
                     within_spread = book['ok'] and book['spread_bps']<=summary['spread_limit_bps']
                     summary['books_within_spread']+=int(within_spread)
                     summary['native_candidates_within_spread']+=int(within_spread and symbol in candidates)
+                    if symbol in candidates and not within_spread:
+                        retry_candidates[symbol] = received
                     summary['candidates']+=int(geometry is not None)
                     summary['quoted_candidates']+=int(geometry is not None and book['ok'])
                     if not book['ok']:errors[book['rejection']]+=1
@@ -254,6 +285,17 @@ class StockStructureObserver:
 
             with ThreadPoolExecutor(max_workers=4) as pool:
                 summary['minute_activity'] = dict(zip(candidates, pool.map(activity, candidates), strict=True))
+            def recheck_spread(symbol):
+                evidence = self._observe_spread_rechecks(instruments[symbol], retry_candidates[symbol], bucket)
+                proposal = candidates[symbol]
+                log.info('Native stock spread recheck %s', encoded(dict(
+                    symbol=symbol, instrument=instruments[symbol], bucket=bucket, direction=proposal['direction'],
+                    backing_level=proposal.get('backing_level'), target_r=proposal['target_r'], **evidence)))
+                return evidence
+
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                summary['spread_rechecks'] = dict(zip(retry_candidates, pool.map(recheck_spread, retry_candidates),
+                                                      strict=True))
             status='complete' if (complete and summary['quotes']==len(self.symbols)
                 and summary['specs_available']==len(self.symbols) and protocol_ok) else 'partial'
             self.store.finish(PROFILE,bucket,self.clock(),status,summary)
