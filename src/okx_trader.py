@@ -433,11 +433,13 @@ def place_market_entry(creds: dict, inst_id: str, direction: str, sz: float,
 
 
 def get_order_by_client_id(creds: dict, inst_id: str,
-                           client_order_id: str) -> tuple:
-    """Recover a recent order after a lost place-order response."""
+                           client_order_id: str, *, timeout: int | None = None) -> tuple:
+    """Retrieve a recent order by its client ID."""
+    request_options = {} if timeout is None else {"timeout": timeout}
     ok, data = _request(
         creds, "GET", "/api/v5/trade/order",
         params={"instId": inst_id, "clOrdId": client_order_id},
+        **request_options,
     )
     if not ok:
         return False, data

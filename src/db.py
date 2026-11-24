@@ -462,6 +462,8 @@ def init_db():
         _ensure_column(c, "autotrade_positions", "tp1_algo_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "tp1_sz", "REAL")
         _ensure_column(c, "autotrade_positions", "entry_filled_sz", "REAL")
+        _ensure_column(c, "autotrade_positions", "entry_last_fill_ms", "INTEGER")
+        _ensure_column(c, "autotrade_positions", "entry_fill_checked_at", "REAL")
         _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "entry_submit_started_at", "REAL")
         _ensure_column(c, "autotrade_positions", "entry_account_short_count", "INTEGER")
@@ -2631,15 +2633,46 @@ def at_create_entry_intent(signal_id: int, user_id: int, inst_id: str,
 def at_mark_entry_submitting(
     pos_id: int, *, account_short_count: int | None = None,
     account_unknown_side_count: int | None = None,
+    expected_signal_id: int | None = None,
 ) -> bool:
     """Claim the reserved row before any request to place the order."""
     with _conn() as c:
         return c.execute(
             "UPDATE autotrade_positions SET entry_submit_started_at = ?, "
             "entry_account_short_count = ?, entry_account_unknown_side_count = ? "
-            "WHERE id = ? AND status = 'ENTRY_PENDING' AND entry_submit_started_at = 0",
-            (time_mod.time(), account_short_count, account_unknown_side_count, pos_id),
+            "WHERE id = ? AND status = 'ENTRY_PENDING' AND entry_submit_started_at = 0 "
+            "AND (? IS NULL OR EXISTS (SELECT 1 FROM signals s "
+            "WHERE s.id = autotrade_positions.signal_id AND s.id = ? "
+            "AND s.status = 'OPEN' AND s.autotrade_eligible = 1))",
+            (time_mod.time(), account_short_count, account_unknown_side_count, pos_id,
+             expected_signal_id, expected_signal_id),
         ).rowcount == 1
+
+
+def at_entry_fill_checks(now: float) -> list:
+    """Return a bounded set of protected positions with no order fill timestamp."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT p.id, p.user_id, p.signal_id, p.inst_id, p.direction, p.client_order_id,
+                   p.entry_submit_started_at, s.opened_at AS published_at,
+                   s.tp1_hit_at, s.closed_at AS signal_closed_at
+            FROM autotrade_positions p
+            JOIN signals s ON s.id = p.signal_id
+            JOIN autotrade_users u ON u.user_id = p.user_id AND u.allowed = 1
+            WHERE p.status IN ('OPEN', 'CLOSED') AND p.entry_last_fill_ms IS NULL
+              AND p.entry_submit_started_at >= ? AND p.client_order_id != ''
+              AND p.sl_algo_id != '' AND (p.entry_fill_checked_at IS NULL OR p.entry_fill_checked_at <= ?)
+            ORDER BY p.entry_fill_checked_at ASC, p.entry_submit_started_at DESC LIMIT 4
+        """, (now - 3*86400, now - 120)).fetchall()
+        return [dict(row) for row in rows]
+
+
+def at_record_entry_fill_check(pos_id: int, client_order_id: str, now: float, fill_ms: int | None) -> bool:
+    with _conn() as c:
+        return c.execute("""
+            UPDATE autotrade_positions SET entry_last_fill_ms = ?, entry_fill_checked_at = ?
+            WHERE id = ? AND client_order_id = ? AND entry_last_fill_ms IS NULL
+        """, (fill_ms, now, pos_id, client_order_id)).rowcount == 1
 
 
 def at_short_exposure_audit(since_ts: float) -> dict:

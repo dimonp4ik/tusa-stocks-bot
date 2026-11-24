@@ -8,7 +8,7 @@ from src.shared_capacity_transport import CapacityUnavailable
 
 
 def entry_harness(prepare=True,reserve_error=False,begin_error=False,expire=False,
-                  refresh_ask=None, *, native_direction=None, backing_level=None):
+                  refresh_ask=None, *, native_direction=None, backing_level=None, submit_allowed=True):
     spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
     sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
     if native_direction is not None:
@@ -46,7 +46,8 @@ def entry_harness(prepare=True,reserve_error=False,begin_error=False,expire=Fals
                 dict(ts=(wall[0]+4)*1000, bids=[[refresh_ask-.02,1000]], asks=[[refresh_ask,1000]]),
             ]
         create=stack.enter_context(patch.object(at,'at_create_entry_intent',return_value=91))
-        mark=stack.enter_context(patch.object(at,'at_mark_entry_submitting',return_value=True))
+        mark=stack.enter_context(patch.object(at,'at_mark_entry_submitting',return_value=submit_allowed))
+        shared.release_unsent=stack.enter_context(patch.object(at,'at_release_unsent_entry'))
         close=stack.enter_context(patch.object(at,'at_close_position'))
         order=stack.enter_context(patch.object(at.okx,'place_market_entry',return_value=(False,'rejected')))
         at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST-X','TEST')
@@ -64,6 +65,15 @@ def test_shared_network_failure_closes_only_unsent_intent_and_never_places_order
 def test_unready_coordinator_refuses_before_creating_entry():
     _,create,mark,close,order=entry_harness(prepare=False)
     create.assert_not_called();mark.assert_not_called();close.assert_not_called();order.assert_not_called()
+
+
+def test_signal_closed_during_reservation_never_submits_to_okx():
+    shared,create,mark,_,order=entry_harness(submit_allowed=False)
+    create.assert_called_once()
+    shared.begin.assert_called_once()
+    assert mark.call_args.kwargs['expected_signal_id'] == 1
+    order.assert_not_called()
+    shared.release_unsent.assert_called_once_with(91)
 
 
 def test_snapshot_that_expires_during_shared_claim_is_not_submitted():

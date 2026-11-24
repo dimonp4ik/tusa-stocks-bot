@@ -4995,6 +4995,9 @@ def start_bot():
     if AUTOTRADE_ENABLED:
         scheduler.add_job(autotrader.maintain_equity_guards,'interval',seconds=60,
                           id='equity_guard_recovery',max_instances=1,coalesce=True)
+        from src.entry_execution import audit_entry_fills
+        scheduler.add_job(audit_entry_fills, 'interval', seconds=60,
+                          id='entry_fill_verification', next_run_time=datetime.now(timezone.utc))
     if (os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1'
             or os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')=='1'):
         from apscheduler.executors.pool import ThreadPoolExecutor as SchedulerPool

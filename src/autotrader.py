@@ -661,8 +661,10 @@ def _open_for_account_locked(
             return
     if not at_mark_entry_submitting(
             intent_id, account_short_count=latest_positions.get("short_count"),
-            account_unknown_side_count=latest_positions.get("unknown_side_count")):
-        _entry_skip(uid, sig, inst_id, "entry reservation is no longer available")
+            account_unknown_side_count=latest_positions.get("unknown_side_count"),
+            expected_signal_id=sig["id"]):
+        at_release_unsent_entry(intent_id)
+        _entry_skip(uid, sig, inst_id, "сигнал или бронь больше не доступны перед отправкой")
         return
     if sig["direction"] == "SHORT":
         log.info(
