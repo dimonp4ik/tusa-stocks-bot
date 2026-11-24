@@ -1021,6 +1021,25 @@ def update_trailing(sig: dict, stop_px: float) -> None:
             log.warning(f"autotrade trailing failed pos#{pos['id']}: {e}")
 
 
+def _clear_closed_protection(pos: dict, creds: dict, *, notify=None) -> bool:
+    """Clear the old fixed-size TP1 before releasing a confirmed-flat position."""
+    inst_id = pos["inst_id"]
+    if pos.get("tp1_algo_id"):
+        canceled, _ = okx.cancel_protection(creds, inst_id, pos["tp1_algo_id"])
+        if not canceled:
+            log.warning("TP1 cancellation unconfirmed pos#%s %s; retaining tracking", pos["id"], inst_id)
+            if notify is not None:
+                base = inst_id.split("-")[0]
+                notify(pos["user_id"],
+                       f"⚠️ *{base}/USDC*: OKX ещё не подтвердил снятие старого ордера TP1.\n"
+                       "Бот повторит проверку. Новый вход по этому инструменту пока заблокирован.")
+            return False
+    # OKX also retires the closeFraction OCO when the position becomes flat.
+    if pos.get("sl_algo_id"):
+        okx.cancel_protection(creds, inst_id, pos["sl_algo_id"])
+    return True
+
+
 def mirror_transition(sig: dict, new_status: str, exit_px: float, *, notify=None) -> None:
     """Engine transitioned a signal → mirror it on the exchange for every user."""
     if not AUTOTRADE_ENABLED:
@@ -1041,11 +1060,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float, *, notify=None
                 continue
 
             if new_status in _CLOSE_STATUSES:
-                # Cancel protection first so its market close can't double-fire,
-                # then flatten whatever the algo hasn't already closed. Also
-                # cancel any still-resting TP1 partial-close order — if TP1
-                # was never reached (e.g. straight SL_HIT) it would otherwise
-                # sit orphaned on the exchange after the position is flat.
+                # Confirm flatness before cancelling the associated exits.
                 ok, err = okx.close_position_market(creds, pos["inst_id"])
                 if not ok:
                     ok, err = okx.close_position_market(creds, pos["inst_id"])
@@ -1062,34 +1077,8 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float, *, notify=None
                         f"причина: `{err}`",
                     ]))
                     continue
-                if pos.get("sl_algo_id"):
-                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
-                if pos.get("tp1_algo_id"):
-                    # This one is checked while the OCO above is not, and the asymmetry is
-                    # deliberate. The OCO is placed with closeFraction, so the exchange
-                    # retires it when the position goes flat. The TP1 partial is a FIXED
-                    # size reduce-only order: nothing retires it, and a leftover would sit
-                    # armed until the next position in the same instrument, then close part
-                    # of it at a price chosen for a trade that ended days ago.
-                    _c_ok, _c_err = okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
-                    if not _c_ok:
-                        log.error(f"autotrade STALE TP1 ORDER {pos['user_id']} {pos['inst_id']}: "
-                                  f"cancel failed ({_c_err}) — it can fire on a later position")
-                        send(pos["user_id"], "\n".join([
-                            f"⚠️ *{disp}*: не смог снять ордер частичного закрытия TP1.",
-                            "Он может сработать по следующей сделке этого же тикера.",
-                            "Проверь открытые алго-ордера на бирже.",
-                            f"`{_c_err}`",
-                        ]))
-                        continue
-                # The protection was cancelled a few lines up, so if this
-                # close does not go through the position is sitting on the
-                # exchange with NOTHING under it. Marking the record closed
-                # here would also stop us tracking it and tell the owner it
-                # is over. Retry once, exactly like the naked-position guard
-                # on the open path, and if it still will not close, keep the
-                # record OPEN and say so: poll_exchange_closes will retire it
-                # properly once the position really is flat.
+                if not _clear_closed_protection(pos, creds, notify=send):
+                    continue
                 at_close_position(pos["id"], new_status, error=None)
                 send(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
@@ -1225,12 +1214,8 @@ def poll_exchange_closes() -> None:
                 ok2, size2 = okx.get_position_size(creds, pos["inst_id"])
                 if not ok2 or size2 > 0:
                     continue
-                if pos.get("sl_algo_id"):
-                    okx.cancel_protection(
-                        creds, pos["inst_id"], pos["sl_algo_id"])
-                if pos.get("tp1_algo_id"):
-                    okx.cancel_protection(
-                        creds, pos["inst_id"], pos["tp1_algo_id"])
+                if not _clear_closed_protection(pos, creds):
+                    continue
                 at_close_position(pos["id"], "ENTRY_TERMINAL_FLAT")
                 continue
             if size > 0:
@@ -1270,10 +1255,8 @@ def poll_exchange_closes() -> None:
                         f"причина: `{_rerr}`",
                     ]))
                     continue
-                if pos.get("sl_algo_id"):
-                    okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
-                if pos.get("tp1_algo_id"):
-                    okx.cancel_protection(creds, pos["inst_id"], pos["tp1_algo_id"])
+                if not _clear_closed_protection(pos, creds):
+                    continue
                 at_close_position(pos["id"], _sig["status"])
                 _dm(pos["user_id"],
                     f"🤖 *{_rbase}*: позиция осталась висеть на бирже после "
@@ -1294,31 +1277,9 @@ def poll_exchange_closes() -> None:
                          f"(second read ok={ok2} size={size2}) — leaving open")
                 continue
 
-            # Exchange is flat but our DB still says OPEN → SL/TP/trail
-            # already fired for real. Close out the record and tell the user
-            # right away; the signal's own status message follows separately.
-            okx.cancel_protection(creds, pos["inst_id"], pos["sl_algo_id"])
-            if pos.get("tp1_algo_id"):
-                # Same hazard as the close path above, which checks this and
-                # this path did not. The OCO is closeFraction, so the exchange
-                # retires it once the position is flat; the TP1 partial is a
-                # FIXED size reduce-only order that nothing retires. A leftover
-                # sits armed until the next position in this instrument, then
-                # closes part of it at a price chosen for a trade already over.
-                _c_ok, _c_err = okx.cancel_protection(
-                    creds, pos["inst_id"], pos["tp1_algo_id"])
-                if not _c_ok:
-                    _d = pos["inst_id"].split("-")[0]
-                    log.error(f"autotrade STALE TP1 ORDER {pos['user_id']} "
-                              f"{pos['inst_id']}: cancel failed ({_c_err}) "
-                              f"on the exchange-flat path - it can fire later")
-                    _dm(pos["user_id"], "\n".join([
-                        f"⚠️ *{_d}*: не смог снять ордер частичного закрытия TP1.",
-                        "Он может сработать по следующей сделке этого же тикера.",
-                        "Проверь открытые алго-ордера на бирже.",
-                        f"`{_c_err}`",
-                    ]))
-                    continue
+            # Keep the local and shared reservations while the old TP1 could still fire.
+            if not _clear_closed_protection(pos, creds):
+                continue
             at_close_position(pos["id"], "EXCHANGE_FLAT")
             base = pos["inst_id"].split("-")[0]
             # Bound all exit fills to this position's protective orders and

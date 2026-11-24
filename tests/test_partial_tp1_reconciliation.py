@@ -1,4 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import call, patch
+
+import pytest
 
 from src import autotrader as at
 from src import db
@@ -51,3 +53,37 @@ def test_size_update_compares_previous_size_and_requires_an_open_position(tmp_pa
     assert db.at_all_open_positions()[0]['sz'] == 2.
     db.at_close_position(pos_id, 'TEST')
     assert not db.at_reduce_position_sz(pos_id, 1., expected_sz=2.)
+
+
+
+@pytest.mark.parametrize('position_status', ['OPEN', 'ENTRY_PENDING'])
+def test_close_recovery_keeps_instrument_reserved_until_old_tp1_is_cleared(
+        tmp_path, monkeypatch, position_status):
+    monkeypatch.setattr(db, 'DB_PATH', str(tmp_path / 'positions.sqlite3'))
+    db.init_db()
+    pos_id = db.at_log_position(2, 7, 'TEST-X', 'LONG', 3., 100., 3., 'stop', 99., 'tp1', 1.)
+    with db._conn() as conn:
+        conn.execute('UPDATE autotrade_positions SET status=?, opened_at=1, client_order_id=? WHERE id=?',
+                     (position_status, 'entry', pos_id))
+    snapshots = [(True, 3.), (True, 0), (True, 0)] if position_status == 'OPEN' else [(True, 0)] * 4
+    creds = {'test': True}
+    with (patch.object(at, 'AUTOTRADE_ENABLED', True),
+          patch.object(at, 'get_signal_by_id', return_value={'status': 'SL_HIT'}),
+          patch.object(at, 'at_get', return_value={'user_id': 7}),
+          patch.object(at, '_creds_of', return_value=creds),
+          patch.object(at.okx, 'get_position_size', side_effect=snapshots),
+          patch.object(at.okx, 'close_position_market', return_value=(True, None)),
+          patch.object(at.okx, 'get_order_by_client_id', return_value=(True, {'state': 'filled'})),
+          patch.object(at.okx, 'get_xperp_spec', return_value=None),
+          patch('src.exit_summary.protective_exit_summary', return_value=None),
+          patch.object(at.okx, 'cancel_protection',
+                       side_effect=[(False, 'timeout'), (True, 'canceled'), (True, 'canceled')]) as cancel,
+          patch.object(at, '_dm')):
+        at.poll_exchange_closes()
+        assert db.at_has_open_position(7, 'TEST-X')
+        cancel.assert_called_once_with(creds, 'TEST-X', 'tp1')
+        at.poll_exchange_closes()
+
+    assert not db.at_has_open_position(7, 'TEST-X')
+    assert cancel.call_args_list == [call(creds, 'TEST-X', 'tp1'), call(creds, 'TEST-X', 'tp1'),
+                                    call(creds, 'TEST-X', 'stop')]
