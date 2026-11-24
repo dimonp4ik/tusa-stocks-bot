@@ -10,6 +10,31 @@ def positive(value):
         return None
 
 
+def confirmed_partial_tp1(position, remaining, creds, broker):
+    """Attribute a reduction only to verified fills of this position's TP1."""
+    tracked = positive(position.get('sz'))
+    original = positive(position.get('entry_filled_sz')) or tracked
+    planned = positive(position.get('tp1_sz'))
+    opened = positive(position.get('opened_at'))
+    remaining = positive(remaining)
+    direction = position.get('direction')
+    algo_id = position.get('tp1_algo_id')
+    if (None in (tracked, original, planned, opened, remaining) or not algo_id
+            or direction not in ('LONG', 'SHORT') or not remaining < tracked <= original):
+        return None
+    closed = original - remaining
+    if closed > planned and not math.isclose(closed, planned, rel_tol=1e-9):
+        return None
+    instrument = position['inst_id']
+    order_ids = broker.get_protection_order_ids(creds, instrument, algo_id, ord_type='conditional')
+    if not order_ids:
+        return None
+    price = positive(broker.get_last_fill_px(
+        creds, instrument, since_ts=opened, side='sell' if direction == 'LONG' else 'buy',
+        order_ids=order_ids, expected_size=closed))
+    return dict(closed=closed, original=original, remaining=remaining, price=price) if price else None
+
+
 def protective_exit_summary(position,creds,broker):
     direction=str(position.get('direction') or '').upper()
     if direction not in ('LONG','SHORT') or not position.get('sl_algo_id'):return None

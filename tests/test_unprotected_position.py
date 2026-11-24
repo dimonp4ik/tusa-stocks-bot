@@ -26,12 +26,10 @@ class UnprotectedPositionTests(unittest.TestCase):
                                  order_error="request failed: timed out"):
         spec=dict(ctVal=1,lotSz=.001,minSz=.001,tickSz=.01)
         sig=dict(id=1,symbol='TEST',direction='LONG',entry_price=100,sl=98,tp1=102,tp2=110)
-        if expired:
+        if expired or expires_during_snapshot:
             sig["source"] = "stock_xperp_native_shadow"
             sig["strategy_entry_bar_ts"] = at.time.time() - 175
-        if expires_during_snapshot:
-            sig["source"] = "stock_xperp_native_shadow"
-            sig["strategy_entry_bar_ts"] = at.time.time() - 175
+            sig["_native_backing_level"] = 99.
         with ExitStack() as stack:
             for name,value in [('_creds_of',{'test':True}),('at_has_open_position',False),
                 ('at_set_balance',None),('get_bot_state',None),

@@ -2780,13 +2780,13 @@ def at_update_position_sl(pos_id: int, sl_px: float) -> None:
                   (sl_px, pos_id))
 
 
-def at_reduce_position_sz(pos_id: int, new_sz: float) -> None:
-    """Shrink the tracked size after a partial close at TP1 — the remaining
-    protection (OCO, closeFraction=1) auto-covers whatever's left on the
-    exchange, this just keeps our own record in sync."""
+def at_reduce_position_sz(pos_id: int, new_sz: float, *, expected_sz: float) -> bool:
+    """Record a verified partial close once while the position is still open."""
     with _conn() as c:
-        c.execute("UPDATE autotrade_positions SET sz = ? WHERE id = ?",
-                  (new_sz, pos_id))
+        return c.execute("""
+            UPDATE autotrade_positions SET sz = ?
+            WHERE id = ? AND status = 'OPEN' AND sz = ? AND ? > 0 AND ? < sz
+        """, (new_sz, pos_id, expected_sz, new_sz, new_sz)).rowcount == 1
 
 
 def at_close_position(pos_id: int, close_reason: str, error: str = None) -> None:

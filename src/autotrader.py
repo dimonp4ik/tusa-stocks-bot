@@ -1124,40 +1124,28 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 except Exception as e:
                     log.warning(f"autotrade breakeven amend failed pos#{pos['id']}: {e}")
 
-                # If the user has a TP1 %, the exchange's own pre-placed order
-                # (set at trade-open, see _open_for_user) should have fired
-                # the instant TP1 triggered — no need to re-issue anything
-                # here. Just sync our record to the REAL remaining size so
-                # bookkeeping/notifications reflect what actually happened.
-                if pos.get("tp1_algo_id"):
-                    try:
-                        ok, real_sz = okx.get_position_size(creds, pos["inst_id"])
-                        if ok and real_sz < float(pos["sz"]):
-                            if real_sz <= 0:
-                                log.info('TP1 flat read awaiting independent confirmation pos#%s',pos['id'])
-                                continue
-                            at_reduce_position_sz(pos["id"], real_sz)
-                            # Say how much actually closed: the exchange fills in
-                            # whole lots, so the realised share is rarely the
-                            # configured one.
-                            _orig = float(pos["sz"])
-                            _closed = _orig - real_sz
-                            _pct = _closed / _orig * 100.0 if _orig else 0.0
-                            _dm(pos["user_id"],
-                                f"🤖 *{disp}*: {label}.\n"
-                                f"Закрыто {_pct:.1f}% "
-                                f"({okx._fmt_sz(_closed)} из {okx._fmt_sz(_orig)} контр.), "
-                                f"остаток {okx._fmt_sz(real_sz)} контр. идёт под трейлинг.")
-                            continue
-                        elif ok:
-                            log.warning(f"autotrade TP1 order pos#{pos['id']} hasn't filled yet "
-                                       f"(real_sz={real_sz} >= tracked {pos['sz']}) — will recheck next cycle")
-                    except Exception as e:
-                        log.warning(f"autotrade TP1 size sync failed pos#{pos['id']}: {e}")
-
-                _dm(pos["user_id"], f"🤖 *{disp}*: {label}.")
+                detail = ("Биржевое исполнение TP1 подтверждается отдельно."
+                          if pos.get("tp1_algo_id") else "Весь объём ведётся под защитой стопа.")
+                _dm(pos["user_id"], f"🤖 *{disp}*: {label}.\n{detail}")
         except Exception as e:
             log.warning(f"autotrade mirror failed pos#{pos['id']}: {e}")
+
+
+def _reconcile_partial_tp1(pos: dict, size: float, creds: dict) -> None:
+    if not pos.get("tp1_algo_id") or size >= float(pos.get("sz") or 0):
+        return
+    try:
+        from src.exit_summary import confirmed_partial_tp1
+        fill = confirmed_partial_tp1(pos, size, creds, okx)
+        if fill is None or not at_reduce_position_sz(pos["id"], size, expected_sz=pos["sz"]):
+            return
+        base = pos["inst_id"].split("-")[0]
+        pct = 100 * fill["closed"] / fill["original"]
+        _dm(pos["user_id"], f"🤖 *{base}/USDC*: OKX подтвердил исполнение TP1.\n"
+            f"Всего закрыто {pct:.1f}% ({okx._fmt_sz(fill['closed'])} из "
+            f"{okx._fmt_sz(fill['original'])} контр.). Остаток {okx._fmt_sz(size)} контр.")
+    except Exception as exc:
+        log.warning("TP1 reconciliation deferred pos#%s (%s)", pos["id"], type(exc).__name__)
 
 
 def poll_exchange_closes() -> None:
@@ -1256,6 +1244,7 @@ def poll_exchange_closes() -> None:
                 unprotected = not pos.get("sl_algo_id")
                 _sig = {"status": "UNPROTECTED_CLOSED"} if unprotected else get_signal_by_id(pos["signal_id"])
                 if not unprotected and (not _sig or _sig.get("status") not in _CLOSE_STATUSES):
+                    _reconcile_partial_tp1(pos, size, creds)
                     continue   # still open on the exchange, nothing to do
                 log.warning(f"autotrade reconcile pos#{pos['id']} "
                             f"{pos['inst_id']}: signal already {_sig['status']} "
