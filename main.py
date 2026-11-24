@@ -2518,7 +2518,7 @@ def _at_begin_keys(chat_id: int):
     _reply(chat_id,
            "🔐 *Подключение OKX*\n\n"
            "Создай API-ключ на OKX: Профиль → API → *Торговля API*.\n"
-           "Права: *Чтение + Торговля* (⚠️ БЕЗ вывода средств).\n\n"
+           "Для подключения нужны *Чтение (Read)* и *Торговля (Trade)*.\n\n"
            "Шаг 1/3 — отправь *API Key*.\n"
            "_Сообщения с ключами я сразу удаляю из чата._")
 
@@ -2576,9 +2576,6 @@ def _at_handle_text(chat_id: int, user_id: int, text_raw: str, message_id: int) 
                 "trade_permission_missing": (
                     "У ключа нет права *Trade*. Создай новый ключ с правами "
                     "*Read + Trade*."),
-                "withdraw_permission_present": (
-                    "У ключа включено право *Withdraw*. Такой ключ бот не "
-                    "принимает — создай новый только с *Read + Trade*."),
             }.get(reason, "Не удалось проверить конфигурацию API-ключа OKX.")
             _reply(chat_id, f"❌ Ключи не сохранены.\n\n{message}")
             return True

@@ -332,20 +332,19 @@ class ExchangeTests(unittest.TestCase):
         self.assertFalse(good)
         self.assertIn('unknown position mode', error)
 
-    def test_autotrade_account_requires_trade_and_rejects_withdraw(self):
-        for permission, expected in [
-                ('read_only', 'trade_permission_missing'),
-                ('read_only,trade,withdraw', 'withdraw_permission_present')]:
+    def test_autotrade_account_requires_trade_with_or_without_withdraw(self):
+        for permission in ('read_only', 'read_only,withdraw'):
             with patch.object(okx, '_request', return_value=(True, [{
-                    'posMode': 'net_mode', 'perm': permission}])):
+                    'posMode': 'net_mode', 'perm': permission, 'uid': '123'}])):
                 good, detail = okx.validate_autotrade_account({})
             self.assertFalse(good)
-            self.assertEqual(detail['reason'], expected)
-        with patch.object(okx, '_request', return_value=(True, [{
-                'posMode': 'net_mode', 'perm': 'read_only,trade', 'uid': '123'}])):
-            good, detail = okx.validate_autotrade_account({})
-        self.assertTrue(good)
-        self.assertEqual(detail['permissions'], ('read_only', 'trade'))
+            self.assertEqual(detail['reason'], 'trade_permission_missing')
+        for permission in ('read_only,trade', 'read_only,trade,withdraw'):
+            with patch.object(okx, '_request', return_value=(True, [{
+                    'posMode': 'net_mode', 'perm': permission, 'uid': '123'}])):
+                good, detail = okx.validate_autotrade_account({})
+            self.assertTrue(good)
+            self.assertEqual(detail['permissions'], tuple(permission.split(',')))
 
     def test_live_entry_uses_client_margin_without_strategy_resizing(self):
         from src import autotrader as at

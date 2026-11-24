@@ -306,10 +306,6 @@ def _open_for_user_locked(u: dict, sig: dict, inst_id: str, disp: str) -> None:
                 "у API-ключа нет права Trade",
                 f"⚠️ Автотрейдинг: {disp} пропущен — у API-ключа OKX нет права "
                 "Trade. Создай ключ с правами Read + Trade."),
-            "withdraw_permission_present": (
-                "API-ключ имеет запрещённое право Withdraw",
-                f"⚠️ Автотрейдинг: {disp} пропущен — подключённый API-ключ имеет "
-                "право Withdraw. Замени его ключом только с Read + Trade."),
         }
         audit_reason, message = messages.get(reason, (
             "конфигурацию API-ключа OKX не удалось проверить",

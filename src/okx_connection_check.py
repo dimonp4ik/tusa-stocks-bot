@@ -45,7 +45,6 @@ def check_connection(credentials):
         return {
             'long_short_mode': '⚠️ На счёте включён режим Long/Short. Для входов боту нужен режим Net.',
             'trade_permission_missing': '⚠️ В сохранённом ключе отсутствует право Trade.',
-            'withdraw_permission_present': '⚠️ В сохранённом ключе есть право Withdraw. Нужен ключ Read + Trade.',
             'account_identity_missing': '⚠️ OKX не подтвердил идентификатор счёта для общего лимита позиций.',
         }.get(reason, '⚠️ OKX пока не подтвердил настройки сохранённого подключения. Повтори проверку позже.')
 
