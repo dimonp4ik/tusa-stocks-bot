@@ -1019,7 +1019,7 @@ def update_trailing(sig: dict, stop_px: float) -> None:
             log.warning(f"autotrade trailing failed pos#{pos['id']}: {e}")
 
 
-def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
+def mirror_transition(sig: dict, new_status: str, exit_px: float, *, notify=None) -> None:
     """Engine transitioned a signal → mirror it on the exchange for every user."""
     if not AUTOTRADE_ENABLED:
         return
@@ -1028,6 +1028,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
         return
     disp = sig["symbol"].replace("USDT", "/USDC")
     label = _STATUS_RU.get(new_status, new_status)
+    send = _dm if notify is None else notify
 
     for pos in positions:
         try:
@@ -1050,7 +1051,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                     log.error(f"autotrade CLOSE PENDING {pos['user_id']} "
                               f"{pos['inst_id']}: close not confirmed; protection retained "
                               f"({err}) — position remains tracked for retry")
-                    _dm(pos["user_id"], "\n".join([
+                    send(pos["user_id"], "\n".join([
                         f"🚨 *СРОЧНО: {disp} пока не закрыта*",
                         "",
                         "Закрытие пока не подтверждено. Существующая защита не отменялась.",
@@ -1072,7 +1073,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                     if not _c_ok:
                         log.error(f"autotrade STALE TP1 ORDER {pos['user_id']} {pos['inst_id']}: "
                                   f"cancel failed ({_c_err}) — it can fire on a later position")
-                        _dm(pos["user_id"], "\n".join([
+                        send(pos["user_id"], "\n".join([
                             f"⚠️ *{disp}*: не смог снять ордер частичного закрытия TP1.",
                             "Он может сработать по следующей сделке этого же тикера.",
                             "Проверь открытые алго-ордера на бирже.",
@@ -1088,7 +1089,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
                 # record OPEN and say so: poll_exchange_closes will retire it
                 # properly once the position really is flat.
                 at_close_position(pos["id"], new_status, error=None)
-                _dm(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
+                send(pos["user_id"], f"🤖 *{disp}*: {label} (~{exit_px}).")
             elif new_status == "TP1_PARTIAL":
                 # Move the exchange stop to breakeven RIGHT NOW — don't wait
                 # for the next monitor cycle's trail computation, which would
@@ -1126,7 +1127,7 @@ def mirror_transition(sig: dict, new_status: str, exit_px: float) -> None:
 
                 detail = ("Биржевое исполнение TP1 подтверждается отдельно."
                           if pos.get("tp1_algo_id") else "Весь объём ведётся под защитой стопа.")
-                _dm(pos["user_id"], f"🤖 *{disp}*: {label}.\n{detail}")
+                send(pos["user_id"], f"🤖 *{disp}*: {label}.\n{detail}")
         except Exception as e:
             log.warning(f"autotrade mirror failed pos#{pos['id']}: {e}")
 

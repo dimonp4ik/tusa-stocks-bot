@@ -3353,6 +3353,10 @@ def _check_open_signals():
         return
 
     now = time.time()
+    notifications = []
+
+    def queue_private(user_id, message):
+        notifications.append((autotrader._dm, (user_id, message)))
 
     for sig in active_signals:
         try:
@@ -3730,14 +3734,7 @@ def _check_open_signals():
                         runner_trail_atr_mult=runner_trail_atr_mult,
                         runner_activation_bar_ts=runner_activation_bar_ts)
                     log.info(f"  Signal #{sig['id']} {sig['symbol']} → TP1_PARTIAL (same poll as TP2)")
-                    try:
-                        send_signal_update(sig, "TP1_PARTIAL", tp1)
-                    except Exception as _e:
-                        log.warning(f"  TP1 update notification failed #{sig['id']}: {_e}")
-                    try:
-                        autotrader.mirror_transition(sig, "TP1_PARTIAL", tp1)
-                    except Exception as _ae:
-                        log.warning(f"  Autotrade TP1 mirror failed #{sig['id']}: {_ae}")
+                    notifications.append((send_signal_update, (sig, "TP1_PARTIAL", tp1)))
                 update_signal_status(sig["id"], new_status, exit_px, realized_r=realized_r,
                                      runner_trail_atr_mult=runner_trail_atr_mult,
                                      runner_activation_bar_ts=runner_activation_bar_ts)
@@ -3746,14 +3743,11 @@ def _check_open_signals():
                 if new_status == "SL_HIT" and _deep_ok is not None:
                     set_sl_xperp_only(sig["id"], 0 if _deep_ok else 1)
                 log.info(f"  Signal #{sig['id']} {sig['symbol']} → {new_status}")
-                try:
-                    send_signal_update(sig, new_status, exit_px)
-                except Exception as _e:
-                    log.warning(f"  Update notification failed #{sig['id']}: {_e}")
+                notifications.append((send_signal_update, (sig, new_status, exit_px)))
                 # Autotrade: mirror the transition on the exchange (close /
                 # start-trailing) for every user holding this signal live.
                 try:
-                    autotrader.mirror_transition(sig, new_status, exit_px)
+                    autotrader.mirror_transition(sig, new_status, exit_px, notify=queue_private)
                 except Exception as _ae:
                     log.warning(f"  Autotrade mirror failed #{sig['id']}: {_ae}")
             elif status == "TP1_PARTIAL" and live_trail_stop is not None:
@@ -3765,6 +3759,12 @@ def _check_open_signals():
 
         except Exception as e:
             log.warning(f"  Could not check signal #{sig['id']}: {e}")
+
+    for deliver, args in notifications:
+        try:
+            deliver(*args)
+        except Exception as exc:
+            log.warning("Signal lifecycle notification failed (%s)", type(exc).__name__)
 
 
 

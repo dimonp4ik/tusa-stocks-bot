@@ -62,7 +62,28 @@ def test_one_poll_crossing_both_targets_records_and_notifies_both():
     assert [item.args[1] for item in notify.call_args_list] == [
         "TP1_PARTIAL", "TP2_HIT"]
     assert [item.args[1] for item in mirror.call_args_list] == [
-        "TP1_PARTIAL", "TP2_HIT"]
+        "TP2_HIT"]
+
+
+def test_monitor_prioritizes_all_exchange_closes_over_telegram_delivery():
+    actions = []
+    rows = [signal(id=i, tp1=102., strategy_runner_mode="single_target") for i in (77, 78)]
+    with patch.object(main, "get_open_signals", return_value=rows), \
+         patch.object(main, "get_klines_xperp", return_value=candle(high=102.4, low=99.5, close=102.2)), \
+         patch.object(main, "update_signal_status"), \
+         patch.object(main, "send_signal_update", side_effect=lambda row, *args: actions.append(("channel", row["id"]))), \
+         patch.object(main.autotrader, "_dm", side_effect=lambda uid, message: actions.append(("dm", uid))), \
+         patch.object(main, "time", SimpleNamespace(time=lambda: 2000.0)):
+        def mirror(row, status, price, *, notify):
+            assert status == "TP2_HIT"
+            actions.append(("exchange", row["id"]))
+            notify(row["id"], "closed")
+
+        with patch.object(main.autotrader, "mirror_transition", side_effect=mirror):
+            main._check_open_signals()
+
+    assert actions == [("exchange", 77), ("exchange", 78), ("channel", 77), ("dm", 77),
+                       ("channel", 78), ("dm", 78)]
 
 
 def test_exchange_backstop_wins_over_tp2_inside_same_candle():
