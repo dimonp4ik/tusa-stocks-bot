@@ -1,5 +1,7 @@
-"""Remove pre-publication prices from a native one-minute market entry."""
+"""Remove prices that precede the decision for a native market entry."""
 import math
+
+from src.candle_evidence import bar_has_trade
 
 
 class EntryWindowUnavailable(ValueError):
@@ -10,26 +12,30 @@ def _near(a,b):
     return math.isclose(float(a),float(b),rel_tol=1e-8,abs_tol=1e-9)
 
 
-def _seconds(raw,start):
+def checked_window(raw, start, end, step):
     rows={}
     for r in raw:
         if not isinstance(r,(tuple,list)) or len(r)<9 or r[8]!='1':
-            raise EntryWindowUnavailable('unconfirmed entry seconds')
+            raise EntryWindowUnavailable('unconfirmed entry data')
         stamp=int(r[0])//1000
-        if not start<=stamp<start+60 or int(r[0])%1000:
-            raise EntryWindowUnavailable('entry seconds outside window')
+        if not start<=stamp<end or int(r[0])%1000 or (stamp-start)%step:
+            raise EntryWindowUnavailable('entry data outside window')
         o,h,l,c,contracts,base=(float(v) for v in r[1:7])
         if (not all(math.isfinite(v) for v in (o,h,l,c,contracts,base))
                 or min(o,h,l,c)<=0 or min(contracts,base)<0
                 or not l<=min(o,c)<=max(o,c)<=h):
-            raise EntryWindowUnavailable('invalid entry seconds')
+            raise EntryWindowUnavailable('invalid entry data')
         value=(stamp,o,h,l,c,contracts,base)
         if stamp in rows and rows[stamp]!=value:
-            raise EntryWindowUnavailable('conflicting entry seconds')
+            raise EntryWindowUnavailable('conflicting entry data')
         rows[stamp]=value
-    if sorted(rows)!=list(range(start,start+60)):
-        raise EntryWindowUnavailable('incomplete entry seconds')
-    return [rows[t] for t in range(start,start+60)]
+    if sorted(rows)!=list(range(start,end,step)):
+        raise EntryWindowUnavailable('incomplete entry data')
+    return [rows[t] for t in range(start,end,step)]
+
+
+def _seconds(raw, start):
+    return checked_window(raw, start, start+60, 1)
 
 
 def _trades(raw,second,expected):
@@ -67,6 +73,8 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
     if not positions or opened==start:
         return frame
     index=positions[0]
+    if not bar_has_trade(frame, index):
+        return frame
     touch=lambda high,low:(low<=sl or high>=min(tp1,tp2)) if direction=='LONG' else (
         high>=sl or low<=max(tp1,tp2))
     if not touch(float(frame['high'][index]),float(frame['low'][index])):
@@ -104,3 +112,46 @@ def clip_native_entry_minute(frame,*,opened_at,direction,sl,tp1,tp2,now,
         raise EntryWindowUnavailable('unsupported candle schema')
     return {k:list(v[:index])+[r[k] for r in replacements]+list(v[index+1:])
         for k,v in frame.items()}
+
+
+def clip_native_entry_bar(frame, *, opened_at, bar_seconds, direction, sl, tp1, tp2, now,
+                          load_minutes, load_seconds, load_second_trades):
+    """Replace an overlapping strategy candle with verified later minutes/trades."""
+    if (not math.isfinite(opened_at) or not math.isfinite(now) or direction not in ('LONG', 'SHORT')
+            or bar_seconds not in (300, 900, 3600)):
+        raise EntryWindowUnavailable('invalid strategy entry window')
+    bucket = int(opened_at//bar_seconds)*bar_seconds
+    if opened_at == bucket or bucket not in frame.get('time', []):
+        return frame
+    i = frame['time'].index(bucket)
+    if not bar_has_trade(frame, i):
+        return frame
+    lo, hi = frame['low'][i], frame['high'][i]
+    touch = (lo <= sl or hi >= min(tp1,tp2)) if direction == 'LONG' else (hi >= sl or lo <= max(tp1,tp2))
+    if not touch:
+        return frame
+    expiry = bucket+bar_seconds
+    covered = min(expiry, int(now//60)*60)
+    first = int(opened_at//60)*60
+    if covered <= first:
+        raise EntryWindowUnavailable('entry minute still forming')
+    minutes = checked_window(load_minutes(bucket, covered), bucket, covered, 60)
+    if covered == expiry and frame.get('confirmed', [False]*len(frame['time']))[i]:
+        traded = [r for r in minutes if r[5]>0]
+        if not traded:
+            raise EntryWindowUnavailable('entry strategy bar has no trades')
+        aggregate = traded[0][1], max(r[2] for r in traded), min(r[3] for r in traded), traded[-1][4]
+        if not all(_near(val,frame[key][i]) for key,val in zip(('open','high','low','close'),aggregate,strict=True)):
+            raise EntryWindowUnavailable('entry strategy bar and minutes disagree')
+        if 'volume_contracts' in frame and not _near(math.fsum(r[5] for r in minutes),frame['volume_contracts'][i]):
+            raise EntryWindowUnavailable('entry strategy contracts disagree')
+    keys = ('time','open','high','low','close','volume_contracts','volume')
+    minute_frame = {key: [r[col] for r in minutes if r[0]>=first] for col,key in enumerate(keys)}
+    minute_frame['confirmed'] = [1]*len(minute_frame['time'])
+    reduced = clip_native_entry_minute(minute_frame, opened_at=opened_at, direction=direction,
+        sl=sl, tp1=tp1, tp2=tp2, now=now, load_seconds=load_seconds, load_second_trades=load_second_trades)
+    # Close-confirmed strategy stops may inspect only the last price of a full strategy bar.
+    reduced['confirmed'] = [0]*len(reduced['time'])
+    if reduced['confirmed'] and covered == expiry:
+        reduced['confirmed'][-1] = 1
+    return {key: list(values[:i])+reduced[key]+list(values[i+1:]) for key,values in frame.items()}

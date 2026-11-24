@@ -3775,9 +3775,8 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
 
     This is deliberately narrower than the retired Claude shadow tracker: it
     accepts only the fixed market bracket already persisted by the venue path.
-    The entry can occur inside the first strategy candle, so that candle is
-    treated conservatively as an intrabar entry and ambiguous stop/target bars
-    remain stop-first.
+    For a native market setup, a barrier in the decision candle requires
+    matching minute or trade evidence from after the setup was observed.
     """
     now = time.time() if now is None else float(now)
     entry = float(setup["entry_price"])
@@ -3791,19 +3790,41 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
     bar_seconds = 300 if five_minute_shadow else 900
     entry_bar_open = (signal_bar + bar_seconds if signal_bar > 0
                       else math.floor(opened / bar_seconds) * bar_seconds)
-    sliced = _slice_candles_from_open(candles, entry_bar_open)
+    horizon_end = entry_bar_open + NATIVE_XPERP_HOLD_BARS * bar_seconds
+    if native_xperp_shadow:
+        from src.entry_window import clip_native_entry_bar, EntryWindowUnavailable
+        from src.binance_client import (
+            get_xperp_entry_minutes, get_xperp_entry_seconds, get_xperp_entry_second_trades,
+        )
+
+        opened = max(opened, entry_bar_open)
+        first_bar = math.floor(opened / bar_seconds) * bar_seconds
+        keep = [i for i, stamp in enumerate(candles.get("time", []))
+                if first_bar <= float(stamp) < horizon_end]
+        sliced = {key: [values[i] for i in keep] for key, values in candles.items()}
+        times = sliced.get("time") or []
+        if not times:
+            return None
+        if float(times[0]) != first_bar or any(b - a != bar_seconds for a, b in zip(times, times[1:])):
+            raise EntryWindowUnavailable("native setup candle coverage incomplete")
+        horizon_complete = float(times[-1]) + bar_seconds == horizon_end
+        symbol = setup["symbol"]
+        sliced = clip_native_entry_bar(
+            sliced, opened_at=opened, bar_seconds=bar_seconds, direction=setup["direction"],
+            sl=stop, tp1=tp1, tp2=tp2, now=now,
+            load_minutes=lambda start, end: get_xperp_entry_minutes(symbol, start, end),
+            load_seconds=lambda start: get_xperp_entry_seconds(symbol, start),
+            load_second_trades=lambda start: get_xperp_entry_second_trades(symbol, start),
+        )
+    else:
+        sliced = _slice_candles_from_open(candles, entry_bar_open)
     if not sliced.get("time"):
         return None
-    if native_xperp_shadow:
-        # The frozen route expires after 64 15m bars. Do not let later candles
-        # turn an expired counterfactual into a fictional TP or stop.
-        sliced = {key: value[:NATIVE_XPERP_HOLD_BARS]
-                  for key, value in sliced.items()}
     from src.candle_evidence import bar_has_trade
     trade_indices = [i for i in range(len(sliced['time'])) if bar_has_trade(sliced, i)]
     if not trade_indices:
         return None
-    intrabar = float(sliced["time"][trade_indices[0]]) < opened
+    intrabar = not native_xperp_shadow and float(sliced["time"][trade_indices[0]]) < opened
     result = simulate_exit(
         sliced, trade_indices, direction=setup["direction"],
         entry=entry, sl=stop, tp1=tp1, tp2=tp2,
@@ -3826,9 +3847,7 @@ def _resolve_unsent_venue_setup(setup: dict, candles: dict,
         return None
 
     if native_xperp_shadow:
-        horizon_end = entry_bar_open + NATIVE_XPERP_HOLD_BARS * bar_seconds
-        if (now < horizon_end
-                or len(sliced.get("time") or []) < NATIVE_XPERP_HOLD_BARS):
+        if now < horizon_end or not horizon_complete:
             return None
         return "EXPIRED", int(result.reached_tp1), 0, result.gross_r
 
@@ -3874,7 +3893,14 @@ def _track_unsent_venue_setups() -> None:
                     log.warning("Venue shadow history truncated for setup #%s %s",
                                 setup["id"], symbol)
                     continue
-                value = _resolve_unsent_venue_setup(setup, candles)
+                try:
+                    value = _resolve_unsent_venue_setup(setup, candles)
+                except (OSError, ValueError, KeyError, TypeError, IndexError) as exc:
+                    from src.entry_window import EntryWindowUnavailable
+                    reason = str(exc) if isinstance(exc, EntryWindowUnavailable) else type(exc).__name__
+                    log.warning("Venue shadow evidence deferred #%s %s (%s)",
+                                setup["id"], symbol, reason)
+                    continue
                 if value is None:
                     continue
                 outcome, reached_tp1, reached_tp2, net_r = value

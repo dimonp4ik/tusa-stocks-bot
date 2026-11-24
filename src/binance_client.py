@@ -423,6 +423,21 @@ def get_klines_xperp(symbol, limit=60, include_forming=False, interval="15m"):
         return None
 
 
+@lru_cache(maxsize=192)
+def get_xperp_entry_minutes(symbol: str, start: int, end: int):
+    """Load only closed 1m candles within a single strategy bar."""
+    if start%60 or end%60 or not 0 < end-start <= 3600 or end>time.time():
+        raise ValueError('invalid entry minute bounds')
+    inst = get_xperp_instruments().get(_base_of(symbol))
+    if not inst:
+        raise ValueError('native instrument unavailable')
+    rows = _okx_get('/api/v5/market/history-candles', dict(instId=inst, bar='1m',
+        after=str(end*1000), limit=(end-start)//60), timeout=3).get('data', [])
+    from src.entry_window import checked_window
+    checked_window(rows, start, end, 60)
+    return tuple(tuple(row) for row in rows)
+
+
 @lru_cache(maxsize=128)
 def get_xperp_entry_seconds(symbol: str, start: int):
     """Closed entry minute only; no credentials or exchange orders."""

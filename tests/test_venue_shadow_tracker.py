@@ -97,6 +97,58 @@ class VenueShadowTrackerTests(unittest.TestCase):
             value = main._resolve_unsent_venue_setup(setup, candles, now=2200)
         self.assertEqual(value[:3], ("SL", 0, 0))
 
+    @staticmethod
+    def native_entry_minutes(*, target_after_decision):
+        rows = []
+        for stamp in range(1800, 2700, 60):
+            high = 101.25 if target_after_decision and stamp == 1920 else 100.20
+            low = 98.75 if stamp == 1800 else 99.90
+            rows.append([str(stamp * 1000), '100', str(high), str(low), '100',
+                         '1', '1', '100', '1'])
+        return rows
+
+    def test_native_shadow_ignores_stop_before_the_decision(self):
+        setup = dict(self.setup(), source='stock_xperp_native_shadow', ts=1870.0, signal_bar_ts=900.0)
+        candles = dict(self.candles(high=100.20, low=98.75, close=100.0),
+                       time=[1800], volume=[15.0], volume_contracts=[15.0], confirmed=[1])
+        with patch('src.binance_client.get_xperp_entry_minutes',
+                   return_value=self.native_entry_minutes(target_after_decision=False)) as minutes:
+            value = main._resolve_unsent_venue_setup(setup, candles, now=2700)
+        self.assertIsNone(value)
+        minutes.assert_called_once_with('TESTUSDT', 1800, 2700)
+
+    def test_native_shadow_credits_target_after_a_predecision_stop(self):
+        setup = dict(self.setup(), source='stock_xperp_native_shadow', ts=1870.0, signal_bar_ts=900.0)
+        candles = dict(self.candles(high=101.25, low=98.75, close=100.0),
+                       time=[1800], volume=[15.0], volume_contracts=[15.0], confirmed=[1])
+        with patch('src.binance_client.get_xperp_entry_minutes',
+                   return_value=self.native_entry_minutes(target_after_decision=True)):
+            value = main._resolve_unsent_venue_setup(setup, candles, now=2700)
+        self.assertEqual(value, ('TP2', 1, 1, 1.0))
+
+    def test_native_shadow_worker_defers_missing_evidence_and_processes_other_setups(self):
+        first = dict(self.setup(), source='stock_xperp_native_shadow', ts=1870.0, signal_bar_ts=900.0)
+        second = dict(self.setup(), id=8, source='stock_xperp_native_shadow', ts=1800.0, signal_bar_ts=900.0)
+        candles = dict(self.candles(high=101.25, low=98.75, close=100.0),
+                       time=[1800], volume=[15.0], volume_contracts=[15.0], confirmed=[1])
+        with (patch.object(main, 'get_unresolved_venue_setups', return_value=[first, second]),
+              patch.object(main, 'get_klines_xperp', return_value=candles),
+              patch.object(main, 'mark_setup_resolved') as resolved,
+              patch.object(main.time, 'time', return_value=2700.0),
+              patch('src.binance_client.get_xperp_entry_minutes', return_value=[])):
+            main._track_unsent_venue_setups()
+        resolved.assert_called_once_with(8, 'SL', 0, 0, net_r=-1.0)
+
+    def test_native_shadow_does_not_block_a_later_target_on_an_empty_entry_bar(self):
+        setup = dict(self.setup(), source='stock_xperp_native_shadow', ts=1870.0, signal_bar_ts=900.0)
+        candles = dict(time=[1800, 2700], open=[98.0, 100.0], high=[98.0, 101.25],
+                       low=[98.0, 99.8], close=[98.0, 100.0], volume_contracts=[0, 1],
+                       confirmed=[1, 1])
+        with patch('src.binance_client.get_xperp_entry_minutes') as minutes:
+            value = main._resolve_unsent_venue_setup(setup, candles, now=3600)
+        self.assertEqual(value, ('TP2', 1, 1, 1.0))
+        minutes.assert_not_called()
+
     def test_native_shadow_expires_at_64_bars(self):
         setup = {
             **self.setup(), "source": "stock_xperp_native_shadow",
