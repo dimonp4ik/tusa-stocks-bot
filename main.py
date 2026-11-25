@@ -2472,6 +2472,12 @@ def _at_show_menu(chat_id: int, u: dict, *, notice: str = ""):
     except Exception:
         risk_line = "Проверка лимитов счёта: сохранённые данные недоступны."
     execution_line = _execution_state_text()
+    import sqlite3
+    from src.exit_execution import cash_status
+    try:
+        receipt_line = cash_status(chat_id, time.time())
+    except (ValueError, KeyError, TypeError, ArithmeticError, sqlite3.Error):
+        receipt_line = ""
     tp1_pct = float(u.get("tp1_close_pct") or 0)
     from src.tp1_plan import tp1_setting_label
     tp1_str = tp1_setting_label(u)
@@ -2505,7 +2511,7 @@ def _at_show_menu(chat_id: int, u: dict, *, notice: str = ""):
                   f"Закрытие на TP1: *{tp1_str}*\n"
                   f"Исполнение стратегии: {execution_line}\n\n{risk_line}\n\n"
                   f"Баланс (посл. известный): {bal_str}\nПлечо: 10x, изолированная маржа"
-                  f"{skip_line}\n\n"
+                  f"{skip_line}\n\n{receipt_line}"
                   "_Обычный процент может округлиться до нуля. Режим «50% / минимум лот» "
                   "фиксирует допустимую часть; неделимую позицию — целиком на TP1. "
                   "Настройка действует на новые сделки._",
@@ -5024,6 +5030,9 @@ def start_bot():
         from src.entry_execution import audit_entry_fills
         scheduler.add_job(audit_entry_fills, 'interval', seconds=60,
                           id='entry_fill_verification', next_run_time=datetime.now(timezone.utc))
+        from src.exit_execution import audit_exit_fills
+        scheduler.add_job(audit_exit_fills, 'interval', seconds=60,
+                          id='exit_fill_verification', max_instances=1, coalesce=True)
     if (os.getenv('STOCK_STRUCTURE_OBSERVER_ENABLED','1')=='1'
             or os.getenv('STOCK_MARK_CONTEXT_ENABLED','1')=='1'):
         from apscheduler.executors.pool import ThreadPoolExecutor as SchedulerPool

@@ -464,6 +464,8 @@ def init_db():
         _ensure_column(c, "autotrade_positions", "entry_filled_sz", "REAL")
         _ensure_column(c, "autotrade_positions", "entry_last_fill_ms", "INTEGER")
         _ensure_column(c, "autotrade_positions", "entry_fill_checked_at", "REAL")
+        _ensure_column(c, "autotrade_positions", "exit_receipt_json", "TEXT")
+        _ensure_column(c, "autotrade_positions", "exit_receipt_checked_at", "REAL")
         _ensure_column(c, "autotrade_positions", "client_order_id", "TEXT")
         _ensure_column(c, "autotrade_positions", "entry_submit_started_at", "REAL")
         _ensure_column(c, "autotrade_positions", "entry_account_short_count", "INTEGER")
@@ -2665,6 +2667,43 @@ def at_entry_fill_checks(now: float) -> list:
             ORDER BY p.entry_fill_checked_at ASC, p.entry_submit_started_at DESC LIMIT 4
         """, (now - 3*86400, now - 120)).fetchall()
         return [dict(row) for row in rows]
+
+
+
+def at_exit_fill_checks(now: float) -> list:
+    """Read a bounded batch of recent closures for exchange reconciliation."""
+    with _conn() as c:
+        rows = c.execute("""
+            SELECT p.id, p.user_id, p.signal_id, p.inst_id, p.direction, p.client_order_id,
+                   p.entry_submit_started_at, p.entry_last_fill_ms, p.entry_filled_sz,
+                   p.closed_at, p.sl_algo_id, p.tp1_algo_id, p.tp1_sz, s.status AS signal_status
+            FROM autotrade_positions p
+            JOIN autotrade_users u ON u.user_id = p.user_id AND u.allowed = 1
+            LEFT JOIN signals s ON s.id = p.signal_id
+            WHERE p.status = 'CLOSED' AND p.closed_at >= ? AND p.entry_last_fill_ms IS NOT NULL
+              AND p.client_order_id != '' AND p.sl_algo_id != '' AND p.exit_receipt_json IS NULL
+              AND (p.exit_receipt_checked_at IS NULL OR p.exit_receipt_checked_at <= ?)
+            ORDER BY p.exit_receipt_checked_at ASC, p.closed_at DESC LIMIT 2
+        """, (now - 3 * 86400, now - 180)).fetchall()
+        return [dict(row) for row in rows]
+
+
+def at_record_exit_fill_check(pos_id: int, client_order_id: str, now: float, receipt: dict | None) -> bool:
+    payload = json.dumps(receipt, allow_nan=False) if receipt is not None else None
+    with _conn() as c:
+        return c.execute("""
+            UPDATE autotrade_positions SET exit_receipt_json = ?, exit_receipt_checked_at = ?
+            WHERE id = ? AND client_order_id = ? AND status = 'CLOSED' AND exit_receipt_json IS NULL
+        """, (payload, now, pos_id, client_order_id)).rowcount == 1
+
+
+def at_exit_receipts_for_user(user_id: int, since_ts: float) -> list:
+    with _conn() as c:
+        return [dict(row) for row in c.execute("""
+            SELECT inst_id, exit_receipt_json FROM autotrade_positions
+            WHERE user_id = ? AND status = 'CLOSED' AND closed_at >= ? AND entry_last_fill_ms IS NOT NULL
+              AND client_order_id != '' AND sl_algo_id != ''
+        """, (user_id, since_ts)).fetchall()]
 
 
 def at_record_entry_fill_check(pos_id: int, client_order_id: str, now: float, fill_ms: int | None) -> bool:

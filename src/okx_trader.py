@@ -456,6 +456,19 @@ def get_order_by_client_id(creds: dict, inst_id: str,
         return False, f"order lookup parse failed: {exc}"
 
 
+
+def get_order_by_exchange_id(creds: dict, inst_id: str, order_id: str, *, timeout: int = 2) -> tuple:
+    ok, data = _request(creds, "GET", "/api/v5/trade/order",
+                        params={"instId": inst_id, "ordId": order_id}, timeout=timeout)
+    if not ok:
+        return False, data
+    if not isinstance(data, list) or len(data) != 1 or not isinstance(data[0], dict):
+        return False, "expected one exchange order"
+    if data[0].get("instId") != inst_id or data[0].get("ordId") != order_id:
+        return False, "exchange order identity mismatch"
+    return True, data[0]
+
+
 def get_entry_order_for_release(creds: dict, inst_id: str, client_order_id: str,
                                 submitted_at: float | None, *, now: float) -> tuple:
     """Look up a submitted entry, including recent OKX history after a 51603."""
@@ -633,13 +646,14 @@ def cancel_protection(creds: dict, inst_id: str, algo_id: str) -> tuple:
 
 
 def get_protection_order_ids(creds: dict, inst_id: str, algo_id: str, *,
-                             ord_type: str = 'oco') -> tuple[str, ...] | None:
+                             ord_type: str = 'oco', timeout: int | None = None) -> tuple[str, ...] | None:
     """Look up regular orders created by a specific TP/SL or OCO."""
     if ord_type not in ('oco','conditional'):
         return None
+    opts = {} if timeout is None else {"timeout": timeout}
     ok, rows = _request(creds, "GET", "/api/v5/trade/orders-algo-history",
                         params={"instId": inst_id, "algoId": algo_id,
-                                "ordType": ord_type})
+                                "ordType": ord_type}, **opts)
     if not ok or not isinstance(rows, list) or len(rows) != 1:
         return None
     row = rows[0]
