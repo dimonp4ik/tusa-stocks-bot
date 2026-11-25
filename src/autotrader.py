@@ -883,6 +883,11 @@ def _open_for_account_locked(
             f"ошибка: `{_db_err}`",
         ]))
         raise
+    try:
+        from src.factor_exposure_observer import record as record_exposure
+        record_exposure(intent_id, sig, inst_id, latest_positions, account_snapshot_at)
+    except Exception:
+        log.warning("factor exposure shadow unavailable for position=%s", intent_id)
     if _avg_px and planned > 0:
         sign = 1 if sig["direction"] == "LONG" else -1
         log.info(

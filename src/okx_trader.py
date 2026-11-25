@@ -328,6 +328,7 @@ def get_open_position_margin(creds: dict) -> tuple:
         total = 0.0
         instruments = []
         margin_by_inst = {}
+        side_by_inst = {}
         short_count = unknown_side_count = 0
         for row in data:
             raw_pos = row.get('pos')
@@ -346,6 +347,7 @@ def get_open_position_margin(creds: dict) -> tuple:
                 side = "short" if position < 0 else "long"
             short_count += side == "short"
             unknown_side_count += side not in {"short", "long"}
+            side_by_inst[inst_id] = side if inst_id not in side_by_inst and side in {"long", "short"} else None
             estimates = []
             for field in ('margin', 'imr'):
                 raw = row.get(field)
@@ -374,6 +376,7 @@ def get_open_position_margin(creds: dict) -> tuple:
             'unknown_side_count': unknown_side_count,
             'inst_ids': tuple(sorted(set(instruments))),
             'margin_by_inst': margin_by_inst,
+            'side_by_inst': side_by_inst,
         }
     except (TypeError, ValueError, KeyError, AttributeError) as exc:
         return False, f'position margin parse failed: {exc}'

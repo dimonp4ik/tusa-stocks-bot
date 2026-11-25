@@ -169,7 +169,13 @@ class UnprotectedPositionTests(unittest.TestCase):
             update=stack.enter_context(patch.object(at,'at_update_entry_intent_protection'))
             activate=stack.enter_context(patch.object(at,'at_activate_entry_intent',return_value=True))
             protect=at.okx.place_protection_oco
+            observed = []
+            def fail_observation(position,*_):
+                observed.append((position, protect.called, activate.called))
+                raise RuntimeError('simulated shadow observer failure')
+            stack.enter_context(patch('src.factor_exposure_observer.record',side_effect=fail_observation))
             at._open_for_user(dict(user_id=7,size_mode='percent',size_value=3),sig,'TEST','TEST')
+        self.assertEqual(observed, [(91, True, True)])
         protect.assert_called_once()
         update.assert_called_once()
         self.assertEqual(update.call_args.args[:2], (91, 'algo'))

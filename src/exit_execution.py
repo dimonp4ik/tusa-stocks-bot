@@ -112,9 +112,9 @@ def audit_exit_fills():
             if db.at_record_exit_fill_check(position['id'], position['client_order_id'], time.time(), receipt) and receipt:
                 pnl = receipt['pnl_usdc']
                 outcome = 'positive' if pnl > 0 else 'negative' if pnl < 0 else 'flat'
-                log.info('exit receipt verified signal=%s inst=%s broker_pnl=%s signal_status=%s tp1_filled=%s',
+                log.info('exit receipt verified signal=%s inst=%s broker_pnl=%s signal_status=%s tp1_filled=%s position=%s',
                          position['signal_id'], position['inst_id'], outcome, position['signal_status'],
-                         receipt['tp1_contracts'] > 0)
+                         receipt['tp1_contracts'] > 0, position['id'])
         except (ValueError, TypeError, KeyError, ArithmeticError, OSError) as exc:
             log.warning('Exit fill verification deferred (%s)', type(exc).__name__)
 

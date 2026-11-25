@@ -256,7 +256,8 @@ class SharedCapacityRuntime:
         return self.ready and self.transport is not None and self.clock()-self.last_sync<=180
 
     def _snapshot(self,positions,equity,captured_at):
-        return dict(positions,equity=equity,captured_at=captured_at)
+        capacity_fields = {key:value for key,value in positions.items() if key!='side_by_inst'}
+        return dict(capacity_fields,equity=equity,captured_at=captured_at)
 
     def reserve(self,position_id,account,instrument,intent,margin,positions,equity,captured_at):
         if not self.enabled:
